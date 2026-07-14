@@ -33,8 +33,8 @@ class _DashboardHomeState extends State<DashboardHome> {
     final user = authProvider.user;
 
     const vanillaColor = Color(0xFFF3E5AB);
-    const darkBlueColor = Color(0xFF0F1E36);
-    const cardBgColor = Color(0xFF1B263B);
+    const oldDarkBlueColor = Color(0xFF002D62);
+    const cardBgColor = Color(0xFFFFFDF0);
 
     final List<Widget> tabs = [
       const OverviewTab(),
@@ -45,12 +45,12 @@ class _DashboardHomeState extends State<DashboardHome> {
     ];
 
     return Scaffold(
-      backgroundColor: darkBlueColor,
+      backgroundColor: vanillaColor,
       appBar: AppBar(
-        backgroundColor: cardBgColor,
-        elevation: 0,
+        backgroundColor: oldDarkBlueColor,
+        elevation: 2,
         title: user?['role'] == 'guardian'
-            ? _buildChildSwitcher(context, studentProvider, vanillaColor, cardBgColor)
+            ? _buildChildSwitcher(context, studentProvider, oldDarkBlueColor, cardBgColor)
             : Text(
                 user?['name'] ?? 'Dashboard',
                 style: const TextStyle(color: vanillaColor, fontSize: 18, fontWeight: FontWeight.bold),
@@ -63,11 +63,15 @@ class _DashboardHomeState extends State<DashboardHome> {
                 context: context,
                 builder: (context) => AlertDialog(
                   backgroundColor: cardBgColor,
-                  title: const Text('Logout', style: TextStyle(color: Colors.white)),
-                  content: const Text('Are you sure you want to sign out?', style: TextStyle(color: Colors.white70)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    side: const BorderSide(color: oldDarkBlueColor, width: 1.5),
+                  ),
+                  title: const Text('Logout', style: TextStyle(color: oldDarkBlueColor, fontWeight: FontWeight.bold)),
+                  content: const Text('Are you sure you want to sign out?', style: TextStyle(color: oldDarkBlueColor)),
                   actions: [
                     TextButton(
-                      child: const Text('Cancel', style: TextStyle(color: vanillaColor)),
+                      child: const Text('Cancel', style: TextStyle(color: oldDarkBlueColor, fontWeight: FontWeight.bold)),
                       onPressed: () => Navigator.pop(context),
                     ),
                     ElevatedButton(
@@ -89,7 +93,7 @@ class _DashboardHomeState extends State<DashboardHome> {
         ],
       ),
       body: studentProvider.isLoadingStudents
-          ? const Center(child: CircularProgressIndicator(color: vanillaColor))
+          ? const Center(child: CircularProgressIndicator(color: oldDarkBlueColor))
           : studentProvider.students.isEmpty
               ? _buildEmptyState(user)
               : tabs[_currentIndex],
@@ -99,9 +103,9 @@ class _DashboardHomeState extends State<DashboardHome> {
               currentIndex: _currentIndex,
               onTap: (index) => setState(() => _currentIndex = index),
               type: BottomNavigationBarType.fixed,
-              backgroundColor: cardBgColor,
+              backgroundColor: oldDarkBlueColor,
               selectedItemColor: vanillaColor,
-              unselectedItemColor: Colors.white54,
+              unselectedItemColor: Colors.white60,
               selectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 11),
               unselectedLabelStyle: const TextStyle(fontSize: 10),
               items: const [
@@ -136,20 +140,20 @@ class _DashboardHomeState extends State<DashboardHome> {
   }
 
   Widget _buildChildSwitcher(
-      BuildContext context, StudentProvider provider, Color vanillaColor, Color cardBg) {
+      BuildContext context, StudentProvider provider, Color darkBlue, Color cardBg) {
     if (provider.students.isEmpty) {
-      return Text('Edu+Conect', style: TextStyle(color: vanillaColor, fontWeight: FontWeight.bold));
+      return const Text('Edu+Conect', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold));
     }
     
     final selected = provider.selectedStudent;
     if (selected == null) return const SizedBox();
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+        color: cardBg,
+        borderRadius: BorderRadius.circular(6),
+        border: Border.all(color: darkBlue, width: 1.5),
       ),
       child: DropdownButtonHideUnderline(
         child: DropdownButton<Map<String, dynamic>>(
@@ -158,8 +162,8 @@ class _DashboardHomeState extends State<DashboardHome> {
             orElse: () => provider.students.first,
           ),
           dropdownColor: cardBg,
-          icon: Icon(Icons.keyboard_arrow_down_rounded, color: vanillaColor),
-          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15),
+          icon: const Icon(Icons.keyboard_arrow_down_rounded, color: Colors.black),
+          style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 14),
           items: provider.students.map((dynamic item) {
             final student = item as Map<String, dynamic>;
             return DropdownMenuItem<Map<String, dynamic>>(
@@ -167,9 +171,9 @@ class _DashboardHomeState extends State<DashboardHome> {
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(Icons.face_unlock_rounded, color: vanillaColor, size: 18),
+                  const Icon(Icons.person_rounded, color: Colors.black, size: 18),
                   const SizedBox(width: 8),
-                  Text(student['name'] ?? '', style: const TextStyle(color: Colors.white)),
+                  Text(student['name'] ?? '', style: const TextStyle(color: Colors.black)),
                 ],
               ),
             );
@@ -191,11 +195,11 @@ class _DashboardHomeState extends State<DashboardHome> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.person_off_outlined, size: 72, color: Colors.white.withValues(alpha: 0.3)),
+            Icon(Icons.person_off_outlined, size: 72, color: const Color(0xFF002D62).withValues(alpha: 0.3)),
             const SizedBox(height: 16),
             const Text(
               'No Student Records Found',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Color(0xFF002D62)),
             ),
             const SizedBox(height: 8),
             Text(
@@ -203,7 +207,7 @@ class _DashboardHomeState extends State<DashboardHome> {
                   ? 'Your account has not been linked to any students yet. Please contact the school administration office to link your children.'
                   : 'There are no students registered in your school class yet.',
               textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 14, color: Colors.white.withValues(alpha: 0.6)),
+              style: const TextStyle(fontSize: 14, color: Color(0xFF002D62)),
             ),
           ],
         ),
@@ -218,10 +222,10 @@ class OverviewTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final studentProvider = Provider.of<StudentProvider>(context);
-    const vanillaColor = Color(0xFFF3E5AB);
+    const oldDarkBlueColor = Color(0xFF002D62);
 
     if (studentProvider.isLoadingDashboard || studentProvider.dashboardData == null) {
-      return const Center(child: CircularProgressIndicator(color: vanillaColor));
+      return const Center(child: CircularProgressIndicator(color: oldDarkBlueColor));
     }
 
     final data = studentProvider.dashboardData!;
@@ -233,14 +237,14 @@ class OverviewTab extends StatelessWidget {
 
     return RefreshIndicator(
       onRefresh: () => studentProvider.fetchDashboard(studentProvider.selectedStudent!['id']),
-      color: vanillaColor,
+      color: oldDarkBlueColor,
       child: SingleChildScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Student Class Badge & Velocity Indicator Row
+            // Student Class Badge & Classic Status Row
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -249,19 +253,19 @@ class OverviewTab extends StatelessWidget {
                   children: [
                     Text(
                       studentProvider.selectedStudent!['name'] ?? '',
-                      style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.white),
+                      style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: oldDarkBlueColor),
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      '${studentProvider.selectedStudent!['grade']} • ${studentProvider.selectedStudent!['class_name']}',
-                      style: TextStyle(color: Colors.white.withValues(alpha: 0.6), fontSize: 14),
+                      'Grade ${studentProvider.selectedStudent!['grade']} • ${studentProvider.selectedStudent!['class_name']}',
+                      style: TextStyle(color: oldDarkBlueColor.withValues(alpha: 0.7), fontSize: 14, fontWeight: FontWeight.bold),
                     ),
                   ],
                 ),
-                _buildVelocityBadge(velocityStatus),
+                _buildStatusBadge(velocityStatus),
               ],
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 20),
 
             // Attendance & Fee Snapshot Cards
             Row(
@@ -271,8 +275,8 @@ class OverviewTab extends StatelessWidget {
                     title: 'Attendance YTD',
                     value: '${attendance['percentage']}%',
                     subtitle: '${attendance['present_days']}/${attendance['total_days']} Days Present',
-                    icon: Icons.check_circle_outline_rounded,
-                    color: Colors.greenAccent,
+                    icon: Icons.check_circle_rounded,
+                    color: Colors.green,
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -281,41 +285,41 @@ class OverviewTab extends StatelessWidget {
                     title: 'Fee Balance Due',
                     value: '\$${fee['balance_usd']}',
                     subtitle: '${fee['balance_zig']} ZiG Outstanding',
-                    icon: Icons.receipt_long_outlined,
+                    icon: Icons.assignment_turned_in_rounded,
                     color: double.parse(fee['balance_usd'].toString()) > 0 || double.parse(fee['balance_zig'].toString()) > 0
-                        ? Colors.redAccent
-                        : vanillaColor,
+                        ? Colors.red
+                        : Colors.green,
                   ),
                 ),
               ],
             ),
             const SizedBox(height: 24),
 
-            // Z-Score Academic Trajectory (FL Chart representation)
+            // Academic Trajectory Chart
             const Text(
-              'Z-Score Academic Trajectory',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
+              'Academic Z-Score History',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: oldDarkBlueColor),
             ),
             const SizedBox(height: 12),
-            _buildZScoreChart(zScoreTrend, vanillaColor),
+            _buildZScoreChart(zScoreTrend, oldDarkBlueColor),
             const SizedBox(height: 24),
 
             // Recent Announcements List
-            Row(
+            const Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
+                Text(
                   'Recent School Alerts',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: oldDarkBlueColor),
                 ),
-                Icon(Icons.arrow_forward_ios_rounded, color: Colors.white.withValues(alpha: 0.4), size: 14),
+                Icon(Icons.campaign_rounded, color: oldDarkBlueColor, size: 20),
               ],
             ),
             const SizedBox(height: 12),
             if (announcements.isEmpty)
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 16.0),
-                child: Text('No recent announcements.', style: TextStyle(color: Colors.white.withValues(alpha: 0.4))),
+                child: Text('No recent announcements.', style: TextStyle(color: oldDarkBlueColor.withValues(alpha: 0.5))),
               )
             else
               ListView.separated(
@@ -326,23 +330,14 @@ class OverviewTab extends StatelessWidget {
                 itemBuilder: (context, index) {
                   final alert = announcements[index];
                   return Card(
-                    color: Colors.white.withValues(alpha: 0.04),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      side: BorderSide(color: Colors.white.withValues(alpha: 0.06)),
-                    ),
                     child: ListTile(
-                      leading: Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: vanillaColor.withValues(alpha: 0.1),
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(Icons.campaign, color: vanillaColor, size: 20),
+                      leading: const CircleAvatar(
+                        backgroundColor: oldDarkBlueColor,
+                        child: Icon(Icons.announcement_rounded, color: Color(0xFFF3E5AB), size: 18),
                       ),
                       title: Text(
                         alert['title'] ?? '',
-                        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
+                        style: const TextStyle(color: oldDarkBlueColor, fontWeight: FontWeight.bold, fontSize: 14),
                       ),
                       subtitle: Padding(
                         padding: const EdgeInsets.only(top: 4.0),
@@ -350,43 +345,45 @@ class OverviewTab extends StatelessWidget {
                           alert['content'] ?? '',
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
-                          style: TextStyle(color: Colors.white.withValues(alpha: 0.6), fontSize: 12),
+                          style: TextStyle(color: oldDarkBlueColor.withValues(alpha: 0.8), fontSize: 12),
                         ),
                       ),
                     ),
                   );
                 },
               ),
+            const SizedBox(height: 20),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildVelocityBadge(String status) {
+  // Classic checkmark status badge (removed complex Velocity/AI names)
+  Widget _buildStatusBadge(String status) {
     final isOptimal = status == 'OPTIMAL';
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
         color: isOptimal ? Colors.green.withValues(alpha: 0.1) : Colors.amber.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: isOptimal ? Colors.greenAccent : Colors.amberAccent),
+        borderRadius: BorderRadius.circular(4),
+        border: Border.all(color: isOptimal ? Colors.green : Colors.amber, width: 1.5),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(
-            isOptimal ? Icons.offline_bolt : Icons.warning_amber_rounded,
+            isOptimal ? Icons.check_circle_outline : Icons.warning_amber_rounded,
             size: 14,
-            color: isOptimal ? Colors.greenAccent : Colors.amberAccent,
+            color: isOptimal ? Colors.green : Colors.amber,
           ),
           const SizedBox(width: 4),
           Text(
-            isOptimal ? 'VELOCITY: OPTIMAL' : 'VELOCITY: SLOWING',
+            isOptimal ? 'STATUS: OK' : 'STATUS: ALERT',
             style: TextStyle(
               fontSize: 10,
               fontWeight: FontWeight.bold,
-              color: isOptimal ? Colors.greenAccent : Colors.amberAccent,
+              color: isOptimal ? Colors.green : Colors.amber,
             ),
           ),
         ],
@@ -401,12 +398,20 @@ class OverviewTab extends StatelessWidget {
     required IconData icon,
     required Color color,
   }) {
+    const oldDarkBlueColor = Color(0xFF002D62);
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.04),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.06)),
+        color: const Color(0xFFFFFDF0),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: oldDarkBlueColor, width: 1.5),
+        boxShadow: [
+          BoxShadow(
+            color: oldDarkBlueColor.withValues(alpha: 0.05),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          )
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -414,29 +419,29 @@ class OverviewTab extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(title, style: TextStyle(color: Colors.white.withValues(alpha: 0.5), fontSize: 12)),
+              Text(title, style: TextStyle(color: oldDarkBlueColor.withValues(alpha: 0.6), fontSize: 12, fontWeight: FontWeight.bold)),
               Icon(icon, color: color, size: 20),
             ],
           ),
           const SizedBox(height: 12),
-          Text(value, style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold)),
+          Text(value, style: const TextStyle(color: oldDarkBlueColor, fontSize: 24, fontWeight: FontWeight.bold)),
           const SizedBox(height: 4),
-          Text(subtitle, style: TextStyle(color: Colors.white.withValues(alpha: 0.6), fontSize: 11)),
+          Text(subtitle, style: TextStyle(color: oldDarkBlueColor.withValues(alpha: 0.7), fontSize: 11, fontWeight: FontWeight.w600)),
         ],
       ),
     );
   }
 
-  Widget _buildZScoreChart(List<dynamic> trend, Color vanillaColor) {
+  Widget _buildZScoreChart(List<dynamic> trend, Color darkBlue) {
     if (trend.isEmpty) return const SizedBox();
 
     return Container(
       height: 160,
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.03),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
+        color: const Color(0xFFFFFDF0),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: darkBlue, width: 1.5),
       ),
       child: LineChart(
         LineChartData(
@@ -451,7 +456,7 @@ class OverviewTab extends StatelessWidget {
                   if (idx >= 0 && idx < trend.length) {
                     final term = trend[idx]['term'] as String;
                     final shortTerm = term.contains('Term 1') ? 'T1' : (term.contains('Term 2') ? 'T2' : 'T3');
-                    return Text(shortTerm, style: const TextStyle(color: Colors.white38, fontSize: 10));
+                    return Text(shortTerm, style: TextStyle(color: darkBlue.withValues(alpha: 0.6), fontSize: 10, fontWeight: FontWeight.bold));
                   }
                   return const SizedBox();
                 },
@@ -468,13 +473,13 @@ class OverviewTab extends StatelessWidget {
                 return FlSpot(entry.key.toDouble(), double.parse(entry.value['z_score'].toString()));
               }).toList(),
               isCurved: true,
-              color: vanillaColor,
+              color: darkBlue,
               barWidth: 3,
               isStrokeCapRound: true,
               dotData: const FlDotData(show: true),
               belowBarData: BarAreaData(
                 show: true,
-                color: vanillaColor.withValues(alpha: 0.1),
+                color: darkBlue.withValues(alpha: 0.1),
               ),
             ),
           ],

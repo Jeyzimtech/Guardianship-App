@@ -22,17 +22,15 @@ class _GetStartedScreenState extends State<GetStartedScreen> with TickerProvider
   void initState() {
     super.initState();
     
-    // Fade-in animations for text and illustration
     _fadeController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 1200),
+      duration: const Duration(milliseconds: 1000),
     );
     _fadeInAnimation = CurvedAnimation(
       parent: _fadeController,
       curve: Curves.easeOut,
     );
     
-    // Graduate hat continuous slow rotation/rocking animation when idle
     _hatRotationController = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 2),
@@ -51,7 +49,7 @@ class _GetStartedScreenState extends State<GetStartedScreen> with TickerProvider
   void _onDragUpdate(DragUpdateDetails details) {
     if (_isUnlocked) return;
     
-    final maxDrag = _sliderWidth - _thumbSize - 8.0; // 8.0 for internal padding
+    final maxDrag = _sliderWidth - _thumbSize - 8.0;
     setState(() {
       _dragPosition = (_dragPosition + details.delta.dx).clamp(0.0, maxDrag);
     });
@@ -61,7 +59,6 @@ class _GetStartedScreenState extends State<GetStartedScreen> with TickerProvider
     if (_isUnlocked) return;
     
     final maxDrag = _sliderWidth - _thumbSize - 8.0;
-    // If dragged past 85% of the track, unlock!
     if (_dragPosition >= maxDrag * 0.85) {
       setState(() {
         _dragPosition = maxDrag;
@@ -69,7 +66,6 @@ class _GetStartedScreenState extends State<GetStartedScreen> with TickerProvider
       });
       _navigateToNextScreen();
     } else {
-      // Snap back
       setState(() {
         _dragPosition = 0.0;
       });
@@ -77,7 +73,7 @@ class _GetStartedScreenState extends State<GetStartedScreen> with TickerProvider
   }
 
   void _navigateToNextScreen() {
-    Future.delayed(const Duration(milliseconds: 300), () {
+    Future.delayed(const Duration(milliseconds: 250), () {
       if (mounted) {
         Navigator.of(context).pushReplacement(
           PageRouteBuilder(
@@ -85,7 +81,7 @@ class _GetStartedScreenState extends State<GetStartedScreen> with TickerProvider
             transitionsBuilder: (context, animation, secondaryAnimation, child) {
               return FadeTransition(opacity: animation, child: child);
             },
-            transitionDuration: const Duration(milliseconds: 600),
+            transitionDuration: const Duration(milliseconds: 400),
           ),
         );
       }
@@ -94,12 +90,10 @@ class _GetStartedScreenState extends State<GetStartedScreen> with TickerProvider
 
   @override
   Widget build(BuildContext context) {
-    // Colors based on requested F3E5AB (Vanilla) and Dark Blue (0xFF0F1E36)
     const vanillaColor = Color(0xFFF3E5AB);
-    const darkBlueColor = Color(0xFF0F1E36);
+    const oldDarkBlue = Color(0xFF002D62);
     
     final maxDrag = _sliderWidth - _thumbSize - 8.0;
-    // Calculate opacity of the text inside track based on drag progress
     final double textOpacity = (1.0 - (_dragPosition / maxDrag)).clamp(0.0, 1.0);
 
     return Scaffold(
@@ -122,42 +116,49 @@ class _GetStartedScreenState extends State<GetStartedScreen> with TickerProvider
                       });
                       _navigateToNextScreen();
                     },
-                    icon: const Icon(Icons.play_circle_fill_rounded, color: darkBlueColor, size: 20),
+                    icon: const Icon(Icons.arrow_forward_rounded, color: vanillaColor, size: 16),
                     label: const Text(
                       'Skip',
                       style: TextStyle(
-                        color: darkBlueColor,
+                        color: vanillaColor,
                         fontWeight: FontWeight.bold,
                         fontSize: 14,
                       ),
                     ),
                     style: TextButton.styleFrom(
-                      backgroundColor: Colors.white.withValues(alpha: 0.35),
+                      backgroundColor: oldDarkBlue,
                       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                     ),
                   ),
                 ),
                 
                 const Spacer(),
                 
-                // Illustration / Logo Layout resembling doctor pic
+                // Illustration / Logo Layout
                 Center(
                   child: Stack(
                     alignment: Alignment.center,
                     children: [
-                      // Large Circular Container
+                      // Large Circular Logo Container
                       Container(
-                        width: 250,
-                        height: 250,
+                        width: 260,
+                        height: 260,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: Colors.white.withValues(alpha: 0.4),
-                          border: Border.all(color: Colors.white.withValues(alpha: 0.6), width: 3),
+                          color: Colors.white,
+                          border: Border.all(color: oldDarkBlue, width: 3),
+                          boxShadow: [
+                            BoxShadow(
+                              color: oldDarkBlue.withValues(alpha: 0.15),
+                              blurRadius: 10,
+                              offset: const Offset(0, 4),
+                            )
+                          ],
                         ),
                         child: ClipOval(
                           child: Padding(
-                            padding: const EdgeInsets.all(32.0),
+                            padding: const EdgeInsets.all(12.0),
                             child: Image.asset(
                               'assets/logo.png',
                               fit: BoxFit.contain,
@@ -166,45 +167,31 @@ class _GetStartedScreenState extends State<GetStartedScreen> with TickerProvider
                         ),
                       ),
                       
-                      // Overlapping small avatar with student image
+                      // Overlapping small avatar with classic student icon (No face unlock/AI icons)
                       Positioned(
-                        top: 0,
-                        left: 10,
+                        top: 4,
+                        left: 4,
                         child: Container(
-                          width: 80,
-                          height: 80,
+                          width: 72,
+                          height: 72,
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             color: Colors.white,
                             boxShadow: [
                               BoxShadow(
                                 color: Colors.black.withValues(alpha: 0.1),
-                                blurRadius: 10,
-                                offset: const Offset(0, 4),
+                                blurRadius: 6,
+                                offset: const Offset(0, 3),
                               )
                             ],
-                            border: Border.all(color: Colors.white, width: 3),
+                            border: Border.all(color: oldDarkBlue, width: 2),
                           ),
                           child: const ClipOval(
                             child: Icon(
-                              Icons.face_unlock_rounded,
-                              size: 44,
-                              color: darkBlueColor,
+                              Icons.people_rounded,
+                              size: 38,
+                              color: oldDarkBlue,
                             ),
-                          ),
-                        ),
-                      ),
-                      
-                      // Floating Orange/Vanilla Circle in background
-                      Positioned(
-                        right: 12,
-                        bottom: 40,
-                        child: Container(
-                          width: 28,
-                          height: 28,
-                          decoration: const BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: Colors.orangeAccent,
                           ),
                         ),
                       ),
@@ -216,11 +203,11 @@ class _GetStartedScreenState extends State<GetStartedScreen> with TickerProvider
                 
                 // App Title
                 const Text(
-                  'Welcome to Edu+Conect',
+                  'Edu+Conect',
                   style: TextStyle(
-                    fontSize: 28,
+                    fontSize: 32,
                     fontWeight: FontWeight.bold,
-                    color: darkBlueColor,
+                    color: oldDarkBlue,
                     letterSpacing: 0.5,
                   ),
                 ),
@@ -230,11 +217,12 @@ class _GetStartedScreenState extends State<GetStartedScreen> with TickerProvider
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16.0),
                   child: Text(
-                    'Easily access student records, attendance, outstanding fee balances and reports securely.',
+                    'The official single channel for parent-school communication, attendance, fee balances, and report cards.',
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      fontSize: 14,
-                      color: darkBlueColor.withValues(alpha: 0.7),
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                      color: oldDarkBlue.withValues(alpha: 0.8),
                       height: 1.4,
                     ),
                   ),
@@ -242,18 +230,19 @@ class _GetStartedScreenState extends State<GetStartedScreen> with TickerProvider
                 
                 const Spacer(),
                 
-                // Swipe to Unlock Slider
+                // Swipe to Unlock Slider (Classic look)
                 Container(
                   width: _sliderWidth,
                   height: 68,
                   decoration: BoxDecoration(
-                    color: darkBlueColor,
-                    borderRadius: BorderRadius.circular(40),
+                    color: oldDarkBlue,
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: oldDarkBlue, width: 2),
                     boxShadow: [
                       BoxShadow(
-                        color: darkBlueColor.withValues(alpha: 0.25),
-                        blurRadius: 12,
-                        offset: const Offset(0, 6),
+                        color: oldDarkBlue.withValues(alpha: 0.15),
+                        blurRadius: 8,
+                        offset: const Offset(0, 4),
                       )
                     ],
                   ),
@@ -270,7 +259,7 @@ class _GetStartedScreenState extends State<GetStartedScreen> with TickerProvider
                               Text(
                                 'Swipe to get started',
                                 style: TextStyle(
-                                  color: vanillaColor.withValues(alpha: 0.8),
+                                  color: vanillaColor.withValues(alpha: 0.9),
                                   fontWeight: FontWeight.bold,
                                   fontSize: 14,
                                 ),
@@ -278,7 +267,7 @@ class _GetStartedScreenState extends State<GetStartedScreen> with TickerProvider
                               const SizedBox(width: 8),
                               Icon(
                                 Icons.keyboard_double_arrow_right_rounded,
-                                color: vanillaColor.withValues(alpha: 0.8),
+                                color: vanillaColor.withValues(alpha: 0.9),
                                 size: 16,
                               ),
                             ],
@@ -297,27 +286,20 @@ class _GetStartedScreenState extends State<GetStartedScreen> with TickerProvider
                             height: _thumbSize,
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
-                              color: Colors.white,
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withValues(alpha: 0.15),
-                                  blurRadius: 6,
-                                  offset: const Offset(0, 3),
-                                )
-                              ],
+                              color: vanillaColor,
+                              border: Border.all(color: oldDarkBlue, width: 2),
                             ),
                             child: Center(
                               // Animated Moving Graduate Hat Icon!
                               child: AnimatedBuilder(
                                 animation: _hatRotationController,
                                 builder: (context, child) {
-                                  // Map animation to rocking rotation (-0.1 to 0.1 radians)
                                   final double angle = (_hatRotationController.value * 0.2) - 0.1;
                                   return Transform.rotate(
                                     angle: angle,
                                     child: const Icon(
                                       Icons.school_rounded,
-                                      color: darkBlueColor,
+                                      color: oldDarkBlue,
                                       size: 28,
                                     ),
                                   );

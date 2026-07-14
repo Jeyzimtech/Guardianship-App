@@ -29,29 +29,82 @@ class EduConectApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const vanillaColor = Color(0xFFF3E5AB);
-    const darkBlueColor = Color(0xFF0F1E36);
-    const slateDarkColor = Color(0xFF1E293B);
+    const oldDarkBlueColor = Color(0xFF002D62);
+    const cardBgColor = Color(0xFFFFFDF0);
 
     return MaterialApp(
       title: 'Edu+Conect',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        brightness: Brightness.dark,
-        primaryColor: darkBlueColor,
-        scaffoldBackgroundColor: darkBlueColor,
-        colorScheme: const ColorScheme.dark(
-          primary: vanillaColor,
-          secondary: vanillaColor,
-          surface: slateDarkColor,
-          background: darkBlueColor,
+        brightness: Brightness.light,
+        primaryColor: oldDarkBlueColor,
+        scaffoldBackgroundColor: vanillaColor,
+        colorScheme: const ColorScheme.light(
+          primary: oldDarkBlueColor,
+          secondary: oldDarkBlueColor,
+          surface: cardBgColor,
+          background: vanillaColor,
         ),
         fontFamily: 'Inter',
         useMaterial3: true,
-        dropdownMenuTheme: const DropdownMenuThemeData(
-          textStyle: TextStyle(color: Colors.white),
+        cardTheme: CardThemeData(
+          color: cardBgColor,
+          elevation: 2,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+            side: const BorderSide(color: oldDarkBlueColor, width: 1.5),
+          ),
+        ),
+        textTheme: const TextTheme(
+          bodyLarge: TextStyle(color: oldDarkBlueColor),
+          bodyMedium: TextStyle(color: oldDarkBlueColor),
+          titleLarge: TextStyle(color: oldDarkBlueColor, fontWeight: FontWeight.bold),
+        ),
+        appBarTheme: const AppBarTheme(
+          backgroundColor: oldDarkBlueColor,
+          foregroundColor: vanillaColor,
+          elevation: 2,
+          iconTheme: IconThemeData(color: vanillaColor),
+        ),
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: oldDarkBlueColor,
+            foregroundColor: vanillaColor,
+            elevation: 2,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+              side: const BorderSide(color: oldDarkBlueColor),
+            ),
+            textStyle: const TextStyle(fontWeight: FontWeight.bold),
+          ),
+        ),
+        outlinedButtonTheme: OutlinedButtonThemeData(
+          style: OutlinedButton.styleFrom(
+            foregroundColor: oldDarkBlueColor,
+            side: const BorderSide(color: oldDarkBlueColor, width: 1.5),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            textStyle: const TextStyle(fontWeight: FontWeight.bold),
+          ),
+        ),
+        inputDecorationTheme: InputDecorationTheme(
+          filled: true,
+          fillColor: cardBgColor,
+          labelStyle: const TextStyle(color: oldDarkBlueColor),
+          hintStyle: TextStyle(color: oldDarkBlueColor.withValues(alpha: 0.5)),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8),
+            borderSide: const BorderSide(color: oldDarkBlueColor, width: 1.5),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8),
+            borderSide: const BorderSide(color: oldDarkBlueColor, width: 1.5),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8),
+            borderSide: const BorderSide(color: oldDarkBlueColor, width: 2.5),
+          ),
         ),
       ),
-      // Starts onboarding first
       home: const GetStartedScreen(),
     );
   }

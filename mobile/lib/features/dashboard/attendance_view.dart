@@ -51,18 +51,17 @@ class _AttendanceViewState extends State<AttendanceView> {
   @override
   Widget build(BuildContext context) {
     const vanillaColor = Color(0xFFF3E5AB);
-    const cardBgColor = Color(0xFF1B263B);
-    const darkBlueColor = Color(0xFF0F1E36);
+    const oldDarkBlue = Color(0xFF002D62);
 
     return Scaffold(
-      backgroundColor: darkBlueColor,
+      backgroundColor: vanillaColor,
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator(color: vanillaColor))
+          ? const Center(child: CircularProgressIndicator(color: oldDarkBlue))
           : _errorMessage != null
-              ? Center(child: Text(_errorMessage!, style: const TextStyle(color: Colors.white70)))
+              ? Center(child: Text(_errorMessage!, style: const TextStyle(color: oldDarkBlue, fontWeight: FontWeight.bold)))
               : RefreshIndicator(
                   onRefresh: _fetchAttendance,
-                  color: vanillaColor,
+                  color: oldDarkBlue,
                   child: ListView.builder(
                     padding: const EdgeInsets.all(16),
                     itemCount: _attendance.isEmpty ? 1 : _attendance.length,
@@ -73,11 +72,11 @@ class _AttendanceViewState extends State<AttendanceView> {
                             padding: const EdgeInsets.only(top: 100.0),
                             child: Column(
                               children: [
-                                Icon(Icons.calendar_month_outlined, size: 64, color: Colors.white.withValues(alpha: 0.3)),
+                                Icon(Icons.calendar_month_rounded, size: 64, color: oldDarkBlue.withValues(alpha: 0.3)),
                                 const SizedBox(height: 16),
                                 Text(
                                   'No attendance data logged yet.',
-                                  style: TextStyle(color: Colors.white.withValues(alpha: 0.5)),
+                                  style: TextStyle(color: oldDarkBlue.withValues(alpha: 0.6), fontWeight: FontWeight.bold),
                                 ),
                               ],
                             ),
@@ -89,39 +88,35 @@ class _AttendanceViewState extends State<AttendanceView> {
                       final isPresent = record['status'] == 'present';
 
                       return Card(
-                        color: cardBgColor,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                          side: BorderSide(color: Colors.white.withValues(alpha: 0.05)),
-                        ),
                         margin: const EdgeInsets.only(bottom: 10),
                         child: ListTile(
                           contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
                           leading: Icon(
                             isPresent ? Icons.check_circle_rounded : Icons.cancel_rounded,
-                            color: isPresent ? Colors.greenAccent : Colors.redAccent,
+                            color: isPresent ? Colors.green : Colors.red,
                             size: 28,
                           ),
                           title: Text(
                             record['date'] ?? '',
-                            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                            style: const TextStyle(color: oldDarkBlue, fontWeight: FontWeight.bold),
                           ),
                           subtitle: Text(
                             record['subject_name'] != null
                                 ? 'Subject: ${record['subject_name']}'
                                 : 'Daily Roster',
-                            style: TextStyle(color: Colors.white.withValues(alpha: 0.5), fontSize: 12),
+                            style: TextStyle(color: oldDarkBlue.withValues(alpha: 0.6), fontSize: 12, fontWeight: FontWeight.bold),
                           ),
                           trailing: Container(
                             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                             decoration: BoxDecoration(
                               color: isPresent ? Colors.green.withValues(alpha: 0.1) : Colors.red.withValues(alpha: 0.1),
-                              borderRadius: BorderRadius.circular(8),
+                              borderRadius: BorderRadius.circular(4),
+                              border: Border.all(color: isPresent ? Colors.green : Colors.red, width: 1),
                             ),
                             child: Text(
                               isPresent ? 'Present' : 'Absent',
                               style: TextStyle(
-                                color: isPresent ? Colors.greenAccent : Colors.redAccent,
+                                color: isPresent ? Colors.green : Colors.red,
                                 fontSize: 12,
                                 fontWeight: FontWeight.bold,
                               ),
