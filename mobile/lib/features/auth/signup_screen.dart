@@ -11,10 +11,10 @@ class SignupScreen extends StatefulWidget {
 }
 
 class _SignupScreenState extends State<SignupScreen> {
-  final _nameController = TextEditingController();
-  final _emailController = TextEditingController();
-  final _passwordController = TextEditingController();
-  final _confirmPasswordController = TextEditingController();
+  final _nameController = TextEditingController(text: 'John Doe');
+  final _emailController = TextEditingController(text: 'parent@educonect.com');
+  final _passwordController = TextEditingController(text: 'password123');
+  final _confirmPasswordController = TextEditingController(text: 'password123');
   String _selectedRole = 'Parent'; // Parent or Teacher
   bool _isObscuredPassword = true;
   bool _isObscuredConfirm = true;
