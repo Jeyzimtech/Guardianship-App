@@ -202,7 +202,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               children: [
                                 IconButton(
                                   onPressed: () => setState(() => _otpSent = false),
-                                  icon: const Icon(Icons.arrow_back, color: Colors.white75),
+                                   icon: const Icon(Icons.arrow_back, color: Colors.white70),
                                 ),
                                 const Text(
                                   'Verify OTP',
@@ -289,7 +289,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           onPressed: _isAuthenticating
                               ? null
                               : () => _demoLogin('+263773333333', 'Guardian John Doe', 'guardian'),
-                          icon: const Icon(Icons.parent_rounded, size: 18),
+                          icon: const Icon(Icons.people_rounded, size: 18),
                           label: const Text('As Parent'),
                           style: OutlinedButton.styleFrom(
                             foregroundColor: Colors.tealAccent,

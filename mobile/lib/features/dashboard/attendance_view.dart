@@ -94,7 +94,7 @@ class _AttendanceViewState extends State<AttendanceView> {
                           contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
                           leading: Icon(
                             isPresent ? Icons.check_circle_rounded : Icons.cancel_rounded,
-                            color: isPresent ? Colors.emeraldAccent : Colors.redAccent,
+                            color: isPresent ? Colors.greenAccent : Colors.redAccent,
                             size: 28,
                           ),
                           title: Text(
@@ -110,13 +110,13 @@ class _AttendanceViewState extends State<AttendanceView> {
                           trailing: Container(
                             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                             decoration: BoxDecoration(
-                              color: isPresent ? Colors.emerald.withOpacity(0.1) : Colors.red.withOpacity(0.1),
+                              color: isPresent ? Colors.green.withOpacity(0.1) : Colors.red.withOpacity(0.1),
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: Text(
                               isPresent ? 'Present' : 'Absent',
                               style: TextStyle(
-                                color: isPresent ? Colors.emeraldAccent : Colors.redAccent,
+                                color: isPresent ? Colors.greenAccent : Colors.redAccent,
                                 fontSize: 12,
                                 fontWeight: FontWeight.bold,
                               ),
