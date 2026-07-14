@@ -11,7 +11,7 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final _emailController = TextEditingController(text: 'parent@educonect.com');
+  final _emailController = TextEditingController(text: 'parent@chewe.tech');
   final _passwordController = TextEditingController(text: 'password123');
   bool _isObscured = true;
   bool _isAuthenticating = false;
@@ -54,27 +54,6 @@ class _LoginScreenState extends State<LoginScreen> {
     if (!success && mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(authProvider.errorMessage ?? 'Authentication failed.')),
-      );
-    }
-  }
-
-  void _demoLogin(String phone, String name, String role) async {
-    setState(() {
-      _isAuthenticating = true;
-    });
-
-    final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    final mockToken = 'mock-firebase-token-$phone-uid_${role}_123';
-    
-    final success = await authProvider.loginWithFirebaseToken(mockToken);
-    
-    setState(() {
-      _isAuthenticating = false;
-    });
-
-    if (!success && mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(authProvider.errorMessage ?? 'Demo Login failed.')),
       );
     }
   }
@@ -247,54 +226,6 @@ class _LoginScreenState extends State<LoginScreen> {
                           fontWeight: FontWeight.bold,
                           decoration: TextDecoration.underline,
                           fontSize: 14,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-
-                const SizedBox(height: 24),
-                // Quick Demo Login Options
-                const Text(
-                  'QUICK DEMO ACCESSIBILITY',
-                  style: TextStyle(
-                    color: oldDarkBlue,
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 1.1,
-                  ),
-                ),
-                const SizedBox(height: 12),
-                Row(
-                  children: [
-                    Expanded(
-                      child: OutlinedButton.icon(
-                        onPressed: _isAuthenticating
-                            ? null
-                            : () => _demoLogin('+263773333333', 'Guardian John Doe', 'guardian'),
-                        icon: const Icon(Icons.person_rounded, size: 18),
-                        label: const Text('As Parent'),
-                        style: OutlinedButton.styleFrom(
-                          foregroundColor: oldDarkBlue,
-                          side: const BorderSide(color: oldDarkBlue, width: 1.5),
-                          padding: const EdgeInsets.symmetric(vertical: 14),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: OutlinedButton.icon(
-                        onPressed: _isAuthenticating
-                            ? null
-                            : () => _demoLogin('+263772222222', 'Teacher Grace', 'teacher'),
-                        icon: const Icon(Icons.school_rounded, size: 18),
-                        label: const Text('As Teacher'),
-                        style: OutlinedButton.styleFrom(
-                          foregroundColor: oldDarkBlue,
-                          side: const BorderSide(color: oldDarkBlue, width: 1.5),
-                          padding: const EdgeInsets.symmetric(vertical: 14),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                         ),
                       ),
                     ),

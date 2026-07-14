@@ -58,8 +58,8 @@ class DatabaseSeeder extends Seeder
         ]);
 
         $guardian = User::create([
-            'name' => 'Guardian John Doe',
-            'email' => 'john.doe@gmail.com',
+            'name' => 'Guardian John Chewe',
+            'email' => 'john.chewe@gmail.com',
             'phone_number' => '+263773333333',
             'firebase_uid' => 'mock_uid_guardian_123',
             'role' => 'guardian',
@@ -76,7 +76,7 @@ class DatabaseSeeder extends Seeder
         // 4. Create Students
         $student1 = Student::create([
             'school_id' => $prepSchool->id,
-            'name' => 'Alice Doe',
+            'name' => 'Alice Chewe',
             'grade' => 'ECD B',
             'class_name' => 'Butterflies',
             'dob' => '2021-05-14',
@@ -84,7 +84,7 @@ class DatabaseSeeder extends Seeder
 
         $student2 = Student::create([
             'school_id' => $primarySchool->id,
-            'name' => 'Bob Doe',
+            'name' => 'Bob Chewe',
             'grade' => 'Grade 4',
             'class_name' => 'Gold',
             'dob' => '2017-08-22',

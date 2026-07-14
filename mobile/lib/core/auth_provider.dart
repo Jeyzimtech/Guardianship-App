@@ -65,7 +65,7 @@ class AuthProvider extends ChangeNotifier {
       final isTeacher = firebaseIdToken.contains('teacher') || firebaseIdToken.contains('+263772222222');
       _token = 'mock-local-token-123456';
       _user = {
-        'name': isTeacher ? 'Teacher Grace' : 'Guardian John Doe',
+        'name': isTeacher ? 'Teacher Grace' : 'Guardian John Chewe',
         'role': isTeacher ? 'teacher' : 'guardian',
         'phone_number': isTeacher ? '+263772222222' : '+263773333333',
       };

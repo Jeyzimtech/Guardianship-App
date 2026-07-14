@@ -63,14 +63,14 @@ class GuardianshipApiTest extends TestCase
 
         $this->student1 = Student::create([
             'school_id' => $this->school->id,
-            'name' => 'Alice Doe',
+            'name' => 'Alice Chewe',
             'grade' => 'Grade 1',
             'class_name' => 'Green',
         ]);
 
         $this->student2 = Student::create([
             'school_id' => $this->school->id,
-            'name' => 'Bob Doe',
+            'name' => 'Bob Chewe',
             'grade' => 'Grade 4',
             'class_name' => 'Blue',
         ]);
@@ -156,8 +156,8 @@ class GuardianshipApiTest extends TestCase
 
         $response->assertStatus(200)
             ->assertJsonCount(2, 'students')
-            ->assertJsonPath('students.0.name', 'Alice Doe')
-            ->assertJsonPath('students.1.name', 'Bob Doe');
+            ->assertJsonPath('students.0.name', 'Alice Chewe')
+            ->assertJsonPath('students.1.name', 'Bob Chewe');
     }
 
     /**

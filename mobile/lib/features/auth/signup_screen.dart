@@ -11,8 +11,8 @@ class SignupScreen extends StatefulWidget {
 }
 
 class _SignupScreenState extends State<SignupScreen> {
-  final _nameController = TextEditingController(text: 'John Doe');
-  final _emailController = TextEditingController(text: 'parent@educonect.com');
+  final _nameController = TextEditingController(text: 'John Chewe');
+  final _emailController = TextEditingController(text: 'parent@chewe.tech');
   final _passwordController = TextEditingController(text: 'password123');
   final _confirmPasswordController = TextEditingController(text: 'password123');
   String _selectedRole = 'Parent'; // Parent or Teacher

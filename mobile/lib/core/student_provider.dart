@@ -40,17 +40,17 @@ class StudentProvider extends ChangeNotifier {
         }
       }
     } catch (e) {
-      // Offline fallback: load mock student list for John Doe (Guardian)
+      // Offline fallback: load mock student list for John Chewe (Guardian)
       _students = [
         {
           'id': 1,
-          'name': 'Alice Doe',
+          'name': 'Alice Chewe',
           'grade': '4',
           'class_name': '4A',
         },
         {
           'id': 2,
-          'name': 'Bob Doe',
+          'name': 'Bob Chewe',
           'grade': '2',
           'class_name': '2B',
         }
