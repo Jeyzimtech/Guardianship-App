@@ -65,16 +65,12 @@ class _PaymentsViewState extends State<PaymentsView> {
       return;
     }
 
-    const oldDarkBlue = Color(0xFF002D62);
-    const cardBgColor = Color(0xFFFFFDF0);
-
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: cardBgColor,
+      backgroundColor: Colors.white,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(10)),
-        side: BorderSide(color: oldDarkBlue, width: 1.5),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
       builder: (context) {
         return PaymentForm(
@@ -93,35 +89,36 @@ class _PaymentsViewState extends State<PaymentsView> {
 
   @override
   Widget build(BuildContext context) {
-    const vanillaColor = Color(0xFFF3E5AB);
-    const oldDarkBlue = Color(0xFF002D62);
+    final theme = Theme.of(context);
+    final primaryColor = theme.primaryColor;
+    final backgroundColor = theme.scaffoldBackgroundColor;
 
     return Scaffold(
-      backgroundColor: vanillaColor,
+      backgroundColor: backgroundColor,
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator(color: oldDarkBlue))
+          ? Center(child: CircularProgressIndicator(color: primaryColor))
           : _errorMessage != null
-              ? Center(child: Text(_errorMessage!, style: const TextStyle(color: oldDarkBlue, fontWeight: FontWeight.bold)))
+               ? Center(child: Text(_errorMessage!, style: TextStyle(color: primaryColor, fontWeight: FontWeight.bold)))
               : RefreshIndicator(
                   onRefresh: _fetchFeeDetails,
-                  color: oldDarkBlue,
+                  color: primaryColor,
                   child: SingleChildScrollView(
                     physics: const AlwaysScrollableScrollPhysics(),
                     padding: const EdgeInsets.all(16),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _buildBalanceHeader(vanillaColor, oldDarkBlue),
+                        _buildBalanceHeader(context),
                         const SizedBox(height: 24),
                         
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            const Text(
+                            Text(
                               'Payment History',
-                              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: oldDarkBlue),
+                              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: primaryColor),
                             ),
-                            Icon(Icons.history_rounded, color: oldDarkBlue.withValues(alpha: 0.5), size: 18),
+                            Icon(Icons.history_rounded, color: primaryColor.withValues(alpha: 0.5), size: 18),
                           ],
                         ),
                         const SizedBox(height: 12),
@@ -132,7 +129,7 @@ class _PaymentsViewState extends State<PaymentsView> {
                             child: Center(
                               child: Text(
                                 'No payment transactions recorded yet.',
-                                style: TextStyle(color: oldDarkBlue.withValues(alpha: 0.6), fontWeight: FontWeight.bold),
+                                style: TextStyle(color: primaryColor.withValues(alpha: 0.6), fontWeight: FontWeight.bold),
                               ),
                             ),
                           )
@@ -146,19 +143,20 @@ class _PaymentsViewState extends State<PaymentsView> {
                               final isCompleted = tx['status'] == 'completed';
 
                               return Card(
+                                elevation: 0,
                                 margin: const EdgeInsets.only(bottom: 10),
                                 child: ListTile(
-                                  leading: const CircleAvatar(
-                                    backgroundColor: oldDarkBlue,
-                                    child: Icon(Icons.arrow_upward_rounded, color: vanillaColor, size: 20),
+                                  leading: CircleAvatar(
+                                    backgroundColor: theme.colorScheme.secondary.withValues(alpha: 0.1),
+                                    child: Icon(Icons.arrow_upward_rounded, color: theme.colorScheme.secondary, size: 20),
                                   ),
                                   title: Text(
                                     'Fee Payment via ${tx['payment_method']}',
-                                    style: const TextStyle(color: oldDarkBlue, fontWeight: FontWeight.bold, fontSize: 14),
+                                    style: TextStyle(color: primaryColor, fontWeight: FontWeight.bold, fontSize: 14),
                                   ),
                                   subtitle: Text(
                                     tx['created_at']?.split('T')[0] ?? '',
-                                    style: TextStyle(color: oldDarkBlue.withValues(alpha: 0.6), fontSize: 12, fontWeight: FontWeight.bold),
+                                    style: TextStyle(color: primaryColor.withValues(alpha: 0.6), fontSize: 12, fontWeight: FontWeight.w500),
                                   ),
                                   trailing: Column(
                                     mainAxisAlignment: MainAxisAlignment.center,
@@ -190,7 +188,9 @@ class _PaymentsViewState extends State<PaymentsView> {
     );
   }
 
-  Widget _buildBalanceHeader(Color vanillaColor, Color oldDarkBlue) {
+  Widget _buildBalanceHeader(BuildContext context) {
+    final theme = Theme.of(context);
+    final primaryColor = theme.primaryColor;
     double balanceUsd = double.parse(_feeAccount?['balance_usd']?.toString() ?? '0.0');
     double balanceZig = double.parse(_feeAccount?['balance_zig']?.toString() ?? '0.0');
     bool hasFees = balanceUsd > 0 || balanceZig > 0;
@@ -199,14 +199,14 @@ class _PaymentsViewState extends State<PaymentsView> {
       width: double.infinity,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: const Color(0xFFFFFDF0),
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: oldDarkBlue, width: 2),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: const Color(0xFFE2E8F0), width: 1.0),
         boxShadow: [
           BoxShadow(
-            color: oldDarkBlue.withValues(alpha: 0.1),
-            blurRadius: 6,
-            offset: const Offset(0, 3),
+            color: Colors.black.withValues(alpha: 0.02),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
           )
         ],
       ),
@@ -216,13 +216,13 @@ class _PaymentsViewState extends State<PaymentsView> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('OUTSTANDING BALANCE', style: TextStyle(color: oldDarkBlue, fontSize: 12, fontWeight: FontWeight.bold, letterSpacing: 1.1)),
+              Text('OUTSTANDING BALANCE', style: TextStyle(color: primaryColor.withValues(alpha: 0.5), fontSize: 12, fontWeight: FontWeight.bold, letterSpacing: 1.1)),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
-                  color: hasFees ? Colors.red.withValues(alpha: 0.1) : Colors.green.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(4),
-                  border: Border.all(color: hasFees ? Colors.red : Colors.green, width: 1.5),
+                  color: hasFees ? Colors.red.withValues(alpha: 0.08) : Colors.green.withValues(alpha: 0.08),
+                  borderRadius: BorderRadius.circular(6),
+                  border: Border.all(color: hasFees ? Colors.red.withValues(alpha: 0.5) : Colors.green.withValues(alpha: 0.5), width: 1.0),
                 ),
                 child: Text(
                   hasFees ? 'PAYMENT DUE' : 'CLEARED',
@@ -237,16 +237,16 @@ class _PaymentsViewState extends State<PaymentsView> {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('\$$balanceUsd', style: TextStyle(color: oldDarkBlue, fontSize: 32, fontWeight: FontWeight.bold)),
-                  Text('USD Balance', style: TextStyle(color: oldDarkBlue, fontSize: 12, fontWeight: FontWeight.bold)),
+                  Text('\$$balanceUsd', style: TextStyle(color: primaryColor, fontSize: 32, fontWeight: FontWeight.bold)),
+                  Text('USD Balance', style: TextStyle(color: primaryColor.withValues(alpha: 0.6), fontSize: 12, fontWeight: FontWeight.bold)),
                 ],
               ),
               const SizedBox(width: 48),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('${balanceZig.toInt()} ZiG', style: TextStyle(color: oldDarkBlue, fontSize: 32, fontWeight: FontWeight.bold)),
-                  Text('ZiG Balance', style: TextStyle(color: oldDarkBlue, fontSize: 12, fontWeight: FontWeight.bold)),
+                  Text('${balanceZig.toInt()} ZiG', style: TextStyle(color: primaryColor, fontSize: 32, fontWeight: FontWeight.bold)),
+                  Text('ZiG Balance', style: TextStyle(color: primaryColor.withValues(alpha: 0.6), fontSize: 12, fontWeight: FontWeight.bold)),
                 ],
               ),
             ],
@@ -258,10 +258,11 @@ class _PaymentsViewState extends State<PaymentsView> {
               icon: const Icon(Icons.payment_rounded, size: 18),
               label: const Text('Pay Outstanding Fees', style: TextStyle(fontWeight: FontWeight.bold)),
               style: ElevatedButton.styleFrom(
-                backgroundColor: oldDarkBlue,
-                foregroundColor: vanillaColor,
+                backgroundColor: primaryColor,
+                foregroundColor: Colors.white,
                 minimumSize: const Size(double.infinity, 48),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                elevation: 0,
               ),
             )
           else
@@ -350,8 +351,8 @@ class _PaymentFormState extends State<PaymentForm> {
 
   @override
   Widget build(BuildContext context) {
-    const vanillaColor = Color(0xFFF3E5AB);
-    const oldDarkBlue = Color(0xFF002D62);
+    final theme = Theme.of(context);
+    final primaryColor = theme.primaryColor;
     
     return Padding(
       padding: EdgeInsets.only(
@@ -367,8 +368,8 @@ class _PaymentFormState extends State<PaymentForm> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text('Make School Payment', style: TextStyle(color: oldDarkBlue, fontSize: 18, fontWeight: FontWeight.bold)),
-              IconButton(icon: const Icon(Icons.close, color: oldDarkBlue), onPressed: () => Navigator.pop(context)),
+              Text('Make School Payment', style: TextStyle(color: primaryColor, fontSize: 18, fontWeight: FontWeight.bold)),
+              IconButton(icon: Icon(Icons.close, color: primaryColor), onPressed: () => Navigator.pop(context)),
             ],
           ),
           const SizedBox(height: 16),
@@ -379,10 +380,10 @@ class _PaymentFormState extends State<PaymentForm> {
                 child: ChoiceChip(
                   label: const Center(child: Text('USD')),
                   selected: _selectedCurrency == 'USD',
-                  selectedColor: oldDarkBlue,
+                  selectedColor: primaryColor,
                   backgroundColor: Colors.white,
-                  labelStyle: TextStyle(color: _selectedCurrency == 'USD' ? vanillaColor : oldDarkBlue, fontWeight: FontWeight.bold),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6), side: const BorderSide(color: oldDarkBlue)),
+                  labelStyle: TextStyle(color: _selectedCurrency == 'USD' ? Colors.white : primaryColor, fontWeight: FontWeight.bold),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8), side: BorderSide(color: _selectedCurrency == 'USD' ? primaryColor : const Color(0xFFE2E8F0))),
                   onSelected: (val) {
                     if (val) {
                       setState(() {
@@ -398,10 +399,10 @@ class _PaymentFormState extends State<PaymentForm> {
                 child: ChoiceChip(
                   label: const Center(child: Text('ZiG')),
                   selected: _selectedCurrency == 'ZiG',
-                  selectedColor: oldDarkBlue,
+                  selectedColor: primaryColor,
                   backgroundColor: Colors.white,
-                  labelStyle: TextStyle(color: _selectedCurrency == 'ZiG' ? vanillaColor : oldDarkBlue, fontWeight: FontWeight.bold),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6), side: const BorderSide(color: oldDarkBlue)),
+                  labelStyle: TextStyle(color: _selectedCurrency == 'ZiG' ? Colors.white : primaryColor, fontWeight: FontWeight.bold),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8), side: BorderSide(color: _selectedCurrency == 'ZiG' ? primaryColor : const Color(0xFFE2E8F0))),
                   onSelected: (val) {
                     if (val) {
                       setState(() {
@@ -419,26 +420,26 @@ class _PaymentFormState extends State<PaymentForm> {
           TextField(
             controller: _amountController,
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
-            style: const TextStyle(color: oldDarkBlue, fontWeight: FontWeight.bold),
+            style: TextStyle(color: primaryColor, fontWeight: FontWeight.bold),
             decoration: InputDecoration(
               labelText: 'Payment Amount',
-              labelStyle: const TextStyle(color: oldDarkBlue),
-              prefixIcon: const Icon(
+              labelStyle: TextStyle(color: theme.textTheme.bodyMedium?.color?.withValues(alpha: 0.6)),
+              prefixIcon: Icon(
                 Icons.attach_money_rounded,
-                color: oldDarkBlue,
+                color: primaryColor.withValues(alpha: 0.7),
               ),
             ),
           ),
           const SizedBox(height: 16),
 
-          const Text('Select Payment Method', style: TextStyle(color: oldDarkBlue, fontSize: 13, fontWeight: FontWeight.bold)),
+          Text('Select Payment Method', style: TextStyle(color: primaryColor, fontSize: 13, fontWeight: FontWeight.bold)),
           const SizedBox(height: 8),
           DropdownButtonFormField<String>(
-            value: _selectedMethod,
-            dropdownColor: const Color(0xFFFFFDF0),
-            style: const TextStyle(color: oldDarkBlue, fontWeight: FontWeight.bold),
-            decoration: const InputDecoration(
-              prefixIcon: Icon(Icons.payment_rounded, color: oldDarkBlue),
+            initialValue: _selectedMethod,
+            dropdownColor: Colors.white,
+            style: TextStyle(color: primaryColor, fontWeight: FontWeight.bold),
+            decoration: InputDecoration(
+              prefixIcon: Icon(Icons.payment_rounded, color: primaryColor.withValues(alpha: 0.7)),
             ),
             items: ['EcoCash', 'OneMoney', 'Card'].map((method) {
               return DropdownMenuItem<String>(
@@ -457,16 +458,17 @@ class _PaymentFormState extends State<PaymentForm> {
           ElevatedButton(
             onPressed: _isProcessing ? null : _submitPayment,
             style: ElevatedButton.styleFrom(
-              backgroundColor: oldDarkBlue,
-              foregroundColor: vanillaColor,
+              backgroundColor: primaryColor,
+              foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(vertical: 16),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              elevation: 0,
             ),
             child: _isProcessing
                 ? const SizedBox(
                     height: 20,
                     width: 20,
-                    child: CircularProgressIndicator(color: vanillaColor, strokeWidth: 2.5),
+                    child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2.5),
                   )
                 : Text(
                     'Pay Amount (${_selectedCurrency == 'USD' ? '\$' : ''}${_amountController.text} ${_selectedCurrency == 'ZiG' ? 'ZiG' : ''})',

@@ -90,14 +90,15 @@ class _GetStartedScreenState extends State<GetStartedScreen> with TickerProvider
 
   @override
   Widget build(BuildContext context) {
-    const vanillaColor = Color(0xFFF3E5AB);
-    const oldDarkBlue = Color(0xFF002D62);
+    final theme = Theme.of(context);
+    final primaryColor = theme.primaryColor;
+    final backgroundColor = theme.scaffoldBackgroundColor;
     
     final maxDrag = _sliderWidth - _thumbSize - 8.0;
     final double textOpacity = (1.0 - (_dragPosition / maxDrag)).clamp(0.0, 1.0);
 
     return Scaffold(
-      backgroundColor: vanillaColor,
+      backgroundColor: backgroundColor,
       body: SafeArea(
         child: FadeTransition(
           opacity: _fadeInAnimation,
@@ -116,17 +117,17 @@ class _GetStartedScreenState extends State<GetStartedScreen> with TickerProvider
                       });
                       _navigateToNextScreen();
                     },
-                    icon: const Icon(Icons.arrow_forward_rounded, color: vanillaColor, size: 16),
+                    icon: const Icon(Icons.arrow_forward_rounded, color: Colors.white, size: 16),
                     label: const Text(
                       'Skip',
                       style: TextStyle(
-                        color: vanillaColor,
+                        color: Colors.white,
                         fontWeight: FontWeight.bold,
                         fontSize: 14,
                       ),
                     ),
                     style: TextButton.styleFrom(
-                      backgroundColor: oldDarkBlue,
+                      backgroundColor: primaryColor,
                       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                     ),
@@ -137,77 +138,43 @@ class _GetStartedScreenState extends State<GetStartedScreen> with TickerProvider
                 
                 // Illustration / Logo Layout
                 Center(
-                  child: Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      // Large Circular Logo Container
-                      Container(
-                        width: 260,
-                        height: 260,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Colors.white,
-                          border: Border.all(color: oldDarkBlue, width: 3),
-                          boxShadow: [
-                            BoxShadow(
-                              color: oldDarkBlue.withValues(alpha: 0.15),
-                              blurRadius: 10,
-                              offset: const Offset(0, 4),
-                            )
-                          ],
+                  child: Container(
+                    width: 220,
+                    height: 220,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(24),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.04),
+                          blurRadius: 20,
+                          offset: const Offset(0, 8),
                         ),
-                        child: ClipOval(
-                          child: Padding(
-                            padding: const EdgeInsets.all(12.0),
-                            child: Image.asset(
-                              'assets/logo.png',
-                              fit: BoxFit.contain,
-                            ),
-                          ),
+                      ],
+                      border: Border.all(color: const Color(0xFFE2E8F0), width: 1.0),
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(24),
+                      child: Padding(
+                        padding: const EdgeInsets.all(24.0),
+                        child: Image.asset(
+                          'assets/logo.png',
+                          fit: BoxFit.contain,
                         ),
                       ),
-                      
-                      // Overlapping small avatar with classic student icon (No face unlock/AI icons)
-                      Positioned(
-                        top: 4,
-                        left: 4,
-                        child: Container(
-                          width: 72,
-                          height: 72,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: Colors.white,
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.1),
-                                blurRadius: 6,
-                                offset: const Offset(0, 3),
-                              )
-                            ],
-                            border: Border.all(color: oldDarkBlue, width: 2),
-                          ),
-                          child: const ClipOval(
-                            child: Icon(
-                              Icons.people_rounded,
-                              size: 38,
-                              color: oldDarkBlue,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
                 ),
                 
                 const Spacer(),
                 
                 // App Title
-                const Text(
+                Text(
                   'Edu+Conect',
                   style: TextStyle(
                     fontSize: 32,
                     fontWeight: FontWeight.bold,
-                    color: oldDarkBlue,
+                    color: primaryColor,
                     letterSpacing: 0.5,
                   ),
                 ),
@@ -221,8 +188,8 @@ class _GetStartedScreenState extends State<GetStartedScreen> with TickerProvider
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 15,
-                      fontWeight: FontWeight.w600,
-                      color: oldDarkBlue.withValues(alpha: 0.8),
+                      fontWeight: FontWeight.w500,
+                      color: theme.textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
                       height: 1.4,
                     ),
                   ),
@@ -230,17 +197,16 @@ class _GetStartedScreenState extends State<GetStartedScreen> with TickerProvider
                 
                 const Spacer(),
                 
-                // Swipe to Unlock Slider (Classic look)
+                // Swipe to Unlock Slider (Sleek modern pill style)
                 Container(
                   width: _sliderWidth,
-                  height: 68,
+                  height: 56,
                   decoration: BoxDecoration(
-                    color: oldDarkBlue,
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(color: oldDarkBlue, width: 2),
+                    color: primaryColor,
+                    borderRadius: BorderRadius.circular(28),
                     boxShadow: [
                       BoxShadow(
-                        color: oldDarkBlue.withValues(alpha: 0.15),
+                        color: primaryColor.withValues(alpha: 0.15),
                         blurRadius: 8,
                         offset: const Offset(0, 4),
                       )
@@ -259,7 +225,7 @@ class _GetStartedScreenState extends State<GetStartedScreen> with TickerProvider
                               Text(
                                 'Swipe to get started',
                                 style: TextStyle(
-                                  color: vanillaColor.withValues(alpha: 0.9),
+                                  color: Colors.white.withValues(alpha: 0.9),
                                   fontWeight: FontWeight.bold,
                                   fontSize: 14,
                                 ),
@@ -267,7 +233,7 @@ class _GetStartedScreenState extends State<GetStartedScreen> with TickerProvider
                               const SizedBox(width: 8),
                               Icon(
                                 Icons.keyboard_double_arrow_right_rounded,
-                                color: vanillaColor.withValues(alpha: 0.9),
+                                color: Colors.white.withValues(alpha: 0.9),
                                 size: 16,
                               ),
                             ],
@@ -286,24 +252,20 @@ class _GetStartedScreenState extends State<GetStartedScreen> with TickerProvider
                             height: _thumbSize,
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
-                              color: vanillaColor,
-                              border: Border.all(color: oldDarkBlue, width: 2),
+                              color: Colors.white,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withValues(alpha: 0.1),
+                                  blurRadius: 4,
+                                  offset: const Offset(0, 2),
+                                )
+                              ],
                             ),
                             child: Center(
-                              // Animated Moving Graduate Hat Icon!
-                              child: AnimatedBuilder(
-                                animation: _hatRotationController,
-                                builder: (context, child) {
-                                  final double angle = (_hatRotationController.value * 0.2) - 0.1;
-                                  return Transform.rotate(
-                                    angle: angle,
-                                    child: const Icon(
-                                      Icons.school_rounded,
-                                      color: oldDarkBlue,
-                                      size: 28,
-                                    ),
-                                  );
-                                },
+                              child: Icon(
+                                Icons.school_rounded,
+                                color: primaryColor,
+                                size: 24,
                               ),
                             ),
                           ),

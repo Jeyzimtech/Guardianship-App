@@ -57,18 +57,19 @@ class _AttendanceViewState extends State<AttendanceView> {
 
   @override
   Widget build(BuildContext context) {
-    const vanillaColor = Color(0xFFF3E5AB);
-    const oldDarkBlue = Color(0xFF002D62);
+    final theme = Theme.of(context);
+    final primaryColor = theme.primaryColor;
+    final backgroundColor = theme.scaffoldBackgroundColor;
 
     return Scaffold(
-      backgroundColor: vanillaColor,
+      backgroundColor: backgroundColor,
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator(color: oldDarkBlue))
+          ? Center(child: CircularProgressIndicator(color: primaryColor))
           : _errorMessage != null
-              ? Center(child: Text(_errorMessage!, style: const TextStyle(color: oldDarkBlue, fontWeight: FontWeight.bold)))
+              ? Center(child: Text(_errorMessage!, style: TextStyle(color: primaryColor, fontWeight: FontWeight.bold)))
               : RefreshIndicator(
                   onRefresh: _fetchAttendance,
-                  color: oldDarkBlue,
+                  color: primaryColor,
                   child: ListView.builder(
                     padding: const EdgeInsets.all(16),
                     itemCount: _attendance.isEmpty ? 1 : _attendance.length,
@@ -79,11 +80,11 @@ class _AttendanceViewState extends State<AttendanceView> {
                             padding: const EdgeInsets.only(top: 100.0),
                             child: Column(
                               children: [
-                                Icon(Icons.calendar_month_rounded, size: 64, color: oldDarkBlue.withValues(alpha: 0.3)),
+                                Icon(Icons.calendar_month_rounded, size: 64, color: primaryColor.withValues(alpha: 0.3)),
                                 const SizedBox(height: 16),
                                 Text(
                                   'No attendance data logged yet.',
-                                  style: TextStyle(color: oldDarkBlue.withValues(alpha: 0.6), fontWeight: FontWeight.bold),
+                                  style: TextStyle(color: primaryColor.withValues(alpha: 0.6), fontWeight: FontWeight.bold),
                                 ),
                               ],
                             ),
@@ -96,6 +97,7 @@ class _AttendanceViewState extends State<AttendanceView> {
 
                       return Card(
                         margin: const EdgeInsets.only(bottom: 10),
+                        elevation: 0,
                         child: ListTile(
                           contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
                           leading: Icon(
@@ -105,27 +107,27 @@ class _AttendanceViewState extends State<AttendanceView> {
                           ),
                           title: Text(
                             record['date'] ?? '',
-                            style: const TextStyle(color: oldDarkBlue, fontWeight: FontWeight.bold),
+                            style: TextStyle(color: primaryColor, fontWeight: FontWeight.bold),
                           ),
                           subtitle: Text(
                             record['subject_name'] != null
                                 ? 'Subject: ${record['subject_name']}'
                                 : 'Daily Roster',
-                            style: TextStyle(color: oldDarkBlue.withValues(alpha: 0.6), fontSize: 12, fontWeight: FontWeight.bold),
+                            style: TextStyle(color: primaryColor.withValues(alpha: 0.6), fontSize: 12, fontWeight: FontWeight.w500),
                           ),
                           trailing: Container(
                             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                             decoration: BoxDecoration(
-                              color: isPresent ? Colors.green.withValues(alpha: 0.1) : Colors.red.withValues(alpha: 0.1),
-                              borderRadius: BorderRadius.circular(4),
-                              border: Border.all(color: isPresent ? Colors.green : Colors.red, width: 1),
+                              color: isPresent ? Colors.green.withValues(alpha: 0.08) : Colors.red.withValues(alpha: 0.08),
+                              borderRadius: BorderRadius.circular(6),
+                              border: Border.all(color: isPresent ? Colors.green.withValues(alpha: 0.5) : Colors.red.withValues(alpha: 0.5), width: 1.0),
                             ),
                             child: Text(
                               isPresent ? 'Present' : 'Absent',
                               style: TextStyle(
                                 color: isPresent ? Colors.green : Colors.red,
                                 fontSize: 12,
-                                fontWeight: FontWeight.bold,
+                                  fontWeight: FontWeight.bold,
                               ),
                             ),
                           ),

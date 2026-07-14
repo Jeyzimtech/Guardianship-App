@@ -28,80 +28,83 @@ class EduConectApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const vanillaColor = Color(0xFFF3E5AB);
-    const oldDarkBlueColor = Color(0xFF002D62);
-    const cardBgColor = Color(0xFFFFFDF0);
+    const primaryColor = Color(0xFF0B2144);
+    const accentColor = Color(0xFF2563EB);
+    const backgroundColor = Color(0xFFF8FAFC);
+    const surfaceColor = Colors.white;
+    const textPrimaryColor = Color(0xFF0F172A);
+    const textSecondaryColor = Color(0xFF64748B);
+    const borderColor = Color(0xFFE2E8F0);
 
     return MaterialApp(
       title: 'Edu+Conect',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         brightness: Brightness.light,
-        primaryColor: oldDarkBlueColor,
-        scaffoldBackgroundColor: vanillaColor,
+        primaryColor: primaryColor,
+        scaffoldBackgroundColor: backgroundColor,
         colorScheme: const ColorScheme.light(
-          primary: oldDarkBlueColor,
-          secondary: oldDarkBlueColor,
-          surface: cardBgColor,
-          background: vanillaColor,
+          primary: primaryColor,
+          secondary: accentColor,
+          surface: surfaceColor,
         ),
         fontFamily: 'Inter',
         useMaterial3: true,
         cardTheme: CardThemeData(
-          color: cardBgColor,
-          elevation: 2,
+          color: surfaceColor,
+          elevation: 0,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-            side: const BorderSide(color: oldDarkBlueColor, width: 1.5),
+            borderRadius: BorderRadius.circular(12),
+            side: const BorderSide(color: borderColor, width: 1.0),
           ),
         ),
         textTheme: const TextTheme(
-          bodyLarge: TextStyle(color: oldDarkBlueColor),
-          bodyMedium: TextStyle(color: oldDarkBlueColor),
-          titleLarge: TextStyle(color: oldDarkBlueColor, fontWeight: FontWeight.bold),
+          bodyLarge: TextStyle(color: textPrimaryColor),
+          bodyMedium: TextStyle(color: textPrimaryColor),
+          titleLarge: TextStyle(color: textPrimaryColor, fontWeight: FontWeight.bold),
         ),
         appBarTheme: const AppBarTheme(
-          backgroundColor: oldDarkBlueColor,
-          foregroundColor: vanillaColor,
-          elevation: 2,
-          iconTheme: IconThemeData(color: vanillaColor),
+          backgroundColor: primaryColor,
+          foregroundColor: Colors.white,
+          elevation: 0,
+          iconTheme: IconThemeData(color: Colors.white),
         ),
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
-            backgroundColor: oldDarkBlueColor,
-            foregroundColor: vanillaColor,
-            elevation: 2,
+            backgroundColor: primaryColor,
+            foregroundColor: Colors.white,
+            elevation: 0,
+            padding: const EdgeInsets.symmetric(vertical: 14),
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-              side: const BorderSide(color: oldDarkBlueColor),
+              borderRadius: BorderRadius.circular(10),
             ),
             textStyle: const TextStyle(fontWeight: FontWeight.bold),
           ),
         ),
         outlinedButtonTheme: OutlinedButtonThemeData(
           style: OutlinedButton.styleFrom(
-            foregroundColor: oldDarkBlueColor,
-            side: const BorderSide(color: oldDarkBlueColor, width: 1.5),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            foregroundColor: primaryColor,
+            side: const BorderSide(color: borderColor, width: 1.0),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
             textStyle: const TextStyle(fontWeight: FontWeight.bold),
           ),
         ),
         inputDecorationTheme: InputDecorationTheme(
           filled: true,
-          fillColor: cardBgColor,
-          labelStyle: const TextStyle(color: oldDarkBlueColor),
-          hintStyle: TextStyle(color: oldDarkBlueColor.withValues(alpha: 0.5)),
+          fillColor: surfaceColor,
+          labelStyle: const TextStyle(color: textSecondaryColor, fontSize: 14),
+          hintStyle: TextStyle(color: textSecondaryColor.withValues(alpha: 0.5)),
           border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(8),
-            borderSide: const BorderSide(color: oldDarkBlueColor, width: 1.5),
+            borderRadius: BorderRadius.circular(10),
+            borderSide: const BorderSide(color: borderColor, width: 1.0),
           ),
           enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(8),
-            borderSide: const BorderSide(color: oldDarkBlueColor, width: 1.5),
+            borderRadius: BorderRadius.circular(10),
+            borderSide: const BorderSide(color: borderColor, width: 1.0),
           ),
           focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(8),
-            borderSide: const BorderSide(color: oldDarkBlueColor, width: 2.5),
+            borderRadius: BorderRadius.circular(10),
+            borderSide: const BorderSide(color: accentColor, width: 1.5),
           ),
         ),
       ),
