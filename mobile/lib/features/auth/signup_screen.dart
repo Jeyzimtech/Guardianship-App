@@ -1,28 +1,34 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../core/auth_provider.dart';
-import 'signup_screen.dart';
+import 'login_screen.dart';
 
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+class SignupScreen extends StatefulWidget {
+  const SignupScreen({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  State<SignupScreen> createState() => _SignupScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _SignupScreenState extends State<SignupScreen> {
+  final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-  bool _isObscured = true;
+  final _confirmPasswordController = TextEditingController();
+  String _selectedRole = 'Parent'; // Parent or Teacher
+  bool _isObscuredPassword = true;
+  bool _isObscuredConfirm = true;
   bool _isAuthenticating = false;
 
-  void _login() async {
+  void _signup() async {
+    final name = _nameController.text.trim();
     final email = _emailController.text.trim();
     final password = _passwordController.text;
+    final confirm = _confirmPasswordController.text;
 
-    if (email.isEmpty || password.isEmpty) {
+    if (name.isEmpty || email.isEmpty || password.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter email and password.')),
+        const SnackBar(content: Text('Please fill in all fields.')),
       );
       return;
     }
@@ -34,49 +40,55 @@ class _LoginScreenState extends State<LoginScreen> {
       return;
     }
 
-    setState(() {
-      _isAuthenticating = true;
-    });
-
-    final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    
-    // Choose mock profile depending on email content for simple local prototyping
-    final bool isTeacher = email.toLowerCase().contains('teacher');
-    final String mockPhone = isTeacher ? '+263772222222' : '+263773333333';
-    final String roleLower = isTeacher ? 'teacher' : 'guardian';
-    final mockToken = 'mock-firebase-token-$mockPhone-uid_${roleLower}_123';
-    
-    final success = await authProvider.loginWithFirebaseToken(mockToken);
-    
-    setState(() {
-      _isAuthenticating = false;
-    });
-
-    if (!success && mounted) {
+    if (password.length < 6) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(authProvider.errorMessage ?? 'Authentication failed.')),
+        const SnackBar(content: Text('Password must be at least 6 characters.')),
       );
+      return;
     }
-  }
 
-  void _demoLogin(String phone, String name, String role) async {
+    if (password != confirm) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Passwords do not match.')),
+      );
+      return;
+    }
+
     setState(() {
       _isAuthenticating = true;
     });
 
+    // Simulate database/API delay
+    await Future.delayed(const Duration(milliseconds: 1000));
+
+    if (!mounted) return;
+
+    // Simulate login based on selected role
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    final mockToken = 'mock-firebase-token-$phone-uid_${role}_123';
     
+    // Select correct mock phone to match seeder data depending on role
+    final String mockPhone = _selectedRole == 'Teacher' ? '+263772222222' : '+263773333333';
+    final String roleLower = _selectedRole == 'Teacher' ? 'teacher' : 'guardian';
+    final mockToken = 'mock-firebase-token-$mockPhone-uid_${roleLower}_123';
+
     final success = await authProvider.loginWithFirebaseToken(mockToken);
     
-    setState(() {
-      _isAuthenticating = false;
-    });
+    if (mounted) {
+      setState(() {
+        _isAuthenticating = false;
+      });
 
-    if (!success && mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(authProvider.errorMessage ?? 'Demo Login failed.')),
-      );
+      if (success) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Welcome, $name! Account created successfully (Dummy mode).')),
+        );
+        // Pop back to root - AuthGate will auto redirect to Dashboard because isAuthenticated is true
+        Navigator.of(context).popUntil((route) => route.isFirst);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(authProvider.errorMessage ?? 'Signup simulation failed.')),
+        );
+      }
     }
   }
 
@@ -106,23 +118,16 @@ class _LoginScreenState extends State<LoginScreen> {
                 children: [
                   // Logo Graphic from Assets
                   Container(
-                    width: 100,
-                    height: 100,
+                    width: 90,
+                    height: 90,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       color: Colors.white.withValues(alpha: 0.08),
                       border: Border.all(color: vanillaColor.withValues(alpha: 0.35), width: 2),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.1),
-                          blurRadius: 10,
-                          offset: const Offset(0, 4),
-                        )
-                      ],
                     ),
                     child: ClipOval(
                       child: Padding(
-                        padding: const EdgeInsets.all(12.0),
+                        padding: const EdgeInsets.all(10.0),
                         child: Image.asset(
                           'assets/logo.png',
                           fit: BoxFit.contain,
@@ -130,29 +135,29 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 16),
                   
                   // App Title
                   const Text(
                     'Edu+Conect',
                     style: TextStyle(
-                      fontSize: 32,
+                      fontSize: 28,
                       fontWeight: FontWeight.bold,
                       color: vanillaColor,
                       letterSpacing: 1.2,
                     ),
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 4),
                   Text(
-                    'School-Parent Communication App',
+                    'Create your account',
                     style: TextStyle(
                       fontSize: 14,
                       color: Colors.white.withValues(alpha: 0.6),
                     ),
                   ),
-                  const SizedBox(height: 36),
+                  const SizedBox(height: 28),
 
-                  // Login Form Card
+                  // Signup Form Card
                   Card(
                     color: Colors.white.withValues(alpha: 0.06),
                     elevation: 0,
@@ -165,16 +170,26 @@ class _LoginScreenState extends State<LoginScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          const Text(
-                            'Log In',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
+                          // Full Name
+                          TextField(
+                            controller: _nameController,
+                            style: const TextStyle(color: Colors.white),
+                            keyboardType: TextInputType.name,
+                            decoration: InputDecoration(
+                              labelText: 'Full Name',
+                              labelStyle: const TextStyle(color: Colors.white60, fontSize: 13),
+                              prefixIcon: const Icon(Icons.person_outline_rounded, color: Colors.white54),
+                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: const BorderSide(color: vanillaColor, width: 2),
+                              ),
+                              fillColor: Colors.white.withValues(alpha: 0.03),
+                              filled: true,
                             ),
                           ),
                           const SizedBox(height: 16),
-                          
+
                           // Email Field
                           TextField(
                             controller: _emailController,
@@ -198,7 +213,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           // Password Field
                           TextField(
                             controller: _passwordController,
-                            obscureText: _isObscured,
+                            obscureText: _isObscuredPassword,
                             style: const TextStyle(color: Colors.white),
                             decoration: InputDecoration(
                               labelText: 'Password',
@@ -206,10 +221,10 @@ class _LoginScreenState extends State<LoginScreen> {
                               prefixIcon: const Icon(Icons.lock_outline, color: Colors.white54),
                               suffixIcon: IconButton(
                                 icon: Icon(
-                                  _isObscured ? Icons.visibility_off : Icons.visibility,
+                                  _isObscuredPassword ? Icons.visibility_off : Icons.visibility,
                                   color: Colors.white54,
                                 ),
-                                onPressed: () => setState(() => _isObscured = !_isObscured),
+                                onPressed: () => setState(() => _isObscuredPassword = !_isObscuredPassword),
                               ),
                               border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                               focusedBorder: OutlineInputBorder(
@@ -220,10 +235,69 @@ class _LoginScreenState extends State<LoginScreen> {
                               filled: true,
                             ),
                           ),
-                          const SizedBox(height: 20),
+                          const SizedBox(height: 16),
 
+                          // Confirm Password
+                          TextField(
+                            controller: _confirmPasswordController,
+                            obscureText: _isObscuredConfirm,
+                            style: const TextStyle(color: Colors.white),
+                            decoration: InputDecoration(
+                              labelText: 'Confirm Password',
+                              labelStyle: const TextStyle(color: Colors.white60, fontSize: 13),
+                              prefixIcon: const Icon(Icons.lock_clock_outlined, color: Colors.white54),
+                              suffixIcon: IconButton(
+                                icon: Icon(
+                                  _isObscuredConfirm ? Icons.visibility_off : Icons.visibility,
+                                  color: Colors.white54,
+                                ),
+                                onPressed: () => setState(() => _isObscuredConfirm = !_isObscuredConfirm),
+                              ),
+                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: const BorderSide(color: vanillaColor, width: 2),
+                              ),
+                              fillColor: Colors.white.withValues(alpha: 0.03),
+                              filled: true,
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+
+                          // Role Selection
+                          DropdownButtonFormField<String>(
+                            value: _selectedRole,
+                            dropdownColor: const Color(0xFF1B263B),
+                            style: const TextStyle(color: Colors.white),
+                            decoration: InputDecoration(
+                              labelText: 'Account Type',
+                              labelStyle: const TextStyle(color: Colors.white60, fontSize: 13),
+                              prefixIcon: const Icon(Icons.people_outline, color: Colors.white54),
+                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: const BorderSide(color: vanillaColor, width: 2),
+                              ),
+                              fillColor: Colors.white.withValues(alpha: 0.03),
+                              filled: true,
+                            ),
+                            items: ['Parent', 'Teacher'].map((role) {
+                              return DropdownMenuItem<String>(
+                                value: role,
+                                child: Text(role),
+                              );
+                            }).toList(),
+                            onChanged: (val) {
+                              if (val != null) {
+                                setState(() => _selectedRole = val);
+                              }
+                            },
+                          ),
+                          const SizedBox(height: 24),
+
+                          // Register Button
                           ElevatedButton(
-                            onPressed: _isAuthenticating ? null : _login,
+                            onPressed: _isAuthenticating ? null : _signup,
                             style: ElevatedButton.styleFrom(
                               backgroundColor: vanillaColor,
                               foregroundColor: darkBlueColor,
@@ -238,7 +312,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                     width: 20,
                                     child: CircularProgressIndicator(color: darkBlueColor, strokeWidth: 2),
                                   )
-                                : const Text('Log In', style: TextStyle(fontWeight: FontWeight.bold)),
+                                : const Text('Sign Up', style: TextStyle(fontWeight: FontWeight.bold)),
                           ),
                         ],
                       ),
@@ -247,75 +321,27 @@ class _LoginScreenState extends State<LoginScreen> {
 
                   const SizedBox(height: 16),
                   
-                  // Go to signup link
+                  // Go to login link
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        "Don't have an account? ",
+                        'Already have an account? ',
                         style: TextStyle(color: Colors.white.withValues(alpha: 0.6), fontSize: 14),
                       ),
                       TextButton(
                         onPressed: () {
                           Navigator.of(context).pushReplacement(
-                            MaterialPageRoute(builder: (_) => const SignupScreen()),
+                            MaterialPageRoute(builder: (_) => const LoginScreen()),
                           );
                         },
                         child: const Text(
-                          'Sign Up',
+                          'Log In',
                           style: TextStyle(color: vanillaColor, fontWeight: FontWeight.bold, fontSize: 14),
                         ),
                       ),
                     ],
                   ),
-
-                  const SizedBox(height: 24),
-                  // Quick Demo Login Options
-                  Text(
-                    'QUICK DEMO ACCESSIBILITY',
-                    style: TextStyle(
-                      color: Colors.white.withValues(alpha: 0.4),
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 1.1,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: OutlinedButton.icon(
-                          onPressed: _isAuthenticating
-                              ? null
-                              : () => _demoLogin('+263773333333', 'Guardian John Doe', 'guardian'),
-                          icon: const Icon(Icons.people_rounded, size: 18),
-                          label: const Text('As Parent'),
-                          style: OutlinedButton.styleFrom(
-                            foregroundColor: vanillaColor,
-                            side: BorderSide(color: vanillaColor.withValues(alpha: 0.35)),
-                            padding: const EdgeInsets.symmetric(vertical: 14),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: OutlinedButton.icon(
-                          onPressed: _isAuthenticating
-                              ? null
-                              : () => _demoLogin('+263772222222', 'Teacher Grace', 'teacher'),
-                          icon: const Icon(Icons.school, size: 18),
-                          label: const Text('As Teacher'),
-                          style: OutlinedButton.styleFrom(
-                            foregroundColor: vanillaColor,
-                            side: BorderSide(color: vanillaColor.withValues(alpha: 0.35)),
-                            padding: const EdgeInsets.symmetric(vertical: 14),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                          ),
-                        ),
-                      ),
-                    ],
-                  )
                 ],
               ),
             ),
