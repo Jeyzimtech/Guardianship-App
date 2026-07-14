@@ -43,7 +43,6 @@ class _LoginScreenState extends State<LoginScreen> {
     });
 
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    // Use the phone number to create a mock Firebase ID token
     final phone = _phoneController.text.trim();
     final mockToken = 'mock-firebase-token-$phone-uid_${phone.replaceAll('+', '')}';
     
@@ -83,6 +82,9 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    const vanillaColor = Color(0xFFF3E5AB);
+    const darkBlueColor = Color(0xFF0F1E36);
+
     return Scaffold(
       body: Container(
         decoration: const BoxDecoration(
@@ -90,8 +92,8 @@ class _LoginScreenState extends State<LoginScreen> {
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              Color(0xFF1E293B), // Dark Slate
-              Color(0xFF0F172A), // Very Dark Slate
+              Color(0xFF1B263B), // Navy Blue
+              darkBlueColor, // Deep Dark Blue
             ],
           ),
         ),
@@ -102,48 +104,61 @@ class _LoginScreenState extends State<LoginScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // Logo / Icon
+                  // Logo Graphic from Assets
                   Container(
-                    padding: const EdgeInsets.all(18),
+                    width: 110,
+                    height: 110,
                     decoration: BoxDecoration(
-                      color: Colors.blue.withOpacity(0.1),
                       shape: BoxShape.circle,
-                      border: Border.all(color: Colors.blue.withOpacity(0.3), width: 2),
+                      color: Colors.white.withValues(alpha: 0.08),
+                      border: Border.all(color: vanillaColor.withValues(alpha: 0.35), width: 2),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.1),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
+                        )
+                      ],
                     ),
-                    child: const Icon(
-                      Icons.shield_outlined,
-                      size: 64,
-                      color: Colors.blueAccent,
+                    child: ClipOval(
+                      child: Padding(
+                        padding: const EdgeInsets.all(12.0),
+                        child: Image.asset(
+                          'assets/logo.png',
+                          fit: BoxFit.contain,
+                        ),
+                      ),
                     ),
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 20),
+                  
                   // App Title
                   const Text(
-                    'Guardianship',
+                    'Edu+Conect',
                     style: TextStyle(
                       fontSize: 32,
                       fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                      color: vanillaColor,
                       letterSpacing: 1.2,
                     ),
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'School-Parent official channel',
+                    'School-Parent Communication App',
                     style: TextStyle(
-                      fontSize: 15,
-                      color: Colors.white.withOpacity(0.6),
+                      fontSize: 14,
+                      color: Colors.white.withValues(alpha: 0.6),
                     ),
                   ),
-                  const SizedBox(height: 48),
+                  const SizedBox(height: 36),
 
                   // Login Form Card
                   Card(
-                    color: Colors.white.withOpacity(0.06),
+                    color: Colors.white.withValues(alpha: 0.06),
                     elevation: 0,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                      side: BorderSide(color: Colors.white.withOpacity(0.08)),
+                      borderRadius: BorderRadius.circular(20),
+                      side: BorderSide(color: Colors.white.withValues(alpha: 0.08)),
                     ),
                     child: Padding(
                       padding: const EdgeInsets.all(24.0),
@@ -166,21 +181,21 @@ class _LoginScreenState extends State<LoginScreen> {
                               keyboardType: TextInputType.phone,
                               decoration: InputDecoration(
                                 hintText: '+263773333333',
-                                hintStyle: TextStyle(color: Colors.white.withOpacity(0.3)),
+                                hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.3)),
                                 prefixIcon: const Icon(Icons.phone_outlined, color: Colors.white54),
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(12),
-                                  borderSide: BorderSide(color: Colors.white.withOpacity(0.2)),
+                                  borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.2)),
                                 ),
                                 enabledBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(12),
-                                  borderSide: BorderSide(color: Colors.white.withOpacity(0.1)),
+                                  borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.1)),
                                 ),
                                 focusedBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(12),
-                                  borderSide: const BorderSide(color: Colors.blueAccent),
+                                  borderSide: const BorderSide(color: vanillaColor, width: 2),
                                 ),
-                                fillColor: Colors.white.withOpacity(0.03),
+                                fillColor: Colors.white.withValues(alpha: 0.03),
                                 filled: true,
                               ),
                             ),
@@ -188,21 +203,21 @@ class _LoginScreenState extends State<LoginScreen> {
                             ElevatedButton(
                               onPressed: _isAuthenticating ? null : _sendOtp,
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.blueAccent,
-                                foregroundColor: Colors.white,
+                                backgroundColor: vanillaColor,
+                                foregroundColor: darkBlueColor,
                                 padding: const EdgeInsets.symmetric(vertical: 16),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(12),
                                 ),
                               ),
-                              child: const Text('Send Verification Code'),
+                              child: const Text('Send Verification Code', style: TextStyle(fontWeight: FontWeight.bold)),
                             ),
                           ] else ...[
                             Row(
                               children: [
                                 IconButton(
                                   onPressed: () => setState(() => _otpSent = false),
-                                   icon: const Icon(Icons.arrow_back, color: Colors.white70),
+                                  icon: const Icon(Icons.arrow_back, color: Colors.white70),
                                 ),
                                 const Text(
                                   'Verify OTP',
@@ -217,7 +232,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             const SizedBox(height: 16),
                             Text(
                               'Enter the 6-digit code sent to ${_phoneController.text}',
-                              style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 13),
+                              style: TextStyle(color: Colors.white.withValues(alpha: 0.6), fontSize: 13),
                             ),
                             const SizedBox(height: 16),
                             TextField(
@@ -227,21 +242,21 @@ class _LoginScreenState extends State<LoginScreen> {
                               maxLength: 6,
                               decoration: InputDecoration(
                                 hintText: '123456',
-                                hintStyle: TextStyle(color: Colors.white.withOpacity(0.3)),
+                                hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.3)),
                                 prefixIcon: const Icon(Icons.lock_open_outlined, color: Colors.white54),
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(12),
-                                  borderSide: BorderSide(color: Colors.white.withOpacity(0.2)),
+                                  borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.2)),
                                 ),
                                 enabledBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(12),
-                                  borderSide: BorderSide(color: Colors.white.withOpacity(0.1)),
+                                  borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.1)),
                                 ),
                                 focusedBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(12),
-                                  borderSide: const BorderSide(color: Colors.blueAccent),
+                                  borderSide: const BorderSide(color: vanillaColor, width: 2),
                                 ),
-                                fillColor: Colors.white.withOpacity(0.03),
+                                fillColor: Colors.white.withValues(alpha: 0.03),
                                 filled: true,
                               ),
                             ),
@@ -249,8 +264,8 @@ class _LoginScreenState extends State<LoginScreen> {
                             ElevatedButton(
                               onPressed: _isAuthenticating ? null : _verifyOtp,
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.blueAccent,
-                                foregroundColor: Colors.white,
+                                backgroundColor: vanillaColor,
+                                foregroundColor: darkBlueColor,
                                 padding: const EdgeInsets.symmetric(vertical: 16),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(12),
@@ -260,9 +275,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                   ? const SizedBox(
                                       height: 20,
                                       width: 20,
-                                      child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                                      child: CircularProgressIndicator(color: darkBlueColor, strokeWidth: 2),
                                     )
-                                  : const Text('Verify and Login'),
+                                  : const Text('Verify and Login', style: TextStyle(fontWeight: FontWeight.bold)),
                             ),
                           ]
                         ],
@@ -275,7 +290,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   Text(
                     'QUICK DEMO ACCESSIBILITY',
                     style: TextStyle(
-                      color: Colors.white.withOpacity(0.4),
+                      color: Colors.white.withValues(alpha: 0.4),
                       fontSize: 12,
                       fontWeight: FontWeight.bold,
                       letterSpacing: 1.1,
@@ -292,8 +307,8 @@ class _LoginScreenState extends State<LoginScreen> {
                           icon: const Icon(Icons.people_rounded, size: 18),
                           label: const Text('As Parent'),
                           style: OutlinedButton.styleFrom(
-                            foregroundColor: Colors.tealAccent,
-                            side: BorderSide(color: Colors.tealAccent.withOpacity(0.3)),
+                            foregroundColor: vanillaColor,
+                            side: BorderSide(color: vanillaColor.withValues(alpha: 0.35)),
                             padding: const EdgeInsets.symmetric(vertical: 14),
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                           ),
@@ -308,8 +323,8 @@ class _LoginScreenState extends State<LoginScreen> {
                           icon: const Icon(Icons.school, size: 18),
                           label: const Text('As Teacher'),
                           style: OutlinedButton.styleFrom(
-                            foregroundColor: Colors.orangeAccent,
-                            side: BorderSide(color: Colors.orangeAccent.withOpacity(0.3)),
+                            foregroundColor: vanillaColor,
+                            side: BorderSide(color: vanillaColor.withValues(alpha: 0.35)),
                             padding: const EdgeInsets.symmetric(vertical: 14),
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                           ),

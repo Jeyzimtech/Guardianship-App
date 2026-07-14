@@ -50,14 +50,19 @@ class _AttendanceViewState extends State<AttendanceView> {
 
   @override
   Widget build(BuildContext context) {
+    const vanillaColor = Color(0xFFF3E5AB);
+    const cardBgColor = Color(0xFF1B263B);
+    const darkBlueColor = Color(0xFF0F1E36);
+
     return Scaffold(
-      backgroundColor: const Color(0xFF0F172A),
+      backgroundColor: darkBlueColor,
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator(color: Colors.blueAccent))
+          ? const Center(child: CircularProgressIndicator(color: vanillaColor))
           : _errorMessage != null
               ? Center(child: Text(_errorMessage!, style: const TextStyle(color: Colors.white70)))
               : RefreshIndicator(
                   onRefresh: _fetchAttendance,
+                  color: vanillaColor,
                   child: ListView.builder(
                     padding: const EdgeInsets.all(16),
                     itemCount: _attendance.isEmpty ? 1 : _attendance.length,
@@ -68,11 +73,11 @@ class _AttendanceViewState extends State<AttendanceView> {
                             padding: const EdgeInsets.only(top: 100.0),
                             child: Column(
                               children: [
-                                Icon(Icons.calendar_month_outlined, size: 64, color: Colors.white.withOpacity(0.3)),
+                                Icon(Icons.calendar_month_outlined, size: 64, color: Colors.white.withValues(alpha: 0.3)),
                                 const SizedBox(height: 16),
                                 Text(
                                   'No attendance data logged yet.',
-                                  style: TextStyle(color: Colors.white.withOpacity(0.5)),
+                                  style: TextStyle(color: Colors.white.withValues(alpha: 0.5)),
                                 ),
                               ],
                             ),
@@ -84,10 +89,10 @@ class _AttendanceViewState extends State<AttendanceView> {
                       final isPresent = record['status'] == 'present';
 
                       return Card(
-                        color: Colors.white.withOpacity(0.04),
+                        color: cardBgColor,
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          side: BorderSide(color: Colors.white.withOpacity(0.06)),
+                          borderRadius: BorderRadius.circular(16),
+                          side: BorderSide(color: Colors.white.withValues(alpha: 0.05)),
                         ),
                         margin: const EdgeInsets.only(bottom: 10),
                         child: ListTile(
@@ -105,12 +110,12 @@ class _AttendanceViewState extends State<AttendanceView> {
                             record['subject_name'] != null
                                 ? 'Subject: ${record['subject_name']}'
                                 : 'Daily Roster',
-                            style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 12),
+                            style: TextStyle(color: Colors.white.withValues(alpha: 0.5), fontSize: 12),
                           ),
                           trailing: Container(
                             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                             decoration: BoxDecoration(
-                              color: isPresent ? Colors.green.withOpacity(0.1) : Colors.red.withOpacity(0.1),
+                              color: isPresent ? Colors.green.withValues(alpha: 0.1) : Colors.red.withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: Text(

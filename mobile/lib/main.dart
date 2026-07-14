@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'core/api_client.dart';
 import 'core/auth_provider.dart';
 import 'core/student_provider.dart';
+import 'features/get_started_screen.dart';
 import 'features/auth/login_screen.dart';
 import 'features/dashboard/dashboard_home.dart';
 
@@ -17,33 +18,41 @@ void main() {
         ChangeNotifierProvider(create: (_) => AuthProvider(apiClient)),
         ChangeNotifierProvider(create: (_) => StudentProvider(apiClient)),
       ],
-      child: const GuardianshipApp(),
+      child: const EduConectApp(),
     ),
   );
 }
 
-class GuardianshipApp extends StatelessWidget {
-  const GuardianshipApp({super.key});
+class EduConectApp extends StatelessWidget {
+  const EduConectApp({super.key});
 
   @override
   Widget build(BuildContext context) {
+    const vanillaColor = Color(0xFFF3E5AB);
+    const darkBlueColor = Color(0xFF0F1E36);
+    const slateDarkColor = Color(0xFF1E293B);
+
     return MaterialApp(
-      title: 'Guardianship App',
+      title: 'Edu+Conect',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         brightness: Brightness.dark,
-        primaryColor: const Color(0xFF1E293B),
-        scaffoldBackgroundColor: const Color(0xFF0F172A),
+        primaryColor: darkBlueColor,
+        scaffoldBackgroundColor: darkBlueColor,
         colorScheme: const ColorScheme.dark(
-          primary: Colors.blueAccent,
-          secondary: Colors.tealAccent,
-          surface: Color(0xFF1E293B),
-          background: Color(0xFF0F172A),
+          primary: vanillaColor,
+          secondary: vanillaColor,
+          surface: slateDarkColor,
+          background: darkBlueColor,
         ),
         fontFamily: 'Inter',
         useMaterial3: true,
+        dropdownMenuTheme: const DropdownMenuThemeData(
+          textStyle: TextStyle(color: Colors.white),
+        ),
       ),
-      home: const AuthGate(),
+      // Starts onboarding first
+      home: const GetStartedScreen(),
     );
   }
 }

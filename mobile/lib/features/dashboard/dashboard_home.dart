@@ -32,6 +32,10 @@ class _DashboardHomeState extends State<DashboardHome> {
     final authProvider = Provider.of<AuthProvider>(context);
     final user = authProvider.user;
 
+    const vanillaColor = Color(0xFFF3E5AB);
+    const darkBlueColor = Color(0xFF0F1E36);
+    const cardBgColor = Color(0xFF1B263B);
+
     final List<Widget> tabs = [
       const OverviewTab(),
       const ReportsView(),
@@ -41,30 +45,36 @@ class _DashboardHomeState extends State<DashboardHome> {
     ];
 
     return Scaffold(
-      backgroundColor: const Color(0xFF0F172A),
+      backgroundColor: darkBlueColor,
       appBar: AppBar(
-        backgroundColor: const Color(0xFF1E293B),
+        backgroundColor: cardBgColor,
         elevation: 0,
         title: user?['role'] == 'guardian'
-            ? _buildChildSwitcher(context, studentProvider)
-            : Text(user?['name'] ?? 'Dashboard', style: const TextStyle(color: Colors.white, fontSize: 18)),
+            ? _buildChildSwitcher(context, studentProvider, vanillaColor, cardBgColor)
+            : Text(
+                user?['name'] ?? 'Dashboard',
+                style: const TextStyle(color: vanillaColor, fontSize: 18, fontWeight: FontWeight.bold),
+              ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.logout_rounded, color: Colors.white70),
+            icon: const Icon(Icons.logout_rounded, color: vanillaColor),
             onPressed: () {
               showDialog(
                 context: context,
                 builder: (context) => AlertDialog(
-                  backgroundColor: const Color(0xFF1E293B),
+                  backgroundColor: cardBgColor,
                   title: const Text('Logout', style: TextStyle(color: Colors.white)),
                   content: const Text('Are you sure you want to sign out?', style: TextStyle(color: Colors.white70)),
                   actions: [
                     TextButton(
-                      child: const Text('Cancel', style: TextStyle(color: Colors.blueAccent)),
+                      child: const Text('Cancel', style: TextStyle(color: vanillaColor)),
                       onPressed: () => Navigator.pop(context),
                     ),
                     ElevatedButton(
-                      style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.redAccent,
+                        foregroundColor: Colors.white,
+                      ),
                       child: const Text('Logout'),
                       onPressed: () {
                         Navigator.pop(context);
@@ -79,7 +89,7 @@ class _DashboardHomeState extends State<DashboardHome> {
         ],
       ),
       body: studentProvider.isLoadingStudents
-          ? const Center(child: CircularProgressIndicator(color: Colors.blueAccent))
+          ? const Center(child: CircularProgressIndicator(color: vanillaColor))
           : studentProvider.students.isEmpty
               ? _buildEmptyState(user)
               : tabs[_currentIndex],
@@ -89,8 +99,8 @@ class _DashboardHomeState extends State<DashboardHome> {
               currentIndex: _currentIndex,
               onTap: (index) => setState(() => _currentIndex = index),
               type: BottomNavigationBarType.fixed,
-              backgroundColor: const Color(0xFF1E293B),
-              selectedItemColor: Colors.blueAccent,
+              backgroundColor: cardBgColor,
+              selectedItemColor: vanillaColor,
               unselectedItemColor: Colors.white54,
               selectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 11),
               unselectedLabelStyle: const TextStyle(fontSize: 10),
@@ -125,20 +135,21 @@ class _DashboardHomeState extends State<DashboardHome> {
     );
   }
 
-  Widget _buildChildSwitcher(BuildContext context, StudentProvider provider) {
+  Widget _buildChildSwitcher(
+      BuildContext context, StudentProvider provider, Color vanillaColor, Color cardBg) {
     if (provider.students.isEmpty) {
-      return const Text('Guardianship', style: TextStyle(color: Colors.white));
+      return Text('Edu+Conect', style: TextStyle(color: vanillaColor, fontWeight: FontWeight.bold));
     }
     
     final selected = provider.selectedStudent;
     if (selected == null) return const SizedBox();
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.08),
+        color: Colors.white.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.white.withOpacity(0.1)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
       ),
       child: DropdownButtonHideUnderline(
         child: DropdownButton<Map<String, dynamic>>(
@@ -146,8 +157,8 @@ class _DashboardHomeState extends State<DashboardHome> {
             (element) => element['id'] == selected['id'],
             orElse: () => provider.students.first,
           ),
-          dropdownColor: const Color(0xFF1E293B),
-          icon: const Icon(Icons.keyboard_arrow_down_rounded, color: Colors.blueAccent),
+          dropdownColor: cardBg,
+          icon: Icon(Icons.keyboard_arrow_down_rounded, color: vanillaColor),
           style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15),
           items: provider.students.map((dynamic item) {
             final student = item as Map<String, dynamic>;
@@ -156,9 +167,9 @@ class _DashboardHomeState extends State<DashboardHome> {
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Icon(Icons.face_unlock_rounded, color: Colors.blueAccent, size: 18),
+                  Icon(Icons.face_unlock_rounded, color: vanillaColor, size: 18),
                   const SizedBox(width: 8),
-                  Text(student['name'] ?? ''),
+                  Text(student['name'] ?? '', style: const TextStyle(color: Colors.white)),
                 ],
               ),
             );
@@ -180,7 +191,7 @@ class _DashboardHomeState extends State<DashboardHome> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.person_off_outlined, size: 72, color: Colors.white.withOpacity(0.3)),
+            Icon(Icons.person_off_outlined, size: 72, color: Colors.white.withValues(alpha: 0.3)),
             const SizedBox(height: 16),
             const Text(
               'No Student Records Found',
@@ -192,7 +203,7 @@ class _DashboardHomeState extends State<DashboardHome> {
                   ? 'Your account has not been linked to any students yet. Please contact the school administration office to link your children.'
                   : 'There are no students registered in your school class yet.',
               textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 14, color: Colors.white.withOpacity(0.6)),
+              style: TextStyle(fontSize: 14, color: Colors.white.withValues(alpha: 0.6)),
             ),
           ],
         ),
@@ -207,9 +218,10 @@ class OverviewTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final studentProvider = Provider.of<StudentProvider>(context);
+    const vanillaColor = Color(0xFFF3E5AB);
 
     if (studentProvider.isLoadingDashboard || studentProvider.dashboardData == null) {
-      return const Center(child: CircularProgressIndicator(color: Colors.blueAccent));
+      return const Center(child: CircularProgressIndicator(color: vanillaColor));
     }
 
     final data = studentProvider.dashboardData!;
@@ -221,6 +233,7 @@ class OverviewTab extends StatelessWidget {
 
     return RefreshIndicator(
       onRefresh: () => studentProvider.fetchDashboard(studentProvider.selectedStudent!['id']),
+      color: vanillaColor,
       child: SingleChildScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
         padding: const EdgeInsets.all(16.0),
@@ -241,7 +254,7 @@ class OverviewTab extends StatelessWidget {
                     const SizedBox(height: 4),
                     Text(
                       '${studentProvider.selectedStudent!['grade']} • ${studentProvider.selectedStudent!['class_name']}',
-                      style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 14),
+                      style: TextStyle(color: Colors.white.withValues(alpha: 0.6), fontSize: 14),
                     ),
                   ],
                 ),
@@ -271,7 +284,7 @@ class OverviewTab extends StatelessWidget {
                     icon: Icons.receipt_long_outlined,
                     color: double.parse(fee['balance_usd'].toString()) > 0 || double.parse(fee['balance_zig'].toString()) > 0
                         ? Colors.redAccent
-                        : Colors.tealAccent,
+                        : vanillaColor,
                   ),
                 ),
               ],
@@ -284,7 +297,7 @@ class OverviewTab extends StatelessWidget {
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
             ),
             const SizedBox(height: 12),
-            _buildZScoreChart(zScoreTrend),
+            _buildZScoreChart(zScoreTrend, vanillaColor),
             const SizedBox(height: 24),
 
             // Recent Announcements List
@@ -295,14 +308,14 @@ class OverviewTab extends StatelessWidget {
                   'Recent School Alerts',
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
                 ),
-                Icon(Icons.arrow_forward_ios_rounded, color: Colors.white.withOpacity(0.4), size: 14),
+                Icon(Icons.arrow_forward_ios_rounded, color: Colors.white.withValues(alpha: 0.4), size: 14),
               ],
             ),
             const SizedBox(height: 12),
             if (announcements.isEmpty)
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 16.0),
-                child: Text('No recent announcements.', style: TextStyle(color: Colors.white.withOpacity(0.4))),
+                child: Text('No recent announcements.', style: TextStyle(color: Colors.white.withValues(alpha: 0.4))),
               )
             else
               ListView.separated(
@@ -313,19 +326,19 @@ class OverviewTab extends StatelessWidget {
                 itemBuilder: (context, index) {
                   final alert = announcements[index];
                   return Card(
-                    color: Colors.white.withOpacity(0.04),
+                    color: Colors.white.withValues(alpha: 0.04),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
-                      side: BorderSide(color: Colors.white.withOpacity(0.06)),
+                      side: BorderSide(color: Colors.white.withValues(alpha: 0.06)),
                     ),
                     child: ListTile(
                       leading: Container(
                         padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
-                          color: Colors.blueAccent.withOpacity(0.1),
+                          color: vanillaColor.withValues(alpha: 0.1),
                           shape: BoxShape.circle,
                         ),
-                        child: const Icon(Icons.campaign, color: Colors.blueAccent, size: 20),
+                        child: const Icon(Icons.campaign, color: vanillaColor, size: 20),
                       ),
                       title: Text(
                         alert['title'] ?? '',
@@ -337,7 +350,7 @@ class OverviewTab extends StatelessWidget {
                           alert['content'] ?? '',
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
-                          style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 12),
+                          style: TextStyle(color: Colors.white.withValues(alpha: 0.6), fontSize: 12),
                         ),
                       ),
                     ),
@@ -355,7 +368,7 @@ class OverviewTab extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: isOptimal ? Colors.green.withOpacity(0.1) : Colors.amber.withOpacity(0.1),
+        color: isOptimal ? Colors.green.withValues(alpha: 0.1) : Colors.amber.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: isOptimal ? Colors.greenAccent : Colors.amberAccent),
       ),
@@ -391,9 +404,9 @@ class OverviewTab extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.04),
+        color: Colors.white.withValues(alpha: 0.04),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withOpacity(0.06)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.06)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -401,29 +414,29 @@ class OverviewTab extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(title, style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 12)),
+              Text(title, style: TextStyle(color: Colors.white.withValues(alpha: 0.5), fontSize: 12)),
               Icon(icon, color: color, size: 20),
             ],
           ),
           const SizedBox(height: 12),
           Text(value, style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold)),
           const SizedBox(height: 4),
-          Text(subtitle, style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 11)),
+          Text(subtitle, style: TextStyle(color: Colors.white.withValues(alpha: 0.6), fontSize: 11)),
         ],
       ),
     );
   }
 
-  Widget _buildZScoreChart(List<dynamic> trend) {
+  Widget _buildZScoreChart(List<dynamic> trend, Color vanillaColor) {
     if (trend.isEmpty) return const SizedBox();
 
     return Container(
       height: 160,
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.03),
+        color: Colors.white.withValues(alpha: 0.03),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withOpacity(0.05)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
       ),
       child: LineChart(
         LineChartData(
@@ -437,7 +450,6 @@ class OverviewTab extends StatelessWidget {
                   int idx = value.toInt();
                   if (idx >= 0 && idx < trend.length) {
                     final term = trend[idx]['term'] as String;
-                    // Return T1, T2 format
                     final shortTerm = term.contains('Term 1') ? 'T1' : (term.contains('Term 2') ? 'T2' : 'T3');
                     return Text(shortTerm, style: const TextStyle(color: Colors.white38, fontSize: 10));
                   }
@@ -456,13 +468,13 @@ class OverviewTab extends StatelessWidget {
                 return FlSpot(entry.key.toDouble(), double.parse(entry.value['z_score'].toString()));
               }).toList(),
               isCurved: true,
-              color: Colors.blueAccent,
+              color: vanillaColor,
               barWidth: 3,
               isStrokeCapRound: true,
               dotData: const FlDotData(show: true),
               belowBarData: BarAreaData(
                 show: true,
-                color: Colors.blueAccent.withOpacity(0.1),
+                color: vanillaColor.withValues(alpha: 0.1),
               ),
             ),
           ],

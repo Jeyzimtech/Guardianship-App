@@ -48,14 +48,19 @@ class _AnnouncementsViewState extends State<AnnouncementsView> {
 
   @override
   Widget build(BuildContext context) {
+    const vanillaColor = Color(0xFFF3E5AB);
+    const cardBgColor = Color(0xFF1B263B);
+    const darkBlueColor = Color(0xFF0F1E36);
+
     return Scaffold(
-      backgroundColor: const Color(0xFF0F172A),
+      backgroundColor: darkBlueColor,
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator(color: Colors.blueAccent))
+          ? const Center(child: CircularProgressIndicator(color: vanillaColor))
           : _errorMessage != null
               ? Center(child: Text(_errorMessage!, style: const TextStyle(color: Colors.white70)))
               : RefreshIndicator(
                   onRefresh: _fetchAnnouncements,
+                  color: vanillaColor,
                   child: ListView.builder(
                     padding: const EdgeInsets.all(16),
                     itemCount: _announcements.isEmpty ? 1 : _announcements.length,
@@ -66,11 +71,11 @@ class _AnnouncementsViewState extends State<AnnouncementsView> {
                             padding: const EdgeInsets.only(top: 100.0),
                             child: Column(
                               children: [
-                                Icon(Icons.campaign_outlined, size: 64, color: Colors.white.withOpacity(0.3)),
+                                Icon(Icons.campaign_outlined, size: 64, color: Colors.white.withValues(alpha: 0.3)),
                                 const SizedBox(height: 16),
                                 Text(
                                   'No announcements posted.',
-                                  style: TextStyle(color: Colors.white.withOpacity(0.5)),
+                                  style: TextStyle(color: Colors.white.withValues(alpha: 0.5)),
                                 ),
                               ],
                             ),
@@ -82,10 +87,10 @@ class _AnnouncementsViewState extends State<AnnouncementsView> {
                       final audience = alert['audience_role'] ?? 'all';
 
                       return Card(
-                        color: Colors.white.withOpacity(0.04),
+                        color: cardBgColor,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(16),
-                          side: BorderSide(color: Colors.white.withOpacity(0.06)),
+                          side: BorderSide(color: Colors.white.withValues(alpha: 0.05)),
                         ),
                         margin: const EdgeInsets.only(bottom: 14),
                         child: Padding(
@@ -93,40 +98,35 @@ class _AnnouncementsViewState extends State<AnnouncementsView> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              // Audience Badge & Date Row
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
                                   Container(
                                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                                     decoration: BoxDecoration(
-                                      color: Colors.blueAccent.withOpacity(0.12),
+                                      color: vanillaColor.withValues(alpha: 0.12),
                                       borderRadius: BorderRadius.circular(8),
                                     ),
                                     child: Text(
                                       'TO: ${audience.toString().toUpperCase()}',
-                                      style: const TextStyle(color: Colors.blueAccent, fontSize: 10, fontWeight: FontWeight.bold),
+                                      style: const TextStyle(color: vanillaColor, fontSize: 10, fontWeight: FontWeight.bold),
                                     ),
                                   ),
                                   Text(
                                     alert['created_at']?.split('T')[0] ?? '',
-                                    style: TextStyle(color: Colors.white.withOpacity(0.4), fontSize: 12),
+                                    style: TextStyle(color: Colors.white.withValues(alpha: 0.4), fontSize: 12),
                                   ),
                                 ],
                               ),
                               const SizedBox(height: 12),
-                              
-                              // Announcement Title
                               Text(
                                 alert['title'] ?? '',
                                 style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
                               ),
                               const SizedBox(height: 8),
-                              
-                              // Announcement Body
                               Text(
                                 alert['content'] ?? '',
-                                style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 14, height: 1.4),
+                                style: TextStyle(color: Colors.white.withValues(alpha: 0.7), fontSize: 14, height: 1.4),
                               ),
                             ],
                           ),

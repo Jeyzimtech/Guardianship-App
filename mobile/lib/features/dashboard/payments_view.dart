@@ -80,7 +80,6 @@ class _PaymentsViewState extends State<PaymentsView> {
           onPaymentCompleted: () {
             Navigator.pop(context);
             _fetchFeeDetails();
-            // Refresh student provider's dashboard data
             studentProvider.fetchDashboard(selectedStudent['id']);
           },
         );
@@ -90,25 +89,28 @@ class _PaymentsViewState extends State<PaymentsView> {
 
   @override
   Widget build(BuildContext context) {
+    const vanillaColor = Color(0xFFF3E5AB);
+    const cardBgColor = Color(0xFF1B263B);
+    const darkBlueColor = Color(0xFF0F1E36);
+
     return Scaffold(
-      backgroundColor: const Color(0xFF0F172A),
+      backgroundColor: darkBlueColor,
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator(color: Colors.blueAccent))
+          ? const Center(child: CircularProgressIndicator(color: vanillaColor))
           : _errorMessage != null
               ? Center(child: Text(_errorMessage!, style: const TextStyle(color: Colors.white70)))
               : RefreshIndicator(
                   onRefresh: _fetchFeeDetails,
+                  color: vanillaColor,
                   child: SingleChildScrollView(
                     physics: const AlwaysScrollableScrollPhysics(),
                     padding: const EdgeInsets.all(16),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Fee Balance Header Card
-                        _buildBalanceHeader(),
+                        _buildBalanceHeader(vanillaColor, darkBlueColor),
                         const SizedBox(height: 24),
                         
-                        // Transaction History Title
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
@@ -116,7 +118,7 @@ class _PaymentsViewState extends State<PaymentsView> {
                               'Payment History',
                               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
                             ),
-                            Icon(Icons.history, color: Colors.white.withOpacity(0.4), size: 18),
+                            Icon(Icons.history, color: Colors.white.withValues(alpha: 0.4), size: 18),
                           ],
                         ),
                         const SizedBox(height: 12),
@@ -127,7 +129,7 @@ class _PaymentsViewState extends State<PaymentsView> {
                             child: Center(
                               child: Text(
                                 'No payment transactions recorded yet.',
-                                style: TextStyle(color: Colors.white.withOpacity(0.5)),
+                                style: TextStyle(color: Colors.white.withValues(alpha: 0.5)),
                               ),
                             ),
                           )
@@ -141,16 +143,16 @@ class _PaymentsViewState extends State<PaymentsView> {
                               final isCompleted = tx['status'] == 'completed';
 
                               return Card(
-                                color: Colors.white.withOpacity(0.04),
+                                color: cardBgColor,
                                 shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                  side: BorderSide(color: Colors.white.withOpacity(0.06)),
+                                  borderRadius: BorderRadius.circular(16),
+                                  side: BorderSide(color: Colors.white.withValues(alpha: 0.05)),
                                 ),
                                 margin: const EdgeInsets.only(bottom: 10),
                                 child: ListTile(
                                   leading: CircleAvatar(
-                                    backgroundColor: Colors.blueAccent.withOpacity(0.1),
-                                    child: const Icon(Icons.arrow_upward_rounded, color: Colors.blueAccent, size: 20),
+                                    backgroundColor: vanillaColor.withValues(alpha: 0.1),
+                                    child: const Icon(Icons.arrow_upward_rounded, color: vanillaColor, size: 20),
                                   ),
                                   title: Text(
                                     'Fee Payment via ${tx['payment_method']}',
@@ -158,7 +160,7 @@ class _PaymentsViewState extends State<PaymentsView> {
                                   ),
                                   subtitle: Text(
                                     tx['created_at']?.split('T')[0] ?? '',
-                                    style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 12),
+                                    style: TextStyle(color: Colors.white.withValues(alpha: 0.5), fontSize: 12),
                                   ),
                                   trailing: Column(
                                     mainAxisAlignment: MainAxisAlignment.center,
@@ -166,13 +168,13 @@ class _PaymentsViewState extends State<PaymentsView> {
                                     children: [
                                       Text(
                                         '${tx['currency'] == 'USD' ? '\$' : ''}${tx['amount']} ${tx['currency'] == 'ZiG' ? 'ZiG' : ''}',
-                                        style: const TextStyle(color: Colors.tealAccent, fontWeight: FontWeight.bold, fontSize: 15),
+                                        style: const TextStyle(color: Colors.greenAccent, fontWeight: FontWeight.bold, fontSize: 15),
                                       ),
                                       const SizedBox(height: 2),
                                       Text(
                                         isCompleted ? 'Completed' : 'Pending',
                                         style: TextStyle(
-                                          color: isCompleted ? Colors.tealAccent.withOpacity(0.7) : Colors.amberAccent,
+                                          color: isCompleted ? Colors.greenAccent.withValues(alpha: 0.7) : Colors.amberAccent,
                                           fontSize: 10,
                                         ),
                                       ),
@@ -189,7 +191,7 @@ class _PaymentsViewState extends State<PaymentsView> {
     );
   }
 
-  Widget _buildBalanceHeader() {
+  Widget _buildBalanceHeader(Color vanillaColor, Color darkBlueColor) {
     double balanceUsd = double.parse(_feeAccount?['balance_usd']?.toString() ?? '0.0');
     double balanceZig = double.parse(_feeAccount?['balance_zig']?.toString() ?? '0.0');
     bool hasFees = balanceUsd > 0 || balanceZig > 0;
@@ -208,7 +210,7 @@ class _PaymentsViewState extends State<PaymentsView> {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: (hasFees ? Colors.red : Colors.green).withOpacity(0.15),
+            color: (hasFees ? Colors.red : Colors.green).withValues(alpha: 0.15),
             blurRadius: 15,
             offset: const Offset(0, 8),
           )
@@ -224,7 +226,7 @@ class _PaymentsViewState extends State<PaymentsView> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.15),
+                  color: Colors.white.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
@@ -261,8 +263,8 @@ class _PaymentsViewState extends State<PaymentsView> {
               icon: const Icon(Icons.payment_rounded, size: 18),
               label: const Text('Pay Outstanding Fees', style: TextStyle(fontWeight: FontWeight.bold)),
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.white,
-                foregroundColor: Colors.red[900],
+                backgroundColor: vanillaColor,
+                foregroundColor: darkBlueColor,
                 minimumSize: const Size(double.infinity, 48),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               ),
@@ -308,7 +310,6 @@ class _PaymentFormState extends State<PaymentForm> {
   @override
   void initState() {
     super.initState();
-    // Default input amount to outstanding balance
     _amountController.text = widget.balanceUsd > 0
         ? widget.balanceUsd.toString()
         : widget.balanceZig.toString();
@@ -354,6 +355,9 @@ class _PaymentFormState extends State<PaymentForm> {
 
   @override
   Widget build(BuildContext context) {
+    const vanillaColor = Color(0xFFF3E5AB);
+    const darkBlueColor = Color(0xFF0F1E36);
+    
     return Padding(
       padding: EdgeInsets.only(
         left: 20,
@@ -374,16 +378,15 @@ class _PaymentFormState extends State<PaymentForm> {
           ),
           const SizedBox(height: 16),
 
-          // Currency Selector Card
           Row(
             children: [
               Expanded(
                 child: ChoiceChip(
                   label: const Center(child: Text('USD')),
                   selected: _selectedCurrency == 'USD',
-                  selectedColor: Colors.blueAccent,
-                  backgroundColor: Colors.white.withOpacity(0.05),
-                  labelStyle: TextStyle(color: _selectedCurrency == 'USD' ? Colors.white : Colors.white60, fontWeight: FontWeight.bold),
+                  selectedColor: vanillaColor,
+                  backgroundColor: Colors.white.withValues(alpha: 0.05),
+                  labelStyle: TextStyle(color: _selectedCurrency == 'USD' ? darkBlueColor : Colors.white60, fontWeight: FontWeight.bold),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                   onSelected: (val) {
                     if (val) {
@@ -400,9 +403,9 @@ class _PaymentFormState extends State<PaymentForm> {
                 child: ChoiceChip(
                   label: const Center(child: Text('ZiG')),
                   selected: _selectedCurrency == 'ZiG',
-                  selectedColor: Colors.blueAccent,
-                  backgroundColor: Colors.white.withOpacity(0.05),
-                  labelStyle: TextStyle(color: _selectedCurrency == 'ZiG' ? Colors.white : Colors.white60, fontWeight: FontWeight.bold),
+                  selectedColor: vanillaColor,
+                  backgroundColor: Colors.white.withValues(alpha: 0.05),
+                  labelStyle: TextStyle(color: _selectedCurrency == 'ZiG' ? darkBlueColor : Colors.white60, fontWeight: FontWeight.bold),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                   onSelected: (val) {
                     if (val) {
@@ -418,7 +421,6 @@ class _PaymentFormState extends State<PaymentForm> {
           ),
           const SizedBox(height: 16),
 
-          // Amount input field
           TextField(
             controller: _amountController,
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
@@ -426,18 +428,21 @@ class _PaymentFormState extends State<PaymentForm> {
             decoration: InputDecoration(
               labelText: 'Payment Amount',
               labelStyle: const TextStyle(color: Colors.white60),
-              prefixIcon: Icon(
-                _selectedCurrency == 'USD' ? Icons.attach_money : Icons.money_rounded,
-                color: Colors.blueAccent,
+              prefixIcon: const Icon(
+                Icons.attach_money,
+                color: vanillaColor,
               ),
               border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: const BorderSide(color: vanillaColor, width: 2),
+              ),
               filled: true,
-              fillColor: Colors.white.withOpacity(0.03),
+              fillColor: Colors.white.withValues(alpha: 0.03),
             ),
           ),
           const SizedBox(height: 16),
 
-          // Gateway Selector
           const Text('Select Payment Method', style: TextStyle(color: Colors.white60, fontSize: 13, fontWeight: FontWeight.bold)),
           const SizedBox(height: 8),
           DropdownButtonFormField<String>(
@@ -447,7 +452,7 @@ class _PaymentFormState extends State<PaymentForm> {
             decoration: InputDecoration(
               prefixIcon: const Icon(Icons.account_balance_wallet_outlined, color: Colors.white54),
               border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-              fillColor: Colors.white.withOpacity(0.03),
+              fillColor: Colors.white.withValues(alpha: 0.03),
               filled: true,
             ),
             items: ['EcoCash', 'OneMoney', 'Card'].map((method) {
@@ -464,12 +469,11 @@ class _PaymentFormState extends State<PaymentForm> {
           ),
           const SizedBox(height: 24),
 
-          // Pay Button
           ElevatedButton(
             onPressed: _isProcessing ? null : _submitPayment,
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.blueAccent,
-              foregroundColor: Colors.white,
+              backgroundColor: vanillaColor,
+              foregroundColor: darkBlueColor,
               padding: const EdgeInsets.symmetric(vertical: 16),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             ),
@@ -477,9 +481,12 @@ class _PaymentFormState extends State<PaymentForm> {
                 ? const SizedBox(
                     height: 20,
                     width: 20,
-                    child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                    child: CircularProgressIndicator(color: darkBlueColor, strokeWidth: 2),
                   )
-                : Text('Pay Amount (${_selectedCurrency == 'USD' ? '\$' : ''}${_amountController.text} ${_selectedCurrency == 'ZiG' ? 'ZiG' : ''})'),
+                : Text(
+                    'Pay Amount (${_selectedCurrency == 'USD' ? '\$' : ''}${_amountController.text} ${_selectedCurrency == 'ZiG' ? 'ZiG' : ''})',
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
           ),
         ],
       ),
