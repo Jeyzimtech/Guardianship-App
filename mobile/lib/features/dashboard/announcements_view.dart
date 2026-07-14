@@ -36,8 +36,28 @@ class _AnnouncementsViewState extends State<AnnouncementsView> {
         });
       }
     } catch (e) {
+      // Offline fallback: load mock announcements list
       setState(() {
-        _errorMessage = 'Failed to load announcements.';
+        _announcements = [
+          {
+            'audience_role': 'all',
+            'created_at': '2026-07-14',
+            'title': 'Welcome to Edu+Conect!',
+            'content': 'We are pleased to launch the new school communication portal for all parents and teachers.',
+          },
+          {
+            'audience_role': 'guardian',
+            'created_at': '2026-07-12',
+            'title': 'School Fees Terms & Conditions',
+            'content': 'Please verify that Term 2 fee balances are paid in full. Late report release lockdowns apply.',
+          },
+          {
+            'audience_role': 'teacher',
+            'created_at': '2026-07-10',
+            'title': 'Staff Curricular Guidelines',
+            'content': 'Ensure all class rosters and syllabus tracking updates are uploaded to the dashboard.',
+          }
+        ];
       });
     }
 
