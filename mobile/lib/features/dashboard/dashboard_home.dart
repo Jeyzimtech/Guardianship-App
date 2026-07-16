@@ -26,6 +26,112 @@ class _DashboardHomeState extends State<DashboardHome> {
     });
   }
 
+  Widget _buildNavItem(int index, IconData icon, String label, ThemeData theme) {
+    final isSelected = _currentIndex == index;
+    final primaryColor = theme.primaryColor;
+    
+    return GestureDetector(
+      onTap: () => setState(() => _currentIndex = index),
+      behavior: HitTestBehavior.opaque,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            icon,
+            color: isSelected ? primaryColor : const Color(0xFF64748B),
+            size: 22,
+          ),
+          const SizedBox(height: 4),
+          Text(
+            label,
+            style: TextStyle(
+              color: isSelected ? primaryColor : const Color(0xFF64748B),
+              fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+              fontSize: 10,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCustomBottomNavBar(ThemeData theme) {
+    final primaryColor = theme.primaryColor;
+    
+    return Stack(
+      alignment: Alignment.topCenter,
+      clipBehavior: Clip.none,
+      children: [
+        CustomPaint(
+          size: Size(MediaQuery.of(context).size.width, 80),
+          painter: BottomNavPainter(),
+          child: Container(
+            height: 80,
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                // Left 2 items
+                Expanded(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      _buildNavItem(0, Icons.dashboard_outlined, 'Overview', theme),
+                      _buildNavItem(1, Icons.assignment_outlined, 'Reports', theme),
+                    ],
+                  ),
+                ),
+                
+                // Space for FAB
+                const SizedBox(width: 80),
+                
+                // Right 2 items
+                Expanded(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      _buildNavItem(3, Icons.payment_outlined, 'Payments', theme),
+                      _buildNavItem(4, Icons.campaign_outlined, 'Alerts', theme),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        
+        // Central Floating Action Button (Attendance)
+        Positioned(
+          top: -24,
+          child: GestureDetector(
+            onTap: () => setState(() => _currentIndex = 2),
+            child: Container(
+              width: 56,
+              height: 56,
+              decoration: BoxDecoration(
+                color: primaryColor,
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: primaryColor.withValues(alpha: 0.3),
+                    blurRadius: 12,
+                    offset: const Offset(0, 6),
+                  ),
+                ],
+              ),
+              child: const Icon(
+                Icons.calendar_month_rounded,
+                color: Colors.white,
+                size: 26,
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final studentProvider = Provider.of<StudentProvider>(context);
@@ -44,104 +150,121 @@ class _DashboardHomeState extends State<DashboardHome> {
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
-      appBar: AppBar(
-        backgroundColor: primaryColor,
-        elevation: 0,
-        title: user?['role'] == 'guardian'
-            ? _buildChildSwitcher(context, studentProvider)
-            : Text(
-                user?['name'] ?? 'Dashboard',
-                style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.logout_rounded, color: Colors.white),
-            onPressed: () {
-              showDialog(
-                context: context,
-                builder: (context) => AlertDialog(
-                  backgroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    side: const BorderSide(color: Color(0xFFE2E8F0), width: 1.0),
-                  ),
-                  title: Text('Logout', style: TextStyle(color: primaryColor, fontWeight: FontWeight.bold)),
-                  content: Text('Are you sure you want to sign out?', style: TextStyle(color: primaryColor)),
-                  actions: [
-                    TextButton(
-                      child: Text('Cancel', style: TextStyle(color: primaryColor, fontWeight: FontWeight.bold)),
-                      onPressed: () => Navigator.pop(context),
+      bottomNavigationBar: studentProvider.students.isEmpty ? null : _buildCustomBottomNavBar(theme),
+      body: studentProvider.isLoadingStudents
+          ? Center(child: CircularProgressIndicator(color: primaryColor))
+          : Stack(
+              children: [
+                // Top blue header background
+                Container(
+                  height: 180,
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [primaryColor, const Color(0xFF1D4ED8)],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
                     ),
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.redAccent,
-                        foregroundColor: Colors.white,
-                        elevation: 0,
+                  ),
+                ),
+                
+                // Main content
+                Column(
+                  children: [
+                    const SizedBox(height: 12),
+                    // Header Bar (AppBar replacement)
+                    SafeArea(
+                      bottom: false,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            CircleAvatar(
+                              radius: 18,
+                              backgroundColor: Colors.white.withValues(alpha: 0.15),
+                              child: const Icon(Icons.person_rounded, color: Colors.white, size: 20),
+                            ),
+                            if (user?['role'] == 'guardian')
+                              _buildChildSwitcher(context, studentProvider)
+                            else
+                              Text(
+                                user?['name'] ?? 'Dashboard',
+                                style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+                              ),
+                            IconButton(
+                              icon: const Icon(Icons.logout_rounded, color: Colors.white),
+                              onPressed: () {
+                                showDialog(
+                                  context: context,
+                                  builder: (context) => AlertDialog(
+                                    backgroundColor: Colors.white,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                      side: const BorderSide(color: Color(0xFFE2E8F0), width: 1.0),
+                                    ),
+                                    title: Text('Logout', style: TextStyle(color: primaryColor, fontWeight: FontWeight.bold)),
+                                    content: Text('Are you sure you want to sign out?', style: TextStyle(color: primaryColor)),
+                                    actions: [
+                                      TextButton(
+                                        child: Text('Cancel', style: TextStyle(color: primaryColor, fontWeight: FontWeight.bold)),
+                                        onPressed: () => Navigator.pop(context),
+                                      ),
+                                      ElevatedButton(
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: Colors.redAccent,
+                                          foregroundColor: Colors.white,
+                                          elevation: 0,
+                                        ),
+                                        child: const Text('Logout'),
+                                        onPressed: () {
+                                          Navigator.pop(context);
+                                          authProvider.logout();
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
+                            ),
+                          ],
+                        ),
                       ),
-                      child: const Text('Logout'),
-                      onPressed: () {
-                        Navigator.pop(context);
-                        authProvider.logout();
-                      },
+                    ),
+                    const SizedBox(height: 16),
+                    
+                    // Main Curved Body
+                    Expanded(
+                      child: Container(
+                        width: double.infinity,
+                        decoration: const BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(32),
+                            topRight: Radius.circular(32),
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black12,
+                              blurRadius: 15,
+                              offset: Offset(0, -5),
+                            ),
+                          ],
+                        ),
+                        child: ClipRRect(
+                          borderRadius: const BorderRadius.only(
+                            topLeft: Radius.circular(32),
+                            topRight: Radius.circular(32),
+                          ),
+                          child: studentProvider.students.isEmpty
+                              ? _buildEmptyState(user)
+                              : tabs[_currentIndex],
+                        ),
+                      ),
                     ),
                   ],
                 ),
-              );
-            },
-          ),
-        ],
-      ),
-      body: studentProvider.isLoadingStudents
-          ? Center(child: CircularProgressIndicator(color: primaryColor))
-          : studentProvider.students.isEmpty
-              ? _buildEmptyState(user)
-              : tabs[_currentIndex],
-      bottomNavigationBar: studentProvider.students.isEmpty
-          ? null
-          : Container(
-              decoration: const BoxDecoration(
-                border: Border(
-                  top: BorderSide(color: Color(0xFFE2E8F0), width: 1.0),
-                ),
-              ),
-              child: BottomNavigationBar(
-                currentIndex: _currentIndex,
-                onTap: (index) => setState(() => _currentIndex = index),
-                type: BottomNavigationBarType.fixed,
-                backgroundColor: Colors.white,
-                selectedItemColor: theme.colorScheme.secondary,
-                unselectedItemColor: const Color(0xFF64748B),
-                selectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 11),
-                unselectedLabelStyle: const TextStyle(fontSize: 10),
-                elevation: 0,
-                items: const [
-                  BottomNavigationBarItem(
-                    icon: Icon(Icons.dashboard_outlined),
-                    activeIcon: Icon(Icons.dashboard),
-                    label: 'Dashboard',
-                  ),
-                  BottomNavigationBarItem(
-                    icon: Icon(Icons.assignment_outlined),
-                    activeIcon: Icon(Icons.assignment),
-                    label: 'Reports',
-                  ),
-                  BottomNavigationBarItem(
-                    icon: Icon(Icons.calendar_month_outlined),
-                    activeIcon: Icon(Icons.calendar_month),
-                    label: 'Attendance',
-                  ),
-                  BottomNavigationBarItem(
-                    icon: Icon(Icons.payment_outlined),
-                    activeIcon: Icon(Icons.payment),
-                    label: 'Payments',
-                  ),
-                  BottomNavigationBarItem(
-                    icon: Icon(Icons.campaign_outlined),
-                    activeIcon: Icon(Icons.campaign),
-                    label: 'Announcements',
-                  ),
-                ],
-              ),
+              ],
             ),
     );
   }
@@ -498,4 +621,48 @@ class OverviewTab extends StatelessWidget {
       ),
     );
   }
+}
+
+class BottomNavPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    Paint paint = Paint()
+      ..color = Colors.white
+      ..style = PaintingStyle.fill;
+
+    Path path = Path();
+    path.moveTo(0, 0);
+    
+    double notchWidth = 80;
+    double notchHeight = 28;
+    double startX = (size.width - notchWidth) / 2;
+    
+    path.lineTo(startX, 0);
+    
+    // Smooth curve down into the notch
+    path.cubicTo(
+      startX + 20, 0,
+      startX + 15, notchHeight,
+      size.width / 2, notchHeight,
+    );
+    
+    // Smooth curve back up
+    path.cubicTo(
+      size.width / 2 + 15, notchHeight,
+      size.width / 2 + 20, 0,
+      size.width / 2 + notchWidth / 2, 0,
+    );
+    
+    path.lineTo(size.width, 0);
+    path.lineTo(size.width, size.height);
+    path.lineTo(0, size.height);
+    path.close();
+
+    // Draw shadow
+    canvas.drawShadow(path, Colors.black.withValues(alpha: 0.08), 8.0, true);
+    canvas.drawPath(path, paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

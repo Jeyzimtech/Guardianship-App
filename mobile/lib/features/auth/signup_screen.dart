@@ -91,9 +91,10 @@ class _SignupScreenState extends State<SignupScreen> {
 
   @override
   Widget build(BuildContext context) {
-    const primaryColor = Color(0xFF0F172A); // Slate 900
-    const accentColor = Color(0xFFC2410C); // Warm rust-orange
-    const backgroundColor = Color(0xFFF5F2EB); // Warm beige/off-white
+    final theme = Theme.of(context);
+    final primaryColor = theme.primaryColor;
+    final accentColor = theme.colorScheme.secondary;
+    final backgroundColor = theme.scaffoldBackgroundColor;
 
     return Scaffold(
       backgroundColor: backgroundColor,
@@ -105,7 +106,7 @@ class _SignupScreenState extends State<SignupScreen> {
               top: 10,
               left: 10,
               child: IconButton(
-                icon: const Icon(Icons.arrow_back_ios_new_rounded, color: primaryColor),
+                icon: Icon(Icons.arrow_back_ios_new_rounded, color: primaryColor),
                 onPressed: () {
                   Navigator.of(context).pushReplacement(
                     MaterialPageRoute(builder: (_) => const GetStartedScreen()),
@@ -154,7 +155,7 @@ class _SignupScreenState extends State<SignupScreen> {
                     const SizedBox(height: 24),
                     
                     // Header
-                    const Text(
+                    Text(
                       'Create Account',
                       textAlign: TextAlign.center,
                       style: TextStyle(
@@ -180,7 +181,7 @@ class _SignupScreenState extends State<SignupScreen> {
                     // Full Name Field
                     TextField(
                       controller: _nameController,
-                      style: const TextStyle(color: primaryColor, fontWeight: FontWeight.w500),
+                      style: TextStyle(color: primaryColor, fontWeight: FontWeight.w500),
                       keyboardType: TextInputType.name,
                       decoration: InputDecoration(
                         hintText: 'Full Name',
@@ -199,7 +200,7 @@ class _SignupScreenState extends State<SignupScreen> {
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(color: accentColor, width: 1.5),
+                          borderSide: BorderSide(color: accentColor, width: 1.5),
                         ),
                       ),
                     ),
@@ -208,7 +209,7 @@ class _SignupScreenState extends State<SignupScreen> {
                     // Email Field
                     TextField(
                       controller: _emailController,
-                      style: const TextStyle(color: primaryColor, fontWeight: FontWeight.w500),
+                      style: TextStyle(color: primaryColor, fontWeight: FontWeight.w500),
                       keyboardType: TextInputType.emailAddress,
                       decoration: InputDecoration(
                         hintText: 'Email Address',
@@ -227,7 +228,7 @@ class _SignupScreenState extends State<SignupScreen> {
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(color: accentColor, width: 1.5),
+                          borderSide: BorderSide(color: accentColor, width: 1.5),
                         ),
                       ),
                     ),
@@ -237,7 +238,7 @@ class _SignupScreenState extends State<SignupScreen> {
                     TextField(
                       controller: _passwordController,
                       obscureText: _isObscuredPassword,
-                      style: const TextStyle(color: primaryColor, fontWeight: FontWeight.w500),
+                      style: TextStyle(color: primaryColor, fontWeight: FontWeight.w500),
                       decoration: InputDecoration(
                         hintText: 'Password',
                         hintStyle: TextStyle(color: Colors.grey[400], fontSize: 14),
@@ -262,7 +263,7 @@ class _SignupScreenState extends State<SignupScreen> {
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(color: accentColor, width: 1.5),
+                          borderSide: BorderSide(color: accentColor, width: 1.5),
                         ),
                       ),
                     ),
@@ -272,7 +273,7 @@ class _SignupScreenState extends State<SignupScreen> {
                     TextField(
                       controller: _confirmPasswordController,
                       obscureText: _isObscuredConfirm,
-                      style: const TextStyle(color: primaryColor, fontWeight: FontWeight.w500),
+                      style: TextStyle(color: primaryColor, fontWeight: FontWeight.w500),
                       decoration: InputDecoration(
                         hintText: 'Confirm Password',
                         hintStyle: TextStyle(color: Colors.grey[400], fontSize: 14),
@@ -297,7 +298,7 @@ class _SignupScreenState extends State<SignupScreen> {
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(color: accentColor, width: 1.5),
+                          borderSide: BorderSide(color: accentColor, width: 1.5),
                         ),
                       ),
                     ),
@@ -307,7 +308,7 @@ class _SignupScreenState extends State<SignupScreen> {
                     DropdownButtonFormField<String>(
                       initialValue: _selectedRole,
                       dropdownColor: Colors.white,
-                      style: const TextStyle(color: primaryColor, fontWeight: FontWeight.w500),
+                      style: TextStyle(color: primaryColor, fontWeight: FontWeight.w500),
                       decoration: InputDecoration(
                         hintText: 'Account Type',
                         hintStyle: TextStyle(color: Colors.grey[400], fontSize: 14),
@@ -325,13 +326,13 @@ class _SignupScreenState extends State<SignupScreen> {
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(color: accentColor, width: 1.5),
+                          borderSide: BorderSide(color: accentColor, width: 1.5),
                         ),
                       ),
                       items: ['Parent', 'Teacher'].map((role) {
                         return DropdownMenuItem<String>(
                           value: role,
-                          child: Text(role, style: const TextStyle(color: primaryColor)),
+                          child: Text(role, style: TextStyle(color: primaryColor)),
                         );
                       }).toList(),
                       onChanged: (val) {
@@ -378,7 +379,7 @@ class _SignupScreenState extends State<SignupScreen> {
                               MaterialPageRoute(builder: (_) => const LoginScreen()),
                             );
                           },
-                          child: const Text(
+                          child: Text(
                             'Log In',
                             style: TextStyle(
                               color: accentColor,

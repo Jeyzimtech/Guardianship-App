@@ -91,10 +91,9 @@ class _PaymentsViewState extends State<PaymentsView> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final primaryColor = theme.primaryColor;
-    final backgroundColor = theme.scaffoldBackgroundColor;
 
     return Scaffold(
-      backgroundColor: backgroundColor,
+      backgroundColor: Colors.transparent,
       body: _isLoading
           ? Center(child: CircularProgressIndicator(color: primaryColor))
           : _errorMessage != null

@@ -61,9 +61,10 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    const primaryColor = Color(0xFF0F172A); // Slate 900
-    const accentColor = Color(0xFFC2410C); // Warm rust-orange
-    const backgroundColor = Color(0xFFF5F2EB); // Warm beige/off-white
+    final theme = Theme.of(context);
+    final primaryColor = theme.primaryColor;
+    final accentColor = theme.colorScheme.secondary;
+    final backgroundColor = theme.scaffoldBackgroundColor;
 
     return Scaffold(
       backgroundColor: backgroundColor,
@@ -75,7 +76,7 @@ class _LoginScreenState extends State<LoginScreen> {
               top: 10,
               left: 10,
               child: IconButton(
-                icon: const Icon(Icons.arrow_back_ios_new_rounded, color: primaryColor),
+                icon: Icon(Icons.arrow_back_ios_new_rounded, color: primaryColor),
                 onPressed: () {
                   Navigator.of(context).pushReplacement(
                     MaterialPageRoute(builder: (_) => const GetStartedScreen()),
@@ -124,7 +125,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     const SizedBox(height: 32),
                     
                     // Welcome Header
-                    const Text(
+                    Text(
                       'Welcome Back',
                       textAlign: TextAlign.center,
                       style: TextStyle(
@@ -150,7 +151,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     // Email Field
                     TextField(
                       controller: _emailController,
-                      style: const TextStyle(color: primaryColor, fontWeight: FontWeight.w500),
+                      style: TextStyle(color: primaryColor, fontWeight: FontWeight.w500),
                       keyboardType: TextInputType.emailAddress,
                       decoration: InputDecoration(
                         hintText: 'Email Address',
@@ -169,7 +170,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(color: accentColor, width: 1.5),
+                          borderSide: BorderSide(color: accentColor, width: 1.5),
                         ),
                       ),
                     ),
@@ -179,7 +180,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     TextField(
                       controller: _passwordController,
                       obscureText: _isObscured,
-                      style: const TextStyle(color: primaryColor, fontWeight: FontWeight.w500),
+                      style: TextStyle(color: primaryColor, fontWeight: FontWeight.w500),
                       decoration: InputDecoration(
                         hintText: 'Password',
                         hintStyle: TextStyle(color: Colors.grey[400], fontSize: 14),
@@ -204,7 +205,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(color: accentColor, width: 1.5),
+                          borderSide: BorderSide(color: accentColor, width: 1.5),
                         ),
                       ),
                     ),
@@ -218,7 +219,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             const SnackBar(content: Text('Password reset link sent (Simulation).')),
                           );
                         },
-                        child: const Text(
+                        child: Text(
                           'Forgot Password?',
                           style: TextStyle(
                             color: accentColor,
@@ -269,7 +270,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               MaterialPageRoute(builder: (_) => const SignupScreen()),
                             );
                           },
-                          child: const Text(
+                          child: Text(
                             'Sign Up',
                             style: TextStyle(
                               color: accentColor,

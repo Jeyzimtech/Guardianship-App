@@ -28,13 +28,13 @@ class EduConectApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const primaryColor = Color(0xFF0B2144);
-    const accentColor = Color(0xFF2563EB);
-    const backgroundColor = Color(0xFFF8FAFC);
+    const primaryColor = Color(0xFF0047AB); // Cobalt Blue
+    const accentColor = Color(0xFF0047AB); // Cobalt Blue
+    const backgroundColor = Color(0xFFEFEAE2); // Sand
     const surfaceColor = Colors.white;
-    const textPrimaryColor = Color(0xFF0F172A);
-    const textSecondaryColor = Color(0xFF64748B);
-    const borderColor = Color(0xFFE2E8F0);
+    const textPrimaryColor = Color(0xFF1F2937); // Slate 800
+    const textSecondaryColor = Color(0xFF4B5563); // Slate 600
+    const borderColor = Color(0xFFD4CFC7); // Warm grey border
 
     return MaterialApp(
       title: 'Edu+Conect',
