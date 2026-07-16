@@ -26,7 +26,7 @@ class _DashboardHomeState extends State<DashboardHome> {
     });
   }
 
-  Widget _buildNavItem(int index, IconData icon, String label, ThemeData theme) {
+  Widget _buildNavItem(int index, String iconUrl, IconData fallbackIcon, String label, ThemeData theme) {
     final isSelected = _currentIndex == index;
     final primaryColor = theme.primaryColor;
     
@@ -37,10 +37,20 @@ class _DashboardHomeState extends State<DashboardHome> {
         mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            icon,
-            color: isSelected ? primaryColor : const Color(0xFF64748B),
-            size: 22,
+          ColorFiltered(
+            colorFilter: isSelected
+                ? const ColorFilter.mode(Colors.transparent, BlendMode.dst)
+                : const ColorFilter.mode(Color(0xFF94A3B8), BlendMode.srcIn),
+            child: Image.network(
+              iconUrl,
+              width: 24,
+              height: 24,
+              errorBuilder: (context, error, stackTrace) => Icon(
+                fallbackIcon,
+                color: isSelected ? primaryColor : const Color(0xFF64748B),
+                size: 22,
+              ),
+            ),
           ),
           const SizedBox(height: 4),
           Text(
@@ -77,8 +87,8 @@ class _DashboardHomeState extends State<DashboardHome> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      _buildNavItem(0, Icons.dashboard_outlined, 'Overview', theme),
-                      _buildNavItem(1, Icons.assignment_outlined, 'Reports', theme),
+                      _buildNavItem(0, 'https://img.icons8.com/?id=XnHBz2LnhELw&format=png&size=96', Icons.dashboard_outlined, 'Overview', theme),
+                      _buildNavItem(1, 'https://img.icons8.com/?id=13184&format=png&size=96', Icons.assignment_outlined, 'Reports', theme),
                     ],
                   ),
                 ),
@@ -91,8 +101,8 @@ class _DashboardHomeState extends State<DashboardHome> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      _buildNavItem(3, Icons.payment_outlined, 'Payments', theme),
-                      _buildNavItem(4, Icons.campaign_outlined, 'Alerts', theme),
+                      _buildNavItem(3, 'https://img.icons8.com/?id=13016&format=png&size=96', Icons.payment_outlined, 'Payments', theme),
+                      _buildNavItem(4, 'https://img.icons8.com/?id=13757&format=png&size=96', Icons.campaign_outlined, 'Alerts', theme),
                     ],
                   ),
                 ),
@@ -110,20 +120,30 @@ class _DashboardHomeState extends State<DashboardHome> {
               width: 56,
               height: 56,
               decoration: BoxDecoration(
-                color: primaryColor,
+                color: Colors.white,
                 shape: BoxShape.circle,
                 boxShadow: [
                   BoxShadow(
-                    color: primaryColor.withValues(alpha: 0.3),
+                    color: Colors.black.withValues(alpha: 0.1),
                     blurRadius: 12,
                     offset: const Offset(0, 6),
                   ),
                 ],
+                border: Border.all(
+                  color: _currentIndex == 2 ? primaryColor : const Color(0xFFE2E8F0),
+                  width: 2.0,
+                ),
               ),
-              child: const Icon(
-                Icons.calendar_month_rounded,
-                color: Colors.white,
-                size: 26,
+              child: Padding(
+                padding: const EdgeInsets.all(12.0),
+                child: Image.network(
+                  'https://img.icons8.com/?id=26055&format=png&size=96',
+                  errorBuilder: (context, error, stackTrace) => Icon(
+                    Icons.calendar_month_rounded,
+                    color: primaryColor,
+                    size: 26,
+                  ),
+                ),
               ),
             ),
           ),
@@ -407,7 +427,8 @@ class OverviewTab extends StatelessWidget {
                     title: 'Attendance YTD',
                     value: '${attendance['percentage']}%',
                     subtitle: '${attendance['present_days']}/${attendance['total_days']} Days Present',
-                    icon: Icons.check_circle_rounded,
+                    iconUrl: 'https://img.icons8.com/?id=26055&format=png&size=96',
+                    fallbackIcon: Icons.check_circle_rounded,
                     color: Colors.green,
                   ),
                 ),
@@ -418,7 +439,8 @@ class OverviewTab extends StatelessWidget {
                     title: 'Fee Balance Due',
                     value: '\$${fee['balance_usd']}',
                     subtitle: '${fee['balance_zig']} ZiG Outstanding',
-                    icon: Icons.assignment_turned_in_rounded,
+                    iconUrl: 'https://img.icons8.com/?id=13224&format=png&size=96',
+                    fallbackIcon: Icons.assignment_turned_in_rounded,
                     color: double.parse(fee['balance_usd'].toString()) > 0 || double.parse(fee['balance_zig'].toString()) > 0
                         ? Colors.red
                         : Colors.green,
@@ -527,7 +549,8 @@ class OverviewTab extends StatelessWidget {
     required String title,
     required String value,
     required String subtitle,
-    required IconData icon,
+    required String iconUrl,
+    required IconData fallbackIcon,
     required Color color,
   }) {
     final theme = Theme.of(context);
@@ -553,7 +576,12 @@ class OverviewTab extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(title, style: TextStyle(color: theme.textTheme.bodyMedium?.color?.withValues(alpha: 0.5), fontSize: 12, fontWeight: FontWeight.bold)),
-              Icon(icon, color: color, size: 20),
+              Image.network(
+                iconUrl,
+                width: 24,
+                height: 24,
+                errorBuilder: (context, error, stackTrace) => Icon(fallbackIcon, color: color, size: 20),
+              ),
             ],
           ),
           const SizedBox(height: 12),

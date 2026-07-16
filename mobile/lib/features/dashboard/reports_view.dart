@@ -252,11 +252,22 @@ class _ReportsViewState extends State<ReportsView> {
                               color: isGated ? Colors.red.withValues(alpha: 0.08) : primaryColor.withValues(alpha: 0.08),
                               shape: BoxShape.circle,
                             ),
-                            child: Icon(
-                              isGated ? Icons.lock_rounded : Icons.file_present_rounded,
-                              color: isGated ? Colors.red : primaryColor,
-                              size: 24,
-                            ),
+                            child: isGated
+                                ? const Icon(
+                                    Icons.lock_rounded,
+                                    color: Colors.red,
+                                    size: 24,
+                                  )
+                                : Image.network(
+                                    'https://img.icons8.com/?id=13184&format=png&size=96',
+                                    width: 24,
+                                    height: 24,
+                                    errorBuilder: (context, error, stackTrace) => Icon(
+                                      Icons.file_present_rounded,
+                                      color: primaryColor,
+                                      size: 24,
+                                    ),
+                                  ),
                           ),
                           title: Text(
                             report['title'] ?? '',
