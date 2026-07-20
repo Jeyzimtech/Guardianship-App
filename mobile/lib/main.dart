@@ -34,7 +34,6 @@ class EduConectApp extends StatelessWidget {
     const surfaceColor = Color(0xFFF7F9FA); // Soft container tint
     const textPrimaryColor = Color(0xFF0B5549); // Dark Teal text
     const textSecondaryColor = Color(0xFF6B7280); // Gray text
-    const borderColor = Color(0xFFE5E7EB); // Soft light border
 
     return MaterialApp(
       title: 'Edu+Conect',

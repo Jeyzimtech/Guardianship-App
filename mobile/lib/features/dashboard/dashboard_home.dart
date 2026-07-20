@@ -1,10 +1,11 @@
-import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../core/auth_provider.dart';
 import '../../core/student_provider.dart';
-import 'reports_view.dart';
+import '../chat/chat_view.dart';
+import '../profile/profile_view.dart';
 import 'attendance_view.dart';
+import 'attendance_calendar_view.dart';
 import 'payments_view.dart';
 import 'announcements_view.dart';
 
@@ -86,9 +87,8 @@ class _DashboardHomeState extends State<DashboardHome> {
 
     final List<Widget> tabs = [
       const OverviewTab(),
-      const ReportsView(),
-      const AttendanceView(),
-      const PaymentsView(),
+      const ChatView(showAppBar: false),
+      const ProfileView(showAppBar: false),
       const AnnouncementsView(),
     ];
 
@@ -105,56 +105,7 @@ class _DashboardHomeState extends State<DashboardHome> {
     );
   }
 
-  Widget _buildChildSwitcher(BuildContext context, StudentProvider provider) {
-    final theme = Theme.of(context);
-    final primaryColor = theme.primaryColor;
 
-    if (provider.students.isEmpty) {
-      return const Text('Edu+Conect', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold));
-    }
-    
-    final selected = provider.selectedStudent;
-    if (selected == null) return const SizedBox();
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.15),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.25), width: 1.0),
-      ),
-      child: DropdownButtonHideUnderline(
-        child: DropdownButton<Map<String, dynamic>>(
-          value: provider.students.firstWhere(
-            (element) => element['id'] == selected['id'],
-            orElse: () => provider.students.first,
-          ),
-          dropdownColor: primaryColor,
-          icon: const Icon(Icons.keyboard_arrow_down_rounded, color: Colors.white),
-          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
-          items: provider.students.map((dynamic item) {
-            final student = item as Map<String, dynamic>;
-            return DropdownMenuItem<Map<String, dynamic>>(
-              value: student,
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Icon(Icons.person_rounded, color: Colors.white, size: 18),
-                  const SizedBox(width: 8),
-                  Text(student['name'] ?? '', style: const TextStyle(color: Colors.white)),
-                ],
-              ),
-            );
-          }).toList(),
-          onChanged: (Map<String, dynamic>? newStudent) {
-            if (newStudent != null) {
-              provider.selectStudent(newStudent);
-            }
-          },
-        ),
-      ),
-    );
-  }
 
   Widget _buildEmptyState(Map<String, dynamic>? user) {
     return Center(
@@ -184,6 +135,12 @@ class _DashboardHomeState extends State<DashboardHome> {
   }
 }
 
+class OverviewTab extends StatelessWidget {
+  const OverviewTab({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final studentProvider = Provider.of<StudentProvider>(context);
     const mintGreen = Color(0xFF05D099);
     const darkTeal = Color(0xFF0B5549);
     final selectedStudent = studentProvider.selectedStudent;
@@ -375,27 +332,42 @@ class _DashboardHomeState extends State<DashboardHome> {
                   Positioned(
                     bottom: 0,
                     right: 0,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 12),
-                      decoration: const BoxDecoration(
-                        color: Color(0xFF262626),
-                        borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(20),
-                          bottomRight: Radius.circular(24),
-                        ),
-                      ),
-                      child: const Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            'Details  →',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => Scaffold(
+                              appBar: AppBar(
+                                title: const Text('Payments & History'),
+                              ),
+                              body: const PaymentsView(),
                             ),
                           ),
-                        ],
+                        );
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 12),
+                        decoration: const BoxDecoration(
+                          color: Color(0xFF262626),
+                          borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(20),
+                            bottomRight: Radius.circular(24),
+                          ),
+                        ),
+                        child: const Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              'Details  →',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
@@ -405,77 +377,97 @@ class _DashboardHomeState extends State<DashboardHome> {
             const SizedBox(height: 20),
 
             // Quick Action Card 1: Class Selection
-            Container(
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: const Color(0xFFF9FAFB),
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Row(
-                children: [
-                  const Icon(Icons.grid_on_rounded, color: darkTeal, size: 28),
-                  const SizedBox(width: 16),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Form 1 B - Term 1 2025',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.grey.shade800,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        'Change Class',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.grey.shade500,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
+            GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const AttendanceCalendarView(),
                   ),
-                ],
+                );
+              },
+              child: Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF9FAFB),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.grid_on_rounded, color: darkTeal, size: 28),
+                    const SizedBox(width: 16),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Form 1 B - Term 1 2025',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.grey.shade800,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          'Change Class',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey.shade500,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
             const SizedBox(height: 16),
 
             // Quick Action Card 2: Membership
-            Container(
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: const Color(0xFFF9FAFB),
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Row(
-                children: [
-                  const Icon(Icons.badge_outlined, color: darkTeal, size: 28),
-                  const SizedBox(width: 16),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Membership',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.grey.shade800,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        'Show Membership Card',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.grey.shade500,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
+            GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const AttendanceView(),
                   ),
-                ],
+                );
+              },
+              child: Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF9FAFB),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.badge_outlined, color: darkTeal, size: 28),
+                    const SizedBox(width: 16),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Membership',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.grey.shade800,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          'Show Membership Card',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey.shade500,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
           ],
@@ -483,185 +475,4 @@ class _DashboardHomeState extends State<DashboardHome> {
       ),
     );
   }
-
-  Widget _buildStatusBadge(BuildContext context, String status) {
-    final isOptimal = status == 'OPTIMAL';
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-      decoration: BoxDecoration(
-        color: isOptimal ? Colors.green.withValues(alpha: 0.08) : Colors.amber.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(6),
-        border: Border.all(color: isOptimal ? Colors.green.withValues(alpha: 0.5) : Colors.amber.withValues(alpha: 0.5), width: 1.0),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            isOptimal ? Icons.check_circle_outline : Icons.warning_amber_rounded,
-            size: 13,
-            color: isOptimal ? Colors.green : Colors.amber,
-          ),
-          const SizedBox(width: 4),
-          Text(
-            isOptimal ? 'STATUS: OK' : 'STATUS: ALERT',
-            style: TextStyle(
-              fontSize: 10,
-              fontWeight: FontWeight.bold,
-              color: isOptimal ? Colors.green : Colors.amber,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildDashboardCard({
-    required BuildContext context,
-    required String title,
-    required String value,
-    required String subtitle,
-    required String iconUrl,
-    required IconData fallbackIcon,
-    required Color color,
-  }) {
-    final theme = Theme.of(context);
-    final primaryColor = theme.primaryColor;
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFE2E8F0), width: 1.0),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.02),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          )
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(title, style: TextStyle(color: theme.textTheme.bodyMedium?.color?.withValues(alpha: 0.5), fontSize: 12, fontWeight: FontWeight.bold)),
-              Image.network(
-                iconUrl,
-                width: 24,
-                height: 24,
-                errorBuilder: (context, error, stackTrace) => Icon(fallbackIcon, color: color, size: 20),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Text(value, style: TextStyle(color: primaryColor, fontSize: 24, fontWeight: FontWeight.bold)),
-          const SizedBox(height: 4),
-          Text(subtitle, style: TextStyle(color: theme.textTheme.bodyMedium?.color?.withValues(alpha: 0.6), fontSize: 11, fontWeight: FontWeight.w500)),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildZScoreChart(BuildContext context, List<dynamic> trend, Color darkBlue) {
-    if (trend.isEmpty) return const SizedBox();
-    final theme = Theme.of(context);
-
-    return Container(
-      height: 160,
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFE2E8F0), width: 1.0),
-      ),
-      child: LineChart(
-        LineChartData(
-          gridData: const FlGridData(show: false),
-          titlesData: FlTitlesData(
-            show: true,
-            bottomTitles: AxisTitles(
-              sideTitles: SideTitles(
-                showTitles: true,
-                getTitlesWidget: (value, meta) {
-                  int idx = value.toInt();
-                  if (idx >= 0 && idx < trend.length) {
-                    final term = trend[idx]['term'] as String;
-                    final shortTerm = term.contains('Term 1') ? 'T1' : (term.contains('Term 2') ? 'T2' : 'T3');
-                    return Text(shortTerm, style: TextStyle(color: darkBlue.withValues(alpha: 0.6), fontSize: 10, fontWeight: FontWeight.bold));
-                  }
-                  return const SizedBox();
-                },
-              ),
-            ),
-            leftTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-            topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-            rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-          ),
-          borderData: FlBorderData(show: false),
-          lineBarsData: [
-            LineChartBarData(
-              spots: trend.asMap().entries.map((entry) {
-                return FlSpot(entry.key.toDouble(), double.parse(entry.value['z_score'].toString()));
-              }).toList(),
-              isCurved: true,
-              color: theme.colorScheme.secondary,
-              barWidth: 3,
-              isStrokeCapRound: true,
-              dotData: const FlDotData(show: true),
-              belowBarData: BarAreaData(
-                show: true,
-                color: theme.colorScheme.secondary.withValues(alpha: 0.1),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class BottomNavPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    Paint paint = Paint()
-      ..color = Colors.white
-      ..style = PaintingStyle.fill;
-
-    Path path = Path();
-    path.moveTo(0, 0);
-    
-    double notchWidth = 80;
-    double notchHeight = 28;
-    double startX = (size.width - notchWidth) / 2;
-    
-    path.lineTo(startX, 0);
-    
-    // Smooth curve down into the notch
-    path.cubicTo(
-      startX + 20, 0,
-      startX + 15, notchHeight,
-      size.width / 2, notchHeight,
-    );
-    
-    // Smooth curve back up
-    path.cubicTo(
-      size.width / 2 + 15, notchHeight,
-      size.width / 2 + 20, 0,
-      size.width / 2 + notchWidth / 2, 0,
-    );
-    
-    path.lineTo(size.width, 0);
-    path.lineTo(size.width, size.height);
-    path.lineTo(0, size.height);
-    path.close();
-
-    // Draw shadow
-    canvas.drawShadow(path, Colors.black.withValues(alpha: 0.08), 8.0, true);
-    canvas.drawPath(path, paint);
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
