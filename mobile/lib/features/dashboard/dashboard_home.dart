@@ -26,9 +26,10 @@ class _DashboardHomeState extends State<DashboardHome> {
     });
   }
 
-  Widget _buildNavItem(int index, String iconUrl, IconData fallbackIcon, String label, ThemeData theme) {
+  Widget _buildNavItem(int index, IconData icon, String label) {
     final isSelected = _currentIndex == index;
-    final primaryColor = theme.primaryColor;
+    const activeColor = Color(0xFF0B5549);
+    const inactiveColor = Color(0xFF0B5549);
     
     return GestureDetector(
       onTap: () => setState(() => _currentIndex = index),
@@ -37,28 +38,18 @@ class _DashboardHomeState extends State<DashboardHome> {
         mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          ColorFiltered(
-            colorFilter: isSelected
-                ? const ColorFilter.mode(Colors.transparent, BlendMode.dst)
-                : const ColorFilter.mode(Color(0xFF94A3B8), BlendMode.srcIn),
-            child: Image.network(
-              iconUrl,
-              width: 24,
-              height: 24,
-              errorBuilder: (context, error, stackTrace) => Icon(
-                fallbackIcon,
-                color: isSelected ? primaryColor : const Color(0xFF64748B),
-                size: 22,
-              ),
-            ),
+          Icon(
+            icon,
+            color: isSelected ? activeColor : inactiveColor.withValues(alpha: 0.6),
+            size: 26,
           ),
           const SizedBox(height: 4),
           Text(
             label,
             style: TextStyle(
-              color: isSelected ? primaryColor : const Color(0xFF64748B),
-              fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-              fontSize: 10,
+              color: isSelected ? activeColor : inactiveColor.withValues(alpha: 0.6),
+              fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
+              fontSize: 12,
             ),
           ),
         ],
@@ -67,88 +58,21 @@ class _DashboardHomeState extends State<DashboardHome> {
   }
 
   Widget _buildCustomBottomNavBar(ThemeData theme) {
-    final primaryColor = theme.primaryColor;
-    
-    return Stack(
-      alignment: Alignment.topCenter,
-      clipBehavior: Clip.none,
-      children: [
-        CustomPaint(
-          size: Size(MediaQuery.of(context).size.width, 80),
-          painter: BottomNavPainter(),
-          child: Container(
-            height: 80,
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                // Left 2 items
-                Expanded(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      _buildNavItem(0, 'https://img.icons8.com/?id=XnHBz2LnhELw&format=png&size=96', Icons.dashboard_outlined, 'Overview', theme),
-                      _buildNavItem(1, 'https://img.icons8.com/?id=13184&format=png&size=96', Icons.assignment_outlined, 'Reports', theme),
-                    ],
-                  ),
-                ),
-                
-                // Space for FAB
-                const SizedBox(width: 80),
-                
-                // Right 2 items
-                Expanded(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      _buildNavItem(3, 'https://img.icons8.com/?id=13016&format=png&size=96', Icons.payment_outlined, 'Payments', theme),
-                      _buildNavItem(4, 'https://img.icons8.com/?id=13757&format=png&size=96', Icons.campaign_outlined, 'Alerts', theme),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-        
-        // Central Floating Action Button (Attendance)
-        Positioned(
-          top: -24,
-          child: GestureDetector(
-            onTap: () => setState(() => _currentIndex = 2),
-            child: Container(
-              width: 56,
-              height: 56,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                shape: BoxShape.circle,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.1),
-                    blurRadius: 12,
-                    offset: const Offset(0, 6),
-                  ),
-                ],
-                border: Border.all(
-                  color: _currentIndex == 2 ? primaryColor : const Color(0xFFE2E8F0),
-                  width: 2.0,
-                ),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(12.0),
-                child: Image.network(
-                  'https://img.icons8.com/?id=26055&format=png&size=96',
-                  errorBuilder: (context, error, stackTrace) => Icon(
-                    Icons.calendar_month_rounded,
-                    color: primaryColor,
-                    size: 26,
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ),
-      ],
+    return Container(
+      height: 70,
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        border: Border(top: BorderSide(color: Color(0xFFF3F4F6), width: 1.0)),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          _buildNavItem(0, Icons.home_outlined, 'Home'),
+          _buildNavItem(1, Icons.chat_bubble_outline_rounded, 'Chat'),
+          _buildNavItem(2, Icons.account_circle_outlined, 'Profile'),
+          _buildNavItem(3, Icons.notifications_none_rounded, 'Alerts'),
+        ],
+      ),
     );
   }
 
