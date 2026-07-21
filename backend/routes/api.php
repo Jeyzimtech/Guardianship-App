@@ -10,6 +10,7 @@ use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SchoolClassController;
 use App\Http\Controllers\SchoolController;
 use App\Http\Controllers\StudentController;
+use App\Http\Controllers\TeacherController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -53,6 +54,15 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/school-classes', [SchoolClassController::class, 'store']);
         Route::put('/school-classes/{id}', [SchoolClassController::class, 'update']);
         Route::delete('/school-classes/{id}', [SchoolClassController::class, 'destroy']);
+    });
+
+    // Teacher Management Module
+    Route::get('/teachers', [TeacherController::class, 'index']);
+    Route::get('/teachers/{id}', [TeacherController::class, 'show']);
+    Route::middleware('role:admin')->group(function () {
+        Route::post('/teachers', [TeacherController::class, 'store']);
+        Route::put('/teachers/{id}', [TeacherController::class, 'update']);
+        Route::delete('/teachers/{id}', [TeacherController::class, 'destroy']);
     });
 
     // Dashboard

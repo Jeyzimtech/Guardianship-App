@@ -20,4 +20,11 @@ class SchoolClass extends Model
     {
         return $this->belongsTo(AcademicYear::class);
     }
+
+    public function teachers()
+    {
+        return $this->belongsToMany(Teacher::class, 'teacher_school_class')
+                    ->withPivot('id', 'subject_name')
+                    ->withTimestamps();
+    }
 }
