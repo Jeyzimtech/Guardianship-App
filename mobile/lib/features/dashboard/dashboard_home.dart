@@ -1,13 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../core/auth_provider.dart';
 import '../../core/student_provider.dart';
-import '../chat/chat_view.dart';
-import '../profile/profile_view.dart';
-import 'attendance_view.dart';
-import 'attendance_calendar_view.dart';
-import 'payments_view.dart';
-import 'announcements_view.dart';
+import '../common/app_drawer.dart';
+import '../student_management/student_management_screen.dart';
 import '../user_management/user_management_screen.dart';
 import '../school_management/school_management_screen.dart';
 import '../teacher_management/teacher_management_screen.dart';
@@ -20,615 +15,272 @@ class DashboardHome extends StatefulWidget {
 }
 
 class _DashboardHomeState extends State<DashboardHome> {
-  int _currentIndex = 0;
+  static const primaryBlue = Color(0xFF3B5998);
+  static const borderColor = Color(0xFFD8D8D8);
+  String _selectedSchool = 'Hillside Primary School';
 
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<StudentProvider>(context, listen: false).fetchStudents();
-    });
-  }
-
-  Widget _buildNavItem(int index, IconData icon, String label) {
-    final isSelected = _currentIndex == index;
-    const activeColor = Color(0xFF0B2144);
-    const inactiveColor = Color(0xFF64748B);
-    
-    return GestureDetector(
-      onTap: () => setState(() => _currentIndex = index),
-      behavior: HitTestBehavior.opaque,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            icon,
-            color: isSelected ? activeColor : inactiveColor.withValues(alpha: 0.6),
-            size: 26,
-          ),
-          const SizedBox(height: 4),
-          Text(
-            label,
-            style: TextStyle(
-              color: isSelected ? activeColor : inactiveColor.withValues(alpha: 0.6),
-              fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
-              fontSize: 12,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildCustomBottomNavBar(ThemeData theme) {
+  Widget _buildKpiCard(String title, String value, IconData icon, {Color? valueColor, Color? iconBg, Color? iconColor}) {
     return Container(
-      height: 70,
+      padding: const EdgeInsets.all(14),
       decoration: const BoxDecoration(
         color: Colors.white,
-        border: Border(top: BorderSide(color: Color(0xFFF3F4F6), width: 1.0)),
+        borderRadius: BorderRadius.all(Radius.circular(4)),
+        border: Border(
+          top: BorderSide(color: primaryBlue, width: 4.0),
+          left: BorderSide(color: borderColor),
+          right: BorderSide(color: borderColor),
+          bottom: BorderSide(color: borderColor),
+        ),
       ),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          _buildNavItem(0, Icons.home_outlined, 'Home'),
-          _buildNavItem(1, Icons.chat_bubble_outline_rounded, 'Chat'),
-          _buildNavItem(2, Icons.account_circle_outlined, 'Profile'),
-          _buildNavItem(3, Icons.notifications_none_rounded, 'Alerts'),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(title.toUpperCase(), style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFF6B7280))),
+              const SizedBox(height: 4),
+              Text(value, style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: valueColor ?? const Color(0xFF1F2937))),
+            ],
+          ),
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: iconBg ?? const Color(0xFFEEF2FF),
+              borderRadius: BorderRadius.circular(4),
+            ),
+            child: Icon(icon, color: iconColor ?? primaryBlue, size: 22),
+          ),
         ],
       ),
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final studentProvider = Provider.of<StudentProvider>(context);
-    final authProvider = Provider.of<AuthProvider>(context);
-    final user = authProvider.user;
-    final theme = Theme.of(context);
-    final primaryColor = theme.primaryColor;
-
-    final List<Widget> tabs = [
-      const OverviewTab(),
-      const ChatView(showAppBar: false),
-      const ProfileView(showAppBar: false),
-      const AnnouncementsView(),
-    ];
-
-    return Scaffold(
-      backgroundColor: Colors.white,
-      bottomNavigationBar: studentProvider.students.isEmpty ? null : _buildCustomBottomNavBar(theme),
-      body: studentProvider.isLoadingStudents
-          ? Center(child: CircularProgressIndicator(color: primaryColor))
-          : SafeArea(
-              child: studentProvider.students.isEmpty
-                  ? _buildEmptyState(user)
-                  : tabs[_currentIndex],
-            ),
-    );
-  }
-
-
-
-  Widget _buildEmptyState(Map<String, dynamic>? user) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(32.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.person_off_outlined, size: 72, color: const Color(0xFF64748B).withValues(alpha: 0.3)),
-            const SizedBox(height: 16),
-            const Text(
-              'No Student Records Found',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Color(0xFF0F172A)),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              user?['role'] == 'guardian'
-                  ? 'Your account has not been linked to any students yet. Please contact the school administration office to link your children.'
-                  : 'There are no students registered in your school class yet.',
-              textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 14, color: Color(0xFF64748B)),
-            ),
-          ],
+  Widget _buildModuleCard(BuildContext context, String title, String subtitle, IconData icon, Color color, VoidCallback onTap) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(4),
+          border: Border.all(color: borderColor),
         ),
-      ),
-    );
-  }
-}
-
-class OverviewTab extends StatelessWidget {
-  const OverviewTab({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    final studentProvider = Provider.of<StudentProvider>(context);
-    final authProvider = Provider.of<AuthProvider>(context);
-    const primaryBlue = Color(0xFF0B2144);
-    const accentBlue = Color(0xFF2563EB);
-    final selectedStudent = studentProvider.selectedStudent;
-
-    return RefreshIndicator(
-      onRefresh: () => studentProvider.fetchDashboard(selectedStudent?['id'] ?? 1),
-      color: accentBlue,
-      child: SingleChildScrollView(
-        physics: const AlwaysScrollableScrollPhysics(),
-        padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        child: Row(
           children: [
-            // School Header
-            Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(6),
-                  decoration: BoxDecoration(
-                    color: primaryBlue.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: const Icon(Icons.school_rounded, color: primaryBlue, size: 28),
-                ),
-                const SizedBox(width: 12),
-                const Text(
-                  'Queens High School',
-                  style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                    color: primaryBlue,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 20),
-
-            // Student profile section
-            Row(
-              children: [
-                const CircleAvatar(
-                  radius: 30,
-                  backgroundColor: Color(0xFFE2E8F0),
-                  child: Icon(Icons.person_rounded, size: 36, color: Colors.grey),
-                ),
-                const SizedBox(width: 16),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      selectedStudent?['name'] ?? 'Student 1',
-                      style: const TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
-                        color: primaryBlue,
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    const Text(
-                      'Student',
-                      style: TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w600,
-                        color: accentBlue,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-            const SizedBox(height: 24),
-
-            // Royal Blue Payments & History Card
             Container(
-              width: double.infinity,
-              decoration: BoxDecoration(
-                color: accentBlue,
-                borderRadius: BorderRadius.circular(24),
-              ),
-              child: Stack(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(color: color.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(4)),
+              child: Icon(icon, color: color, size: 24),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Padding(
-                    padding: const EdgeInsets.all(22.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Align(
-                          alignment: Alignment.topRight,
-                          child: Text(
-                            'Payments & History',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 12),
-
-                        // Invoices
-                        const Row(
-                          children: [
-                            Icon(Icons.receipt_long_outlined, color: Colors.white, size: 20),
-                            SizedBox(width: 10),
-                            Text(
-                              'Invoices',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                            Spacer(),
-                            Text(
-                              '\$360',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 12),
-
-                        // Payments
-                        const Row(
-                          children: [
-                            Icon(Icons.payment_outlined, color: Colors.white, size: 20),
-                            SizedBox(width: 10),
-                            Text(
-                              'Payments',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                            Spacer(),
-                            Text(
-                              '\$0',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 12),
-
-                        // Divider line
-                        Container(
-                          height: 1,
-                          color: Colors.white.withValues(alpha: 0.5),
-                        ),
-                        const SizedBox(height: 12),
-
-                        // Balance
-                        const Row(
-                          children: [
-                            Icon(Icons.account_balance_wallet_outlined, color: Colors.white, size: 20),
-                            SizedBox(width: 10),
-                            Text(
-                              'Balance',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            Spacer(),
-                            Text(
-                              '\$360',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 40),
-                      ],
-                    ),
-                  ),
-
-                  // Bottom Right Details Button Pill
-                  Positioned(
-                    bottom: 0,
-                    right: 0,
-                    child: GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => Scaffold(
-                              appBar: AppBar(
-                                title: const Text('Payments & History'),
-                              ),
-                              body: const PaymentsView(),
-                            ),
-                          ),
-                        );
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 12),
-                        decoration: const BoxDecoration(
-                          color: Color(0xFF262626),
-                          borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(20),
-                            bottomRight: Radius.circular(24),
-                          ),
-                        ),
-                        child: const Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              'Details  →',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 14,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
+                  Text(title, style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: color)),
+                  const SizedBox(height: 2),
+                  Text(subtitle, style: const TextStyle(fontSize: 12, color: Color(0xFF6B7280))),
                 ],
               ),
             ),
-            const SizedBox(height: 20),
-
-            // Quick Action Card 1: Class Selection
-            GestureDetector(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => const AttendanceCalendarView(),
-                  ),
-                );
-              },
-              child: Container(
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFF8FAFC),
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: const Color(0xFFE2E8F0)),
-                ),
-                child: Row(
-                  children: [
-                    const Icon(Icons.grid_on_rounded, color: primaryBlue, size: 28),
-                    const SizedBox(width: 16),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Form 1 B - Term 1 2025',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.grey.shade800,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          'Change Class',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.grey.shade500,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
-
-            // Quick Action Card 2: Membership
-            GestureDetector(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => const AttendanceView(),
-                  ),
-                );
-              },
-              child: Container(
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFF8FAFC),
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: const Color(0xFFE2E8F0)),
-                ),
-                child: Row(
-                  children: [
-                    const Icon(Icons.badge_outlined, color: primaryBlue, size: 28),
-                    const SizedBox(width: 16),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Membership',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.grey.shade800,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          'Show Membership Card',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.grey.shade500,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            if (authProvider.isAdmin) ...[
-              const SizedBox(height: 16),
-              GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const UserManagementScreen(),
-                    ),
-                  );
-                },
-                child: Container(
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFF3E8FF),
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: const Color(0xFFE9D5FF)),
-                  ),
-                  child: Row(
-                    children: [
-                      const Icon(Icons.manage_accounts_rounded, color: Color(0xFF6B21A8), size: 28),
-                      const SizedBox(width: 16),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            'User Management Module',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: Color(0xFF6B21A8),
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            'Manage Admin, Teacher & Guardian accounts',
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: const Color(0xFF6B21A8).withValues(alpha: 0.8),
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const Spacer(),
-                      const Icon(Icons.arrow_forward_ios_rounded, color: Color(0xFF6B21A8), size: 16),
-                    ],
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-              GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const TeacherManagementScreen(),
-                    ),
-                  );
-                },
-                child: Container(
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFE6F4F1),
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: const Color(0xFFB4E3DB)),
-                  ),
-                  child: Row(
-                    children: [
-                      const Icon(Icons.badge_rounded, color: Color(0xFF0B5549), size: 28),
-                      const SizedBox(width: 16),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            'Teacher Management Module',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: Color(0xFF0B5549),
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            'Manage teachers, subjects & class assignments',
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: const Color(0xFF0B5549).withValues(alpha: 0.8),
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const Spacer(),
-                      const Icon(Icons.arrow_forward_ios_rounded, color: Color(0xFF0B5549), size: 16),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-            if (authProvider.isAdmin || authProvider.isTeacher) ...[
-              const SizedBox(height: 16),
-              GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const SchoolManagementScreen(),
-                    ),
-                  );
-                },
-                child: Container(
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFE0F2FE),
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: const Color(0xFFBAE6FD)),
-                  ),
-                  child: Row(
-                    children: [
-                      const Icon(Icons.school_rounded, color: Color(0xFF0284C7), size: 28),
-                      const SizedBox(width: 16),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            'School Management Module',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: Color(0xFF0284C7),
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            'Manage schools, grades, classes & terms',
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: const Color(0xFF0284C7).withValues(alpha: 0.8),
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const Spacer(),
-                      const Icon(Icons.arrow_forward_ios_rounded, color: Color(0xFF0284C7), size: 16),
-                    ],
-                  ),
-                ),
-              ),
-            ],
+            const Icon(Icons.arrow_forward_ios_rounded, color: Color(0xFF9CA3AF), size: 16),
           ],
         ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final studentProvider = Provider.of<StudentProvider>(context);
+
+    return Scaffold(
+      backgroundColor: const Color(0xFFF9FAFB),
+      appBar: AppBar(
+        backgroundColor: primaryBlue,
+        title: Row(
+          children: [
+            const Icon(Icons.shield_rounded, size: 22),
+            const SizedBox(width: 8),
+            const Text('Guardianship', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+            const Spacer(),
+            DropdownButtonHideUnderline(
+              child: DropdownButton<String>(
+                value: _selectedSchool,
+                dropdownColor: primaryBlue,
+                icon: const Icon(Icons.arrow_drop_down, color: Colors.white),
+                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12),
+                items: const [
+                  DropdownMenuItem(value: 'Hillside Primary School', child: Text('Hillside Primary')),
+                  DropdownMenuItem(value: 'Hillside Preparatory', child: Text('Hillside Prep')),
+                  DropdownMenuItem(value: 'Hillside Secondary', child: Text('Hillside Secondary')),
+                ],
+                onChanged: (val) {
+                  if (val != null) setState(() => _selectedSchool = val);
+                },
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          IconButton(
+            icon: const Stack(
+              children: [
+                Icon(Icons.notifications_outlined),
+                Positioned(right: 0, top: 0, child: CircleAvatar(radius: 6, backgroundColor: Color(0xFFE74C3C))),
+              ],
+            ),
+            onPressed: () => ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('3 New Notifications'))),
+          ),
+          IconButton(
+            icon: const Stack(
+              children: [
+                Icon(Icons.chat_bubble_outline_rounded),
+                Positioned(right: 0, top: 0, child: CircleAvatar(radius: 6, backgroundColor: Color(0xFFE74C3C))),
+              ],
+            ),
+            onPressed: () => ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('15 Unread Messages'))),
+          ),
+        ],
+      ),
+      drawer: const AppDrawer(currentRoute: 'Dashboard'),
+      body: RefreshIndicator(
+        onRefresh: () => studentProvider.fetchDashboard(1),
+        color: primaryBlue,
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Header title
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(_selectedSchool, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: primaryBlue)),
+                      const SizedBox(height: 2),
+                      const Text('School Overview & Performance Dashboard', style: TextStyle(fontSize: 12, color: Color(0xFF6B7280))),
+                    ],
+                  ),
+                  const CircleAvatar(
+                    radius: 18,
+                    backgroundColor: primaryBlue,
+                    child: Text('AT', style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold)),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+
+              // 4 KPI Summary Cards Grid
+              GridView.count(
+                crossAxisCount: 2,
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                crossAxisSpacing: 10,
+                mainAxisSpacing: 10,
+                childAspectRatio: 2.1,
+                children: [
+                  _buildKpiCard('Students', '1,250', Icons.school_rounded),
+                  _buildKpiCard('Attendance', '95%', Icons.fact_check_rounded, valueColor: const Color(0xFF4CAF50), iconBg: const Color(0xFFE8F5E9), iconColor: const Color(0xFF4CAF50)),
+                  _buildKpiCard('Outstanding', 'USD 24,000', Icons.file_present_rounded, valueColor: const Color(0xFFE74C3C), iconBg: const Color(0xFFFDEDEC), iconColor: const Color(0xFFE74C3C)),
+                  _buildKpiCard('Unread', '15', Icons.forum_rounded, valueColor: const Color(0xFFF39C12), iconBg: const Color(0xFFFEF9E7), iconColor: const Color(0xFFF39C12)),
+                ],
+              ),
+              const SizedBox(height: 20),
+
+              // Quick Modules Navigation
+              const Text('Quick Management Modules', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: primaryBlue)),
+              const SizedBox(height: 10),
+              _buildModuleCard(
+                context,
+                'Student Management',
+                'Manage student roster, attendance & fee balances',
+                Icons.school_rounded,
+                primaryBlue,
+                () => Navigator.push(context, MaterialPageRoute(builder: (_) => const StudentManagementScreen())),
+              ),
+              const SizedBox(height: 10),
+              _buildModuleCard(
+                context,
+                'Teacher Management',
+                'Manage teachers, subject specialties & classes',
+                Icons.badge_rounded,
+                const Color(0xFF5B7BD5),
+                () => Navigator.push(context, MaterialPageRoute(builder: (_) => const TeacherManagementScreen())),
+              ),
+              const SizedBox(height: 10),
+              _buildModuleCard(
+                context,
+                'School & Class Management',
+                'Manage schools, academic years & class streams',
+                Icons.domain_rounded,
+                const Color(0xFF0284C7),
+                () => Navigator.push(context, MaterialPageRoute(builder: (_) => const SchoolManagementScreen())),
+              ),
+              const SizedBox(height: 10),
+              _buildModuleCard(
+                context,
+                'User & Role Management',
+                'Manage Admin, Teacher & Guardian accounts',
+                Icons.manage_accounts_rounded,
+                const Color(0xFF6B21A8),
+                () => Navigator.push(context, MaterialPageRoute(builder: (_) => const UserManagementScreen())),
+              ),
+              const SizedBox(height: 20),
+
+              // Recent Activity Section
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(4),
+                  border: const Border(
+                    top: BorderSide(color: primaryBlue, width: 4.0),
+                    left: BorderSide(color: borderColor),
+                    right: BorderSide(color: borderColor),
+                    bottom: BorderSide(color: borderColor),
+                  ),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text('Recent Activity', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: primaryBlue)),
+                        Icon(Icons.history_rounded, color: Color(0xFF6B7280), size: 20),
+                      ],
+                    ),
+                    const Divider(height: 20, color: borderColor),
+                    _buildActivityItem('Teacher Grace uploaded Grade 7 report card', '2 minutes ago'),
+                    _buildActivityItem('Parent John Chewe paid school fees (USD 360)', '10 minutes ago'),
+                    _buildActivityItem('Daily attendance completed for Grade 4 Gold', 'Today, 09:15 AM'),
+                    _buildActivityItem('New student Alice Chewe registered', 'Yesterday'),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildActivityItem(String title, String time) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Color(0xFF1F2937))),
+          const SizedBox(height: 2),
+          Text(time, style: const TextStyle(fontSize: 11, color: Color(0xFF6B7280))),
+        ],
       ),
     );
   }

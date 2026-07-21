@@ -28,85 +28,87 @@ class EduConectApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const primaryColor = Color(0xFF0B2144); // Classic Deep Blue
-    const accentColor = Color(0xFF2563EB); // Royal Blue Accent
-    const backgroundColor = Color(0xFFFFFFFF); // Pitch White
-    const surfaceColor = Color(0xFFFFFFFF); // Pitch White Surface
-    const textPrimaryColor = Color(0xFF0F172A); // Dark Slate Text
-    const textSecondaryColor = Color(0xFF64748B); // Slate Gray Text
-    const borderColor = Color(0xFFE2E8F0); // Light Gray Border
+    // Global Color Palette Specifications
+    const primaryBlue = Color(0xFF3B5998); // Facebook Blue
+    const secondaryBlue = Color(0xFF5B7BD5); // Secondary Blue
+    const backgroundColor = Color(0xFFFFFFFF); // Pitch White Background
+    const surfaceColor = Color(0xFFF5F6F7); // Sidebar / Surface Tint
+    const borderColor = Color(0xFFD8D8D8); // Card & Table Border
+    const textPrimaryColor = Color(0xFF1F2937); // Text Dark
+    const textSecondaryColor = Color(0xFF6B7280); // Text Muted
 
     return MaterialApp(
-      title: 'Edu+Conect',
+      title: 'Guardianship App',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         brightness: Brightness.light,
-        primaryColor: primaryColor,
+        primaryColor: primaryBlue,
         scaffoldBackgroundColor: backgroundColor,
         colorScheme: const ColorScheme.light(
-          primary: primaryColor,
-          secondary: accentColor,
+          primary: primaryBlue,
+          secondary: secondaryBlue,
           surface: surfaceColor,
         ),
-        fontFamily: 'Inter',
+        fontFamily: 'Segoe UI',
         useMaterial3: true,
         cardTheme: CardThemeData(
-          color: surfaceColor,
+          color: backgroundColor,
           elevation: 0,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(4),
             side: const BorderSide(color: borderColor, width: 1.0),
           ),
         ),
         textTheme: const TextTheme(
-          bodyLarge: TextStyle(color: textPrimaryColor),
-          bodyMedium: TextStyle(color: textPrimaryColor),
-          titleLarge: TextStyle(color: primaryColor, fontWeight: FontWeight.bold),
+          bodyLarge: TextStyle(color: textPrimaryColor, fontSize: 14),
+          bodyMedium: TextStyle(color: textPrimaryColor, fontSize: 14),
+          titleLarge: TextStyle(color: primaryBlue, fontSize: 24, fontWeight: FontWeight.bold),
         ),
         appBarTheme: const AppBarTheme(
-          backgroundColor: backgroundColor,
-          foregroundColor: primaryColor,
-          elevation: 0,
+          backgroundColor: primaryBlue,
+          foregroundColor: Colors.white,
+          elevation: 2,
           centerTitle: false,
-          iconTheme: IconThemeData(color: primaryColor),
-          titleTextStyle: TextStyle(color: primaryColor, fontSize: 20, fontWeight: FontWeight.bold),
+          iconTheme: IconThemeData(color: Colors.white),
+          titleTextStyle: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
         ),
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
-            backgroundColor: primaryColor,
+            backgroundColor: primaryBlue,
             foregroundColor: Colors.white,
             elevation: 0,
-            padding: const EdgeInsets.symmetric(vertical: 14),
+            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(14),
+              borderRadius: BorderRadius.circular(4),
             ),
-            textStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+            textStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
           ),
         ),
         outlinedButtonTheme: OutlinedButtonThemeData(
           style: OutlinedButton.styleFrom(
-            foregroundColor: primaryColor,
-            side: const BorderSide(color: primaryColor, width: 1.5),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+            foregroundColor: primaryBlue,
+            side: const BorderSide(color: primaryBlue, width: 1.5),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
             textStyle: const TextStyle(fontWeight: FontWeight.bold),
           ),
         ),
         inputDecorationTheme: InputDecorationTheme(
           filled: true,
-          fillColor: const Color(0xFFF8FAFC),
-          labelStyle: const TextStyle(color: textSecondaryColor, fontSize: 14),
-          hintStyle: TextStyle(color: textSecondaryColor.withValues(alpha: 0.6)),
+          fillColor: backgroundColor,
+          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          labelStyle: const TextStyle(color: textSecondaryColor, fontSize: 13),
+          hintStyle: TextStyle(color: textSecondaryColor.withValues(alpha: 0.6), fontSize: 13),
           border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(4),
             borderSide: const BorderSide(color: borderColor, width: 1.0),
           ),
           enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(4),
             borderSide: const BorderSide(color: borderColor, width: 1.0),
           ),
           focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(16),
-            borderSide: const BorderSide(color: accentColor, width: 1.5),
+            borderRadius: BorderRadius.circular(4),
+            borderSide: const BorderSide(color: secondaryBlue, width: 1.5),
           ),
         ),
       ),
