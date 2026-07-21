@@ -9,6 +9,7 @@ import 'attendance_calendar_view.dart';
 import 'payments_view.dart';
 import 'announcements_view.dart';
 import '../user_management/user_management_screen.dart';
+import '../school_management/school_management_screen.dart';
 
 class DashboardHome extends StatefulWidget {
   const DashboardHome({super.key});
@@ -518,6 +519,57 @@ class OverviewTab extends StatelessWidget {
                       ),
                       const Spacer(),
                       const Icon(Icons.arrow_forward_ios_rounded, color: Color(0xFF6B21A8), size: 16),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+            if (authProvider.isAdmin || authProvider.isTeacher) ...[
+              const SizedBox(height: 16),
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const SchoolManagementScreen(),
+                    ),
+                  );
+                },
+                child: Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFE0F2FE),
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: const Color(0xFFBAE6FD)),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.school_rounded, color: Color(0xFF0284C7), size: 28),
+                      const SizedBox(width: 16),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'School Management Module',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF0284C7),
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            'Manage schools, grades, classes & terms',
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: const Color(0xFF0284C7).withValues(alpha: 0.8),
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const Spacer(),
+                      const Icon(Icons.arrow_forward_ios_rounded, color: Color(0xFF0284C7), size: 16),
                     ],
                   ),
                 ),

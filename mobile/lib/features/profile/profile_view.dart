@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../core/auth_provider.dart';
 import '../user_management/user_management_screen.dart';
+import '../school_management/school_management_screen.dart';
 
 class ProfileView extends StatelessWidget {
   final bool showAppBar;
@@ -220,6 +221,28 @@ class ProfileView extends StatelessWidget {
                   label: const Text('Open User Management Module', style: TextStyle(fontWeight: FontWeight.bold)),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF6B21A8),
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+            ],
+            if (authProvider.isAdmin || authProvider.isTeacher) ...[
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const SchoolManagementScreen()),
+                    );
+                  },
+                  icon: const Icon(Icons.school_rounded),
+                  label: const Text('Open School Management Module', style: TextStyle(fontWeight: FontWeight.bold)),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF0284C7),
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(vertical: 14),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
