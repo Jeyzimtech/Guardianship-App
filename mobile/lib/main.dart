@@ -28,12 +28,13 @@ class EduConectApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const primaryColor = Color(0xFF05D099); // Vibrant Mint Green
-    const darkTealColor = Color(0xFF0B5549); // Dark Teal Accent
-    const backgroundColor = Color(0xFFFFFFFF); // Pure clean white
-    const surfaceColor = Color(0xFFF7F9FA); // Soft container tint
-    const textPrimaryColor = Color(0xFF0B5549); // Dark Teal text
-    const textSecondaryColor = Color(0xFF6B7280); // Gray text
+    const primaryColor = Color(0xFF0B2144); // Classic Deep Blue
+    const accentColor = Color(0xFF2563EB); // Royal Blue Accent
+    const backgroundColor = Color(0xFFFFFFFF); // Pitch White
+    const surfaceColor = Color(0xFFFFFFFF); // Pitch White Surface
+    const textPrimaryColor = Color(0xFF0F172A); // Dark Slate Text
+    const textSecondaryColor = Color(0xFF64748B); // Slate Gray Text
+    const borderColor = Color(0xFFE2E8F0); // Light Gray Border
 
     return MaterialApp(
       title: 'Edu+Conect',
@@ -44,8 +45,8 @@ class EduConectApp extends StatelessWidget {
         scaffoldBackgroundColor: backgroundColor,
         colorScheme: const ColorScheme.light(
           primary: primaryColor,
-          secondary: darkTealColor,
-          surface: backgroundColor,
+          secondary: accentColor,
+          surface: surfaceColor,
         ),
         fontFamily: 'Inter',
         useMaterial3: true,
@@ -54,25 +55,25 @@ class EduConectApp extends StatelessWidget {
           elevation: 0,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
-            side: BorderSide.none,
+            side: const BorderSide(color: borderColor, width: 1.0),
           ),
         ),
         textTheme: const TextTheme(
           bodyLarge: TextStyle(color: textPrimaryColor),
           bodyMedium: TextStyle(color: textPrimaryColor),
-          titleLarge: TextStyle(color: darkTealColor, fontWeight: FontWeight.bold),
+          titleLarge: TextStyle(color: primaryColor, fontWeight: FontWeight.bold),
         ),
         appBarTheme: const AppBarTheme(
           backgroundColor: backgroundColor,
-          foregroundColor: darkTealColor,
+          foregroundColor: primaryColor,
           elevation: 0,
           centerTitle: false,
-          iconTheme: IconThemeData(color: darkTealColor),
-          titleTextStyle: TextStyle(color: darkTealColor, fontSize: 20, fontWeight: FontWeight.bold),
+          iconTheme: IconThemeData(color: primaryColor),
+          titleTextStyle: TextStyle(color: primaryColor, fontSize: 20, fontWeight: FontWeight.bold),
         ),
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
-            backgroundColor: darkTealColor,
+            backgroundColor: primaryColor,
             foregroundColor: Colors.white,
             elevation: 0,
             padding: const EdgeInsets.symmetric(vertical: 14),
@@ -84,28 +85,28 @@ class EduConectApp extends StatelessWidget {
         ),
         outlinedButtonTheme: OutlinedButtonThemeData(
           style: OutlinedButton.styleFrom(
-            foregroundColor: darkTealColor,
-            side: const BorderSide(color: darkTealColor, width: 1.5),
+            foregroundColor: primaryColor,
+            side: const BorderSide(color: primaryColor, width: 1.5),
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
             textStyle: const TextStyle(fontWeight: FontWeight.bold),
           ),
         ),
         inputDecorationTheme: InputDecorationTheme(
           filled: true,
-          fillColor: Color(0xFFF3F4F6),
+          fillColor: const Color(0xFFF8FAFC),
           labelStyle: const TextStyle(color: textSecondaryColor, fontSize: 14),
           hintStyle: TextStyle(color: textSecondaryColor.withValues(alpha: 0.6)),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(16),
-            borderSide: BorderSide.none,
+            borderSide: const BorderSide(color: borderColor, width: 1.0),
           ),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(16),
-            borderSide: BorderSide.none,
+            borderSide: const BorderSide(color: borderColor, width: 1.0),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(16),
-            borderSide: const BorderSide(color: primaryColor, width: 1.5),
+            borderSide: const BorderSide(color: accentColor, width: 1.5),
           ),
         ),
       ),

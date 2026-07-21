@@ -40,7 +40,7 @@ class _ChatViewState extends State<ChatView> {
 
   @override
   Widget build(BuildContext context) {
-    const darkTeal = Color(0xFF0B5549);
+    const darkTeal = Color(0xFF0B2144);
     
     return Scaffold(
       backgroundColor: Colors.white,

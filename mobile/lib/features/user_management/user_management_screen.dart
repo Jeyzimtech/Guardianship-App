@@ -146,14 +146,14 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
         label = 'Admin';
         break;
       case 'teacher':
-        bg = const Color(0xFFE6F4F1);
-        fg = const Color(0xFF0B5549);
+        bg = const Color(0xFFEFF6FF);
+        fg = const Color(0xFF2563EB);
         label = 'Teacher';
         break;
       case 'guardian':
       default:
-        bg = const Color(0xFFE6F9F5);
-        fg = const Color(0xFF05D099);
+        bg = const Color(0xFFF1F5F9);
+        fg = const Color(0xFF0B2144);
         label = 'Guardian';
         break;
     }
@@ -173,7 +173,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
 
   Widget _buildFilterChip(String label, String value) {
     final isSelected = _selectedRoleFilter == value;
-    const darkTeal = Color(0xFF0B5549);
+    const darkTeal = Color(0xFF0B2144);
 
     return FilterChip(
       selected: isSelected,
@@ -196,8 +196,8 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
 
   @override
   Widget build(BuildContext context) {
-    const darkTeal = Color(0xFF0B5549);
-    const mintGreen = Color(0xFF05D099);
+    const darkTeal = Color(0xFF0B2144);
+    const mintGreen = Color(0xFF2563EB);
 
     return Scaffold(
       backgroundColor: Colors.white,

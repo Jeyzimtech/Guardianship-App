@@ -102,8 +102,8 @@ class _CreateClassDialogState extends State<CreateClassDialog> {
 
   @override
   Widget build(BuildContext context) {
-    const darkTeal = Color(0xFF0B5549);
-    const mintGreen = Color(0xFF05D099);
+    const darkTeal = Color(0xFF0B2144);
+    const mintGreen = Color(0xFF2563EB);
     final isEditing = widget.initialClass != null;
 
     return Dialog(

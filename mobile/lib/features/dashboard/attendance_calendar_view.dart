@@ -6,8 +6,8 @@ class AttendanceCalendarView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const mintGreen = Color(0xFF05D099);
-    const darkTeal = Color(0xFF0B5549);
+    const mintGreen = Color(0xFF2563EB);
+    const darkTeal = Color(0xFF0B2144);
     const redAccent = Color(0xFFFF2D55);
     const orangeAccent = Color(0xFFFF9500);
     const cyanAccent = Color(0xFF00E5FF);

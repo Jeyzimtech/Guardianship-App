@@ -13,8 +13,8 @@ class ProfileView extends StatelessWidget {
   Widget build(BuildContext context) {
     final authProvider = Provider.of<AuthProvider>(context);
     final user = authProvider.user;
-    const mintGreen = Color(0xFF05D099);
-    const darkTeal = Color(0xFF0B5549);
+    const mintGreen = Color(0xFF2563EB);
+    const darkTeal = Color(0xFF0B2144);
 
     return Scaffold(
       backgroundColor: Colors.white,

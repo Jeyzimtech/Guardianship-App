@@ -13,8 +13,8 @@ class _AttendanceViewState extends State<AttendanceView> {
 
   @override
   Widget build(BuildContext context) {
-    const mintGreen = Color(0xFF05D099);
-    const darkTeal = Color(0xFF0B5549);
+    const mintGreen = Color(0xFF2563EB);
+    const darkTeal = Color(0xFF0B2144);
 
     return Scaffold(
       backgroundColor: Colors.white,

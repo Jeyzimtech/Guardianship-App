@@ -32,8 +32,8 @@ class _DashboardHomeState extends State<DashboardHome> {
 
   Widget _buildNavItem(int index, IconData icon, String label) {
     final isSelected = _currentIndex == index;
-    const activeColor = Color(0xFF0B5549);
-    const inactiveColor = Color(0xFF0B5549);
+    const activeColor = Color(0xFF0B2144);
+    const inactiveColor = Color(0xFF64748B);
     
     return GestureDetector(
       onTap: () => setState(() => _currentIndex = index),
@@ -145,13 +145,13 @@ class OverviewTab extends StatelessWidget {
   Widget build(BuildContext context) {
     final studentProvider = Provider.of<StudentProvider>(context);
     final authProvider = Provider.of<AuthProvider>(context);
-    const mintGreen = Color(0xFF05D099);
-    const darkTeal = Color(0xFF0B5549);
+    const primaryBlue = Color(0xFF0B2144);
+    const accentBlue = Color(0xFF2563EB);
     final selectedStudent = studentProvider.selectedStudent;
 
     return RefreshIndicator(
       onRefresh: () => studentProvider.fetchDashboard(selectedStudent?['id'] ?? 1),
-      color: mintGreen,
+      color: accentBlue,
       child: SingleChildScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
         padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
@@ -164,10 +164,10 @@ class OverviewTab extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(6),
                   decoration: BoxDecoration(
-                    color: darkTeal.withValues(alpha: 0.1),
+                    color: primaryBlue.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: const Icon(Icons.school_rounded, color: darkTeal, size: 28),
+                  child: const Icon(Icons.school_rounded, color: primaryBlue, size: 28),
                 ),
                 const SizedBox(width: 12),
                 const Text(
@@ -175,7 +175,7 @@ class OverviewTab extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
-                    color: darkTeal,
+                    color: primaryBlue,
                   ),
                 ),
               ],
@@ -187,7 +187,7 @@ class OverviewTab extends StatelessWidget {
               children: [
                 const CircleAvatar(
                   radius: 30,
-                  backgroundColor: Color(0xFFE5E7EB),
+                  backgroundColor: Color(0xFFE2E8F0),
                   child: Icon(Icons.person_rounded, size: 36, color: Colors.grey),
                 ),
                 const SizedBox(width: 16),
@@ -199,7 +199,7 @@ class OverviewTab extends StatelessWidget {
                       style: const TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.bold,
-                        color: darkTeal,
+                        color: primaryBlue,
                       ),
                     ),
                     const SizedBox(height: 2),
@@ -208,7 +208,7 @@ class OverviewTab extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w600,
-                        color: mintGreen,
+                        color: accentBlue,
                       ),
                     ),
                   ],
@@ -217,11 +217,11 @@ class OverviewTab extends StatelessWidget {
             ),
             const SizedBox(height: 24),
 
-            // Mint Green Payments & History Card
+            // Royal Blue Payments & History Card
             Container(
               width: double.infinity,
               decoration: BoxDecoration(
-                color: mintGreen,
+                color: accentBlue,
                 borderRadius: BorderRadius.circular(24),
               ),
               child: Stack(
@@ -393,12 +393,13 @@ class OverviewTab extends StatelessWidget {
               child: Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFF9FAFB),
+                  color: const Color(0xFFF8FAFC),
                   borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: const Color(0xFFE2E8F0)),
                 ),
                 child: Row(
                   children: [
-                    const Icon(Icons.grid_on_rounded, color: darkTeal, size: 28),
+                    const Icon(Icons.grid_on_rounded, color: primaryBlue, size: 28),
                     const SizedBox(width: 16),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -441,12 +442,13 @@ class OverviewTab extends StatelessWidget {
               child: Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFF9FAFB),
+                  color: const Color(0xFFF8FAFC),
                   borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: const Color(0xFFE2E8F0)),
                 ),
                 child: Row(
                   children: [
-                    const Icon(Icons.badge_outlined, color: darkTeal, size: 28),
+                    const Icon(Icons.badge_outlined, color: primaryBlue, size: 28),
                     const SizedBox(width: 16),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,

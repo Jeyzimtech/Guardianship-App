@@ -11,8 +11,8 @@ class TeacherManagementScreen extends StatefulWidget {
 }
 
 class _TeacherManagementScreenState extends State<TeacherManagementScreen> {
-  static const darkTeal = Color(0xFF0B5549);
-  static const mintGreen = Color(0xFF05D099);
+  static const darkTeal = Color(0xFF0B2144);
+  static const mintGreen = Color(0xFF2563EB);
 
   bool _isLoading = true;
   String _searchQuery = '';
