@@ -41,9 +41,10 @@ class _LoginScreenState extends State<LoginScreen> {
 
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     
+    final bool isAdmin = email.toLowerCase().contains('admin');
     final bool isTeacher = email.toLowerCase().contains('teacher');
-    final String mockPhone = isTeacher ? '+263772222222' : '+263773333333';
-    final String roleLower = isTeacher ? 'teacher' : 'guardian';
+    final String mockPhone = isAdmin ? '+263771111111' : (isTeacher ? '+263772222222' : '+263773333333');
+    final String roleLower = isAdmin ? 'admin' : (isTeacher ? 'teacher' : 'guardian');
     final mockToken = 'mock-firebase-token-$mockPhone-uid_${roleLower}_123';
     
     final success = await authProvider.loginWithFirebaseToken(mockToken);

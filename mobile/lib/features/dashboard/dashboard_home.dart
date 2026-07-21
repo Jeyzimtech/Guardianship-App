@@ -8,6 +8,7 @@ import 'attendance_view.dart';
 import 'attendance_calendar_view.dart';
 import 'payments_view.dart';
 import 'announcements_view.dart';
+import '../user_management/user_management_screen.dart';
 
 class DashboardHome extends StatefulWidget {
   const DashboardHome({super.key});
@@ -141,6 +142,7 @@ class OverviewTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final studentProvider = Provider.of<StudentProvider>(context);
+    final authProvider = Provider.of<AuthProvider>(context);
     const mintGreen = Color(0xFF05D099);
     const darkTeal = Color(0xFF0B5549);
     final selectedStudent = studentProvider.selectedStudent;
@@ -470,6 +472,57 @@ class OverviewTab extends StatelessWidget {
                 ),
               ),
             ),
+            if (authProvider.isAdmin) ...[
+              const SizedBox(height: 16),
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const UserManagementScreen(),
+                    ),
+                  );
+                },
+                child: Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF3E8FF),
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: const Color(0xFFE9D5FF)),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.manage_accounts_rounded, color: Color(0xFF6B21A8), size: 28),
+                      const SizedBox(width: 16),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'User Management Module',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF6B21A8),
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            'Manage Admin, Teacher & Guardian accounts',
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: const Color(0xFF6B21A8).withValues(alpha: 0.8),
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const Spacer(),
+                      const Icon(Icons.arrow_forward_ios_rounded, color: Color(0xFF6B21A8), size: 16),
+                    ],
+                  ),
+                ),
+              ),
+            ],
           ],
         ),
       ),

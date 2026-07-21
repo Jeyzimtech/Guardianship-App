@@ -65,8 +65,12 @@ class _SignupScreenState extends State<SignupScreen> {
 
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     
-    final String mockPhone = _selectedRole == 'Teacher' ? '+263772222222' : '+263773333333';
-    final String roleLower = _selectedRole == 'Teacher' ? 'teacher' : 'guardian';
+    final String mockPhone = _selectedRole == 'Admin' 
+        ? '+263771111111' 
+        : (_selectedRole == 'Teacher' ? '+263772222222' : '+263773333333');
+    final String roleLower = _selectedRole == 'Admin' 
+        ? 'admin' 
+        : (_selectedRole == 'Teacher' ? 'teacher' : 'guardian');
     final mockToken = 'mock-firebase-token-$mockPhone-uid_${roleLower}_123';
 
     final success = await authProvider.loginWithFirebaseToken(mockToken);
@@ -329,7 +333,7 @@ class _SignupScreenState extends State<SignupScreen> {
                           borderSide: BorderSide(color: accentColor, width: 1.5),
                         ),
                       ),
-                      items: ['Parent', 'Teacher'].map((role) {
+                      items: ['Parent', 'Teacher', 'Admin'].map((role) {
                         return DropdownMenuItem<String>(
                           value: role,
                           child: Text(role, style: TextStyle(color: primaryColor)),

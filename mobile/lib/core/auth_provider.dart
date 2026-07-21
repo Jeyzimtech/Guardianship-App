@@ -15,6 +15,10 @@ class AuthProvider extends ChangeNotifier {
   Map<String, dynamic>? get user => _user;
   String? get errorMessage => _errorMessage;
 
+  bool get isAdmin => _user?['role'] == 'admin';
+  bool get isTeacher => _user?['role'] == 'teacher';
+  bool get isGuardian => _user?['role'] == 'guardian';
+
   AuthProvider(this.apiClient) {
     _tryAutoLogin();
   }
@@ -62,12 +66,17 @@ class AuthProvider extends ChangeNotifier {
       }
     } catch (e) {
       // Offline fallback: simulate successful login for prototype
-      final isTeacher = firebaseIdToken.contains('teacher') || firebaseIdToken.contains('+263772222222');
+      final isAdminRole = firebaseIdToken.contains('admin') || firebaseIdToken.contains('+263771111111');
+      final isTeacherRole = firebaseIdToken.contains('teacher') || firebaseIdToken.contains('+263772222222');
+      final role = isAdminRole ? 'admin' : (isTeacherRole ? 'teacher' : 'guardian');
+      final name = isAdminRole ? 'Admin Tinotenda' : (isTeacherRole ? 'Teacher Grace' : 'Guardian John Chewe');
+      final phone = isAdminRole ? '+263771111111' : (isTeacherRole ? '+263772222222' : '+263773333333');
+
       _token = 'mock-local-token-123456';
       _user = {
-        'name': isTeacher ? 'Teacher Grace' : 'Guardian John Chewe',
-        'role': isTeacher ? 'teacher' : 'guardian',
-        'phone_number': isTeacher ? '+263772222222' : '+263773333333',
+        'name': name,
+        'role': role,
+        'phone_number': phone,
       };
 
       final prefs = await SharedPreferences.getInstance();

@@ -82,7 +82,7 @@ class _ChatViewState extends State<ChatView> {
                   children: [
                     if (showTimestamp && msg['timestamp'] != null)
                       Padding(
-                        padding: const EdgeInsets.vertical: 12.0),
+                        padding: const EdgeInsets.symmetric(vertical: 12.0),
                         child: Text(
                           msg['timestamp'],
                           style: TextStyle(

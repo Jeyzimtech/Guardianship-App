@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../../core/auth_provider.dart';
+import '../user_management/user_management_screen.dart';
 
 class ProfileView extends StatelessWidget {
   final bool showAppBar;
@@ -6,6 +9,8 @@ class ProfileView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final authProvider = Provider.of<AuthProvider>(context);
+    final user = authProvider.user;
     const mintGreen = Color(0xFF05D099);
     const darkTeal = Color(0xFF0B5549);
 
@@ -52,9 +57,9 @@ class ProfileView extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 16),
-            const Text(
-              'Student 1',
-              style: TextStyle(
+            Text(
+              user?['name'] ?? 'User Profile',
+              style: const TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.bold,
                 color: darkTeal,
@@ -62,7 +67,7 @@ class ProfileView extends StatelessWidget {
             ),
             const SizedBox(height: 4),
             Text(
-              '1 address rd',
+              user?['phone_number'] ?? '+263773333333',
               style: TextStyle(fontSize: 14, color: Colors.grey.shade600),
             ),
             const SizedBox(height: 2),
@@ -200,6 +205,43 @@ class ProfileView extends StatelessWidget {
                 ],
               ),
             ),
+            const SizedBox(height: 24),
+            if (authProvider.isAdmin) ...[
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const UserManagementScreen()),
+                    );
+                  },
+                  icon: const Icon(Icons.manage_accounts_rounded),
+                  label: const Text('Open User Management Module', style: TextStyle(fontWeight: FontWeight.bold)),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF6B21A8),
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+            ],
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton.icon(
+                onPressed: () => authProvider.logout(),
+                icon: const Icon(Icons.logout_rounded, color: Colors.red),
+                label: const Text('Log Out', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
+                style: OutlinedButton.styleFrom(
+                  side: const BorderSide(color: Colors.red),
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
           ],
         ),
       ),
