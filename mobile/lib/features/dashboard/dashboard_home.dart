@@ -103,7 +103,7 @@ class _DashboardHomeState extends State<DashboardHome> {
           children: [
             const Icon(Icons.shield_rounded, size: 22),
             const SizedBox(width: 8),
-            const Text('Guardianship', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+            const Text('Edu+Conect', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
             const Spacer(),
             DropdownButtonHideUnderline(
               child: DropdownButton<String>(

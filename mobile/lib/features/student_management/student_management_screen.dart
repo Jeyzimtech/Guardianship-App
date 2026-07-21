@@ -18,7 +18,7 @@ class _StudentManagementScreenState extends State<StudentManagementScreen> {
   String _selectedStatusFilter = 'all';
   String _searchQuery = '';
 
-  List<Map<String, dynamic>> _students = [
+  final List<Map<String, dynamic>> _students = [
     {
       'id': 1,
       'name': 'Alice Chewe',
@@ -166,7 +166,7 @@ class _StudentManagementScreenState extends State<StudentManagementScreen> {
       backgroundColor: const Color(0xFFF9FAFB),
       appBar: AppBar(
         backgroundColor: primaryBlue,
-        title: const Text('Guardianship Mobile', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+        title: const Text('Edu+Conect', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
         actions: [
           IconButton(
             icon: const Stack(
@@ -301,7 +301,7 @@ class _StudentManagementScreenState extends State<StudentManagementScreen> {
                     children: [
                       Expanded(
                         child: DropdownButtonFormField<String>(
-                          value: _selectedClassFilter,
+                          initialValue: _selectedClassFilter,
                           decoration: const InputDecoration(contentPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 8)),
                           items: const [
                             DropdownMenuItem(value: 'all', child: Text('Class: All', style: TextStyle(fontSize: 12))),
@@ -318,7 +318,7 @@ class _StudentManagementScreenState extends State<StudentManagementScreen> {
                       const SizedBox(width: 8),
                       Expanded(
                         child: DropdownButtonFormField<String>(
-                          value: _selectedStatusFilter,
+                          initialValue: _selectedStatusFilter,
                           decoration: const InputDecoration(contentPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 8)),
                           items: const [
                             DropdownMenuItem(value: 'all', child: Text('Status: All', style: TextStyle(fontSize: 12))),
