@@ -1070,14 +1070,6 @@
 
             <!-- Top Header -->
             <header class="top-header">
-                <div class="school-selector-wrap">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M3 7v14M21 7v14M12 3L2 7h20L12 3z"/></svg>
-                    <select class="school-select" id="schoolSelect" onchange="updateSchool(this.value)">
-                        <option value="Hillside Primary School">Hillside Primary School</option>
-                        <option value="Hillside Preparatory">Hillside Preparatory</option>
-                        <option value="Hillside Secondary">Hillside Secondary</option>
-                    </select>
-                </div>
                 <div class="header-actions">
                     <button class="action-btn" title="Notifications" onclick="alert('3 New Administrative Alerts')">
                         <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
