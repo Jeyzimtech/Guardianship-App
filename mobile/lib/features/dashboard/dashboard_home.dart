@@ -154,6 +154,34 @@ class _DashboardHomeState extends State<DashboardHome> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // Admin Web Dashboard Redirection Banner
+              Container(
+                width: double.infinity,
+                margin: const EdgeInsets.only(bottom: 16),
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFEEF2FF),
+                  borderRadius: BorderRadius.circular(6),
+                  border: Border.all(color: const Color(0xFFC7D2FE)),
+                ),
+                child: const Row(
+                  children: [
+                    Icon(Icons.important_devices_rounded, color: primaryBlue, size: 22),
+                    SizedBox(width: 10),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('Web Admin Dashboard Available', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: primaryBlue)),
+                          SizedBox(height: 2),
+                          Text('Admins can access full web tools at http://localhost:8000/admin', style: TextStyle(fontSize: 11, color: Color(0xFF4B5563))),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
               // Header title
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,

@@ -147,10 +147,34 @@ class _LoginScreenState extends State<LoginScreen> {
                         fontWeight: FontWeight.w500,
                       ),
                     ),
-                    const SizedBox(height: 36),
+                    // Admin Web Portal Notice
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      margin: const EdgeInsets.only(bottom: 20),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFEFF6FF),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: const Color(0xFFBFDBFE)),
+                      ),
+                      child: const Row(
+                        children: [
+                          Icon(Icons.computer_rounded, color: Color(0xFF1D4ED8), size: 22),
+                          SizedBox(width: 10),
+                          Expanded(
+                            child: Text(
+                              'Administrators: Please access the Web Admin Portal via browser at http://localhost:8000/admin.\nTeachers, Parents & Students login below.',
+                              style: TextStyle(fontSize: 12, color: Color(0xFF1E40AF), height: 1.3),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                     
+                    const SizedBox(height: 16),
+
                     // Email Field
                     TextField(
+
                       controller: _emailController,
                       style: TextStyle(color: primaryColor, fontWeight: FontWeight.w500),
                       keyboardType: TextInputType.emailAddress,
