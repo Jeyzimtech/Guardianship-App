@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edu+Conect - Admin Dashboard Portal</title>
+    <title>Edu+Conect - Admin Portal</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
             --primary-blue: #3B5998;
@@ -38,12 +38,240 @@
         body {
             background-color: var(--bg-light);
             color: var(--text-primary);
-            display: flex;
             min-height: 100vh;
             overflow-x: hidden;
         }
 
-        /* Sidebar Styles */
+        /* AUTH CONTAINER (LOGIN & SIGNUP WITH LOGO ON RIGHT) */
+        .auth-wrapper {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: #F3F4F6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .auth-wrapper.hidden {
+            display: none;
+        }
+
+        .auth-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+            width: 100%;
+            max-width: 960px;
+            min-height: 560px;
+            display: flex;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+
+        /* Left Side: Form Controls */
+        .auth-form-side {
+            flex: 1.1;
+            padding: 44px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .auth-tabs {
+            display: flex;
+            gap: 16px;
+            border-bottom: 2px solid #E5E7EB;
+            margin-bottom: 28px;
+        }
+
+        .auth-tab-btn {
+            background: transparent;
+            border: none;
+            padding: 10px 0;
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            cursor: pointer;
+            position: relative;
+            transition: all 0.2s;
+        }
+
+        .auth-tab-btn.active {
+            color: var(--primary-blue);
+        }
+
+        .auth-tab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--primary-blue);
+        }
+
+        .auth-form {
+            display: none;
+        }
+
+        .auth-form.active {
+            display: block;
+        }
+
+        .auth-title {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--text-primary);
+            margin-bottom: 6px;
+        }
+
+        .auth-subtitle {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 24px;
+        }
+
+        .auth-form .form-group {
+            margin-bottom: 16px;
+        }
+
+        .auth-form label {
+            display: block;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .auth-form input, .auth-form select {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 14px;
+            outline: none;
+            transition: border 0.2s;
+        }
+
+        .auth-form input:focus, .auth-form select:focus {
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgba(59, 89, 152, 0.1);
+        }
+
+        .btn-auth-submit {
+            width: 100%;
+            padding: 14px;
+            background: var(--primary-blue);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: background 0.2s;
+        }
+
+        .btn-auth-submit:hover {
+            background: var(--primary-hover);
+        }
+
+        /* Right Side: Logo & Branding Panel */
+        .auth-logo-side {
+            flex: 0.9;
+            background: linear-gradient(135deg, var(--primary-blue) 0%, #2b4273 100%);
+            color: white;
+            padding: 44px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .auth-logo-side::before {
+            content: '';
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.05);
+            top: -50px;
+            right: -50px;
+        }
+
+        .auth-logo-side::after {
+            content: '';
+            position: absolute;
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.04);
+            bottom: -30px;
+            left: -30px;
+        }
+
+        .logo-badge {
+            width: 90px;
+            height: 90px;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(8px);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .logo-badge svg {
+            width: 52px;
+            height: 52px;
+            fill: white;
+        }
+
+        .brand-heading {
+            font-size: 28px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            margin-bottom: 8px;
+        }
+
+        .brand-subtext {
+            font-size: 14px;
+            line-height: 1.5;
+            opacity: 0.85;
+            max-width: 300px;
+            margin-bottom: 24px;
+        }
+
+        .brand-tag {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        /* MAIN APP LAYOUT */
+        .app-layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
         aside.sidebar {
             width: var(--sidebar-width);
             background: var(--surface-white);
@@ -130,7 +358,6 @@
             text-align: center;
         }
 
-        /* Main Content */
         main.main-content {
             margin-left: var(--sidebar-width);
             flex: 1;
@@ -139,7 +366,6 @@
             min-width: 0;
         }
 
-        /* Top Navbar */
         header.top-header {
             height: 64px;
             background: var(--primary-blue);
@@ -255,7 +481,21 @@
             font-size: 11px;
         }
 
-        /* Container Body */
+        .btn-logout {
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: pointer;
+            margin-left: 8px;
+        }
+
+        .btn-logout:hover {
+            background: rgba(255, 255, 255, 0.25);
+        }
+
         .content-body {
             padding: 28px;
             flex: 1;
@@ -280,7 +520,6 @@
             margin-top: 2px;
         }
 
-        /* Cards & Grids */
         .kpi-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -342,7 +581,6 @@
             stroke-width: 2;
         }
 
-        /* Modules Grid */
         .section-title {
             font-size: 16px;
             font-weight: 700;
@@ -406,7 +644,6 @@
             margin-top: 2px;
         }
 
-        /* Tables & Filters */
         .table-card {
             background: var(--surface-white);
             border: 1px solid var(--border-color);
@@ -559,7 +796,6 @@
             background: var(--danger-bg);
         }
 
-        /* Tab Panes */
         .tab-pane {
             display: none;
         }
@@ -568,7 +804,6 @@
             display: block;
         }
 
-        /* Modal Popup */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -660,7 +895,6 @@
             gap: 10px;
         }
 
-        /* Banner Alert */
         .info-banner {
             background: var(--info-bg);
             border: 1px solid #BAE6FD;
@@ -687,572 +921,663 @@
 </head>
 <body>
 
-    <!-- Sidebar Navigation -->
-    <aside class="sidebar">
-        <div class="brand-header">
-            <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-5.45 9-12V5l-9-4z"/></svg>
-            <span>Edu+Conect</span>
-        </div>
-        <ul class="nav-list">
-            <li class="nav-item">
-                <a class="nav-link active" onclick="switchTab('dashboard')">
-                    <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-                    <span>Dashboard</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" onclick="switchTab('users')">
-                    <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-                    <span>User Management</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" onclick="switchTab('schools')">
-                    <svg viewBox="0 0 24 24"><path d="M3 21h18M3 7v14M21 7v14M6 21V10m4 11V10m4 11V10m4 11V10M12 3L2 7h20L12 3z"/></svg>
-                    <span>School Management</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" onclick="switchTab('teachers')">
-                    <svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
-                    <span>Teachers</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" onclick="switchTab('students')">
-                    <svg viewBox="0 0 24 24"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
-                    <span>Students</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" onclick="switchTab('attendance')">
-                    <svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
-                    <span>Attendance</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" onclick="switchTab('payments')">
-                    <svg viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
-                    <span>Payments & Fees</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" onclick="switchTab('announcements')">
-                    <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-                    <span>Announcements</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" onclick="switchTab('reports')">
-                    <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-                    <span>Reports & Circulars</span>
-                </a>
-            </li>
-        </ul>
-        <div class="sidebar-footer">
-            Admin Portal v1.2 &bull; Edu+Conect Web
-        </div>
-    </aside>
-
-    <!-- Main Content Area -->
-    <main class="main-content">
-
-        <!-- Top Header -->
-        <header class="top-header">
-            <div class="school-selector-wrap">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M3 7v14M21 7v14M12 3L2 7h20L12 3z"/></svg>
-                <select class="school-select" id="schoolSelect" onchange="updateSchool(this.value)">
-                    <option value="Hillside Primary School">Hillside Primary School</option>
-                    <option value="Hillside Preparatory">Hillside Preparatory</option>
-                    <option value="Hillside Secondary">Hillside Secondary</option>
-                </select>
-            </div>
-            <div class="header-actions">
-                <button class="action-btn" title="Notifications" onclick="alert('3 New Administrative Alerts')">
-                    <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-                    <span class="badge-dot"></span>
-                </button>
-                <button class="action-btn" title="Messages" onclick="alert('15 Unread Messages')">
-                    <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-                    <span class="badge-dot"></span>
-                </button>
-                <div class="user-profile-pill">
-                    <div class="avatar">AT</div>
-                    <div class="user-info">
-                        <span class="user-name">Admin Tinotenda</span>
-                        <span class="user-role">Super Administrator</span>
-                    </div>
-                </div>
-            </div>
-        </header>
-
-        <!-- Body Area -->
-        <div class="content-body">
-
-            <!-- Information Banner for Mobile vs Web -->
-            <div class="info-banner">
-                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-                <div>
-                    <strong>Administrator Notice:</strong> This Web Dashboard is the dedicated portal for Administrators. Teachers, Parents & Students must access the Edu+Conect platform via the Mobile Application.
-                </div>
-            </div>
-
-            <!-- TAB 1: DASHBOARD OVERVIEW -->
-            <div id="tab-dashboard" class="tab-pane active">
-                <div class="page-header">
-                    <div>
-                        <h2 class="page-title" id="displaySchoolName">Hillside Primary School</h2>
-                        <p class="page-subtitle">School Overview & Administrative Performance Dashboard</p>
-                    </div>
-                    <button class="btn-primary" onclick="openModal('userModal')">
-                        <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                        Quick Add User
-                    </button>
+    <!-- AUTH SECTION: LOGIN & SIGNUP WITH LOGO ON THE RIGHT -->
+    <div class="auth-wrapper" id="authScreen">
+        <div class="auth-card">
+            
+            <!-- Left Side: Form Controls -->
+            <div class="auth-form-side">
+                <div class="auth-tabs">
+                    <button class="auth-tab-btn active" id="tabBtnLogin" onclick="switchAuthTab('login')">Admin Log In</button>
+                    <button class="auth-tab-btn" id="tabBtnSignup" onclick="switchAuthTab('signup')">Admin Register</button>
                 </div>
 
-                <div class="kpi-grid">
-                    <div class="kpi-card">
-                        <div class="kpi-info">
-                            <p class="title">Total Students</p>
-                            <p class="value" id="kpiStudents">1,250</p>
-                        </div>
-                        <div class="kpi-icon">
-                            <svg viewBox="0 0 24 24"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
-                        </div>
-                    </div>
-                    <div class="kpi-card success">
-                        <div class="kpi-info">
-                            <p class="title">Attendance Rate</p>
-                            <p class="value">95%</p>
-                        </div>
-                        <div class="kpi-icon">
-                            <svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
-                        </div>
-                    </div>
-                    <div class="kpi-card danger">
-                        <div class="kpi-info">
-                            <p class="title">Outstanding Fees</p>
-                            <p class="value">USD 24,000</p>
-                        </div>
-                        <div class="kpi-icon">
-                            <svg viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
-                        </div>
-                    </div>
-                    <div class="kpi-card warning">
-                        <div class="kpi-info">
-                            <p class="title">Unread Messages</p>
-                            <p class="value">15</p>
-                        </div>
-                        <div class="kpi-icon">
-                            <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-                        </div>
-                    </div>
-                </div>
+                <!-- LOGIN FORM -->
+                <form class="auth-form active" id="loginForm" onsubmit="handleLoginSubmit(event)">
+                    <h2 class="auth-title">Welcome Back</h2>
+                    <p class="auth-subtitle">Sign in to your Edu+Conect Web Admin Portal</p>
 
-                <h3 class="section-title">Quick Management Modules</h3>
-                <div class="cards-grid">
-                    <div class="module-card" onclick="switchTab('students')">
-                        <div class="module-icon"><svg viewBox="0 0 24 24"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg></div>
-                        <div class="module-text">
-                            <h4>Student Management</h4>
-                            <p>Enrolment, profiles & class allocations</p>
-                        </div>
-                    </div>
-                    <div class="module-card" onclick="switchTab('users')">
-                        <div class="module-icon"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div>
-                        <div class="module-text">
-                            <h4>User & Access Control</h4>
-                            <p>Manage Admin, Teacher & Guardian accounts</p>
-                        </div>
-                    </div>
-                    <div class="module-card" onclick="switchTab('schools')">
-                        <div class="module-icon"><svg viewBox="0 0 24 24"><path d="M3 21h18M3 7v14M21 7v14M12 3L2 7h20L12 3z"/></svg></div>
-                        <div class="module-text">
-                            <h4>School Setup & Classes</h4>
-                            <p>Academic calendars, terms & grade divisions</p>
-                        </div>
-                    </div>
-                    <div class="module-card" onclick="switchTab('teachers')">
-                        <div class="module-icon"><svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div>
-                        <div class="module-text">
-                            <h4>Teacher Management</h4>
-                            <p>Faculty directory, subjects & class rosters</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- TAB 2: USER MANAGEMENT -->
-            <div id="tab-users" class="tab-pane">
-                <div class="page-header">
-                    <div>
-                        <h2 class="page-title">User Management</h2>
-                        <p class="page-subtitle">Manage system users, security credentials, and access roles</p>
-                    </div>
-                    <button class="btn-primary" onclick="openModal('userModal')">
-                        <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                        Add New User
-                    </button>
-                </div>
-
-                <div class="table-card">
-                    <div class="table-toolbar">
-                        <div class="filter-group">
-                            <button class="filter-btn active" onclick="filterUserRole('all', this)">All Users</button>
-                            <button class="filter-btn" onclick="filterUserRole('admin', this)">Admins</button>
-                            <button class="filter-btn" onclick="filterUserRole('teacher', this)">Teachers</button>
-                            <button class="filter-btn" onclick="filterUserRole('guardian', this)">Guardians</button>
-                        </div>
-                        <input type="text" id="userSearchInput" class="search-input" placeholder="Search by name, email or phone..." onkeyup="renderUsersTable()">
-                    </div>
-                    <table class="data-table">
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Name</th>
-                                <th>Email</th>
-                                <th>Phone Number</th>
-                                <th>Role</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="usersTableBody">
-                            <!-- Populated dynamically via JS -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- TAB 3: SCHOOL MANAGEMENT -->
-            <div id="tab-schools" class="tab-pane">
-                <div class="page-header">
-                    <div>
-                        <h2 class="page-title">School & Class Management</h2>
-                        <p class="page-subtitle">Academic years, term dates, and grade level configurations</p>
-                    </div>
-                    <button class="btn-primary" onclick="alert('Class Modal Opened')">
-                        <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                        Add Grade/Class
-                    </button>
-                </div>
-
-                <div class="table-card" style="padding: 20px; margin-bottom: 24px;">
-                    <h3 class="section-title">Academic Years & Terms</h3>
-                    <table class="data-table" style="margin-top: 10px;">
-                        <thead>
-                            <tr>
-                                <th>Academic Year</th>
-                                <th>Term</th>
-                                <th>Start Date</th>
-                                <th>End Date</th>
-                                <th>Status</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td><strong>2026 Academic Year</strong></td>
-                                <td>Term 1</td>
-                                <td>12 Jan 2026</td>
-                                <td>10 Apr 2026</td>
-                                <td><span class="role-badge teacher">Active Term</span></td>
-                                <td><button class="btn-sm">Edit</button></td>
-                            </tr>
-                            <tr>
-                                <td><strong>2025 Academic Year</strong></td>
-                                <td>Term 3</td>
-                                <td>08 Sep 2025</td>
-                                <td>05 Dec 2025</td>
-                                <td><span class="role-badge guardian">Ended</span></td>
-                                <td><button class="btn-sm">Archive</button></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <h3 class="section-title">Active Classes & Divisions</h3>
-                <div class="table-card">
-                    <table class="data-table">
-                        <thead>
-                            <tr>
-                                <th>Class Name</th>
-                                <th>Grade Level</th>
-                                <th>Form Teacher</th>
-                                <th>Enrolled Students</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="classesTableBody">
-                            <tr>
-                                <td><strong>Grade 1A</strong></td>
-                                <td>Grade 1</td>
-                                <td>Teacher Grace</td>
-                                <td>32 Students</td>
-                                <td><button class="btn-sm">Edit</button></td>
-                            </tr>
-                            <tr>
-                                <td><strong>Grade 2B</strong></td>
-                                <td>Grade 2</td>
-                                <td>Teacher Tendai</td>
-                                <td>28 Students</td>
-                                <td><button class="btn-sm">Edit</button></td>
-                            </tr>
-                            <tr>
-                                <td><strong>Form 4 Science</strong></td>
-                                <td>Form 4</td>
-                                <td>Teacher Robert</td>
-                                <td>30 Students</td>
-                                <td><button class="btn-sm">Edit</button></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- TAB 4: TEACHER MANAGEMENT -->
-            <div id="tab-teachers" class="tab-pane">
-                <div class="page-header">
-                    <div>
-                        <h2 class="page-title">Teacher Directory</h2>
-                        <p class="page-subtitle">Manage school faculty, assigned subjects, and contact records</p>
-                    </div>
-                    <button class="btn-primary" onclick="openModal('teacherModal')">
-                        <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                        Add New Teacher
-                    </button>
-                </div>
-
-                <div class="table-card">
-                    <table class="data-table">
-                        <thead>
-                            <tr>
-                                <th>Teacher Name</th>
-                                <th>Subject Taught</th>
-                                <th>Assigned Class</th>
-                                <th>Email</th>
-                                <th>Phone</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="teachersTableBody">
-                            <!-- Dynamically filled by JS -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- TAB 5: STUDENT MANAGEMENT -->
-            <div id="tab-students" class="tab-pane">
-                <div class="page-header">
-                    <div>
-                        <h2 class="page-title">Student Directory</h2>
-                        <p class="page-subtitle">Student profiles, parent/guardian links, and academic standing</p>
-                    </div>
-                    <div style="display: flex; gap: 10px;">
-                        <button class="btn-sm" style="padding: 8px 12px; font-weight: 600;" onclick="alert('Link Guardian Modal')">Link Guardian</button>
-                        <button class="btn-primary" onclick="openModal('studentModal')">
-                            <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                            Add New Student
-                        </button>
-                    </div>
-                </div>
-
-                <div class="table-card">
-                    <table class="data-table">
-                        <thead>
-                            <tr>
-                                <th>Reg No</th>
-                                <th>Student Name</th>
-                                <th>Class</th>
-                                <th>Guardian Name</th>
-                                <th>Fee Balance</th>
-                                <th>Attendance %</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="studentsTableBody">
-                            <!-- Dynamically filled by JS -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- TAB 6: ATTENDANCE -->
-            <div id="tab-attendance" class="tab-pane">
-                <div class="page-header">
-                    <div>
-                        <h2 class="page-title">Daily Attendance Register</h2>
-                        <p class="page-subtitle">Mark and verify student attendance logs</p>
-                    </div>
-                    <button class="btn-primary" onclick="alert('Attendance saved successfully!')">Save Register</button>
-                </div>
-
-                <div class="table-card">
-                    <div class="table-toolbar">
-                        <div class="filter-group">
-                            <label style="font-size: 13px; font-weight: 600;">Select Date:</label>
-                            <input type="date" class="form-control" style="width: 160px;" value="2026-07-22">
-                            <label style="font-size: 13px; font-weight: 600; margin-left: 14px;">Select Class:</label>
-                            <select class="form-control" style="width: 160px;">
-                                <option>Grade 1A</option>
-                                <option>Grade 2B</option>
-                                <option>Form 4 Science</option>
-                            </select>
-                        </div>
-                    </div>
-                    <table class="data-table">
-                        <thead>
-                            <tr>
-                                <th>Roll No</th>
-                                <th>Student Name</th>
-                                <th>Status</th>
-                                <th>Remarks</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>STU-001</td>
-                                <td>Tafadzwa Chewe</td>
-                                <td>
-                                    <label><input type="radio" name="att_1" checked> Present</label> &nbsp;
-                                    <label><input type="radio" name="att_1"> Absent</label> &nbsp;
-                                    <label><input type="radio" name="att_1"> Late</label>
-                                </td>
-                                <td><input type="text" class="form-control" placeholder="Optional remark..." style="padding: 4px 8px;"></td>
-                            </tr>
-                            <tr>
-                                <td>STU-002</td>
-                                <td>Anesu Moyo</td>
-                                <td>
-                                    <label><input type="radio" name="att_2" checked> Present</label> &nbsp;
-                                    <label><input type="radio" name="att_2"> Absent</label> &nbsp;
-                                    <label><input type="radio" name="att_2"> Late</label>
-                                </td>
-                                <td><input type="text" class="form-control" placeholder="Optional remark..." style="padding: 4px 8px;"></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- TAB 7: PAYMENTS & FEES -->
-            <div id="tab-payments" class="tab-pane">
-                <div class="page-header">
-                    <div>
-                        <h2 class="page-title">Fee Management & Billing</h2>
-                        <p class="page-subtitle">Track school fee payments, outstanding balances, and invoices</p>
-                    </div>
-                    <button class="btn-primary" onclick="alert('Payment Recorded!')">Record Payment</button>
-                </div>
-
-                <div class="table-card">
-                    <table class="data-table">
-                        <thead>
-                            <tr>
-                                <th>Student</th>
-                                <th>Class</th>
-                                <th>Term Fee</th>
-                                <th>Amount Paid</th>
-                                <th>Balance Due</th>
-                                <th>Status</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>Tafadzwa Chewe</td>
-                                <td>Grade 1A</td>
-                                <td>USD 450.00</td>
-                                <td>USD 450.00</td>
-                                <td>USD 0.00</td>
-                                <td><span class="role-badge teacher">Paid in Full</span></td>
-                                <td><button class="btn-sm">Statement</button></td>
-                            </tr>
-                            <tr>
-                                <td>Anesu Moyo</td>
-                                <td>Grade 2B</td>
-                                <td>USD 450.00</td>
-                                <td>USD 200.00</td>
-                                <td>USD 250.00</td>
-                                <td><span class="role-badge guardian">Partial</span></td>
-                                <td><button class="btn-sm">Receipt</button></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- TAB 8: ANNOUNCEMENTS -->
-            <div id="tab-announcements" class="tab-pane">
-                <div class="page-header">
-                    <div>
-                        <h2 class="page-title">School Announcements</h2>
-                        <p class="page-subtitle">Publish announcements and circulars to mobile app users</p>
-                    </div>
-                    <button class="btn-primary" onclick="alert('Announcement Published to Mobile App!')">Publish Announcement</button>
-                </div>
-
-                <div class="table-card" style="padding: 20px; margin-bottom: 24px;">
-                    <h3 class="section-title">New Announcement Form</h3>
                     <div class="form-group">
-                        <label>Announcement Title</label>
-                        <input type="text" class="form-control" placeholder="e.g. End of Term Parent-Teacher Consultation Meeting">
+                        <label>Admin Email</label>
+                        <input type="email" id="loginEmail" value="admin@hillside.ac.zw" placeholder="admin@hillside.ac.zw" required>
                     </div>
+
                     <div class="form-group">
-                        <label>Target Audience</label>
-                        <select class="form-control">
-                            <option>All Users (Guardians & Teachers)</option>
-                            <option>Guardians Only</option>
-                            <option>Teachers Only</option>
+                        <label>Password</label>
+                        <input type="password" id="loginPassword" value="password123" placeholder="••••••••" required>
+                    </div>
+
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; font-size: 13px;">
+                        <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; text-transform: none; color: var(--text-primary);">
+                            <input type="checkbox" checked> Remember session
+                        </label>
+                        <a href="#" style="color: var(--primary-blue); text-decoration: none; font-weight: 600;" onclick="alert('Password reset instructions sent to email.')">Forgot password?</a>
+                    </div>
+
+                    <button type="submit" class="btn-auth-submit">LOG IN TO DASHBOARD</button>
+                </form>
+
+                <!-- SIGNUP FORM -->
+                <form class="auth-form" id="signupForm" onsubmit="handleSignupSubmit(event)">
+                    <h2 class="auth-title">Create Admin Account</h2>
+                    <p class="auth-subtitle">Register a new administrator credential</p>
+
+                    <div class="form-group">
+                        <label>Full Name</label>
+                        <input type="text" id="signupName" placeholder="Admin Tinotenda" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Admin Email</label>
+                        <input type="email" id="signupEmail" placeholder="admin@hillside.ac.zw" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Phone Number</label>
+                        <input type="text" id="signupPhone" placeholder="+263771111111" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Assigned School</label>
+                        <select id="signupSchool" required>
+                            <option value="Hillside Primary School">Hillside Primary School</option>
+                            <option value="Hillside Preparatory">Hillside Preparatory</option>
+                            <option value="Hillside Secondary">Hillside Secondary</option>
                         </select>
                     </div>
+
                     <div class="form-group">
-                        <label>Message Content</label>
-                        <textarea class="form-control" rows="4" placeholder="Enter announcement body text here..."></textarea>
+                        <label>Password</label>
+                        <input type="password" id="signupPassword" placeholder="••••••••" required>
                     </div>
-                </div>
+
+                    <button type="submit" class="btn-auth-submit">CREATE ADMIN ACCOUNT</button>
+                </form>
             </div>
 
-            <!-- TAB 9: REPORTS -->
-            <div id="tab-reports" class="tab-pane">
-                <div class="page-header">
-                    <div>
-                        <h2 class="page-title">Reports & Academic Documents</h2>
-                        <p class="page-subtitle">Upload and issue term report cards for parents</p>
-                    </div>
-                    <button class="btn-primary" onclick="alert('Report Uploaded!')">Upload Report Card</button>
+            <!-- Right Side: Brand Logo Panel -->
+            <div class="auth-logo-side">
+                <div class="logo-badge" style="width: auto; height: auto; background: transparent; border: none; box-shadow: none; padding: 0; margin-bottom: 20px;">
+                    <img src="/assets/logo.png" alt="Edu+Conect Logo" style="max-width: 150px; max-height: 150px; object-fit: contain; filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.25)); border-radius: 16px;">
                 </div>
-
-                <div class="table-card">
-                    <table class="data-table">
-                        <thead>
-                            <tr>
-                                <th>Student Name</th>
-                                <th>Academic Term</th>
-                                <th>Report File</th>
-                                <th>Uploaded Date</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>Tafadzwa Chewe</td>
-                                <td>2026 Term 1 Progress Report</td>
-                                <td><code>Tafadzwa_Chewe_Report.pdf</code></td>
-                                <td>18 Jul 2026</td>
-                                <td><button class="btn-sm">Download</button></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
+                <h1 class="brand-heading">Edu+Conect</h1>
+                <p class="brand-subtext">Comprehensive Web Administration Portal for School Managers & Board Members.</p>
+                <span class="brand-tag">WEB ADMIN DASHBOARD</span>
             </div>
 
         </div>
-    </main>
+    </div>
+
+
+    <!-- MAIN DASHBOARD CONTENT CONTAINER -->
+    <div class="app-layout" id="dashboardScreen">
+        
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="brand-header">
+                <img src="/assets/logo.png" alt="Edu+Conect Logo" style="height: 36px; width: 36px; object-fit: contain; background: white; border-radius: 6px; padding: 2px;">
+                <span>Edu+Conect</span>
+            </div>
+            <ul class="nav-list">
+                <li class="nav-item">
+                    <a class="nav-link active" onclick="switchTab('dashboard')">
+                        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" onclick="switchTab('users')">
+                        <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                        <span>User Management</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" onclick="switchTab('schools')">
+                        <svg viewBox="0 0 24 24"><path d="M3 21h18M3 7v14M21 7v14M6 21V10m4 11V10m4 11V10m4 11V10M12 3L2 7h20L12 3z"/></svg>
+                        <span>School Management</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" onclick="switchTab('teachers')">
+                        <svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+                        <span>Teachers</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" onclick="switchTab('students')">
+                        <svg viewBox="0 0 24 24"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+                        <span>Students</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" onclick="switchTab('attendance')">
+                        <svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+                        <span>Attendance</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" onclick="switchTab('payments')">
+                        <svg viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+                        <span>Payments & Fees</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" onclick="switchTab('announcements')">
+                        <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                        <span>Announcements</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" onclick="switchTab('reports')">
+                        <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                        <span>Reports & Circulars</span>
+                    </a>
+                </li>
+            </ul>
+            <div class="sidebar-footer">
+                Admin Portal v1.2 &bull; Edu+Conect Web
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+
+            <!-- Top Header -->
+            <header class="top-header">
+                <div class="school-selector-wrap">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M3 7v14M21 7v14M12 3L2 7h20L12 3z"/></svg>
+                    <select class="school-select" id="schoolSelect" onchange="updateSchool(this.value)">
+                        <option value="Hillside Primary School">Hillside Primary School</option>
+                        <option value="Hillside Preparatory">Hillside Preparatory</option>
+                        <option value="Hillside Secondary">Hillside Secondary</option>
+                    </select>
+                </div>
+                <div class="header-actions">
+                    <button class="action-btn" title="Notifications" onclick="alert('3 New Administrative Alerts')">
+                        <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                        <span class="badge-dot"></span>
+                    </button>
+                    <button class="action-btn" title="Messages" onclick="alert('15 Unread Messages')">
+                        <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                        <span class="badge-dot"></span>
+                    </button>
+                    <div class="user-profile-pill">
+                        <div class="avatar" id="headerAvatar">AT</div>
+                        <div class="user-info">
+                            <span class="user-name" id="headerAdminName">Admin Tinotenda</span>
+                            <span class="user-role">Super Administrator</span>
+                        </div>
+                        <button class="btn-logout" onclick="handleLogout()">Log Out</button>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Body Area -->
+            <div class="content-body">
+
+                <!-- Information Banner for Mobile vs Web -->
+                <div class="info-banner">
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                    <div>
+                        <strong>Administrator Notice:</strong> This Web Dashboard is the dedicated portal for Administrators. Teachers, Parents & Students must access the Edu+Conect platform via the Mobile Application.
+                    </div>
+                </div>
+
+                <!-- TAB 1: DASHBOARD OVERVIEW -->
+                <div id="tab-dashboard" class="tab-pane active">
+                    <div class="page-header">
+                        <div>
+                            <h2 class="page-title" id="displaySchoolName">Hillside Primary School</h2>
+                            <p class="page-subtitle">School Overview & Administrative Performance Dashboard</p>
+                        </div>
+                        <button class="btn-primary" onclick="openModal('userModal')">
+                            <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                            Quick Add User
+                        </button>
+                    </div>
+
+                    <div class="kpi-grid">
+                        <div class="kpi-card">
+                            <div class="kpi-info">
+                                <p class="title">Total Students</p>
+                                <p class="value" id="kpiStudents">1,250</p>
+                            </div>
+                            <div class="kpi-icon">
+                                <svg viewBox="0 0 24 24"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+                            </div>
+                        </div>
+                        <div class="kpi-card success">
+                            <div class="kpi-info">
+                                <p class="title">Attendance Rate</p>
+                                <p class="value">95%</p>
+                            </div>
+                            <div class="kpi-icon">
+                                <svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+                            </div>
+                        </div>
+                        <div class="kpi-card danger">
+                            <div class="kpi-info">
+                                <p class="title">Outstanding Fees</p>
+                                <p class="value">USD 24,000</p>
+                            </div>
+                            <div class="kpi-icon">
+                                <svg viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+                            </div>
+                        </div>
+                        <div class="kpi-card warning">
+                            <div class="kpi-info">
+                                <p class="title">Unread Messages</p>
+                                <p class="value">15</p>
+                            </div>
+                            <div class="kpi-icon">
+                                <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h3 class="section-title">Quick Management Modules</h3>
+                    <div class="cards-grid">
+                        <div class="module-card" onclick="switchTab('students')">
+                            <div class="module-icon"><svg viewBox="0 0 24 24"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg></div>
+                            <div class="module-text">
+                                <h4>Student Management</h4>
+                                <p>Enrolment, profiles & class allocations</p>
+                            </div>
+                        </div>
+                        <div class="module-card" onclick="switchTab('users')">
+                            <div class="module-icon"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div>
+                            <div class="module-text">
+                                <h4>User & Access Control</h4>
+                                <p>Manage Admin, Teacher & Guardian accounts</p>
+                            </div>
+                        </div>
+                        <div class="module-card" onclick="switchTab('schools')">
+                            <div class="module-icon"><svg viewBox="0 0 24 24"><path d="M3 21h18M3 7v14M21 7v14M12 3L2 7h20L12 3z"/></svg></div>
+                            <div class="module-text">
+                                <h4>School Setup & Classes</h4>
+                                <p>Academic calendars, terms & grade divisions</p>
+                            </div>
+                        </div>
+                        <div class="module-card" onclick="switchTab('teachers')">
+                            <div class="module-icon"><svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div>
+                            <div class="module-text">
+                                <h4>Teacher Management</h4>
+                                <p>Faculty directory, subjects & class rosters</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 2: USER MANAGEMENT -->
+                <div id="tab-users" class="tab-pane">
+                    <div class="page-header">
+                        <div>
+                            <h2 class="page-title">User Management</h2>
+                            <p class="page-subtitle">Manage system users, security credentials, and access roles</p>
+                        </div>
+                        <button class="btn-primary" onclick="openModal('userModal')">
+                            <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                            Add New User
+                        </button>
+                    </div>
+
+                    <div class="table-card">
+                        <div class="table-toolbar">
+                            <div class="filter-group">
+                                <button class="filter-btn active" onclick="filterUserRole('all', this)">All Users</button>
+                                <button class="filter-btn" onclick="filterUserRole('admin', this)">Admins</button>
+                                <button class="filter-btn" onclick="filterUserRole('teacher', this)">Teachers</button>
+                                <button class="filter-btn" onclick="filterUserRole('guardian', this)">Guardians</button>
+                            </div>
+                            <input type="text" id="userSearchInput" class="search-input" placeholder="Search by name, email or phone..." onkeyup="renderUsersTable()">
+                        </div>
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Phone Number</th>
+                                    <th>Role</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="usersTableBody">
+                                <!-- Populated dynamically via JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- TAB 3: SCHOOL MANAGEMENT -->
+                <div id="tab-schools" class="tab-pane">
+                    <div class="page-header">
+                        <div>
+                            <h2 class="page-title">School & Class Management</h2>
+                            <p class="page-subtitle">Academic years, term dates, and grade level configurations</p>
+                        </div>
+                        <button class="btn-primary" onclick="alert('Class Modal Opened')">
+                            <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                            Add Grade/Class
+                        </button>
+                    </div>
+
+                    <div class="table-card" style="padding: 20px; margin-bottom: 24px;">
+                        <h3 class="section-title">Academic Years & Terms</h3>
+                        <table class="data-table" style="margin-top: 10px;">
+                            <thead>
+                                <tr>
+                                    <th>Academic Year</th>
+                                    <th>Term</th>
+                                    <th>Start Date</th>
+                                    <th>End Date</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>2026 Academic Year</strong></td>
+                                    <td>Term 1</td>
+                                    <td>12 Jan 2026</td>
+                                    <td>10 Apr 2026</td>
+                                    <td><span class="role-badge teacher">Active Term</span></td>
+                                    <td><button class="btn-sm">Edit</button></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>2025 Academic Year</strong></td>
+                                    <td>Term 3</td>
+                                    <td>08 Sep 2025</td>
+                                    <td>05 Dec 2025</td>
+                                    <td><span class="role-badge guardian">Ended</span></td>
+                                    <td><button class="btn-sm">Archive</button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h3 class="section-title">Active Classes & Divisions</h3>
+                    <div class="table-card">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Class Name</th>
+                                    <th>Grade Level</th>
+                                    <th>Form Teacher</th>
+                                    <th>Enrolled Students</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="classesTableBody">
+                                <tr>
+                                    <td><strong>Grade 1A</strong></td>
+                                    <td>Grade 1</td>
+                                    <td>Teacher Grace</td>
+                                    <td>32 Students</td>
+                                    <td><button class="btn-sm">Edit</button></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Grade 2B</strong></td>
+                                    <td>Grade 2</td>
+                                    <td>Teacher Tendai</td>
+                                    <td>28 Students</td>
+                                    <td><button class="btn-sm">Edit</button></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Form 4 Science</strong></td>
+                                    <td>Form 4</td>
+                                    <td>Teacher Robert</td>
+                                    <td>30 Students</td>
+                                    <td><button class="btn-sm">Edit</button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- TAB 4: TEACHER MANAGEMENT -->
+                <div id="tab-teachers" class="tab-pane">
+                    <div class="page-header">
+                        <div>
+                            <h2 class="page-title">Teacher Directory</h2>
+                            <p class="page-subtitle">Manage school faculty, assigned subjects, and contact records</p>
+                        </div>
+                        <button class="btn-primary" onclick="openModal('teacherModal')">
+                            <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                            Add New Teacher
+                        </button>
+                    </div>
+
+                    <div class="table-card">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Teacher Name</th>
+                                    <th>Subject Taught</th>
+                                    <th>Assigned Class</th>
+                                    <th>Email</th>
+                                    <th>Phone</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="teachersTableBody">
+                                <!-- Dynamically filled by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- TAB 5: STUDENT MANAGEMENT -->
+                <div id="tab-students" class="tab-pane">
+                    <div class="page-header">
+                        <div>
+                            <h2 class="page-title">Student Directory</h2>
+                            <p class="page-subtitle">Student profiles, parent/guardian links, and academic standing</p>
+                        </div>
+                        <div style="display: flex; gap: 10px;">
+                            <button class="btn-sm" style="padding: 8px 12px; font-weight: 600;" onclick="alert('Link Guardian Modal')">Link Guardian</button>
+                            <button class="btn-primary" onclick="openModal('studentModal')">
+                                <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                                Add New Student
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="table-card">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Reg No</th>
+                                    <th>Student Name</th>
+                                    <th>Class</th>
+                                    <th>Guardian Name</th>
+                                    <th>Fee Balance</th>
+                                    <th>Attendance %</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="studentsTableBody">
+                                <!-- Dynamically filled by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- TAB 6: ATTENDANCE -->
+                <div id="tab-attendance" class="tab-pane">
+                    <div class="page-header">
+                        <div>
+                            <h2 class="page-title">Daily Attendance Register</h2>
+                            <p class="page-subtitle">Mark and verify student attendance logs</p>
+                        </div>
+                        <button class="btn-primary" onclick="alert('Attendance saved successfully!')">Save Register</button>
+                    </div>
+
+                    <div class="table-card">
+                        <div class="table-toolbar">
+                            <div class="filter-group">
+                                <label style="font-size: 13px; font-weight: 600;">Select Date:</label>
+                                <input type="date" class="form-control" style="width: 160px;" value="2026-07-22">
+                                <label style="font-size: 13px; font-weight: 600; margin-left: 14px;">Select Class:</label>
+                                <select class="form-control" style="width: 160px;">
+                                    <option>Grade 1A</option>
+                                    <option>Grade 2B</option>
+                                    <option>Form 4 Science</option>
+                                </select>
+                            </div>
+                        </div>
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Roll No</th>
+                                    <th>Student Name</th>
+                                    <th>Status</th>
+                                    <th>Remarks</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>STU-001</td>
+                                    <td>Tafadzwa Chewe</td>
+                                    <td>
+                                        <label><input type="radio" name="att_1" checked> Present</label> &nbsp;
+                                        <label><input type="radio" name="att_1"> Absent</label> &nbsp;
+                                        <label><input type="radio" name="att_1"> Late</label>
+                                    </td>
+                                    <td><input type="text" class="form-control" placeholder="Optional remark..." style="padding: 4px 8px;"></td>
+                                </tr>
+                                <tr>
+                                    <td>STU-002</td>
+                                    <td>Anesu Moyo</td>
+                                    <td>
+                                        <label><input type="radio" name="att_2" checked> Present</label> &nbsp;
+                                        <label><input type="radio" name="att_2"> Absent</label> &nbsp;
+                                        <label><input type="radio" name="att_2"> Late</label>
+                                    </td>
+                                    <td><input type="text" class="form-control" placeholder="Optional remark..." style="padding: 4px 8px;"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- TAB 7: PAYMENTS & FEES -->
+                <div id="tab-payments" class="tab-pane">
+                    <div class="page-header">
+                        <div>
+                            <h2 class="page-title">Fee Management & Billing</h2>
+                            <p class="page-subtitle">Track school fee payments, outstanding balances, and invoices</p>
+                        </div>
+                        <button class="btn-primary" onclick="alert('Payment Recorded!')">Record Payment</button>
+                    </div>
+
+                    <div class="table-card">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Student</th>
+                                    <th>Class</th>
+                                    <th>Term Fee</th>
+                                    <th>Amount Paid</th>
+                                    <th>Balance Due</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Tafadzwa Chewe</td>
+                                    <td>Grade 1A</td>
+                                    <td>USD 450.00</td>
+                                    <td>USD 450.00</td>
+                                    <td>USD 0.00</td>
+                                    <td><span class="role-badge teacher">Paid in Full</span></td>
+                                    <td><button class="btn-sm">Statement</button></td>
+                                </tr>
+                                <tr>
+                                    <td>Anesu Moyo</td>
+                                    <td>Grade 2B</td>
+                                    <td>USD 450.00</td>
+                                    <td>USD 200.00</td>
+                                    <td>USD 250.00</td>
+                                    <td><span class="role-badge guardian">Partial</span></td>
+                                    <td><button class="btn-sm">Receipt</button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- TAB 8: ANNOUNCEMENTS -->
+                <div id="tab-announcements" class="tab-pane">
+                    <div class="page-header">
+                        <div>
+                            <h2 class="page-title">School Announcements</h2>
+                            <p class="page-subtitle">Publish announcements and circulars to mobile app users</p>
+                        </div>
+                        <button class="btn-primary" onclick="alert('Announcement Published to Mobile App!')">Publish Announcement</button>
+                    </div>
+
+                    <div class="table-card" style="padding: 20px; margin-bottom: 24px;">
+                        <h3 class="section-title">New Announcement Form</h3>
+                        <div class="form-group">
+                            <label>Announcement Title</label>
+                            <input type="text" class="form-control" placeholder="e.g. End of Term Parent-Teacher Consultation Meeting">
+                        </div>
+                        <div class="form-group">
+                            <label>Target Audience</label>
+                            <select class="form-control">
+                                <option>All Users (Guardians & Teachers)</option>
+                                <option>Guardians Only</option>
+                                <option>Teachers Only</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Message Content</label>
+                            <textarea class="form-control" rows="4" placeholder="Enter announcement body text here..."></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 9: REPORTS -->
+                <div id="tab-reports" class="tab-pane">
+                    <div class="page-header">
+                        <div>
+                            <h2 class="page-title">Reports & Academic Documents</h2>
+                            <p class="page-subtitle">Upload and issue term report cards for parents</p>
+                        </div>
+                        <button class="btn-primary" onclick="alert('Report Uploaded!')">Upload Report Card</button>
+                    </div>
+
+                    <div class="table-card">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Student Name</th>
+                                    <th>Academic Term</th>
+                                    <th>Report File</th>
+                                    <th>Uploaded Date</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Tafadzwa Chewe</td>
+                                    <td>2026 Term 1 Progress Report</td>
+                                    <td><code>Tafadzwa_Chewe_Report.pdf</code></td>
+                                    <td>18 Jul 2026</td>
+                                    <td><button class="btn-sm">Download</button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
 
     <!-- Modal Dialogs -->
-
-    <!-- Add User Modal -->
     <div class="modal-overlay" id="userModal">
         <div class="modal-card">
             <div class="modal-header">
@@ -1290,7 +1615,6 @@
         </div>
     </div>
 
-    <!-- Add Teacher Modal -->
     <div class="modal-overlay" id="teacherModal">
         <div class="modal-card">
             <div class="modal-header">
@@ -1328,7 +1652,6 @@
         </div>
     </div>
 
-    <!-- Add Student Modal -->
     <div class="modal-overlay" id="studentModal">
         <div class="modal-card">
             <div class="modal-header">
@@ -1362,9 +1685,8 @@
         </div>
     </div>
 
-    <!-- JavaScript Data & UI State Management -->
+    <!-- JavaScript Handlers -->
     <script>
-        // State Mock Arrays
         let usersList = [
             { id: 1, name: 'Admin Tinotenda', email: 'admin@hillside.ac.zw', phone: '+263771111111', role: 'admin' },
             { id: 2, name: 'Teacher Grace', email: 'grace@hillside.ac.zw', phone: '+263772222222', role: 'teacher' },
@@ -1383,7 +1705,48 @@
 
         let activeRoleFilter = 'all';
 
-        // Tab Switching
+        // AUTH SWAPPING (LOGIN / SIGNUP TABS)
+        function switchAuthTab(tab) {
+            document.getElementById('tabBtnLogin').classList.toggle('active', tab === 'login');
+            document.getElementById('tabBtnSignup').classList.toggle('active', tab === 'signup');
+            document.getElementById('loginForm').classList.toggle('active', tab === 'login');
+            document.getElementById('signupForm').classList.toggle('active', tab === 'signup');
+        }
+
+        function handleLoginSubmit(e) {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const name = email.toLowerCase().includes('admin') ? 'Admin Tinotenda' : 'Administrator';
+            
+            document.getElementById('headerAdminName').innerText = name;
+            document.getElementById('headerAvatar').innerText = name.split(' ').map(n=>n[0]).join('');
+            
+            document.getElementById('authScreen').classList.add('hidden');
+        }
+
+        function handleSignupSubmit(e) {
+            e.preventDefault();
+            const name = document.getElementById('signupName').value;
+            const email = document.getElementById('signupEmail').value;
+            const phone = document.getElementById('signupPhone').value;
+
+            usersList.push({ id: usersList.length + 1, name, email, phone, role: 'admin' });
+            renderUsersTable();
+
+            document.getElementById('headerAdminName').innerText = name;
+            document.getElementById('headerAvatar').innerText = name.split(' ').map(n=>n[0]).join('');
+
+            alert('Admin Account created successfully! Logging in...');
+            document.getElementById('authScreen').classList.add('hidden');
+        }
+
+        function handleLogout() {
+            if (confirm('Are you sure you want to log out of the Admin Portal?')) {
+                document.getElementById('authScreen').classList.remove('hidden');
+            }
+        }
+
+        // TAB NAVIGATION
         function switchTab(tabId) {
             document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.tab-pane').forEach(el => el.classList.remove('active'));
@@ -1398,12 +1761,10 @@
             if (targetPane) targetPane.classList.add('active');
         }
 
-        // School Selector Handler
         function updateSchool(schoolName) {
             document.getElementById('displaySchoolName').innerText = schoolName;
         }
 
-        // Render Tables
         function renderUsersTable() {
             const tbody = document.getElementById('usersTableBody');
             const searchInput = document.getElementById('userSearchInput');
@@ -1476,7 +1837,6 @@
             `).join('');
         }
 
-        // Modal Handlers
         function openModal(id) {
             document.getElementById(id).classList.add('open');
         }
@@ -1485,7 +1845,6 @@
             document.getElementById(id).classList.remove('open');
         }
 
-        // Form Submit Handlers
         function addUserSubmit(e) {
             e.preventDefault();
             const name = document.getElementById('newUserName').value;
@@ -1493,8 +1852,7 @@
             const phone = document.getElementById('newUserPhone').value;
             const role = document.getElementById('newUserRole').value;
 
-            const newId = usersList.length + 1;
-            usersList.push({ id: newId, name, email, phone, role });
+            usersList.push({ id: usersList.length + 1, name, email, phone, role });
             closeModal('userModal');
             renderUsersTable();
             alert('New User "' + name + '" successfully created!');
@@ -1534,7 +1892,6 @@
             alert('Student "' + name + '" enrolled successfully!');
         }
 
-        // Initial Load
         window.addEventListener('DOMContentLoaded', () => {
             renderUsersTable();
             renderTeachersTable();
