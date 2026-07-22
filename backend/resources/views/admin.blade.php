@@ -1072,9 +1072,6 @@
                     </a>
                 </li>
             </ul>
-            <div class="sidebar-footer">
-                Admin Portal v1.2 &bull; Edu+Conect Web
-            </div>
         </aside>
 
         <!-- Main Content Area -->
