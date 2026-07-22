@@ -372,18 +372,12 @@
             color: white;
             display: flex;
             align-items: center;
-            justify-content: space-between;
+            justify-content: flex-end;
             padding: 0 28px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
             position: sticky;
             top: 0;
             z-index: 90;
-        }
-
-        .school-selector-wrap {
-            display: flex;
-            align-items: center;
-            gap: 10px;
         }
 
         .school-select {
