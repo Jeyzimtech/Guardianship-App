@@ -1002,7 +1002,6 @@
                 </div>
                 <h1 class="brand-heading">Edu+Conect</h1>
                 <p class="brand-subtext">Comprehensive Web Administration Portal for School Managers & Board Members.</p>
-                <span class="brand-tag">WEB ADMIN DASHBOARD</span>
             </div>
 
         </div>
