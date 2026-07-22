@@ -187,7 +187,7 @@
         /* Right Side: Logo & Branding Panel */
         .auth-logo-side {
             flex: 0.9;
-            background: linear-gradient(135deg, var(--primary-blue) 0%, #2b4273 100%);
+            background: linear-gradient(135deg, rgba(59, 89, 152, 0.82) 0%, rgba(30, 48, 88, 0.92) 100%), url('/assets/control.gif') center/cover no-repeat;
             color: white;
             padding: 44px;
             display: flex;
