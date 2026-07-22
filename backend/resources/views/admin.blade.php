@@ -328,9 +328,10 @@
             cursor: pointer;
         }
 
-        .nav-link svg {
-            width: 20px;
-            height: 20px;
+        .nav-link svg, .nav-link img {
+            width: 22px;
+            height: 22px;
+            object-fit: contain;
             stroke: currentColor;
             fill: none;
             stroke-width: 2;
@@ -348,6 +349,10 @@
 
         .nav-link.active svg {
             stroke: white;
+        }
+
+        .nav-link.active img {
+            filter: brightness(0) invert(1);
         }
 
         .sidebar-footer {
@@ -558,6 +563,12 @@
             justify-content: center;
         }
 
+        .kpi-icon img {
+            width: 24px;
+            height: 24px;
+            object-fit: contain;
+        }
+
         .kpi-icon svg {
             width: 22px;
             height: 22px;
@@ -607,6 +618,12 @@
             display: flex;
             align-items: center;
             justify-content: center;
+        }
+
+        .module-icon img {
+            width: 24px;
+            height: 24px;
+            object-fit: contain;
         }
 
         .module-icon svg {
@@ -1004,55 +1021,55 @@
             <ul class="nav-list">
                 <li class="nav-item">
                     <a class="nav-link active" onclick="switchTab('dashboard')">
-                        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                        <img src="/assets/icons8-dashboard.svg" alt="Dashboard">
                         <span>Dashboard</span>
                     </a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" onclick="switchTab('users')">
-                        <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                        <img src="/assets/icons8-user.svg" alt="User Management">
                         <span>User Management</span>
                     </a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" onclick="switchTab('schools')">
-                        <svg viewBox="0 0 24 24"><path d="M3 21h18M3 7v14M21 7v14M6 21V10m4 11V10m4 11V10m4 11V10M12 3L2 7h20L12 3z"/></svg>
+                        <img src="/assets/icons8-school-management.svg" alt="School Management">
                         <span>School Management</span>
                     </a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" onclick="switchTab('teachers')">
-                        <svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+                        <img src="/assets/icons8-teacher.svg" alt="Teachers">
                         <span>Teachers</span>
                     </a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" onclick="switchTab('students')">
-                        <svg viewBox="0 0 24 24"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+                        <img src="/assets/icons8-education.svg" alt="Students">
                         <span>Students</span>
                     </a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" onclick="switchTab('attendance')">
-                        <svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+                        <img src="/assets/icons8-attendance.svg" alt="Attendance">
                         <span>Attendance</span>
                     </a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" onclick="switchTab('payments')">
-                        <svg viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+                        <img src="/assets/icons8-wallet.svg" alt="Payments & Fees">
                         <span>Payments & Fees</span>
                     </a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" onclick="switchTab('announcements')">
-                        <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                        <img src="/assets/icons8-messages.svg" alt="Announcements">
                         <span>Announcements</span>
                     </a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" onclick="switchTab('reports')">
-                        <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                        <img src="/assets/icons8-reports.svg" alt="Reports & Circulars">
                         <span>Reports & Circulars</span>
                     </a>
                 </li>
@@ -1107,7 +1124,7 @@
                                 <p class="value" id="kpiStudents">1,250</p>
                             </div>
                             <div class="kpi-icon">
-                                <svg viewBox="0 0 24 24"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+                                <img src="/assets/icons8-education.svg" alt="Students">
                             </div>
                         </div>
                         <div class="kpi-card">
@@ -1116,7 +1133,7 @@
                                 <p class="value">95%</p>
                             </div>
                             <div class="kpi-icon">
-                                <svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+                                <img src="/assets/icons8-attendance.svg" alt="Attendance">
                             </div>
                         </div>
                         <div class="kpi-card">
@@ -1125,7 +1142,7 @@
                                 <p class="value">USD 24,000</p>
                             </div>
                             <div class="kpi-icon">
-                                <svg viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+                                <img src="/assets/icons8-wallet.svg" alt="Outstanding Fees">
                             </div>
                         </div>
                         <div class="kpi-card">
@@ -1134,7 +1151,7 @@
                                 <p class="value">15</p>
                             </div>
                             <div class="kpi-icon">
-                                <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                                <img src="/assets/icons8-messages.svg" alt="Unread Messages">
                             </div>
                         </div>
                     </div>
@@ -1142,28 +1159,28 @@
                     <h3 class="section-title">Quick Management Modules</h3>
                     <div class="cards-grid">
                         <div class="module-card" onclick="switchTab('students')">
-                            <div class="module-icon"><svg viewBox="0 0 24 24"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg></div>
+                            <div class="module-icon"><img src="/assets/icons8-education.svg" alt="Student Management"></div>
                             <div class="module-text">
                                 <h4>Student Management</h4>
                                 <p>Enrolment, profiles & class allocations</p>
                             </div>
                         </div>
                         <div class="module-card" onclick="switchTab('users')">
-                            <div class="module-icon"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div>
+                            <div class="module-icon"><img src="/assets/icons8-user.svg" alt="User Control"></div>
                             <div class="module-text">
                                 <h4>User & Access Control</h4>
                                 <p>Manage Admin, Teacher & Guardian accounts</p>
                             </div>
                         </div>
                         <div class="module-card" onclick="switchTab('schools')">
-                            <div class="module-icon"><svg viewBox="0 0 24 24"><path d="M3 21h18M3 7v14M21 7v14M12 3L2 7h20L12 3z"/></svg></div>
+                            <div class="module-icon"><img src="/assets/icons8-school-management.svg" alt="School Setup"></div>
                             <div class="module-text">
                                 <h4>School Setup & Classes</h4>
                                 <p>Academic calendars, terms & grade divisions</p>
                             </div>
                         </div>
                         <div class="module-card" onclick="switchTab('teachers')">
-                            <div class="module-icon"><svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div>
+                            <div class="module-icon"><img src="/assets/icons8-teacher.svg" alt="Teacher Management"></div>
                             <div class="module-text">
                                 <h4>Teacher Management</h4>
                                 <p>Faculty directory, subjects & class rosters</p>
