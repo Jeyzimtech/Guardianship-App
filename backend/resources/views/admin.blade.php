@@ -529,19 +529,14 @@
 
         .kpi-card {
             background: var(--surface-white);
-            border-radius: 6px;
+            border-radius: 4px;
             border: 1px solid var(--border-color);
-            border-top: 4px solid var(--primary-blue);
             padding: 18px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+            box-shadow: none;
         }
-
-        .kpi-card.success { border-top-color: var(--success-green); }
-        .kpi-card.danger { border-top-color: var(--danger-red); }
-        .kpi-card.warning { border-top-color: var(--warning-amber); }
 
         .kpi-info p.title {
             font-size: 11px;
@@ -559,19 +554,15 @@
         }
 
         .kpi-icon {
-            width: 44px;
-            height: 44px;
-            border-radius: 8px;
-            background: rgba(59, 89, 152, 0.1);
+            width: 40px;
+            height: 40px;
+            border-radius: 4px;
+            background: rgba(59, 89, 152, 0.08);
             color: var(--primary-blue);
             display: flex;
             align-items: center;
             justify-content: center;
         }
-
-        .kpi-card.success .kpi-icon { background: var(--success-bg); color: var(--success-green); }
-        .kpi-card.danger .kpi-icon { background: var(--danger-bg); color: var(--danger-red); }
-        .kpi-card.warning .kpi-icon { background: var(--warning-bg); color: var(--warning-amber); }
 
         .kpi-icon svg {
             width: 22px;
@@ -1133,7 +1124,7 @@
                                 <svg viewBox="0 0 24 24"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
                             </div>
                         </div>
-                        <div class="kpi-card success">
+                        <div class="kpi-card">
                             <div class="kpi-info">
                                 <p class="title">Attendance Rate</p>
                                 <p class="value">95%</p>
@@ -1142,7 +1133,7 @@
                                 <svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
                             </div>
                         </div>
-                        <div class="kpi-card danger">
+                        <div class="kpi-card">
                             <div class="kpi-info">
                                 <p class="title">Outstanding Fees</p>
                                 <p class="value">USD 24,000</p>
@@ -1151,7 +1142,7 @@
                                 <svg viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
                             </div>
                         </div>
-                        <div class="kpi-card warning">
+                        <div class="kpi-card">
                             <div class="kpi-info">
                                 <p class="title">Unread Messages</p>
                                 <p class="value">15</p>
