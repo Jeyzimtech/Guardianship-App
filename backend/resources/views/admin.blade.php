@@ -1113,14 +1113,6 @@
             <!-- Body Area -->
             <div class="content-body">
 
-                <!-- Information Banner for Mobile vs Web -->
-                <div class="info-banner">
-                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-                    <div>
-                        <strong>Administrator Notice:</strong> This Web Dashboard is the dedicated portal for Administrators. Teachers, Parents & Students must access the Edu+Conect platform via the Mobile Application.
-                    </div>
-                </div>
-
                 <!-- TAB 1: DASHBOARD OVERVIEW -->
                 <div id="tab-dashboard" class="tab-pane active">
                     <div class="page-header">
