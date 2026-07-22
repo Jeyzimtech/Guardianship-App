@@ -1001,7 +1001,6 @@
                     <img src="/assets/logo.png" alt="Edu+Conect Logo" style="max-width: 150px; max-height: 150px; object-fit: contain; filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.25)); border-radius: 16px;">
                 </div>
                 <h1 class="brand-heading">Edu+Conect</h1>
-                <p class="brand-subtext">Comprehensive Web Administration Portal for School Managers & Board Members.</p>
             </div>
 
         </div>
