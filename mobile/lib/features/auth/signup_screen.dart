@@ -314,7 +314,7 @@ class _SignupScreenState extends State<SignupScreen> {
                           borderSide: BorderSide(color: accentColor, width: 1.5),
                         ),
                       ),
-                      items: ['Parent', 'Teacher', 'Admin'].map((role) {
+                      items: ['Parent', 'Teacher'].map((role) {
                         return DropdownMenuItem<String>(
                           value: role,
                           child: Text(role, style: TextStyle(color: primaryColor)),
