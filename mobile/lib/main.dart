@@ -115,7 +115,7 @@ class EduConectApp extends StatelessWidget {
           ),
         ),
       ),
-      home: const GetStartedScreen(),
+      home: const AuthGate(),
     );
   }
 }
