@@ -70,23 +70,7 @@ class _LoginScreenState extends State<LoginScreen> {
     return Scaffold(
       backgroundColor: backgroundColor,
       body: SafeArea(
-        child: Stack(
-          children: [
-            // Back button in top left
-            Positioned(
-              top: 10,
-              left: 10,
-              child: IconButton(
-                icon: Icon(Icons.arrow_back_ios_new_rounded, color: primaryColor),
-                onPressed: () {
-                  Navigator.of(context).pushReplacement(
-                    MaterialPageRoute(builder: (_) => const GetStartedScreen()),
-                  );
-                },
-              ),
-            ),
-            
-            Center(
+        child: Center(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.symmetric(horizontal: 28.0),
                 child: Column(
@@ -292,8 +276,6 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ),
             ),
-          ],
-        ),
       ),
     );
   }
