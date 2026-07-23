@@ -1,17 +1,20 @@
-# guardianship
+# Guardianship - Parents & Teachers Mobile Application
 
-A new Flutter project.
+Edu+Conect / Guardianship mobile application designed specifically for **Parents** and **Teachers**.
 
-## Getting Started
+## Features & Target Users
 
-This project is a starting point for a Flutter application.
+- **Parents (Guardians)**:
+  - Track student attendance, grades, and report cards in real-time.
+  - View fee balances and payment history.
+  - Receive announcements and teacher notifications.
 
-A few resources to get you started if this is your first Flutter project:
+- **Teachers**:
+  - Mark daily attendance for assigned class rosters.
+  - Submit student marks, subject grades, and comments.
+  - View class rosters and student profiles.
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+## Auth & Entry Point
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+The mobile application launches directly into the Authentication / Login flow (`AuthGate`), providing streamlined access for registered Parents and Teachers.
+*(School Administrators access management tools via the Web Admin Portal at `/admin`)*.
