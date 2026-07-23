@@ -62,9 +62,9 @@ class EduConectApp extends StatelessWidget {
         cardTheme: CardThemeData(
           color: backgroundColor,
           elevation: 0,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(4),
-            side: const BorderSide(color: borderColor, width: 1.0),
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.zero,
+            side: BorderSide(color: borderColor, width: 1.0),
           ),
         ),
         textTheme: const TextTheme(
@@ -86,8 +86,8 @@ class EduConectApp extends StatelessWidget {
             foregroundColor: Colors.white,
             elevation: 0,
             padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(4),
+            shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.zero,
             ),
             textStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
           ),
@@ -96,7 +96,7 @@ class EduConectApp extends StatelessWidget {
           style: OutlinedButton.styleFrom(
             foregroundColor: primaryBlue,
             side: const BorderSide(color: primaryBlue, width: 1.5),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+            shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
             textStyle: const TextStyle(fontWeight: FontWeight.bold),
           ),
         ),
@@ -106,17 +106,17 @@ class EduConectApp extends StatelessWidget {
           contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
           labelStyle: const TextStyle(color: textSecondaryColor, fontSize: 13),
           hintStyle: TextStyle(color: textSecondaryColor.withValues(alpha: 0.6), fontSize: 13),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(4),
-            borderSide: const BorderSide(color: borderColor, width: 1.0),
+          border: const OutlineInputBorder(
+            borderRadius: BorderRadius.zero,
+            borderSide: BorderSide(color: borderColor, width: 1.0),
           ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(4),
-            borderSide: const BorderSide(color: borderColor, width: 1.0),
+          enabledBorder: const OutlineInputBorder(
+            borderRadius: BorderRadius.zero,
+            borderSide: BorderSide(color: borderColor, width: 1.0),
           ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(4),
-            borderSide: const BorderSide(color: secondaryBlue, width: 1.5),
+          focusedBorder: const OutlineInputBorder(
+            borderRadius: BorderRadius.zero,
+            borderSide: BorderSide(color: secondaryBlue, width: 1.5),
           ),
         ),
       ),

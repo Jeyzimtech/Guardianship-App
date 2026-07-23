@@ -29,11 +29,12 @@
         }
 
         /* 15. Typography & Resets */
-        * {
+        *, *::before, *::after {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
             font-family: 'Cabin', sans-serif;
+            border-radius: 0 !important;
         }
 
         body {
