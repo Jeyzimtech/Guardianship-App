@@ -4,7 +4,6 @@ import 'package:provider/provider.dart';
 import 'core/api_client.dart';
 import 'core/auth_provider.dart';
 import 'core/student_provider.dart';
-import 'features/get_started_screen.dart';
 import 'features/auth/login_screen.dart';
 import 'features/dashboard/dashboard_home.dart';
 
