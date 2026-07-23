@@ -67,11 +67,6 @@ class EduConectApp extends StatelessWidget {
             side: BorderSide(color: borderColor, width: 1.0),
           ),
         ),
-        textTheme: const TextTheme(
-          bodyLarge: TextStyle(color: textPrimaryColor, fontSize: 14),
-          bodyMedium: TextStyle(color: textPrimaryColor, fontSize: 14),
-          titleLarge: TextStyle(color: primaryBlue, fontSize: 24, fontWeight: FontWeight.bold),
-        ),
         appBarTheme: const AppBarTheme(
           backgroundColor: primaryBlue,
           foregroundColor: Colors.white,
