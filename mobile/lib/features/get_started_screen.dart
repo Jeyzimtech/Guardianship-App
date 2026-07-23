@@ -142,21 +142,11 @@ class _GetStartedScreenState extends State<GetStartedScreen> with SingleTickerPr
       children: [
         Row(
           children: [
-            Container(
-              padding: const EdgeInsets.all(6),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(
-                  color: const Color(0xFFD4CFC7).withValues(alpha: 0.5),
-                  width: 1.0,
-                ),
-              ),
-              child: Image.asset(
-                'assets/logo.png',
-                height: 24,
-                width: 24,
-              ),
+            Image.asset(
+              'assets/logo.png',
+              height: 28,
+              width: 28,
+              fit: BoxFit.contain,
             ),
             const SizedBox(width: 10),
             Text(

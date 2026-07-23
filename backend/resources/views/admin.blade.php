@@ -1000,6 +1000,7 @@
 
             <!-- Right Side: Brand Logo Panel -->
             <div class="auth-logo-side">
+                <img src="/assets/logo.png" alt="Edu+Conect Logo" style="height: 90px; width: auto; object-fit: contain; margin-bottom: 20px; filter: drop-shadow(0 4px 12px rgba(0,0,0,0.3));">
                 <h1 class="brand-heading">Edu+Conect</h1>
             </div>
 
@@ -1013,7 +1014,7 @@
         <!-- Sidebar Navigation -->
         <aside class="sidebar">
             <div class="brand-header">
-                <img src="/assets/logo.png" alt="Edu+Conect Logo" style="height: 36px; width: 36px; object-fit: contain; background: white; border-radius: 6px; padding: 2px;">
+                <img src="/assets/logo.png" alt="Edu+Conect Logo" style="height: 36px; width: 36px; object-fit: contain;">
                 <span>Edu+Conect</span>
             </div>
             <ul class="nav-list">

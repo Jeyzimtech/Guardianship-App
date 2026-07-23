@@ -128,32 +128,13 @@ class _SignupScreenState extends State<SignupScreen> {
                   children: [
                     const SizedBox(height: 40),
                     
-                    // Logo Graphic from Assets
+                    // Logo Graphic Embedded directly on Background
                     Center(
-                      child: Container(
-                        width: 90,
-                        height: 90,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Colors.white,
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.04),
-                              blurRadius: 10,
-                              offset: const Offset(0, 4),
-                            )
-                          ],
-                          border: Border.all(color: const Color(0xFFE2E8F0), width: 1.0),
-                        ),
-                        child: ClipOval(
-                          child: Padding(
-                            padding: const EdgeInsets.all(10.0),
-                            child: Image.asset(
-                              'assets/logo.png',
-                              fit: BoxFit.contain,
-                            ),
-                          ),
-                        ),
+                      child: Image.asset(
+                        'assets/logo.png',
+                        height: 80,
+                        width: 80,
+                        fit: BoxFit.contain,
                       ),
                     ),
                     const SizedBox(height: 24),

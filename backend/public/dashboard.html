@@ -823,7 +823,7 @@
                 <i class="fa-solid fa-bars"></i>
             </button>
             <a href="#" class="company-logo">
-                <i class="fa-solid fa-shield-halved"></i>
+                <img src="/assets/logo.png" alt="Logo" style="height: 28px; width: auto; object-fit: contain; vertical-align: middle;">
                 <span>Guardianship</span>
             </a>
             <!-- Global Search Component -->
