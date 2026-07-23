@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'core/api_client.dart';
 import 'core/auth_provider.dart';
@@ -49,7 +50,14 @@ class EduConectApp extends StatelessWidget {
           secondary: secondaryBlue,
           surface: surfaceColor,
         ),
-        fontFamily: 'Segoe UI',
+        fontFamily: GoogleFonts.cabin().fontFamily,
+        textTheme: GoogleFonts.cabinTextTheme(
+          const TextTheme(
+            bodyLarge: TextStyle(color: textPrimaryColor, fontSize: 14),
+            bodyMedium: TextStyle(color: textPrimaryColor, fontSize: 14),
+            titleLarge: TextStyle(color: primaryBlue, fontSize: 24, fontWeight: FontWeight.bold),
+          ),
+        ),
         useMaterial3: true,
         cardTheme: CardThemeData(
           color: backgroundColor,

@@ -7,7 +7,7 @@
     <!-- Google Fonts & Icons -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cabin:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -33,7 +33,7 @@
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Segoe UI', Arial, sans-serif;
+            font-family: 'Cabin', sans-serif;
         }
 
         body {
@@ -317,7 +317,7 @@
             margin-bottom: 20px;
         }
 
-        /* 6. Page Title Specification (24px Segoe UI) */
+        /* 6. Page Title Specification (24px Cabin) */
         .page-title h1 {
             font-size: 24px;
             font-weight: 700;
@@ -974,7 +974,7 @@
                 <span id="breadcrumbSub">Grade 7</span>
             </div>
 
-            <!-- 6. Page Title Specification (24px Segoe UI) -->
+            <!-- 6. Page Title Specification (24px Cabin) -->
             <div class="page-header-row">
                 <div class="page-title">
                     <h1 id="pageTitleHeading">Student Management</h1>
@@ -1446,7 +1446,7 @@
                             position: 'top',
                             labels: {
                                 font: {
-                                    family: "'Segoe UI', Arial, sans-serif"
+                                    family: "'Cabin', sans-serif"
                                 }
                             }
                         }
