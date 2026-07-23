@@ -113,7 +113,7 @@ class _SignupScreenState extends State<SignupScreen> {
                 icon: Icon(Icons.arrow_back_ios_new_rounded, color: primaryColor),
                 onPressed: () {
                   Navigator.of(context).pushReplacement(
-                    MaterialPageRoute(builder: (_) => const GetStartedScreen()),
+                    MaterialPageRoute(builder: (_) => const LoginScreen()),
                   );
                 },
               ),
