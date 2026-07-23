@@ -112,7 +112,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         fontWeight: FontWeight.w500,
                       ),
                     ),
-                    // Admin Web Portal Notice
+                    // Parents & Teachers Portal Banner Notice
                     Container(
                       padding: const EdgeInsets.all(12),
                       margin: const EdgeInsets.only(bottom: 20),
@@ -123,12 +123,12 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       child: const Row(
                         children: [
-                          Icon(Icons.computer_rounded, color: Color(0xFF1D4ED8), size: 22),
+                          Icon(Icons.family_restroom_rounded, color: Color(0xFF1D4ED8), size: 22),
                           SizedBox(width: 10),
                           Expanded(
                             child: Text(
-                              'Administrators: Please access the Web Admin Portal via browser at http://localhost:8000/admin.\nTeachers, Parents & Students login below.',
-                              style: TextStyle(fontSize: 12, color: Color(0xFF1E40AF), height: 1.3),
+                              'Parents & Teachers Portal\nSign in to access student progress, attendance, reports, and real-time updates.',
+                              style: TextStyle(fontSize: 12, color: Color(0xFF1E40AF), height: 1.3, fontWeight: FontWeight.w500),
                             ),
                           ),
                         ],
