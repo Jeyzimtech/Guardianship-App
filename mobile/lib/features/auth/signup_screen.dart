@@ -153,7 +153,7 @@ class _SignupScreenState extends State<SignupScreen> {
                     
                     // Subtitle
                     Text(
-                      'Sign up to start tracking school activities',
+                      'Register as a Parent or Teacher to get started',
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 14,
