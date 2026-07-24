@@ -1213,6 +1213,73 @@
                         </table>
                     </div>
 
+                    <h3 class="section-title">Statistical Analytics & Statistical AI Insights</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 20px; margin-bottom: 24px;">
+                        
+                        <!-- Z-Score Anomaly Gauge -->
+                        <div class="table-card" style="padding: 16px; margin-bottom: 0;">
+                            <h4 style="font-size: 14px; color: var(--primary-blue); font-weight: 700; margin-bottom: 6px;">Z-Score Anomaly Analysis</h4>
+                            <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 14px;">Identifies statistical outliers ($Z > +2$ or $Z < -2$) in attendance & fee collection.</p>
+                            
+                            <div style="margin-bottom: 12px;">
+                                <div style="display: flex; justify-content: space-between; font-size: 12px; font-weight: 600; margin-bottom: 4px;">
+                                    <span>Grade 4 Gold Attendance Z-Score</span>
+                                    <span style="color: var(--success-green);">Z = +1.8 (Normal High)</span>
+                                </div>
+                                <div style="height: 10px; background: linear-gradient(to right, #EF4444, #F59E0B, #22C55E, #F59E0B, #EF4444); position: relative;">
+                                    <div style="position: absolute; left: 75%; top: -3px; width: 4px; height: 16px; background: #1F2937;"></div>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; font-size: 10px; color: var(--text-secondary); margin-top: 2px;">
+                                    <span>-3σ</span><span>-2σ</span><span>μ</span><span>+2σ</span><span>+3σ</span>
+                                </div>
+                            </div>
+
+                            <div>
+                                <div style="display: flex; justify-content: space-between; font-size: 12px; font-weight: 600; margin-bottom: 4px;">
+                                    <span>ECD B Fee Default Risk Z-Score</span>
+                                    <span style="color: var(--danger-red);">Z = -2.7 (Critical Outlier)</span>
+                                </div>
+                                <div style="height: 10px; background: linear-gradient(to right, #EF4444, #F59E0B, #22C55E, #F59E0B, #EF4444); position: relative;">
+                                    <div style="position: absolute; left: 10%; top: -3px; width: 4px; height: 16px; background: #1F2937;"></div>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; font-size: 10px; color: var(--text-secondary); margin-top: 2px;">
+                                    <span>-3σ</span><span>-2σ</span><span>μ</span><span>+2σ</span><span>+3σ</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Normal Distribution Bell Curve -->
+                        <div class="table-card" style="padding: 16px; margin-bottom: 0;">
+                            <h4 style="font-size: 14px; color: var(--primary-blue); font-weight: 700; margin-bottom: 6px;">Academic Normal Distribution (Bell Curve)</h4>
+                            <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 10px;">Grade distribution variance ($\mu = 68\%$, $\sigma = 12.5\%$).</p>
+                            <div style="text-align: center; background: #F8FAFC; padding: 10px; border: 1px solid var(--border-color);">
+                                <svg viewBox="0 0 300 100" style="width: 100%; height: 90px;">
+                                    <path d="M 10,90 Q 75,90 110,50 T 150,10 T 190,50 T 290,90" fill="rgba(59, 89, 152, 0.15)" stroke="#3B5998" stroke-width="2"/>
+                                    <line x1="150" y1="10" x2="150" y2="90" stroke="#3B5998" stroke-width="1.5" stroke-dasharray="3,3"/>
+                                    <line x1="100" y1="55" x2="100" y2="90" stroke="#94A3B8" stroke-width="1" stroke-dasharray="2,2"/>
+                                    <line x1="200" y1="55" x2="200" y2="90" stroke="#94A3B8" stroke-width="1" stroke-dasharray="2,2"/>
+                                    <text x="150" y="98" font-size="9" text-anchor="middle" fill="#1F2937">μ (Mean 68%)</text>
+                                    <text x="100" y="98" font-size="8" text-anchor="middle" fill="#64748B">-1σ (55.5%)</text>
+                                    <text x="200" y="98" font-size="8" text-anchor="middle" fill="#64748B">+1σ (80.5%)</text>
+                                </svg>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- AI Insights & Predictive Feed -->
+                    <div class="info-banner" style="margin-bottom: 24px; background: #EFF6FF; border-color: #BFDBFE;">
+                        <svg viewBox="0 0 24 24" style="stroke: #1D4ED8;"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                        <div>
+                            <strong style="color: #1E40AF; font-size: 13px;">AI Administrative Insights & Anomaly Alerts</strong>
+                            <p style="font-size: 12px; color: #1E3A8A; margin-top: 2px;">
+                                • <strong>Fee Collection Prediction:</strong> Expected revenue for Term 2 is forecasted to reach $48,500 by week 4 based on rolling payment velocity.<br>
+                                • <strong>Attendance Anomaly Alert:</strong> ECD B class registered a -2.7 Z-Score drop in check-ins on Thursday. System notified Caregiver Amai Tendai.<br>
+                                • <strong>Uniform Shop Inventory:</strong> Blazer stock (UNI-BLZ-01) predicted to run out in 14 days due to peak term intake.
+                            </p>
+                        </div>
+                    </div>
+
                     <h3 class="section-title">Quick Management Modules</h3>
                     <div class="cards-grid">
                         <div class="module-card" onclick="switchTab('students')">
