@@ -1224,7 +1224,7 @@
                             <div style="margin-bottom: 12px;">
                                 <div style="display: flex; justify-content: space-between; font-size: 12px; font-weight: 600; margin-bottom: 4px;">
                                     <span>Grade 4 Gold Attendance Z-Score</span>
-                                    <span style="color: var(--success-green);">Z = +1.8 (Normal High)</span>
+                                    <span id="dynZAtt" style="color: var(--success-green);">Z = +1.8 (Normal High)</span>
                                 </div>
                                 <div style="height: 10px; background: linear-gradient(to right, #EF4444, #F59E0B, #22C55E, #F59E0B, #EF4444); position: relative;">
                                     <div style="position: absolute; left: 75%; top: -3px; width: 4px; height: 16px; background: #1F2937;"></div>
@@ -1272,7 +1272,7 @@
                         <svg viewBox="0 0 24 24" style="stroke: #1D4ED8;"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
                         <div>
                             <strong style="color: #1E40AF; font-size: 13px;">AI Administrative Insights & Anomaly Alerts</strong>
-                            <p style="font-size: 12px; color: #1E3A8A; margin-top: 2px;">
+                            <p id="dynAiAlerts" style="font-size: 12px; color: #1E3A8A; margin-top: 2px;">
                                 • <strong>Fee Collection Prediction:</strong> Expected revenue for Term 2 is forecasted to reach $48,500 by week 4 based on rolling payment velocity.<br>
                                 • <strong>Attendance Anomaly Alert:</strong> ECD B class registered a -2.7 Z-Score drop in check-ins on Thursday. System notified Caregiver Amai Tendai.<br>
                                 • <strong>Uniform Shop Inventory:</strong> Blazer stock (UNI-BLZ-01) predicted to run out in 14 days due to peak term intake.
@@ -2035,6 +2035,34 @@
             alert('Teacher "' + name + '" added successfully!');
         }
 
+        function recalculateStatistics() {
+            const totalStudents = 1250 + (studentsList.length - 2);
+            const kpiEl = document.getElementById('kpiStudents');
+            if (kpiEl) kpiEl.innerText = totalStudents.toLocaleString();
+
+            const attendances = studentsList.map(s => parseFloat(s.attendance.replace('%', '')));
+            const meanAtt = attendances.reduce((a, b) => a + b, 0) / (attendances.length || 1);
+            const variance = attendances.reduce((a, b) => a + Math.pow(b - meanAtt, 2), 0) / (attendances.length || 1);
+            const stdDev = Math.sqrt(variance) || 1.2;
+
+            const sampleAtt = 98.0;
+            const zScoreAtt = ((sampleAtt - meanAtt) / stdDev).toFixed(1);
+
+            const zAttEl = document.getElementById('dynZAtt');
+            if (zAttEl) {
+                zAttEl.innerText = `Z = ${zScoreAtt >= 0 ? '+' : ''}${zScoreAtt} (${zScoreAtt >= 0 ? 'Normal High' : 'Below Mean'})`;
+            }
+
+            const aiAlertEl = document.getElementById('dynAiAlerts');
+            if (aiAlertEl) {
+                aiAlertEl.innerHTML = `
+                    • <strong>Fee Collection Velocity:</strong> Total enrolled students: ${totalStudents.toLocaleString()}. Predicted revenue for current term is $${(totalStudents * 360 * 0.85).toLocaleString()}.<br>
+                    • <strong>Statistical Attendance Z-Score:</strong> Mean school attendance is ${meanAtt.toFixed(1)}% (Std Dev σ = ${stdDev.toFixed(1)}%). Current Grade 4 Gold Z-Score is +${zScoreAtt}.<br>
+                    • <strong>Uniform Shop Forecast:</strong> Uniform inventory predicted to maintain full coverage across ${studentsList.length} newly registered accounts.
+                `;
+            }
+        }
+
         function addStudentSubmit(e) {
             e.preventDefault();
             const name = document.getElementById('sName').value;
@@ -2045,6 +2073,7 @@
             studentsList.push({ reg, name, class: className, guardian, balance: 'USD 0.00', attendance: '100%' });
             closeModal('studentModal');
             renderStudentsTable();
+            recalculateStatistics();
             alert('Student "' + name + '" enrolled successfully!');
         }
 
@@ -2052,6 +2081,7 @@
             renderUsersTable();
             renderTeachersTable();
             renderStudentsTable();
+            recalculateStatistics();
         });
     </script>
 </body>
