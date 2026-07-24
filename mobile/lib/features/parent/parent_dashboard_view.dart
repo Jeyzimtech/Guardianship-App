@@ -498,16 +498,21 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Row(
-                children: [
-                  Icon(Icons.school_rounded, color: primaryBlue, size: 20),
-                  SizedBox(width: 8),
-                  Text('Primary Homeroom & Activities', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: primaryBlue)),
-                ],
+              const Icon(Icons.school_rounded, color: primaryBlue, size: 20),
+              const SizedBox(width: 8),
+              const Expanded(
+                child: Text(
+                  'Primary Homeroom & Activities',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: primaryBlue),
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
-              Text('Homeroom: ${child['homeroom_teacher']}', style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFF4B5563))),
+              const SizedBox(width: 6),
+              Text(
+                'Homeroom: ${child['homeroom_teacher']}',
+                style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFF4B5563)),
+              ),
             ],
           ),
           const SizedBox(height: 12),
@@ -515,14 +520,27 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
           // Daily Attendance Mark
           Container(
             padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(color: const Color(0xFFECFDF5), borderRadius: BorderRadius.circular(4), border: Border.all(color: const Color(0xFFA7F3D0))),
+            decoration: BoxDecoration(
+              color: const Color(0xFFECFDF5),
+              borderRadius: BorderRadius.circular(4),
+              border: Border.all(color: const Color(0xFFA7F3D0)),
+            ),
             child: Row(
               children: [
                 const Icon(Icons.check_circle_rounded, color: Color(0xFF059669), size: 20),
                 const SizedBox(width: 8),
-                Text('Today\'s Attendance: ${child['attendance_today']}', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Color(0xFF065F46))),
-                const Spacer(),
-                Text('Term Rate: ${child['attendance_rate']}', style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFF047857))),
+                Expanded(
+                  child: Text(
+                    'Attendance: ${child['attendance_today']}',
+                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Color(0xFF065F46)),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                const SizedBox(width: 6),
+                Text(
+                  'Rate: ${child['attendance_rate']}',
+                  style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFF047857)),
+                ),
               ],
             ),
           ),
@@ -530,8 +548,8 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
 
           const Text('Grade-Level Extracurricular Activities Today', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Color(0xFF1F2937))),
           const SizedBox(height: 6),
-          _buildActivityRow('Junior Chess Club', '01:30 PM - 02:30 PM', 'Present & Checked In', const Color(0xFF059669)),
-          _buildActivityRow('Grade 4 Athletics Practice', '03:00 PM - 04:00 PM', 'Scheduled (On Roster)', const Color(0xFFD97706)),
+          _buildActivityRow('Junior Chess Club', '01:30 PM - 02:30 PM', 'Present', const Color(0xFF059669)),
+          _buildActivityRow('Grade 4 Athletics Practice', '03:00 PM - 04:00 PM', 'Scheduled', const Color(0xFFD97706)),
         ],
       ),
     );
@@ -551,16 +569,21 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Row(
-                children: [
-                  Icon(Icons.view_timeline_rounded, color: Color(0xFF6B21A8), size: 20),
-                  SizedBox(width: 8),
-                  Text('Secondary Timetable & Per-Subject Attendance', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Color(0xFF6B21A8))),
-                ],
+              const Icon(Icons.view_timeline_rounded, color: Color(0xFF6B21A8), size: 20),
+              const SizedBox(width: 8),
+              const Expanded(
+                child: Text(
+                  'Secondary Timetable & Attendance',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Color(0xFF6B21A8)),
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
-              Text('Tutor: ${child['tutor']}', style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFF4B5563))),
+              const SizedBox(width: 6),
+              Text(
+                'Tutor: ${child['tutor']}',
+                style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFF4B5563)),
+              ),
             ],
           ),
           const SizedBox(height: 12),
@@ -574,7 +597,7 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
           const SizedBox(height: 10),
           const Text('Subject-Linked Clubs & Extracurriculars', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Color(0xFF1F2937))),
           const SizedBox(height: 6),
-          _buildActivityRow('Science & Innovation Club', '02:30 PM - 04:00 PM', 'Tied to Mrs. Sibanda (Science)', const Color(0xFF6B21A8)),
+          _buildActivityRow('Science & Innovation Club', '02:30 PM - 04:00 PM', 'Science Club', const Color(0xFF6B21A8)),
         ],
       ),
     );
@@ -586,15 +609,17 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
       decoration: BoxDecoration(color: const Color(0xFFF8FAFC), borderRadius: BorderRadius.circular(4), border: Border.all(color: const Color(0xFFE2E8F0))),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Color(0xFF1F2937))),
-              Text(time, style: const TextStyle(fontSize: 11, color: Color(0xFF6B7280))),
-            ],
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Color(0xFF1F2937)), overflow: TextOverflow.ellipsis),
+                Text(time, style: const TextStyle(fontSize: 11, color: Color(0xFF6B7280))),
+              ],
+            ),
           ),
+          const SizedBox(width: 8),
           Text(status, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11, color: color)),
         ],
       ),
@@ -609,18 +634,20 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
       child: Row(
         children: [
           SizedBox(
-            width: 100,
-            child: Text(time, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFF475569))),
+            width: 85,
+            child: Text(time, style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFF475569)), overflow: TextOverflow.ellipsis),
           ),
+          const SizedBox(width: 6),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(subject, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Color(0xFF1F2937))),
-                Text('$teacher • $room', style: const TextStyle(fontSize: 11, color: Color(0xFF6B7280))),
+                Text(subject, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Color(0xFF1F2937)), overflow: TextOverflow.ellipsis),
+                Text('$teacher • $room', style: const TextStyle(fontSize: 11, color: Color(0xFF6B7280)), overflow: TextOverflow.ellipsis),
               ],
             ),
           ),
+          const SizedBox(width: 6),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
             decoration: BoxDecoration(color: color.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(4)),
