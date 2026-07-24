@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../core/auth_provider.dart';
-import '../user_management/user_management_screen.dart';
 import '../school_management/school_management_screen.dart';
 import '../teacher_management/teacher_management_screen.dart';
 
@@ -208,27 +207,7 @@ class ProfileView extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 24),
-            if (authProvider.isAdmin) ...[
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton.icon(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (_) => const UserManagementScreen()),
-                    );
-                  },
-                  icon: const Icon(Icons.manage_accounts_rounded),
-                  label: const Text('Open User Management Module', style: TextStyle(fontWeight: FontWeight.bold)),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF6B21A8),
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 12),
+            if (authProvider.isTeacher) ...[
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton.icon(
@@ -239,7 +218,7 @@ class ProfileView extends StatelessWidget {
                     );
                   },
                   icon: const Icon(Icons.badge_rounded),
-                  label: const Text('Open Teacher Management Module', style: TextStyle(fontWeight: FontWeight.bold)),
+                  label: const Text('View Class & Teacher Roster', style: TextStyle(fontWeight: FontWeight.bold)),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF0B5549),
                     foregroundColor: Colors.white,
@@ -250,28 +229,26 @@ class ProfileView extends StatelessWidget {
               ),
               const SizedBox(height: 12),
             ],
-            if (authProvider.isAdmin || authProvider.isTeacher) ...[
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton.icon(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (_) => const SchoolManagementScreen()),
-                    );
-                  },
-                  icon: const Icon(Icons.school_rounded),
-                  label: const Text('Open School Management Module', style: TextStyle(fontWeight: FontWeight.bold)),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF0284C7),
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                  ),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const SchoolManagementScreen()),
+                  );
+                },
+                icon: const Icon(Icons.school_rounded),
+                label: const Text('View School & Class Information', style: TextStyle(fontWeight: FontWeight.bold)),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF0284C7),
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                 ),
               ),
-              const SizedBox(height: 12),
-            ],
+            ),
+            const SizedBox(height: 12),
             SizedBox(
               width: double.infinity,
               child: OutlinedButton.icon(
