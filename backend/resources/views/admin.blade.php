@@ -1167,12 +1167,9 @@
                         
                         <!-- Chart 1: Revenue Collection -->
                         <div class="table-card" style="padding: 18px; margin-bottom: 0;">
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                                <div>
-                                    <h4 style="font-size: 14px; font-weight: 700; color: var(--primary-blue); margin: 0;">Term Fee Revenue & Collection Trends</h4>
-                                    <p style="font-size: 11px; color: var(--text-secondary); margin: 2px 0 0 0;">Monthly fee collection velocity vs. target</p>
-                                </div>
-                                <span class="role-badge admin">Real-time Ledger</span>
+                            <div style="margin-bottom: 12px;">
+                                <h4 style="font-size: 14px; font-weight: 700; color: var(--primary-blue); margin: 0;">Term Fee Revenue & Collection Trends</h4>
+                                <p style="font-size: 11px; color: var(--text-secondary); margin: 2px 0 0 0;">Monthly fee collection velocity vs. target</p>
                             </div>
                             <div style="height: 220px; position: relative;">
                                 <canvas id="revenueChart"></canvas>
@@ -1181,12 +1178,9 @@
 
                         <!-- Chart 2: Attendance by Stream -->
                         <div class="table-card" style="padding: 18px; margin-bottom: 0;">
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                                <div>
-                                    <h4 style="font-size: 14px; font-weight: 700; color: var(--primary-blue); margin: 0;">Weekly Attendance Rate by Stream</h4>
-                                    <p style="font-size: 11px; color: var(--text-secondary); margin: 2px 0 0 0;">Comparison across Preparatory, Primary & Secondary</p>
-                                </div>
-                                <span class="role-badge teacher">95% Target</span>
+                            <div style="margin-bottom: 12px;">
+                                <h4 style="font-size: 14px; font-weight: 700; color: var(--primary-blue); margin: 0;">Weekly Attendance Rate by Stream</h4>
+                                <p style="font-size: 11px; color: var(--text-secondary); margin: 2px 0 0 0;">Comparison across Preparatory, Primary & Secondary</p>
                             </div>
                             <div style="height: 220px; position: relative;">
                                 <canvas id="attendanceChart"></canvas>
@@ -1195,12 +1189,9 @@
 
                         <!-- Chart 3: Payment Method Breakdown -->
                         <div class="table-card" style="padding: 18px; margin-bottom: 0;">
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                                <div>
-                                    <h4 style="font-size: 14px; font-weight: 700; color: var(--primary-blue); margin: 0;">Payment Channel Distribution</h4>
-                                    <p style="font-size: 11px; color: var(--text-secondary); margin: 2px 0 0 0;">EcoCash, Paynow/ZIPIT, Card & Cash breakdown</p>
-                                </div>
-                                <span class="role-badge guardian">Gateways</span>
+                            <div style="margin-bottom: 12px;">
+                                <h4 style="font-size: 14px; font-weight: 700; color: var(--primary-blue); margin: 0;">Payment Channel Distribution</h4>
+                                <p style="font-size: 11px; color: var(--text-secondary); margin: 2px 0 0 0;">EcoCash, Paynow/ZIPIT, Card & Cash breakdown</p>
                             </div>
                             <div style="height: 220px; position: relative;">
                                 <canvas id="paymentChart"></canvas>
@@ -1209,12 +1200,9 @@
 
                         <!-- Chart 4: App Activity & Engagement -->
                         <div class="table-card" style="padding: 18px; margin-bottom: 0;">
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                                <div>
-                                    <h4 style="font-size: 14px; font-weight: 700; color: var(--primary-blue); margin: 0;">Parent & Teacher App Interactions</h4>
-                                    <p style="font-size: 11px; color: var(--text-secondary); margin: 2px 0 0 0;">Daily logins, report card views & notifications</p>
-                                </div>
-                                <span class="role-badge admin">Active Engagement</span>
+                            <div style="margin-bottom: 12px;">
+                                <h4 style="font-size: 14px; font-weight: 700; color: var(--primary-blue); margin: 0;">Parent & Teacher App Interactions</h4>
+                                <p style="font-size: 11px; color: var(--text-secondary); margin: 2px 0 0 0;">Daily logins, report card views & notifications</p>
                             </div>
                             <div style="height: 220px; position: relative;">
                                 <canvas id="activityChart"></canvas>
