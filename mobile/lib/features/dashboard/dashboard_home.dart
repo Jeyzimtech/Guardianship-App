@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../../core/auth_provider.dart';
 import '../../core/student_provider.dart';
 import '../common/app_drawer.dart';
+import '../parent/parent_dashboard_view.dart';
 import '../student_management/student_management_screen.dart';
 import '../school_management/school_management_screen.dart';
 import '../teacher_management/teacher_management_screen.dart';
@@ -145,10 +146,15 @@ class _DashboardHomeState extends State<DashboardHome> {
         ],
       ),
       drawer: const AppDrawer(currentRoute: 'Dashboard'),
-      body: RefreshIndicator(
-        onRefresh: () => studentProvider.fetchDashboard(1),
-        color: primaryBlue,
-        child: SingleChildScrollView(
+      body: Consumer<AuthProvider>(
+        builder: (context, auth, _) {
+          if (!auth.isTeacher) {
+            return const ParentDashboardView();
+          }
+          return RefreshIndicator(
+            onRefresh: () => studentProvider.fetchDashboard(1),
+            color: primaryBlue,
+            child: SingleChildScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
           padding: const EdgeInsets.all(16.0),
           child: Column(
@@ -297,8 +303,10 @@ class _DashboardHomeState extends State<DashboardHome> {
             ],
           ),
         ),
-      ),
-    );
+      );
+    },
+  ),
+);
   }
 
   Widget _buildActivityItem(String title, String time) {
