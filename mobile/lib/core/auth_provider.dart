@@ -65,12 +65,11 @@ class AuthProvider extends ChangeNotifier {
         return true;
       }
     } catch (e) {
-      // Offline fallback: simulate successful login for prototype
-      final isAdminRole = firebaseIdToken.contains('admin') || firebaseIdToken.contains('+263771111111');
+      // Offline fallback: simulate successful login for prototype (Teacher or Guardian)
       final isTeacherRole = firebaseIdToken.contains('teacher') || firebaseIdToken.contains('+263772222222');
-      final role = isAdminRole ? 'admin' : (isTeacherRole ? 'teacher' : 'guardian');
-      final name = isAdminRole ? 'Admin Tinotenda' : (isTeacherRole ? 'Teacher Grace' : 'Guardian John Chewe');
-      final phone = isAdminRole ? '+263771111111' : (isTeacherRole ? '+263772222222' : '+263773333333');
+      final role = isTeacherRole ? 'teacher' : 'guardian';
+      final name = isTeacherRole ? 'Teacher Grace' : 'Guardian John Chewe';
+      final phone = isTeacherRole ? '+263772222222' : '+263773333333';
 
       _token = 'mock-local-token-123456';
       _user = {
