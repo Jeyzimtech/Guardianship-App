@@ -7,6 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cabin:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
             --primary-blue: #3B5998;
@@ -1161,6 +1162,67 @@
                         </div>
                     </div>
 
+                    <h3 class="section-title">School Performance & Financial Analytics</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(420px, 1fr)); gap: 20px; margin-bottom: 24px;">
+                        
+                        <!-- Chart 1: Revenue Collection -->
+                        <div class="table-card" style="padding: 18px; margin-bottom: 0;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                                <div>
+                                    <h4 style="font-size: 14px; font-weight: 700; color: var(--primary-blue); margin: 0;">Term Fee Revenue & Collection Trends</h4>
+                                    <p style="font-size: 11px; color: var(--text-secondary); margin: 2px 0 0 0;">Monthly fee collection velocity vs. target</p>
+                                </div>
+                                <span class="role-badge admin">Real-time Ledger</span>
+                            </div>
+                            <div style="height: 220px; position: relative;">
+                                <canvas id="revenueChart"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- Chart 2: Attendance by Stream -->
+                        <div class="table-card" style="padding: 18px; margin-bottom: 0;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                                <div>
+                                    <h4 style="font-size: 14px; font-weight: 700; color: var(--primary-blue); margin: 0;">Weekly Attendance Rate by Stream</h4>
+                                    <p style="font-size: 11px; color: var(--text-secondary); margin: 2px 0 0 0;">Comparison across Preparatory, Primary & Secondary</p>
+                                </div>
+                                <span class="role-badge teacher">95% Target</span>
+                            </div>
+                            <div style="height: 220px; position: relative;">
+                                <canvas id="attendanceChart"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- Chart 3: Payment Method Breakdown -->
+                        <div class="table-card" style="padding: 18px; margin-bottom: 0;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                                <div>
+                                    <h4 style="font-size: 14px; font-weight: 700; color: var(--primary-blue); margin: 0;">Payment Channel Distribution</h4>
+                                    <p style="font-size: 11px; color: var(--text-secondary); margin: 2px 0 0 0;">EcoCash, Paynow/ZIPIT, Card & Cash breakdown</p>
+                                </div>
+                                <span class="role-badge guardian">Gateways</span>
+                            </div>
+                            <div style="height: 220px; position: relative;">
+                                <canvas id="paymentChart"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- Chart 4: App Activity & Engagement -->
+                        <div class="table-card" style="padding: 18px; margin-bottom: 0;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                                <div>
+                                    <h4 style="font-size: 14px; font-weight: 700; color: var(--primary-blue); margin: 0;">Parent & Teacher App Interactions</h4>
+                                    <p style="font-size: 11px; color: var(--text-secondary); margin: 2px 0 0 0;">Daily logins, report card views & notifications</p>
+                                </div>
+                                <span class="role-badge admin">Active Engagement</span>
+                            </div>
+                            <div style="height: 220px; position: relative;">
+                                <canvas id="activityChart"></canvas>
+                            </div>
+                        </div>
+
+                    </div>
+
                     <h3 class="section-title">Admin & Teacher Access Control Matrix</h3>
                     <div class="table-card" style="margin-bottom: 24px;">
                         <table class="data-table">
@@ -2010,11 +2072,132 @@
             alert('Student "' + name + '" enrolled successfully!');
         }
 
+        function initDashboardCharts() {
+            if (typeof Chart === 'undefined') return;
+
+            // Chart 1: Revenue & Fee Collection Trends
+            const ctxRev = document.getElementById('revenueChart');
+            if (ctxRev) {
+                new Chart(ctxRev, {
+                    type: 'line',
+                    data: {
+                        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'],
+                        datasets: [
+                            {
+                                label: 'Actual Fee Revenue ($)',
+                                data: [12000, 19500, 27000, 34000, 42000, 48000, 54500],
+                                borderColor: '#3B5998',
+                                backgroundColor: 'rgba(59, 89, 152, 0.12)',
+                                fill: true,
+                                tension: 0.4,
+                                borderWidth: 2.5
+                            },
+                            {
+                                label: 'Term Target ($)',
+                                data: [15000, 22000, 30000, 38000, 45000, 52000, 60000],
+                                borderColor: '#94A3B8',
+                                borderDash: [4, 4],
+                                fill: false,
+                                tension: 0.4,
+                                borderWidth: 1.5
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { position: 'top', labels: { font: { family: 'Cabin' } } } },
+                        scales: { y: { beginAtZero: true, grid: { color: '#F1F5F9' } }, x: { grid: { display: false } } }
+                    }
+                });
+            }
+
+            // Chart 2: Attendance Rate by Stream
+            const ctxAtt = document.getElementById('attendanceChart');
+            if (ctxAtt) {
+                new Chart(ctxAtt, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'],
+                        datasets: [
+                            { label: 'Preparatory (ECD)', data: [98, 97, 96, 95, 96], backgroundColor: '#5B7BD5' },
+                            { label: 'Primary', data: [96, 95, 97, 96, 94], backgroundColor: '#3B5998' },
+                            { label: 'Secondary', data: [94, 93, 95, 92, 91], backgroundColor: '#1E3A8A' }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { position: 'top', labels: { font: { family: 'Cabin' } } } },
+                        scales: { y: { min: 80, max: 100, grid: { color: '#F1F5F9' } }, x: { grid: { display: false } } }
+                    }
+                });
+            }
+
+            // Chart 3: Payment Channel Distribution
+            const ctxPay = document.getElementById('paymentChart');
+            if (ctxPay) {
+                new Chart(ctxPay, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['EcoCash (Mobile)', 'Paynow / ZIPIT', 'Visa / Mastercard', 'Direct Bank Cash'],
+                        datasets: [{
+                            data: [45, 25, 18, 12],
+                            backgroundColor: ['#22C55E', '#3B5998', '#0EA5E9', '#F59E0B'],
+                            borderWidth: 2,
+                            borderColor: '#FFFFFF'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { position: 'right', labels: { font: { family: 'Cabin' } } } },
+                        cutout: '65%'
+                    }
+                });
+            }
+
+            // Chart 4: App Activity & Engagement
+            const ctxAct = document.getElementById('activityChart');
+            if (ctxAct) {
+                new Chart(ctxAct, {
+                    type: 'line',
+                    data: {
+                        labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5', 'Week 6'],
+                        datasets: [
+                            {
+                                label: 'Parent Portal Logins',
+                                data: [320, 450, 580, 720, 890, 1100],
+                                borderColor: '#0EA5E9',
+                                backgroundColor: 'rgba(14, 165, 233, 0.1)',
+                                fill: true,
+                                tension: 0.3
+                            },
+                            {
+                                label: 'Teacher Roster Submissions',
+                                data: [140, 180, 210, 250, 290, 340],
+                                borderColor: '#22C55E',
+                                fill: false,
+                                tension: 0.3
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { position: 'top', labels: { font: { family: 'Cabin' } } } },
+                        scales: { y: { beginAtZero: true, grid: { color: '#F1F5F9' } }, x: { grid: { display: false } } }
+                    }
+                });
+            }
+        }
+
         window.addEventListener('DOMContentLoaded', () => {
             renderUsersTable();
             renderTeachersTable();
             renderStudentsTable();
             recalculateStatistics();
+            initDashboardCharts();
         });
     </script>
 </body>
