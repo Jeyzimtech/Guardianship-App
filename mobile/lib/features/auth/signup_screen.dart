@@ -64,12 +64,8 @@ class _SignupScreenState extends State<SignupScreen> {
 
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     
-    final String mockPhone = _selectedRole == 'Admin' 
-        ? '+263771111111' 
-        : (_selectedRole == 'Teacher' ? '+263772222222' : '+263773333333');
-    final String roleLower = _selectedRole == 'Admin' 
-        ? 'admin' 
-        : (_selectedRole == 'Teacher' ? 'teacher' : 'guardian');
+    final String mockPhone = _selectedRole == 'Teacher' ? '+263772222222' : '+263773333333';
+    final String roleLower = _selectedRole == 'Teacher' ? 'teacher' : 'guardian';
     final mockToken = 'mock-firebase-token-$mockPhone-uid_${roleLower}_123';
 
     final success = await authProvider.loginWithFirebaseToken(mockToken);
