@@ -212,6 +212,12 @@ class AppDrawer extends StatelessWidget {
                 ),
                 _buildDrawerItem(
                   context,
+                  title: 'Uniform Shop',
+                  icon: Icons.checkroom_rounded,
+                  onTap: () => ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Opening School Uniform Storefront...'))),
+                ),
+                _buildDrawerItem(
+                  context,
                   title: 'Payments',
                   icon: Icons.payment_rounded,
                   onTap: () => ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Navigating to Payments Log...'))),
