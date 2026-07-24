@@ -214,6 +214,29 @@ class _StudentManagementScreenState extends State<StudentManagementScreen> {
               ],
             ),
             const SizedBox(height: 8),
+
+            // Access Control Scope Banner
+            Container(
+              margin: const EdgeInsets.only(bottom: 12),
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: const Color(0xFFEEF2FF),
+                borderRadius: BorderRadius.circular(4),
+                border: Border.all(color: const Color(0xFFC7D2FE)),
+              ),
+              child: const Row(
+                children: [
+                  Icon(Icons.shield_outlined, color: primaryBlue, size: 18),
+                  SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'Teacher Access Scope: View student records & fee status for assigned class. Student identity editing is managed by School Admin.',
+                      style: TextStyle(fontSize: 11, color: Color(0xFF1E40AF)),
+                    ),
+                  ),
+                ],
+              ),
+            ),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
