@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../core/auth_provider.dart';
 import '../../core/student_provider.dart';
 import '../common/app_drawer.dart';
 import '../student_management/student_management_screen.dart';
-import '../user_management/user_management_screen.dart';
 import '../school_management/school_management_screen.dart';
 import '../teacher_management/teacher_management_screen.dart';
 
@@ -154,52 +154,63 @@ class _DashboardHomeState extends State<DashboardHome> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Admin Web Dashboard Redirection Banner
-              Container(
-                width: double.infinity,
-                margin: const EdgeInsets.only(bottom: 16),
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFEEF2FF),
-                  borderRadius: BorderRadius.circular(6),
-                  border: Border.all(color: const Color(0xFFC7D2FE)),
-                ),
-                child: const Row(
-                  children: [
-                    Icon(Icons.important_devices_rounded, color: primaryBlue, size: 22),
-                    SizedBox(width: 10),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('Web Admin Dashboard Available', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: primaryBlue)),
-                          SizedBox(height: 2),
-                          Text('Admins can access full web tools at http://localhost:8000/admin', style: TextStyle(fontSize: 11, color: Color(0xFF4B5563))),
-                        ],
-                      ),
+              // Parents & Teachers Portal Header Banner
+              Consumer<AuthProvider>(
+                builder: (context, auth, _) {
+                  final isTeacher = auth.isTeacher;
+                  return Container(
+                    width: double.infinity,
+                    margin: const EdgeInsets.only(bottom: 16),
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFEEF2FF),
+                      borderRadius: BorderRadius.circular(6),
+                      border: Border.all(color: const Color(0xFFC7D2FE)),
                     ),
-                  ],
-                ),
+                    child: Row(
+                      children: [
+                        Icon(isTeacher ? Icons.badge_rounded : Icons.family_restroom_rounded, color: primaryBlue, size: 22),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(isTeacher ? 'Teacher Workspace' : 'Parent & Guardian Portal', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: primaryBlue)),
+                              const SizedBox(height: 2),
+                              Text(isTeacher ? 'Manage class rosters, daily attendance, and student performance.' : 'Monitor your child\'s progress, attendance, reports, and school fees.', style: const TextStyle(fontSize: 11, color: Color(0xFF4B5563))),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                },
               ),
 
               // Header title
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+              Consumer<AuthProvider>(
+                builder: (context, auth, _) {
+                  final isTeacher = auth.isTeacher;
+                  final initials = isTeacher ? 'TG' : 'JC';
+                  return Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(_selectedSchool, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: primaryBlue)),
-                      const SizedBox(height: 2),
-                      const Text('School Overview & Performance Dashboard', style: TextStyle(fontSize: 12, color: Color(0xFF6B7280))),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(_selectedSchool, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: primaryBlue)),
+                          const SizedBox(height: 2),
+                          Text(isTeacher ? 'Teacher Dashboard & Roster Overview' : 'Parent / Child Academic Portal', style: const TextStyle(fontSize: 12, color: Color(0xFF6B7280))),
+                        ],
+                      ),
+                      CircleAvatar(
+                        radius: 18,
+                        backgroundColor: primaryBlue,
+                        child: Text(initials, style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold)),
+                      ),
                     ],
-                  ),
-                  const CircleAvatar(
-                    radius: 18,
-                    backgroundColor: primaryBlue,
-                    child: Text('AT', style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold)),
-                  ),
-                ],
+                  );
+                },
               ),
               const SizedBox(height: 16),
 
@@ -221,12 +232,12 @@ class _DashboardHomeState extends State<DashboardHome> {
               const SizedBox(height: 20),
 
               // Quick Modules Navigation
-              const Text('Quick Management Modules', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: primaryBlue)),
+              const Text('Quick Access Modules', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: primaryBlue)),
               const SizedBox(height: 10),
               _buildModuleCard(
                 context,
-                'Student Management',
-                'Manage student roster, attendance & fee balances',
+                'Students & Children',
+                'View student rosters, attendance & academic records',
                 Icons.school_rounded,
                 primaryBlue,
                 () => Navigator.push(context, MaterialPageRoute(builder: (_) => const StudentManagementScreen())),
@@ -234,8 +245,8 @@ class _DashboardHomeState extends State<DashboardHome> {
               const SizedBox(height: 10),
               _buildModuleCard(
                 context,
-                'Teacher Management',
-                'Manage teachers, subject specialties & classes',
+                'Teacher Directory & Classes',
+                'View assigned teachers, subject areas & class streams',
                 Icons.badge_rounded,
                 const Color(0xFF5B7BD5),
                 () => Navigator.push(context, MaterialPageRoute(builder: (_) => const TeacherManagementScreen())),
@@ -243,20 +254,11 @@ class _DashboardHomeState extends State<DashboardHome> {
               const SizedBox(height: 10),
               _buildModuleCard(
                 context,
-                'School & Class Management',
-                'Manage schools, academic years & class streams',
+                'School Streams & Academic Info',
+                'Explore school information, terms & class schedules',
                 Icons.domain_rounded,
                 const Color(0xFF0284C7),
                 () => Navigator.push(context, MaterialPageRoute(builder: (_) => const SchoolManagementScreen())),
-              ),
-              const SizedBox(height: 10),
-              _buildModuleCard(
-                context,
-                'User & Role Management',
-                'Manage Admin, Teacher & Guardian accounts',
-                Icons.manage_accounts_rounded,
-                const Color(0xFF6B21A8),
-                () => Navigator.push(context, MaterialPageRoute(builder: (_) => const UserManagementScreen())),
               ),
               const SizedBox(height: 20),
 
