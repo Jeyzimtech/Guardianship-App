@@ -15,7 +15,7 @@ class _SignupScreenState extends State<SignupScreen> {
   final _emailController = TextEditingController(text: 'parent@chewe.tech');
   final _passwordController = TextEditingController(text: 'password123');
   final _confirmPasswordController = TextEditingController(text: 'password123');
-  String _selectedRole = 'Parent'; // Parent or Teacher
+  String _selectedRole = 'Parent / Student'; // Parent / Student or Teacher
   bool _isObscuredPassword = true;
   bool _isObscuredConfirm = true;
   bool _isAuthenticating = false;
@@ -313,7 +313,7 @@ class _SignupScreenState extends State<SignupScreen> {
                           borderSide: BorderSide(color: accentColor, width: 1.5),
                         ),
                       ),
-                      items: ['Parent', 'Teacher'].map((role) {
+                      items: ['Parent / Student', 'Teacher'].map((role) {
                         return DropdownMenuItem<String>(
                           value: role,
                           child: Text(role, style: TextStyle(color: primaryColor)),
