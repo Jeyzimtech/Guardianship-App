@@ -1,13 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../core/auth_provider.dart';
-import '../../core/student_provider.dart';
 import '../common/app_drawer.dart';
 import '../parent/parent_dashboard_view.dart';
 import '../teacher/teacher_dashboard_view.dart';
-import '../student_management/student_management_screen.dart';
-import '../school_management/school_management_screen.dart';
-import '../teacher_management/teacher_management_screen.dart';
 
 class DashboardHome extends StatefulWidget {
   const DashboardHome({super.key});
@@ -18,85 +14,10 @@ class DashboardHome extends StatefulWidget {
 
 class _DashboardHomeState extends State<DashboardHome> {
   static const primaryBlue = Color(0xFF3B5998);
-  static const borderColor = Color(0xFFD8D8D8);
   String _selectedSchool = 'Hillside Primary School';
-
-  Widget _buildKpiCard(String title, String value, IconData icon, {Color? valueColor, Color? iconBg, Color? iconColor}) {
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.all(Radius.circular(4)),
-        border: Border(
-          top: BorderSide(color: primaryBlue, width: 4.0),
-          left: BorderSide(color: borderColor),
-          right: BorderSide(color: borderColor),
-          bottom: BorderSide(color: borderColor),
-        ),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(title.toUpperCase(), style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFF6B7280))),
-              const SizedBox(height: 4),
-              Text(value, style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: valueColor ?? const Color(0xFF1F2937))),
-            ],
-          ),
-          Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: iconBg ?? const Color(0xFFEEF2FF),
-              borderRadius: BorderRadius.circular(4),
-            ),
-            child: Icon(icon, color: iconColor ?? primaryBlue, size: 22),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildModuleCard(BuildContext context, String title, String subtitle, IconData icon, Color color, VoidCallback onTap) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(4),
-          border: Border.all(color: borderColor),
-        ),
-        child: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(color: color.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(4)),
-              child: Icon(icon, color: color, size: 24),
-            ),
-            const SizedBox(width: 14),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(title, style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: color)),
-                  const SizedBox(height: 2),
-                  Text(subtitle, style: const TextStyle(fontSize: 12, color: Color(0xFF6B7280))),
-                ],
-              ),
-            ),
-            const Icon(Icons.arrow_forward_ios_rounded, color: Color(0xFF9CA3AF), size: 16),
-          ],
-        ),
-      ),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
-    final studentProvider = Provider.of<StudentProvider>(context);
-
     return Scaffold(
       backgroundColor: const Color(0xFFF9FAFB),
       appBar: AppBar(
@@ -154,20 +75,6 @@ class _DashboardHomeState extends State<DashboardHome> {
           }
           return const ParentDashboardView();
         },
-      ),
-    );
-  }
-
-  Widget _buildActivityItem(String title, String time) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Color(0xFF1F2937))),
-          const SizedBox(height: 2),
-          Text(time, style: const TextStyle(fontSize: 11, color: Color(0xFF6B7280))),
-        ],
       ),
     );
   }

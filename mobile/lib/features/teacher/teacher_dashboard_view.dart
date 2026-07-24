@@ -20,7 +20,7 @@ class _TeacherDashboardViewState extends State<TeacherDashboardView> {
   final List<Map<String, dynamic>> _roster = [
     {'id': 'STU001', 'name': 'Alice Chewe', 'status': 'Present', 'fees': 'Paid', 'merits': 12},
     {'id': 'STU002', 'name': 'Kudzai Moyo', 'status': 'Present', 'fees': 'Paid', 'merits': 8},
-    {'id': 'STU003', 'name': 'Tafadzwa Ndlovu', 'status': 'Absent', 'fees': 'USD $120.00 Pending', 'merits': 5},
+    {'id': 'STU003', 'name': 'Tafadzwa Ndlovu', 'status': 'Absent', 'fees': 'USD \$120.00 Pending', 'merits': 5},
     {'id': 'STU004', 'name': 'Tinashe Sibanda', 'status': 'Present', 'fees': 'Paid', 'merits': 15},
     {'id': 'STU005', 'name': 'Chipo Mutasa', 'status': 'Late', 'fees': 'Paid', 'merits': 10},
   ];
@@ -191,7 +191,7 @@ class _TeacherDashboardViewState extends State<TeacherDashboardView> {
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
                   itemCount: _roster.length,
-                  separatorBuilder: (_, __) => const Divider(height: 1, color: Color(0xFFF1F5F9)),
+                  separatorBuilder: (context, index) => const Divider(height: 1, color: Color(0xFFF1F5F9)),
                   itemBuilder: (context, index) {
                     final student = _roster[index];
                     final status = student['status'];
