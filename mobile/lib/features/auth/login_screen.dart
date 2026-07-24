@@ -11,10 +11,22 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  String _selectedRole = 'Parent / Student'; // 'Parent / Student' or 'Teacher'
   final _emailController = TextEditingController(text: 'parent@chewe.tech');
   final _passwordController = TextEditingController(text: 'password123');
   bool _isObscured = true;
   bool _isAuthenticating = false;
+
+  void _onRoleChanged(String role) {
+    setState(() {
+      _selectedRole = role;
+      if (role == 'Teacher') {
+        _emailController.text = 'teacher@hillside.ac.zw';
+      } else {
+        _emailController.text = 'parent@chewe.tech';
+      }
+    });
+  }
 
   void _login() async {
     final email = _emailController.text.trim();
@@ -40,7 +52,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     
-    final bool isTeacher = email.toLowerCase().contains('teacher');
+    final bool isTeacher = _selectedRole == 'Teacher' || email.toLowerCase().contains('teacher');
     final String mockPhone = isTeacher ? '+263772222222' : '+263773333333';
     final String roleLower = isTeacher ? 'teacher' : 'guardian';
     final mockToken = 'mock-firebase-token-$mockPhone-uid_${roleLower}_123';
@@ -110,23 +122,79 @@ class _LoginScreenState extends State<LoginScreen> {
                         fontWeight: FontWeight.w500,
                       ),
                     ),
-                    // Parents & Teachers Portal Banner Notice
+                    const SizedBox(height: 16),
+
+                    // Role Selection Toggle
                     Container(
-                      padding: const EdgeInsets.all(12),
                       margin: const EdgeInsets.only(bottom: 20),
+                      padding: const EdgeInsets.all(4),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFEFF6FF),
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: const Color(0xFFBFDBFE)),
+                        color: const Color(0xFFF1F5F9),
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(color: const Color(0xFFCBD5E1)),
                       ),
-                      child: const Row(
+                      child: Row(
                         children: [
-                          Icon(Icons.family_restroom_rounded, color: Color(0xFF1D4ED8), size: 22),
-                          SizedBox(width: 10),
                           Expanded(
-                            child: Text(
-                              'Parents & Teachers Portal\nSign in to access student progress, attendance, reports, and real-time updates.',
-                              style: TextStyle(fontSize: 12, color: Color(0xFF1E40AF), height: 1.3, fontWeight: FontWeight.w500),
+                            child: GestureDetector(
+                              onTap: () => _onRoleChanged('Parent / Student'),
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(vertical: 12),
+                                decoration: BoxDecoration(
+                                  color: _selectedRole == 'Parent / Student' ? primaryColor : Colors.transparent,
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      Icons.family_restroom_rounded,
+                                      size: 18,
+                                      color: _selectedRole == 'Parent / Student' ? Colors.white : const Color(0xFF64748B),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Text(
+                                      'Parent / Student',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 13,
+                                        color: _selectedRole == 'Parent / Student' ? Colors.white : const Color(0xFF475569),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                            child: GestureDetector(
+                              onTap: () => _onRoleChanged('Teacher'),
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(vertical: 12),
+                                decoration: BoxDecoration(
+                                  color: _selectedRole == 'Teacher' ? primaryColor : Colors.transparent,
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      Icons.badge_rounded,
+                                      size: 18,
+                                      color: _selectedRole == 'Teacher' ? Colors.white : const Color(0xFF64748B),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Text(
+                                      'Teacher',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 13,
+                                        color: _selectedRole == 'Teacher' ? Colors.white : const Color(0xFF475569),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
                             ),
                           ),
                         ],
