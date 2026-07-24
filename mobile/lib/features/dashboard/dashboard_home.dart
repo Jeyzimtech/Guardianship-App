@@ -4,6 +4,7 @@ import '../../core/auth_provider.dart';
 import '../../core/student_provider.dart';
 import '../common/app_drawer.dart';
 import '../parent/parent_dashboard_view.dart';
+import '../teacher/teacher_dashboard_view.dart';
 import '../student_management/student_management_screen.dart';
 import '../school_management/school_management_screen.dart';
 import '../teacher_management/teacher_management_screen.dart';
@@ -148,165 +149,13 @@ class _DashboardHomeState extends State<DashboardHome> {
       drawer: const AppDrawer(currentRoute: 'Dashboard'),
       body: Consumer<AuthProvider>(
         builder: (context, auth, _) {
-          if (!auth.isTeacher) {
-            return const ParentDashboardView();
+          if (auth.isTeacher) {
+            return const TeacherDashboardView();
           }
-          return RefreshIndicator(
-            onRefresh: () => studentProvider.fetchDashboard(1),
-            color: primaryBlue,
-            child: SingleChildScrollView(
-          physics: const AlwaysScrollableScrollPhysics(),
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Parents & Teachers Portal Header Banner
-              Consumer<AuthProvider>(
-                builder: (context, auth, _) {
-                  final isTeacher = auth.isTeacher;
-                  return Container(
-                    width: double.infinity,
-                    margin: const EdgeInsets.only(bottom: 16),
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFEEF2FF),
-                      borderRadius: BorderRadius.circular(6),
-                      border: Border.all(color: const Color(0xFFC7D2FE)),
-                    ),
-                    child: Row(
-                      children: [
-                        Icon(isTeacher ? Icons.badge_rounded : Icons.family_restroom_rounded, color: primaryBlue, size: 22),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(isTeacher ? 'Teacher Workspace' : 'Parent & Guardian Portal', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: primaryBlue)),
-                              const SizedBox(height: 2),
-                              Text(isTeacher ? 'Manage class rosters, daily attendance, and student performance.' : 'Monitor your child\'s progress, attendance, reports, and school fees.', style: const TextStyle(fontSize: 11, color: Color(0xFF4B5563))),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                },
-              ),
-
-              // Header title
-              Consumer<AuthProvider>(
-                builder: (context, auth, _) {
-                  final isTeacher = auth.isTeacher;
-                  final initials = isTeacher ? 'TG' : 'JC';
-                  return Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(_selectedSchool, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: primaryBlue)),
-                          const SizedBox(height: 2),
-                          Text(isTeacher ? 'Teacher Dashboard & Roster Overview' : 'Parent / Child Academic Portal', style: const TextStyle(fontSize: 12, color: Color(0xFF6B7280))),
-                        ],
-                      ),
-                      CircleAvatar(
-                        radius: 18,
-                        backgroundColor: primaryBlue,
-                        child: Text(initials, style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold)),
-                      ),
-                    ],
-                  );
-                },
-              ),
-              const SizedBox(height: 16),
-
-              // 4 KPI Summary Cards Grid
-              GridView.count(
-                crossAxisCount: 2,
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                crossAxisSpacing: 10,
-                mainAxisSpacing: 10,
-                childAspectRatio: 2.1,
-                children: [
-                  _buildKpiCard('Students', '1,250', Icons.school_rounded),
-                  _buildKpiCard('Attendance', '95%', Icons.fact_check_rounded, valueColor: const Color(0xFF4CAF50), iconBg: const Color(0xFFE8F5E9), iconColor: const Color(0xFF4CAF50)),
-                  _buildKpiCard('Outstanding', 'USD 24,000', Icons.file_present_rounded, valueColor: const Color(0xFFE74C3C), iconBg: const Color(0xFFFDEDEC), iconColor: const Color(0xFFE74C3C)),
-                  _buildKpiCard('Unread', '15', Icons.forum_rounded, valueColor: const Color(0xFFF39C12), iconBg: const Color(0xFFFEF9E7), iconColor: const Color(0xFFF39C12)),
-                ],
-              ),
-              const SizedBox(height: 20),
-
-              // Quick Modules Navigation
-              const Text('Quick Access Modules', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: primaryBlue)),
-              const SizedBox(height: 10),
-              _buildModuleCard(
-                context,
-                'Students & Children',
-                'View student rosters, attendance & academic records',
-                Icons.school_rounded,
-                primaryBlue,
-                () => Navigator.push(context, MaterialPageRoute(builder: (_) => const StudentManagementScreen())),
-              ),
-              const SizedBox(height: 10),
-              _buildModuleCard(
-                context,
-                'Teacher Directory & Classes',
-                'View assigned teachers, subject areas & class streams',
-                Icons.badge_rounded,
-                const Color(0xFF5B7BD5),
-                () => Navigator.push(context, MaterialPageRoute(builder: (_) => const TeacherManagementScreen())),
-              ),
-              const SizedBox(height: 10),
-              _buildModuleCard(
-                context,
-                'School Streams & Academic Info',
-                'Explore school information, terms & class schedules',
-                Icons.domain_rounded,
-                const Color(0xFF0284C7),
-                () => Navigator.push(context, MaterialPageRoute(builder: (_) => const SchoolManagementScreen())),
-              ),
-              const SizedBox(height: 20),
-
-              // Recent Activity Section
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(4),
-                  border: const Border(
-                    top: BorderSide(color: primaryBlue, width: 4.0),
-                    left: BorderSide(color: borderColor),
-                    right: BorderSide(color: borderColor),
-                    bottom: BorderSide(color: borderColor),
-                  ),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text('Recent Activity', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: primaryBlue)),
-                        Icon(Icons.history_rounded, color: Color(0xFF6B7280), size: 20),
-                      ],
-                    ),
-                    const Divider(height: 20, color: borderColor),
-                    _buildActivityItem('Teacher Grace uploaded Grade 7 report card', '2 minutes ago'),
-                    _buildActivityItem('Parent John Chewe paid school fees (USD 360)', '10 minutes ago'),
-                    _buildActivityItem('Daily attendance completed for Grade 4 Gold', 'Today, 09:15 AM'),
-                    _buildActivityItem('New student Alice Chewe registered', 'Yesterday'),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      );
-    },
-  ),
-);
+          return const ParentDashboardView();
+        },
+      ),
+    );
   }
 
   Widget _buildActivityItem(String title, String time) {
