@@ -1223,58 +1223,6 @@
 
                     </div>
 
-                    <h3 class="section-title">Admin & Teacher Access Control Matrix</h3>
-                    <div class="table-card" style="margin-bottom: 24px;">
-                        <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th>Tab / Module</th>
-                                    <th>Functionality</th>
-                                    <th>School Admin Access</th>
-                                    <th>Teacher Access Scope</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td><strong>Student Records</strong></td>
-                                    <td>Full name, class, grade — canonical identity source</td>
-                                    <td><span class="role-badge admin">Full Configuration & Edit</span></td>
-                                    <td><span class="role-badge teacher">View Only (Assigned Class)</span></td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Notifications & Communication</strong></td>
-                                    <td>Post announcements, upload report cards, merits & certificates</td>
-                                    <td><span class="role-badge admin">Broadcast All</span></td>
-                                    <td><span class="role-badge teacher">Class-Scoped Messaging</span></td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Fees & Balances</strong></td>
-                                    <td>School fee accounts, ledger history, fee-gating status</td>
-                                    <td><span class="role-badge admin">Edit & Configure Accounts</span></td>
-                                    <td><span class="role-badge teacher">View Only Status</span></td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Uniform Accounts & Shop</strong></td>
-                                    <td>Per-student uniform order accounts and storefront</td>
-                                    <td><span class="role-badge admin">Admin Full Control</span></td>
-                                    <td><span class="role-badge guardian">Parent Order & Pay Link</span></td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Class Calendar & Roster</strong></td>
-                                    <td>Daily class roster & attendance marking</td>
-                                    <td><span class="role-badge admin">View All Classes</span></td>
-                                    <td><span class="role-badge teacher">Mark Attendance (Own Class)</span></td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Activities</strong></td>
-                                    <td>Extracurricular activities roster & daily attendance</td>
-                                    <td><span class="role-badge admin">Configure Roster</span></td>
-                                    <td><span class="role-badge teacher">Mark Attendance (Assigned)</span></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-
                     <h3 class="section-title">Quick Management Modules</h3>
                     <div class="cards-grid">
                         <div class="module-card" onclick="switchTab('students')">
