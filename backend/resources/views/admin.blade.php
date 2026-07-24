@@ -1072,6 +1072,12 @@
                         <span>Reports & Circulars</span>
                     </a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link" onclick="switchTab('uniforms')">
+                        <img src="/assets/icons8-wallet.svg" alt="Uniform Shop & Accounts">
+                        <span>Uniform Shop & Accounts</span>
+                    </a>
+                </li>
             </ul>
         </aside>
 
@@ -1599,6 +1605,57 @@
                                     <td><code>Tafadzwa_Chewe_Report.pdf</code></td>
                                     <td>18 Jul 2026</td>
                                     <td><button class="btn-sm">Download</button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                <!-- TAB 10: UNIFORM SHOP & ACCOUNTS -->
+                <div id="tab-uniforms" class="tab-pane">
+                    <div class="page-header">
+                        <div>
+                            <h2 class="page-title">Uniform Shop & Per-Student Accounts</h2>
+                            <p class="page-subtitle">Configure uniform inventory storefront, prices, and per-student uniform order accounts</p>
+                        </div>
+                        <button class="btn-primary" onclick="alert('New Uniform Item Added!')">Add Uniform Item</button>
+                    </div>
+
+                    <div class="table-card" style="margin-bottom: 24px;">
+                        <h3 class="section-title" style="padding: 16px;">Uniform Inventory Storefront (Admin Controlled)</h3>
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Item Code</th>
+                                    <th>Uniform Item</th>
+                                    <th>Tier / Category</th>
+                                    <th>Price (USD)</th>
+                                    <th>Stock Count</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>UNI-BLZ-01</td>
+                                    <td><strong>School Blazer (Navy Blue with Crest)</strong></td>
+                                    <td>Primary / Secondary</td>
+                                    <td>$45.00</td>
+                                    <td>120 Available</td>
+                                    <td><button class="btn-sm" onclick="alert('Editing Item UNI-BLZ-01')">Edit Price</button></td>
+                                </tr>
+                                <tr>
+                                    <td>UNI-PEK-02</td>
+                                    <td><strong>PE Kit (House T-Shirt & Shorts)</strong></td>
+                                    <td>All Tiers</td>
+                                    <td>$25.00</td>
+                                    <td>85 Available</td>
+                                    <td><button class="btn-sm" onclick="alert('Editing Item UNI-PEK-02')">Edit Price</button></td>
+                                </tr>
+                                <tr>
+                                    <td>UNI-TIE-03</td>
+                                    <td><strong>Official School Tie & Crest Badge</strong></td>
+                                    <td>Primary / Secondary</td>
+                                    <td>$12.00</td>
+                                    <td>200 Available</td>
+                                    <td><button class="btn-sm" onclick="alert('Editing Item UNI-TIE-03')">Edit Price</button></td>
                                 </tr>
                             </tbody>
                         </table>
