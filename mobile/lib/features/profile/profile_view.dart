@@ -157,9 +157,9 @@ class ProfileView extends StatelessWidget {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
-                            'Test SM 2',
-                            style: TextStyle(
+                          Text(
+                            user?['name'] ?? 'Guardian Account',
+                            style: const TextStyle(
                               fontSize: 17,
                               fontWeight: FontWeight.bold,
                               color: darkTeal,
@@ -167,9 +167,10 @@ class ProfileView extends StatelessWidget {
                           ),
                           const SizedBox(height: 2),
                           Text(
-                            'Father (Plumber)',
+                            (user?['role'] ?? 'guardian').toString().toUpperCase(),
                             style: TextStyle(
-                              fontSize: 14,
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
                               color: Colors.grey.shade600,
                             ),
                           ),
@@ -189,16 +190,16 @@ class ProfileView extends StatelessWidget {
                       children: [
                         const Icon(Icons.phone_outlined, color: mintGreen, size: 18),
                         const SizedBox(width: 8),
-                        const Text(
-                          'N/A',
-                          style: TextStyle(color: darkTeal, fontWeight: FontWeight.w500),
+                        Text(
+                          user?['phone_number'] ?? '+263771234567',
+                          style: const TextStyle(color: darkTeal, fontWeight: FontWeight.w500, fontSize: 12),
                         ),
                         const Spacer(),
-                        const Icon(Icons.email_outlined, color: mintGreen, size: 18),
+                        const Icon(Icons.badge_outlined, color: mintGreen, size: 18),
                         const SizedBox(width: 8),
                         Text(
-                          'testparent1@qhs.com',
-                          style: TextStyle(color: darkTeal, fontWeight: FontWeight.w500, fontSize: 13),
+                          'ID: #${user?['id'] ?? 101}',
+                          style: const TextStyle(color: darkTeal, fontWeight: FontWeight.w500, fontSize: 12),
                         ),
                       ],
                     ),
