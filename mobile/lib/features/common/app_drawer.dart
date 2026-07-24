@@ -262,17 +262,43 @@ class AppDrawer extends StatelessWidget {
             ),
           ),
 
-          // Drawer Footer
+          // Drawer Footer with Logout Button
           Container(
             padding: const EdgeInsets.all(16),
             decoration: const BoxDecoration(
               border: Border(top: BorderSide(color: borderColor)),
             ),
-            child: const Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            child: Column(
               children: [
-                Text('Guardianship © 2026', style: TextStyle(fontSize: 11, color: Color(0xFF6B7280))),
-                Text('v1.0', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: primaryBlue)),
+                Consumer<AuthProvider>(
+                  builder: (context, auth, _) => SizedBox(
+                    width: double.infinity,
+                    child: OutlinedButton.icon(
+                      onPressed: () async {
+                        Navigator.pop(context); // Close drawer
+                        await auth.logout();
+                      },
+                      icon: const Icon(Icons.logout_rounded, color: Colors.red, size: 18),
+                      label: const Text(
+                        'LOG OUT',
+                        style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 13),
+                      ),
+                      style: OutlinedButton.styleFrom(
+                        side: const BorderSide(color: Colors.red),
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                const Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text('Guardianship © 2026', style: TextStyle(fontSize: 11, color: Color(0xFF6B7280))),
+                    Text('v1.0', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: primaryBlue)),
+                  ],
+                ),
               ],
             ),
           ),

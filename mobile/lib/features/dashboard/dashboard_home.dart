@@ -65,6 +65,13 @@ class _DashboardHomeState extends State<DashboardHome> {
             ),
             onPressed: () => ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('15 Unread Messages'))),
           ),
+          Consumer<AuthProvider>(
+            builder: (context, auth, _) => IconButton(
+              icon: const Icon(Icons.logout_rounded, color: Colors.white),
+              tooltip: 'Log Out',
+              onPressed: () => auth.logout(),
+            ),
+          ),
         ],
       ),
       drawer: const AppDrawer(currentRoute: 'Dashboard'),
