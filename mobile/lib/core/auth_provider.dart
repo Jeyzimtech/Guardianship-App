@@ -31,6 +31,17 @@ class AuthProvider extends ChangeNotifier {
     final phone = prefs.getString('user_phone');
     
     if (_token != null && role != null) {
+      if (role == 'admin' || role == 'website_admin') {
+        _token = null;
+        _user = null;
+        await prefs.remove('auth_token');
+        await prefs.remove('user_name');
+        await prefs.remove('user_role');
+        await prefs.remove('user_phone');
+        notifyListeners();
+        return;
+      }
+
       _user = {
         'name': name,
         'role': role,
