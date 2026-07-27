@@ -63,6 +63,29 @@ class _TeacherDashboardViewState extends State<TeacherDashboardView> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Teacher Mobile Scope Banner
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: const Color(0xFFF0FDF4),
+              borderRadius: BorderRadius.circular(4),
+              border: Border.all(color: const Color(0xFF86EFAC)),
+            ),
+            child: const Row(
+              children: [
+                Icon(Icons.badge_rounded, color: Color(0xFF16A34A), size: 18),
+                SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    'TEACHER MOBILE CONSOLE • Scoped strictly for class attendance, learning journal, and conduct tracking.',
+                    style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFF15803D), letterSpacing: 0.5),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 12),
           // 1. Teacher Scoped Header Banner
           Container(
             width: double.infinity,
