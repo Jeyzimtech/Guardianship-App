@@ -51,6 +51,16 @@ class AuthProvider extends ChangeNotifier {
       });
 
       if (response.statusCode == 200 && response.data['status'] == 'success') {
+        final userRole = response.data['user']?['role'];
+        if (userRole == 'admin' || userRole == 'website_admin') {
+          _token = null;
+          _user = null;
+          _errorMessage = 'Mobile application access is restricted to Teachers and Parents/Students only. Please log in via the Web Admin Portal.';
+          _isLoading = false;
+          notifyListeners();
+          return false;
+        }
+
         _token = response.data['token'];
         _user = response.data['user'];
 
