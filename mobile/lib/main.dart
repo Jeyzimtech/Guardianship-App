@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'core/api_client.dart';
 import 'core/auth_provider.dart';
+import 'core/role_guard.dart';
 import 'core/student_provider.dart';
 import 'features/auth/login_screen.dart';
 import 'features/dashboard/dashboard_home.dart';
@@ -127,7 +128,9 @@ class AuthGate extends StatelessWidget {
     final authProvider = Provider.of<AuthProvider>(context);
     
     if (authProvider.isAuthenticated) {
-      return const DashboardHome();
+      return const MobileRoleGuard(
+        child: DashboardHome(),
+      );
     } else {
       return const LoginScreen();
     }
