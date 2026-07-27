@@ -1,20 +1,8 @@
-# Guardianship - Parents & Teachers Mobile Application
+# Edu-Connect Mobile Application
 
-Edu+Conect / Guardianship mobile application designed specifically for **Parents** and **Teachers**.
+The Edu-Connect Mobile Application is built using Flutter and is designed **exclusively for Teachers and Parents/Guardians (and Students)**.
 
-## Features & Target Users
-
-- **Parents (Guardians)**:
-  - Track student attendance, grades, and report cards in real-time.
-  - View fee balances and payment history.
-  - Receive announcements and teacher notifications.
-
-- **Teachers**:
-  - Mark daily attendance for assigned class rosters.
-  - Submit student marks, subject grades, and comments.
-  - View class rosters and student profiles.
-
-## Auth & Entry Point
-
-The mobile application launches directly into the Authentication / Login flow (`AuthGate`), providing streamlined access for registered Parents and Teachers.
-*(School Administrators access management tools via the Web Admin Portal at `/admin`)*.
+## Role Access Policy
+- **Teachers**: Access scoped to assigned classes, attendance marking, activity rosters, behavior logging, assignments, and multimedia Learning Journal posting.
+- **Parents/Guardians & Students**: Access scoped to linked child(ren), ungated Learning Journal, attendance, fee ledgers, behaviour snapshots, homework tracking, and self-service profile management.
+- **Platform & School Administrators**: Restricted from mobile app login. Administrators must access the Web Admin Portal via browser.
