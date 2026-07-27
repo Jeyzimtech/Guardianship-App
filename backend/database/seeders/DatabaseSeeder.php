@@ -3,17 +3,20 @@
 namespace Database\Seeders;
 
 use App\Models\Announcement;
+use App\Models\Assignment;
 use App\Models\AttendanceRecord;
+use App\Models\BehaviourIncident;
 use App\Models\FeeAccount;
 use App\Models\FeeTransaction;
+use App\Models\JournalEntry;
 use App\Models\ReportDocument;
 use App\Models\School;
 use App\Models\Student;
+use App\Models\Subscription;
 use App\Models\Teacher;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
 
 class DatabaseSeeder extends Seeder
 {
@@ -26,19 +29,40 @@ class DatabaseSeeder extends Seeder
         $prepSchool = School::create([
             'name' => 'Hillside Preparatory School',
             'type' => 'prep',
+            'primary_admin_name' => 'Sarah Jenkins',
+            'primary_admin_email' => 'sjenkins@prep.hillside.ac.zw',
+            'primary_admin_phone' => '+263771000111',
+            'branding_color' => '#10B981',
         ]);
 
         $primarySchool = School::create([
             'name' => 'Hillside Primary School',
             'type' => 'primary',
+            'primary_admin_name' => 'Admin Tinotenda',
+            'primary_admin_email' => 'admin@hillside.ac.zw',
+            'primary_admin_phone' => '+263771111111',
+            'branding_color' => '#3B5998',
         ]);
 
         $secondarySchool = School::create([
             'name' => 'Hillside Secondary School',
             'type' => 'secondary',
+            'primary_admin_name' => 'Dr. Michael Moyo',
+            'primary_admin_email' => 'mmoyo@sec.hillside.ac.zw',
+            'primary_admin_phone' => '+263771999888',
+            'branding_color' => '#6366F1',
         ]);
 
-        // 2. Create Users (Admin, Teacher, Guardian)
+        // 2. Create Users (Website Admin, Admin, Teacher, Guardian)
+        $websiteAdmin = User::create([
+            'name' => 'CT Pulse Platform Owner',
+            'email' => 'platform@ctpulse.co.zw',
+            'phone_number' => '+263770000000',
+            'firebase_uid' => 'mock_uid_webadmin_000',
+            'role' => 'website_admin',
+            'password' => Hash::make('password'),
+        ]);
+
         $admin = User::create([
             'name' => 'Admin Tinotenda',
             'email' => 'admin@hillside.ac.zw',
@@ -64,6 +88,10 @@ class DatabaseSeeder extends Seeder
             'firebase_uid' => 'mock_uid_guardian_123',
             'role' => 'guardian',
             'password' => Hash::make('password'),
+            'address' => '14 Samora Machel Avenue, Harare',
+            'preferred_language' => 'English',
+            'emergency_contact_name' => 'Mary Chewe',
+            'emergency_contact_phone' => '+263774444444',
         ]);
 
         // 3. Create Teacher Profile
@@ -93,7 +121,94 @@ class DatabaseSeeder extends Seeder
         // 5. Link Guardian to Students
         $guardian->students()->attach([$student1->id, $student2->id]);
 
-        // 6. Create Fee Accounts
+        // 6. Subscriptions (Platform Owner Active Subscriptions)
+        Subscription::create([
+            'student_id' => $student1->id,
+            'status' => 'active',
+            'start_date' => now()->subMonths(3)->toDateString(),
+            'set_by_user_id' => $websiteAdmin->id,
+        ]);
+
+        Subscription::create([
+            'student_id' => $student2->id,
+            'status' => 'active',
+            'start_date' => now()->subMonths(3)->toDateString(),
+            'set_by_user_id' => $websiteAdmin->id,
+        ]);
+
+        // 7. Learning Journal Entries (Ungated work samples & Prep daily logs)
+        JournalEntry::create([
+            'student_id' => $student1->id,
+            'author_id' => $teacher->id,
+            'type' => 'wellbeing',
+            'caption' => 'Alice had a great morning! Participating well in circle time and art.',
+            'wellbeing_data' => [
+                'meals' => 'Ate all of lunch (chicken & rice)',
+                'nap' => 'Rested 45 mins quietly',
+                'hygiene' => 'Hands washed before and after meals',
+                'mood' => 'Cheerful & Energetic'
+            ],
+            'fee_gated' => false,
+        ]);
+
+        JournalEntry::create([
+            'student_id' => $student1->id,
+            'author_id' => $teacher->id,
+            'type' => 'drawing',
+            'media_url' => 'https://picsum.photos/400/300?random=1',
+            'caption' => 'Finger painting experiment: Family Portrait!',
+            'fee_gated' => false,
+        ]);
+
+        JournalEntry::create([
+            'student_id' => $student2->id,
+            'author_id' => $teacher->id,
+            'type' => 'photo',
+            'subject_name' => 'Science',
+            'media_url' => 'https://picsum.photos/400/300?random=2',
+            'caption' => 'Bob built a working solar circuit during Science Lab session today.',
+            'fee_gated' => false,
+        ]);
+
+        // 8. Behaviour & Merits
+        BehaviourIncident::create([
+            'student_id' => $student2->id,
+            'polarity' => 'positive',
+            'category' => 'Excellence in Mathematics',
+            'note' => 'Scored highest mark in mid-term mental arithmetic speed quiz.',
+            'recorded_by' => $teacher->id,
+            'incident_date' => now()->subDays(2)->toDateString(),
+        ]);
+
+        BehaviourIncident::create([
+            'student_id' => $student2->id,
+            'polarity' => 'positive',
+            'category' => 'Helpfulness & Leadership',
+            'note' => 'Assisted fellow class members in organizing classroom library books.',
+            'recorded_by' => $teacher->id,
+            'incident_date' => now()->subDays(5)->toDateString(),
+        ]);
+
+        // 9. Assignments
+        Assignment::create([
+            'grade_name' => 'Grade 4',
+            'subject_name' => 'Mathematics',
+            'title' => 'Fractions & Decimals Exercise Set 3',
+            'description' => 'Complete problems 1 to 15 on page 42 of Math workbook.',
+            'due_date' => now()->addDays(2)->toDateString(),
+            'created_by' => $teacher->id,
+        ]);
+
+        Assignment::create([
+            'grade_name' => 'Grade 4',
+            'subject_name' => 'Science',
+            'title' => 'Photosynthesis Observation Journal',
+            'description' => 'Document daily plant growth progress in project notebook.',
+            'due_date' => now()->subDays(1)->toDateString(), // Overdue!
+            'created_by' => $teacher->id,
+        ]);
+
+        // 10. Create Fee Accounts
         $feeAccount1 = FeeAccount::create([
             'student_id' => $student1->id,
             'balance_usd' => 150.00,
@@ -102,11 +217,11 @@ class DatabaseSeeder extends Seeder
 
         $feeAccount2 = FeeAccount::create([
             'student_id' => $student2->id,
-            'balance_usd' => 0.00, // No outstanding fees for Bob!
+            'balance_usd' => 0.00,
             'balance_zig' => 0.00,
         ]);
 
-        // 7. Create Fee Transactions
+        // 11. Create Fee Transactions
         FeeTransaction::create([
             'fee_account_id' => $feeAccount1->id,
             'amount' => 100.00,
@@ -125,7 +240,7 @@ class DatabaseSeeder extends Seeder
             'created_at' => now()->subDays(5),
         ]);
 
-        // 8. Create Attendance Records
+        // 12. Attendance Records
         $dates = [
             now()->subDays(4)->format('Y-m-d'),
             now()->subDays(3)->format('Y-m-d'),
@@ -135,15 +250,13 @@ class DatabaseSeeder extends Seeder
         ];
 
         foreach ($dates as $index => $date) {
-            // Alice attendance (Prep - homeroom only)
             AttendanceRecord::create([
                 'student_id' => $student1->id,
                 'date' => $date,
-                'status' => $index == 2 ? 'absent' : 'present', // Absent on day 2
+                'status' => $index == 2 ? 'absent' : 'present',
                 'marked_by' => $teacher->id,
             ]);
 
-            // Bob attendance
             AttendanceRecord::create([
                 'student_id' => $student2->id,
                 'date' => $date,
@@ -152,8 +265,7 @@ class DatabaseSeeder extends Seeder
             ]);
         }
 
-        // 9. Create Report Documents
-        // Alice has outstanding fees (Locked report)
+        // 13. Report Documents (Gated vs Merit)
         ReportDocument::create([
             'student_id' => $student1->id,
             'title' => 'ECD B Term 1 Progress Report',
@@ -163,7 +275,6 @@ class DatabaseSeeder extends Seeder
             'uploaded_by' => $teacher->id,
         ]);
 
-        // Alice's merit is not gated (always accessible)
         ReportDocument::create([
             'student_id' => $student1->id,
             'title' => 'Outstanding Swimming Performance Certificate',
@@ -173,7 +284,6 @@ class DatabaseSeeder extends Seeder
             'uploaded_by' => $teacher->id,
         ]);
 
-        // Bob has no outstanding fees (Unlocked report)
         ReportDocument::create([
             'student_id' => $student2->id,
             'title' => 'Grade 4 Term 1 Report Card',
@@ -183,26 +293,19 @@ class DatabaseSeeder extends Seeder
             'uploaded_by' => $teacher->id,
         ]);
 
-        // 10. Create Announcements
+        // 14. Announcements
         Announcement::create([
             'school_id' => $prepSchool->id,
             'title' => 'Early Childhood Sports Day Postponed',
-            'content' => 'Please note that ECD Sports Day has been postponed to next Friday, July 24th, due to forecast weather conditions. Kids should wear comfortable sportswear.',
+            'content' => 'Please note that ECD Sports Day has been postponed to next Friday, July 24th.',
             'audience_role' => 'guardian',
         ]);
 
         Announcement::create([
             'school_id' => $primarySchool->id,
             'title' => 'Annual General Meeting (AGM) Notice',
-            'content' => 'The Annual General Meeting for Hillside Primary School will be held in the main school hall on Saturday, July 18th at 09:00 AM. We encourage all parents and guardians to attend.',
+            'content' => 'The AGM for Hillside Primary School will be held in the main hall on Saturday.',
             'audience_role' => 'all',
-        ]);
-
-        Announcement::create([
-            'school_id' => $primarySchool->id,
-            'title' => 'Mid-Term Consultation Bookings',
-            'content' => 'Mid-term academic consultation bookings will open tomorrow morning. Slots can be booked directly through the consultations dashboard.',
-            'audience_role' => 'guardian',
         ]);
     }
 }

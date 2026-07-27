@@ -1026,6 +1026,12 @@
                     </a>
                 </li>
                 <li class="nav-item">
+                    <a class="nav-link" onclick="switchTab('platform')">
+                        <img src="/assets/icons8-school-management.svg" alt="Platform Owner">
+                        <span>Website Admin (Platform)</span>
+                    </a>
+                </li>
+                <li class="nav-item">
                     <a class="nav-link" onclick="switchTab('users')">
                         <img src="/assets/icons8-user.svg" alt="User Management">
                         <span>User Management</span>
@@ -1047,6 +1053,18 @@
                     <a class="nav-link" onclick="switchTab('students')">
                         <img src="/assets/icons8-education.svg" alt="Students">
                         <span>Students</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" onclick="switchTab('journal')">
+                        <img src="/assets/icons8-reports.svg" alt="Learning Journal">
+                        <span>Learning Journal & Logs</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" onclick="switchTab('attendance')">
+                        <img src="/assets/icons8-attendance.svg" alt="Attendance">
+                        <span>Attendance</span>
                     </a>
                 </li>
                 <li class="nav-item">
@@ -1244,6 +1262,121 @@
                     </div>
                 </div>
 
+                <!-- TAB: WEBSITE ADMIN (PLATFORM OWNER) CONSOLE -->
+                <div id="tab-platform" class="tab-pane">
+                    <div class="page-header">
+                        <div>
+                            <h2 class="page-title">Website Admin (Platform Owner) Console</h2>
+                            <p class="page-subtitle">Cross-school onboarding, platform directory, and guardian subscription controls</p>
+                        </div>
+                        <button class="btn-primary" onclick="openModal('onboardSchoolModal')">
+                            <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                            Onboard New School
+                        </button>
+                    </div>
+
+                    <div class="kpi-grid" style="margin-bottom: 20px;">
+                        <div class="kpi-card">
+                            <div class="kpi-info">
+                                <p class="title">Onboarded Schools</p>
+                                <p class="value" id="platformSchoolCount">3</p>
+                            </div>
+                            <div class="kpi-icon"><img src="/assets/icons8-school-management.svg" alt="Schools"></div>
+                        </div>
+                        <div class="kpi-card">
+                            <div class="kpi-info">
+                                <p class="title">Active Subscriptions</p>
+                                <p class="value" style="color:var(--success-green);">2</p>
+                            </div>
+                            <div class="kpi-icon"><img src="/assets/icons8-user.svg" alt="Active"></div>
+                        </div>
+                        <div class="kpi-card">
+                            <div class="kpi-info">
+                                <p class="title">Suspended Subscriptions</p>
+                                <p class="value" style="color:var(--danger-red);">0</p>
+                            </div>
+                            <div class="kpi-icon"><img src="/assets/icons8-wallet.svg" alt="Suspended"></div>
+                        </div>
+                    </div>
+
+                    <h3 class="section-title">School Directory (Platform Tier Configuration)</h3>
+                    <div class="table-card" style="margin-bottom: 24px;">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>School Name</th>
+                                    <th>Tier / Type</th>
+                                    <th>Primary Admin Contact</th>
+                                    <th>Branding Color</th>
+                                    <th>Enrolled Students</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="platformDirectoryBody">
+                                <tr>
+                                    <td><strong>Hillside Preparatory School</strong></td>
+                                    <td><span class="badge" style="background:#DCFCE7; color:#15803D;">Preparatory (ECD)</span></td>
+                                    <td>Sarah Jenkins (sjenkins@prep.hillside.ac.zw)</td>
+                                    <td><span style="display:inline-block; width:14px; height:14px; background:#10B981; border-radius:50%; vertical-align:middle; margin-right:4px;"></span> #10B981</td>
+                                    <td>1 Child</td>
+                                    <td><button class="btn-sm">Configure</button></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Hillside Primary School</strong></td>
+                                    <td><span class="badge" style="background:#DBEAFE; color:#1E40AF;">Primary</span></td>
+                                    <td>Admin Tinotenda (admin@hillside.ac.zw)</td>
+                                    <td><span style="display:inline-block; width:14px; height:14px; background:#3B5998; border-radius:50%; vertical-align:middle; margin-right:4px;"></span> #3B5998</td>
+                                    <td>1 Child</td>
+                                    <td><button class="btn-sm">Configure</button></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Hillside Secondary School</strong></td>
+                                    <td><span class="badge" style="background:#E0E7FF; color:#3730A3;">Secondary</span></td>
+                                    <td>Dr. Michael Moyo (mmoyo@sec.hillside.ac.zw)</td>
+                                    <td><span style="display:inline-block; width:14px; height:14px; background:#6366F1; border-radius:50%; vertical-align:middle; margin-right:4px;"></span> #6366F1</td>
+                                    <td>0 Children</td>
+                                    <td><button class="btn-sm">Configure</button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h3 class="section-title">Subscription Control Engine (Per-Child Access Toggle)</h3>
+                    <p style="font-size:12px; color:var(--text-secondary); margin-bottom:12px;">Turning a child's subscription <strong>OFF</strong> suspends the parent's mobile app access for that child. School Admin internal records remain active.</p>
+                    <div class="table-card">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Child Name</th>
+                                    <th>School & Grade</th>
+                                    <th>Guardian Contact</th>
+                                    <th>Subscription Status</th>
+                                    <th>Period / Duration</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="subscriptionControlBody">
+                                <tr>
+                                    <td><strong>Alice Chewe</strong></td>
+                                    <td>Hillside Preparatory (ECD B)</td>
+                                    <td>John Chewe (+263773333333)</td>
+                                    <td><span class="badge" style="background:var(--success-bg); color:var(--success-green);">ACTIVE</span></td>
+                                    <td>Subscribed since Apr 2026</td>
+                                    <td><button class="btn-sm btn-danger" onclick="toggleChildSubscription(1, 'inactive')">Suspend Access</button></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Bob Chewe</strong></td>
+                                    <td>Hillside Primary (Grade 4)</td>
+                                    <td>John Chewe (+263773333333)</td>
+                                    <td><span class="badge" style="background:var(--success-bg); color:var(--success-green);">ACTIVE</span></td>
+                                    <td>Subscribed since Apr 2026</td>
+                                    <td><button class="btn-sm btn-danger" onclick="toggleChildSubscription(2, 'inactive')">Suspend Access</button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
                 <!-- TAB 2: USER MANAGEMENT -->
                 <div id="tab-users" class="tab-pane">
                     <div class="page-header">
@@ -1434,8 +1567,96 @@
                             </thead>
                             <tbody id="studentsTableBody">
                                 <!-- Dynamically filled by JS -->
-                            </tbody>
+</tbody>
                         </table>
+                    </div>
+                </div>
+
+                <!-- TAB: LEARNING JOURNAL & PREPARATORY WELLBEING LOGS -->
+                <div id="tab-journal" class="tab-pane">
+                    <div class="page-header">
+                        <div>
+                            <h2 class="page-title">Learning Journal & Daily Wellbeing Feed</h2>
+                            <p class="page-subtitle">Post work samples, drawings, audio/video notes, and Preparatory daily logs (always accessible to parents regardless of fee status)</p>
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1.5fr; gap: 24px;">
+                        <!-- Post Authoring Form -->
+                        <div class="table-card" style="padding: 20px;">
+                            <h4 style="font-size: 15px; font-weight: 700; color: var(--primary-blue); margin-bottom: 14px;">Post Work Sample / Wellbeing Log</h4>
+                            <form onsubmit="handleJournalPostSubmit(event)">
+                                <div class="form-group">
+                                    <label>Select Student</label>
+                                    <select class="form-control" id="journalStudentId">
+                                        <option value="1">Alice Chewe (Hillside Preparatory - ECD B)</option>
+                                        <option value="2">Bob Chewe (Hillside Primary - Grade 4)</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Entry Type</label>
+                                    <select class="form-control" id="journalType" onchange="toggleJournalTypeFields()">
+                                        <option value="photo">Photo Work Sample</option>
+                                        <option value="wellbeing">Preparatory Daily Wellbeing Log</option>
+                                        <option value="drawing">Drawing / Annotation</option>
+                                        <option value="voice">Voice Note</option>
+                                        <option value="text">Text Note</option>
+                                    </select>
+                                </div>
+                                <div class="form-group" id="journalCaptionGroup">
+                                    <label>Caption / Teacher Note</label>
+                                    <textarea class="form-control" id="journalCaption" rows="3" placeholder="Describe the learning activity or achievement..."></textarea>
+                                </div>
+                                <div class="form-group" id="journalMediaGroup">
+                                    <label>Media URL / Sample Image Link</label>
+                                    <input type="url" class="form-control" id="journalMediaUrl" placeholder="https://picsum.photos/400/300">
+                                </div>
+                                <div id="journalWellbeingGroup" style="display:none; background:#F8FAFC; padding:12px; border:1px solid #E2E8F0; border-radius:4px; margin-bottom:14px;">
+                                    <h5 style="font-size:12px; text-transform:uppercase; color:var(--text-secondary); margin-bottom:8px;">Preparatory Wellbeing Details</h5>
+                                    <div class="form-group">
+                                        <label>Meals Eaten</label>
+                                        <input type="text" class="form-control" id="wellbeingMeals" placeholder="e.g. Ate all of lunch & snacks">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Nap / Rest Duration</label>
+                                        <input type="text" class="form-control" id="wellbeingNap" placeholder="e.g. Rested 45 mins quietly">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Hygiene & Toileting</label>
+                                        <input type="text" class="form-control" id="wellbeingHygiene" placeholder="e.g. Hands washed, good routine">
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn-primary" style="width: 100%; justify-content: center;">Post to Learning Journal</button>
+                            </form>
+                        </div>
+
+                        <!-- Running Feed Preview -->
+                        <div>
+                            <h4 style="font-size: 15px; font-weight: 700; color: var(--primary-blue); margin-bottom: 14px;">Live Journal Stream</h4>
+                            <div class="table-card" style="padding: 16px; margin-bottom: 14px;">
+                                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                                    <strong>Alice Chewe (ECD B)</strong>
+                                    <span class="badge" style="background:#DCFCE7; color:#15803D;">Preparatory Wellbeing Log</span>
+                                </div>
+                                <p style="font-size:13px; color:var(--text-primary); margin-bottom:8px;">Alice had a great morning! Participating well in circle time and art.</p>
+                                <div style="background:#F1F5F9; padding:10px; font-size:12px; border-radius:4px;">
+                                    • <strong>Meals:</strong> Ate all of lunch (chicken & rice)<br>
+                                    • <strong>Nap:</strong> Rested 45 mins quietly<br>
+                                    • <strong>Hygiene:</strong> Hands washed before and after meals
+                                </div>
+                                <span style="font-size:11px; color:var(--text-secondary); display:block; margin-top:8px;">Posted by Teacher Grace • Today at 11:30 AM</span>
+                            </div>
+
+                            <div class="table-card" style="padding: 16px;">
+                                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                                    <strong>Bob Chewe (Grade 4)</strong>
+                                    <span class="badge" style="background:#DBEAFE; color:#1E40AF;">Photo Sample (Science)</span>
+                                </div>
+                                <p style="font-size:13px; color:var(--text-primary); margin-bottom:8px;">Bob built a working solar circuit during Science Lab session today.</p>
+                                <img src="https://picsum.photos/400/200?random=2" style="width:100%; height:160px; object-fit:cover; border-radius:4px; margin-bottom:8px;">
+                                <span style="font-size:11px; color:var(--text-secondary); display:block;">Posted by Teacher Grace • Yesterday</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -2126,6 +2347,53 @@
                     }
                 });
             }
+        }
+
+        function toggleChildSubscription(studentId, targetStatus) {
+            const studentName = studentId === 1 ? 'Alice Chewe' : 'Bob Chewe';
+            const actionLabel = targetStatus === 'inactive' ? 'SUSPEND' : 'ACTIVATE';
+            if (confirm(`Are you sure you want to ${actionLabel} parent app subscription access for ${studentName}?`)) {
+                const row = event.target.closest('tr');
+                if (targetStatus === 'inactive') {
+                    row.querySelector('.badge').className = 'badge';
+                    row.querySelector('.badge').style.background = 'var(--danger-bg)';
+                    row.querySelector('.badge').style.color = 'var(--danger-red)';
+                    row.querySelector('.badge').innerText = 'SUSPENDED';
+                    row.querySelector('button').className = 'btn-sm';
+                    row.querySelector('button').innerText = 'Re-enable Access';
+                    row.querySelector('button').onclick = (e) => toggleChildSubscription(studentId, 'active');
+                    alert(`Subscription for ${studentName} has been suspended. Guardian mobile app access blocked.`);
+                } else {
+                    row.querySelector('.badge').className = 'badge';
+                    row.querySelector('.badge').style.background = 'var(--success-bg)';
+                    row.querySelector('.badge').style.color = 'var(--success-green)';
+                    row.querySelector('.badge').innerText = 'ACTIVE';
+                    row.querySelector('button').className = 'btn-sm btn-danger';
+                    row.querySelector('button').innerText = 'Suspend Access';
+                    row.querySelector('button').onclick = (e) => toggleChildSubscription(studentId, 'inactive');
+                    alert(`Subscription for ${studentName} has been activated. Guardian mobile app access resumed.`);
+                }
+            }
+        }
+
+        function toggleJournalTypeFields() {
+            const type = document.getElementById('journalType').value;
+            const wellbeingGrp = document.getElementById('journalWellbeingGroup');
+            const mediaGrp = document.getElementById('journalMediaGroup');
+            if (type === 'wellbeing') {
+                wellbeingGrp.style.display = 'block';
+                mediaGrp.style.display = 'none';
+            } else {
+                wellbeingGrp.style.display = 'none';
+                mediaGrp.style.display = 'block';
+            }
+        }
+
+        function handleJournalPostSubmit(e) {
+            e.preventDefault();
+            const studentId = document.getElementById('journalStudentId').value;
+            const studentName = studentId === '1' ? 'Alice Chewe' : 'Bob Chewe';
+            alert(`Learning Journal entry posted successfully for ${studentName}!`);
         }
 
         window.addEventListener('DOMContentLoaded', () => {

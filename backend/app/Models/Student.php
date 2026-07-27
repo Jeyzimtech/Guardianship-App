@@ -35,4 +35,29 @@ class Student extends Model
     {
         return $this->hasMany(ReportDocument::class);
     }
+
+    public function subscriptions()
+    {
+        return $this->hasMany(Subscription::class);
+    }
+
+    public function activeSubscription()
+    {
+        return $this->hasOne(Subscription::class)->latestOfMany();
+    }
+
+    public function journalEntries()
+    {
+        return $this->hasMany(JournalEntry::class);
+    }
+
+    public function behaviourIncidents()
+    {
+        return $this->hasMany(BehaviourIncident::class);
+    }
+
+    public function uniformOrders()
+    {
+        return $this->hasMany(UniformOrder::class);
+    }
 }

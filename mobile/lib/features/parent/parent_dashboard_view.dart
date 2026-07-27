@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
 import '../dashboard/payments_view.dart';
 import '../dashboard/reports_view.dart';
+import 'learning_journal_view.dart';
+import 'guardian_profile_view.dart';
+import 'behaviour_view.dart';
+import 'assignments_view.dart';
+import 'sms_alerts_log_view.dart';
 
 class ParentDashboardView extends StatefulWidget {
   const ParentDashboardView({super.key});
@@ -271,6 +276,98 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
               ],
             ),
           ),
+          const SizedBox(height: 16),
+
+          // Edu-Connect Core Modules Quick Access Grid
+          const Text(
+            'Edu-Connect Core Modules',
+            style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: primaryBlue),
+          ),
+          const SizedBox(height: 10),
+
+          GridView.count(
+            crossAxisCount: 3,
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            crossAxisSpacing: 10,
+            mainAxisSpacing: 10,
+            childAspectRatio: 1.1,
+            children: [
+              _buildEduModuleCard(
+                icon: Icons.auto_stories_rounded,
+                color: const Color(0xFF10B981),
+                title: 'Learning Journal',
+                subtitle: 'Ungated Feed',
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => LearningJournalView(child: currentChild)),
+                  );
+                },
+              ),
+              _buildEduModuleCard(
+                icon: Icons.person_pin_rounded,
+                color: primaryBlue,
+                title: 'Guardian Profile',
+                subtitle: 'Self-Service',
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => GuardianProfileView(child: currentChild)),
+                  );
+                },
+              ),
+              _buildEduModuleCard(
+                icon: Icons.star_rate_rounded,
+                color: const Color(0xFFF59E0B),
+                title: 'Behaviour & Merits',
+                subtitle: 'Snapshot Log',
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => BehaviourView(child: currentChild)),
+                  );
+                },
+              ),
+              _buildEduModuleCard(
+                icon: Icons.assignment_rounded,
+                color: const Color(0xFF6366F1),
+                title: 'Assignments',
+                subtitle: 'Homework Tasks',
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => AssignmentsView(child: currentChild)),
+                  );
+                },
+              ),
+              _buildEduModuleCard(
+                icon: Icons.sms_rounded,
+                color: const Color(0xFF0EA5E9),
+                title: 'SMS Alerts Log',
+                subtitle: 'Offline History',
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const SmsAlertsLogView()),
+                  );
+                },
+              ),
+              _buildEduModuleCard(
+                icon: Icons.account_balance_wallet_rounded,
+                color: const Color(0xFF8B5CF6),
+                title: 'Fee Payments',
+                subtitle: 'USD / ZiG',
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const PaymentsView()),
+                  );
+                },
+              ),
+            ],
+          ),
+
           const SizedBox(height: 16),
 
           // 3. School Tier Specific Content
@@ -651,9 +748,69 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
             decoration: BoxDecoration(color: color.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(4)),
-            child: Text(attendance, style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: color)),
+            child: Text(attendance, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 10, color: color)),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildEduModuleCard({
+    required IconData icon,
+    required Color color,
+    required String title,
+    required String subtitle,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(6),
+      child: Container(
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(6),
+          border: Border.all(color: const Color(0xFFE2E8F0)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.02),
+              blurRadius: 4,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            CircleAvatar(
+              radius: 18,
+              backgroundColor: color.withValues(alpha: 0.12),
+              child: Icon(icon, color: color, size: 20),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              title,
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 11,
+                color: color,
+              ),
+              textAlign: TextAlign.center,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+            Text(
+              subtitle,
+              style: const TextStyle(
+                fontSize: 9,
+                color: Colors.grey,
+              ),
+              textAlign: TextAlign.center,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
+        ),
       ),
     );
   }
