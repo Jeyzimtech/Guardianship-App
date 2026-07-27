@@ -122,6 +122,29 @@ class _LoginScreenState extends State<LoginScreen> {
                         fontWeight: FontWeight.w500,
                       ),
                     ),
+                    const SizedBox(height: 12),
+
+                    // Mobile Exclusivity Banner
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFEFF6FF),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: const Color(0xFFBFDBFE)),
+                      ),
+                      child: const Row(
+                        children: [
+                          Icon(Icons.phone_android_rounded, size: 18, color: Color(0xFF1D4ED8)),
+                          SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              'Mobile App is built exclusively for Teachers & Parents/Students. Administrators please log in via Web Portal.',
+                              style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Color(0xFF1D4ED8)),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                     const SizedBox(height: 16),
 
                     // Role Selection Toggle
