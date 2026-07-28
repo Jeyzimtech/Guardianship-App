@@ -17,45 +17,20 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
   static const secondaryBlue = Color(0xFF5B7BD5);
   static const borderColor = Color(0xFFD8D8D8);
 
-  // Selected child index for multi-child parents
-  int _selectedChildIndex = 0;
-
-  final List<Map<String, dynamic>> _mockChildren = [
-    {
-      'name': 'Alice Chewe',
-      'class': 'Grade 4 Gold',
-      'tier': 'primary',
-      'school': 'Hillside Primary School',
-      'homeroom_teacher': 'Teacher Grace',
-      'fee_balance': 0.0,
-      'attendance_today': 'Present (Homeroom)',
-      'attendance_rate': '96%',
-    },
-    {
-      'name': 'Timothy Chewe',
-      'class': 'ECD B - Sunflowers',
-      'tier': 'preparatory',
-      'school': 'Hillside Preparatory (ECD)',
-      'caregiver': 'Amai Tendai',
-      'fee_balance': 150.0,
-      'attendance_today': 'Present (Caregiver Checked-In)',
-      'attendance_rate': '98%',
-    },
-    {
-      'name': 'Brian Chewe',
-      'class': 'Form 3 Blue',
-      'tier': 'secondary',
-      'school': 'Hillside Secondary School',
-      'tutor': 'Mr. Moyo',
-      'fee_balance': 360.0,
-      'attendance_today': '4/4 Subjects Present',
-      'attendance_rate': '94%',
-    },
-  ];
+  final Map<String, dynamic> _linkedChild = {
+    'name': 'Alice Chewe',
+    'class': 'Grade 4 Gold',
+    'tier': 'primary',
+    'school': 'Hillside Primary School',
+    'homeroom_teacher': 'Teacher Grace',
+    'fee_balance': 0.0,
+    'attendance_today': 'Present (Homeroom)',
+    'attendance_rate': '96%',
+  };
 
   @override
   Widget build(BuildContext context) {
-    final currentChild = _mockChildren[_selectedChildIndex];
+    final currentChild = _linkedChild;
     final childTier = currentChild['tier'] as String;
     final feeBalance = currentChild['fee_balance'] as double;
     final isFeeGated = feeBalance > 0;
@@ -122,41 +97,6 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
                     ),
                   ],
                 ),
-
-                if (_mockChildren.length > 1) ...[
-                  const SizedBox(height: 12),
-                  SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
-                      children: List.generate(_mockChildren.length, (index) {
-                        final child = _mockChildren[index];
-                        final isSelected = index == _selectedChildIndex;
-                        return GestureDetector(
-                          onTap: () => setState(() => _selectedChildIndex = index),
-                          child: Container(
-                            margin: const EdgeInsets.only(right: 8),
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                            decoration: BoxDecoration(
-                              color: isSelected ? primaryBlue : const Color(0xFFF1F5F9),
-                              borderRadius: BorderRadius.circular(4),
-                              border: Border.all(color: isSelected ? primaryBlue : const Color(0xFFCBD5E1)),
-                            ),
-                            child: Row(
-                              children: [
-                                Icon(Icons.child_care_rounded, size: 14, color: isSelected ? Colors.white : const Color(0xFF64748B)),
-                                const SizedBox(width: 6),
-                                Text(
-                                  child['name'],
-                                  style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: isSelected ? Colors.white : const Color(0xFF334155)),
-                                ),
-                              ],
-                            ),
-                          ),
-                        );
-                      }),
-                    ),
-                  ),
-                ],
               ],
             ),
           ),

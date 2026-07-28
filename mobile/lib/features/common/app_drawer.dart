@@ -1,10 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../core/auth_provider.dart';
-import '../student_management/student_management_screen.dart';
-import '../user_management/user_management_screen.dart';
-import '../school_management/school_management_screen.dart';
-import '../teacher_management/teacher_management_screen.dart';
 
 class AppDrawer extends StatelessWidget {
   final String currentRoute;
@@ -137,128 +133,75 @@ class AppDrawer extends StatelessWidget {
             },
           ),
 
-          // 15 Menu Items List
+          // Role-Scoped Menu Items List
           Expanded(
-            child: ListView(
-              padding: const EdgeInsets.symmetric(vertical: 8),
-              children: [
-                _buildDrawerItem(
-                  context,
-                  title: 'Dashboard',
-                  icon: Icons.space_dashboard_rounded,
-                  onTap: () => Navigator.popUntil(context, (r) => r.isFirst),
-                ),
-                _buildDrawerItem(
-                  context,
-                  title: 'Students',
-                  icon: Icons.school_rounded,
-                  onTap: () {
-                    Navigator.push(
+            child: Consumer<AuthProvider>(
+              builder: (context, auth, _) {
+                final isTeacher = auth.isTeacher;
+
+                return ListView(
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  children: [
+                    _buildDrawerItem(
                       context,
-                      MaterialPageRoute(builder: (_) => const StudentManagementScreen()),
-                    );
-                  },
-                ),
-                _buildDrawerItem(
-                  context,
-                  title: 'Teachers',
-                  icon: Icons.badge_rounded,
-                  onTap: () {
-                    Navigator.push(
+                      title: 'Dashboard',
+                      icon: Icons.space_dashboard_rounded,
+                      onTap: () => Navigator.popUntil(context, (r) => r.isFirst),
+                    ),
+                    if (!isTeacher) ...[
+                      _buildDrawerItem(
+                        context,
+                        title: 'Learning Journal',
+                        icon: Icons.auto_stories_rounded,
+                        onTap: () => ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Opening Learning Journal...'))),
+                      ),
+                      _buildDrawerItem(
+                        context,
+                        title: 'Fee Payments',
+                        icon: Icons.account_balance_wallet_rounded,
+                        onTap: () => ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Opening Fee Ledger & Payments...'))),
+                      ),
+                      _buildDrawerItem(
+                        context,
+                        title: 'Behaviour & Merits',
+                        icon: Icons.star_rate_rounded,
+                        onTap: () => ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Opening Conduct & Merits...'))),
+                      ),
+                      _buildDrawerItem(
+                        context,
+                        title: 'Homework Tasks',
+                        icon: Icons.assignment_rounded,
+                        onTap: () => ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Opening Homework Tracker...'))),
+                      ),
+                    ] else ...[
+                      _buildDrawerItem(
+                        context,
+                        title: 'Class Attendance',
+                        icon: Icons.fact_check_rounded,
+                        onTap: () => ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Opening Class Attendance Register...'))),
+                      ),
+                      _buildDrawerItem(
+                        context,
+                        title: 'Post Learning Entry',
+                        icon: Icons.add_a_photo_rounded,
+                        onTap: () => ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Opening Learning Journal Publisher...'))),
+                      ),
+                      _buildDrawerItem(
+                        context,
+                        title: 'Class Assignments',
+                        icon: Icons.assignment_rounded,
+                        onTap: () => ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Opening Homework Manager...'))),
+                      ),
+                    ],
+                    _buildDrawerItem(
                       context,
-                      MaterialPageRoute(builder: (_) => const TeacherManagementScreen()),
-                    );
-                  },
-                ),
-                _buildDrawerItem(
-                  context,
-                  title: 'Parents',
-                  icon: Icons.people_alt_rounded,
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (_) => const UserManagementScreen()),
-                    );
-                  },
-                ),
-                _buildDrawerItem(
-                  context,
-                  title: 'Classes',
-                  icon: Icons.meeting_room_rounded,
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (_) => const SchoolManagementScreen()),
-                    );
-                  },
-                ),
-                _buildDrawerItem(
-                  context,
-                  title: 'Attendance',
-                  icon: Icons.fact_check_rounded,
-                  onTap: () => ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Navigating to Attendance module...'))),
-                ),
-                _buildDrawerItem(
-                  context,
-                  title: 'Reports',
-                  icon: Icons.assessment_rounded,
-                  onTap: () => ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Navigating to Academic Reports...'))),
-                ),
-                _buildDrawerItem(
-                  context,
-                  title: 'Fees',
-                  icon: Icons.account_balance_wallet_rounded,
-                  onTap: () => ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Navigating to Fee Balances...'))),
-                ),
-                _buildDrawerItem(
-                  context,
-                  title: 'Uniform Shop',
-                  icon: Icons.checkroom_rounded,
-                  onTap: () => ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Opening School Uniform Storefront...'))),
-                ),
-                _buildDrawerItem(
-                  context,
-                  title: 'Payments',
-                  icon: Icons.payment_rounded,
-                  onTap: () => ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Navigating to Payments Log...'))),
-                ),
-                _buildDrawerItem(
-                  context,
-                  title: 'Activities',
-                  icon: Icons.sports_soccer_rounded,
-                  onTap: () => ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Navigating to Activities & Clubs...'))),
-                ),
-                _buildDrawerItem(
-                  context,
-                  title: 'Uniform Shop',
-                  icon: Icons.checkroom_rounded,
-                  onTap: () => ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Navigating to Uniform Shop...'))),
-                ),
-                _buildDrawerItem(
-                  context,
-                  title: 'Messaging',
-                  icon: Icons.forum_rounded,
-                  onTap: () => ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Navigating to Messaging...'))),
-                ),
-                _buildDrawerItem(
-                  context,
-                  title: 'Analytics',
-                  icon: Icons.pie_chart_rounded,
-                  onTap: () => ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Navigating to School Analytics...'))),
-                ),
-                _buildDrawerItem(
-                  context,
-                  title: 'Notifications',
-                  icon: Icons.notifications_active_rounded,
-                  onTap: () => ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Navigating to Notifications...'))),
-                ),
-                _buildDrawerItem(
-                  context,
-                  title: 'Settings',
-                  icon: Icons.settings_rounded,
-                  onTap: () => ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Navigating to System Settings...'))),
-                ),
-              ],
+                      title: 'Notifications',
+                      icon: Icons.notifications_active_rounded,
+                      onTap: () => ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Opening Notifications...'))),
+                    ),
+                  ],
+                );
+              },
             ),
           ),
 
