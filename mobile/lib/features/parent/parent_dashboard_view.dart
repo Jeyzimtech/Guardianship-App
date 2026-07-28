@@ -68,64 +68,14 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Web Admin Style Page Header
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Parent Portal',
-                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: primaryBlue),
-                  ),
-                  const SizedBox(height: 2),
-                  const Text(
-                    'Student Academic Standing & Guardian Self-Service',
-                    style: TextStyle(fontSize: 12, color: Color(0xFF6B7280)),
-                  ),
-                ],
-              ),
-              ElevatedButton.icon(
-                onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const PaymentsView())),
-                icon: const Icon(Icons.account_balance_wallet_rounded, size: 16),
-                label: const Text('Pay Fees', style: TextStyle(fontSize: 12)),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: isFeeGated ? const Color(0xFFDC2626) : primaryBlue,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-
-          // Web Admin Style KPI Cards Grid
-          Row(
-            children: [
-              Expanded(
-                child: _buildWebKpiCard('ATTENDANCE', currentChild['attendance_rate'] ?? '96%', Icons.fact_check_outlined, const Color(0xFF22C55E)),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: _buildWebKpiCard('OUTSTANDING FEES', 'USD \$${feeBalance.toStringAsFixed(2)}', Icons.account_balance_wallet_outlined, isFeeGated ? const Color(0xFFEF4444) : primaryBlue),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: _buildWebKpiCard('MERITS', '+12 Points', Icons.star_outline_rounded, const Color(0xFFF59E0B)),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          // 1. Read-Only Child Scope Banner
+          // 1. Student Summary Header & Child Selector
           Container(
             width: double.infinity,
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.circular(4),
-              border: Border.all(color: primaryBlue, width: 1.5),
+              borderRadius: BorderRadius.circular(6),
+              border: Border.all(color: borderColor),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -135,21 +85,33 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
                   children: [
                     Row(
                       children: [
-                        const Icon(Icons.lock_rounded, color: primaryBlue, size: 18),
-                        const SizedBox(width: 6),
-                        Text(
-                          'READ-ONLY PARENT VIEW',
-                          style: TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.bold,
-                            color: primaryBlue.withValues(alpha: 0.9),
-                            letterSpacing: 0.5,
+                        CircleAvatar(
+                          radius: 20,
+                          backgroundColor: secondaryBlue,
+                          child: Text(
+                            currentChild['name'].toString().substring(0, 1),
+                            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
                           ),
+                        ),
+                        const SizedBox(width: 10),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              currentChild['name'],
+                              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF1F2937)),
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              'Class: ${currentChild['class']} • ${currentChild['school']}',
+                              style: const TextStyle(fontSize: 12, color: Color(0xFF6B7280)),
+                            ),
+                          ],
                         ),
                       ],
                     ),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                       decoration: BoxDecoration(
                         color: const Color(0xFFEFF6FF),
                         borderRadius: BorderRadius.circular(4),
@@ -157,108 +119,68 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
                       ),
                       child: Text(
                         childTier.toUpperCase(),
-                        style: const TextStyle(
-                          fontSize: 10,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF1D4ED8),
-                        ),
+                        style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFF1D4ED8)),
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 10),
-                
-                // Child Selector Tabs if multiple children
-                SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    children: List.generate(_mockChildren.length, (index) {
-                      final child = _mockChildren[index];
-                      final isSelected = index == _selectedChildIndex;
-                      return GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            _selectedChildIndex = index;
-                          });
-                        },
-                        child: Container(
-                          margin: const EdgeInsets.only(right: 8),
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                          decoration: BoxDecoration(
-                            color: isSelected ? primaryBlue : const Color(0xFFF1F5F9),
-                            borderRadius: BorderRadius.circular(4),
-                            border: Border.all(
-                              color: isSelected ? primaryBlue : const Color(0xFFCBD5E1),
+
+                if (_mockChildren.length > 1) ...[
+                  const SizedBox(height: 12),
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: List.generate(_mockChildren.length, (index) {
+                        final child = _mockChildren[index];
+                        final isSelected = index == _selectedChildIndex;
+                        return GestureDetector(
+                          onTap: () => setState(() => _selectedChildIndex = index),
+                          child: Container(
+                            margin: const EdgeInsets.only(right: 8),
+                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                            decoration: BoxDecoration(
+                              color: isSelected ? primaryBlue : const Color(0xFFF1F5F9),
+                              borderRadius: BorderRadius.circular(4),
+                              border: Border.all(color: isSelected ? primaryBlue : const Color(0xFFCBD5E1)),
+                            ),
+                            child: Row(
+                              children: [
+                                Icon(Icons.child_care_rounded, size: 14, color: isSelected ? Colors.white : const Color(0xFF64748B)),
+                                const SizedBox(width: 6),
+                                Text(
+                                  child['name'],
+                                  style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: isSelected ? Colors.white : const Color(0xFF334155)),
+                                ),
+                              ],
                             ),
                           ),
-                          child: Row(
-                            children: [
-                              Icon(
-                                Icons.child_care_rounded,
-                                size: 16,
-                                color: isSelected ? Colors.white : const Color(0xFF64748B),
-                              ),
-                              const SizedBox(width: 6),
-                              Text(
-                                child['name'],
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.bold,
-                                  color: isSelected ? Colors.white : const Color(0xFF334155),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      );
-                    }),
+                        );
+                      }),
+                    ),
                   ),
-                ),
-                const SizedBox(height: 12),
-                
-                // Read-Only Identity Card
-                Row(
-                  children: [
-                    CircleAvatar(
-                      radius: 22,
-                      backgroundColor: secondaryBlue,
-                      child: Text(
-                        currentChild['name'].toString().substring(0, 1),
-                        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              Text(
-                                currentChild['name'],
-                                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF1F2937)),
-                              ),
-                              const SizedBox(width: 6),
-                              const Tooltip(
-                                message: 'Child identity and grade are set by School Admin/Teacher and cannot be edited by parents.',
-                                child: Icon(Icons.verified_user_rounded, color: Color(0xFF22C55E), size: 16),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 2),
-                          Text(
-                            'Class: ${currentChild['class']} • ${currentChild['school']}',
-                            style: const TextStyle(fontSize: 12, color: Color(0xFF6B7280)),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
+                ],
               ],
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 14),
+
+          // 2. Summary KPI Metric Cards
+          Row(
+            children: [
+              Expanded(
+                child: _buildWebKpiCard('ATTENDANCE', currentChild['attendance_rate'] ?? '96%', Icons.fact_check_outlined, const Color(0xFF22C55E)),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: _buildWebKpiCard('FEE BALANCE', isFeeGated ? 'USD \$${feeBalance.toStringAsFixed(2)}' : 'USD \$0.00', Icons.account_balance_wallet_outlined, isFeeGated ? const Color(0xFFEF4444) : primaryBlue),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: _buildWebKpiCard('MERITS', '+12 Points', Icons.star_outline_rounded, const Color(0xFFF59E0B)),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
 
           // 2. Fee Balance & Direct Payment Card with Gating Logic
           Container(

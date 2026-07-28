@@ -63,40 +63,56 @@ class _TeacherDashboardViewState extends State<TeacherDashboardView> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Web Admin Style Page Header
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Teacher Console',
-                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: primaryBlue),
-                  ),
-                  const SizedBox(height: 2),
-                  const Text(
-                    'Faculty Roster, Attendance & Learning Journal Management',
-                    style: TextStyle(fontSize: 12, color: Color(0xFF6B7280)),
-                  ),
-                ],
-              ),
-              ElevatedButton.icon(
-                onPressed: () => ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Attendance Register Saved Successfully!'))),
-                icon: const Icon(Icons.check_circle_rounded, size: 16),
-                label: const Text('Save Register', style: TextStyle(fontSize: 12)),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: primaryBlue,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+          // 1. Teacher Profile Header
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(6),
+              border: Border.all(color: borderColor),
+            ),
+            child: Row(
+              children: [
+                const CircleAvatar(
+                  radius: 20,
+                  backgroundColor: secondaryBlue,
+                  child: Text('TG', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14)),
                 ),
-              ),
-            ],
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        teacherName,
+                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF1F2937)),
+                      ),
+                      const SizedBox(height: 2),
+                      const Text(
+                        'Assigned Homeroom: Grade 4 Gold • Mathematics & Science Teacher',
+                        style: TextStyle(fontSize: 12, color: Color(0xFF6B7280)),
+                      ),
+                    ],
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFDCFCE7),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: const Text(
+                    'CLASS SCOPED',
+                    style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFF16A34A)),
+                  ),
+                ),
+              ],
+            ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 14),
 
-          // Web Admin Style KPI Cards Grid
+          // 2. Summary KPI Cards
           Row(
             children: [
               Expanded(
@@ -112,110 +128,7 @@ class _TeacherDashboardViewState extends State<TeacherDashboardView> {
               ),
             ],
           ),
-          const SizedBox(height: 16),
-
-          // Teacher Mobile Scope Banner
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: const Color(0xFFF0FDF4),
-              borderRadius: BorderRadius.circular(4),
-              border: Border.all(color: const Color(0xFF86EFAC)),
-            ),
-            child: const Row(
-              children: [
-                Icon(Icons.badge_rounded, color: Color(0xFF16A34A), size: 18),
-                SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    'TEACHER MOBILE CONSOLE • Scoped strictly for class attendance, learning journal, and conduct tracking.',
-                    style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFF15803D), letterSpacing: 0.5),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 12),
-          // 1. Teacher Scoped Header Banner
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(14),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(4),
-              border: const Border(
-                top: BorderSide(color: primaryBlue, width: 4.0),
-                left: BorderSide(color: borderColor),
-                right: BorderSide(color: borderColor),
-                bottom: BorderSide(color: borderColor),
-              ),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
-                      children: [
-                        const Icon(Icons.badge_rounded, color: primaryBlue, size: 20),
-                        const SizedBox(width: 8),
-                        Text(
-                          'TEACHER WORKSPACE',
-                          style: TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.bold,
-                            color: primaryBlue.withValues(alpha: 0.9),
-                            letterSpacing: 0.5,
-                          ),
-                        ),
-                      ],
-                    ),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFDCFCE7),
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                      child: const Text(
-                        'CLASS SCOPED',
-                        style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFF16A34A)),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 10),
-                Row(
-                  children: [
-                    const CircleAvatar(
-                      radius: 20,
-                      backgroundColor: secondaryBlue,
-                      child: Text('TG', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14)),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            teacherName,
-                            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF1F2937)),
-                          ),
-                          const SizedBox(height: 2),
-                          const Text(
-                            'Assigned Homeroom: Grade 4 Gold • Mathematics & Science Teacher',
-                            style: TextStyle(fontSize: 12, color: Color(0xFF6B7280)),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 14),
 
           // 2. Class Roster & Daily Attendance Marking
           Container(
