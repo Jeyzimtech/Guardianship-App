@@ -2,10 +2,8 @@ import 'package:flutter/material.dart';
 import '../dashboard/payments_view.dart';
 import '../dashboard/reports_view.dart';
 import 'learning_journal_view.dart';
-import 'guardian_profile_view.dart';
 import 'behaviour_view.dart';
 import 'assignments_view.dart';
-import 'sms_alerts_log_view.dart';
 
 class ParentDashboardView extends StatefulWidget {
   const ParentDashboardView({super.key});
@@ -250,26 +248,26 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
           ),
           const SizedBox(height: 16),
 
-          // Edu-Connect Core Modules Quick Access Grid
+          // 3. Core Quick Access Modules Grid
           const Text(
-            'Edu-Connect Core Modules',
+            'Core Features',
             style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: primaryBlue),
           ),
           const SizedBox(height: 10),
 
           GridView.count(
-            crossAxisCount: 3,
+            crossAxisCount: 2,
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             crossAxisSpacing: 10,
             mainAxisSpacing: 10,
-            childAspectRatio: 1.1,
+            childAspectRatio: 1.6,
             children: [
               _buildEduModuleCard(
                 icon: Icons.auto_stories_rounded,
                 color: const Color(0xFF10B981),
                 title: 'Learning Journal',
-                subtitle: 'Ungated Feed',
+                subtitle: 'Ungated Daily Feed',
                 onTap: () {
                   Navigator.push(
                     context,
@@ -278,14 +276,14 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
                 },
               ),
               _buildEduModuleCard(
-                icon: Icons.person_pin_rounded,
-                color: primaryBlue,
-                title: 'Guardian Profile',
-                subtitle: 'Self-Service',
+                icon: Icons.account_balance_wallet_rounded,
+                color: const Color(0xFF8B5CF6),
+                title: 'Fee Payments',
+                subtitle: isFeeGated ? 'USD \$${feeBalance.toStringAsFixed(2)} Due' : 'Paid',
                 onTap: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (_) => GuardianProfileView(child: currentChild)),
+                    MaterialPageRoute(builder: (_) => const PaymentsView()),
                   );
                 },
               ),
@@ -293,7 +291,7 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
                 icon: Icons.star_rate_rounded,
                 color: const Color(0xFFF59E0B),
                 title: 'Behaviour & Merits',
-                subtitle: 'Snapshot Log',
+                subtitle: '+12 Merit Points',
                 onTap: () {
                   Navigator.push(
                     context,
@@ -304,8 +302,8 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
               _buildEduModuleCard(
                 icon: Icons.assignment_rounded,
                 color: const Color(0xFF6366F1),
-                title: 'Assignments',
-                subtitle: 'Homework Tasks',
+                title: 'Homework Tracker',
+                subtitle: 'Assignments Due',
                 onTap: () {
                   Navigator.push(
                     context,
@@ -313,116 +311,60 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
                   );
                 },
               ),
-              _buildEduModuleCard(
-                icon: Icons.sms_rounded,
-                color: const Color(0xFF0EA5E9),
-                title: 'SMS Alerts Log',
-                subtitle: 'Offline History',
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const SmsAlertsLogView()),
-                  );
-                },
-              ),
-              _buildEduModuleCard(
-                icon: Icons.account_balance_wallet_rounded,
-                color: const Color(0xFF8B5CF6),
-                title: 'Fee Payments',
-                subtitle: 'USD / ZiG',
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const PaymentsView()),
-                  );
-                },
-              ),
             ],
           ),
-
           const SizedBox(height: 16),
 
-          // 3. School Tier Specific Content
-          if (childTier == 'preparatory') ...[
-            _buildPreparatoryEcdView(),
-          ] else if (childTier == 'primary') ...[
-            _buildPrimarySchoolView(currentChild),
-          ] else ...[
-            _buildSecondarySchoolView(currentChild),
-          ],
-
-          const SizedBox(height: 16),
-
-          // 4. Report Cards Gated Document Module
+          // 4. Official Report Cards Card
           Container(
             width: double.infinity,
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.circular(4),
+              borderRadius: BorderRadius.circular(6),
               border: Border.all(color: borderColor),
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Row(
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: primaryBlue.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: const Icon(Icons.assessment_rounded, color: primaryBlue, size: 22),
+                    ),
+                    const SizedBox(width: 12),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Icon(Icons.assessment_rounded, color: primaryBlue, size: 20),
-                        SizedBox(width: 8),
-                        Text('Official Term Report Cards', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: primaryBlue)),
+                        const Text(
+                          'Term Report Card',
+                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Color(0xFF1F2937)),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          isFeeGated ? 'Fee Gated — Pay balance to view' : 'Term 2 2026 Ready',
+                          style: TextStyle(fontSize: 11, color: isFeeGated ? const Color(0xFFDC2626) : const Color(0xFF16A34A)),
+                        ),
                       ],
                     ),
-                    if (isFeeGated)
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                        decoration: BoxDecoration(color: const Color(0xFFFEE2E2), borderRadius: BorderRadius.circular(4)),
-                        child: const Row(
-                          children: [
-                            Icon(Icons.lock_rounded, size: 12, color: Color(0xFFDC2626)),
-                            SizedBox(width: 4),
-                            Text('FEE GATED', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFFDC2626))),
-                          ],
-                        ),
-                      )
-                    else
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                        decoration: BoxDecoration(color: const Color(0xFFDCFCE7), borderRadius: BorderRadius.circular(4)),
-                        child: const Row(
-                          children: [
-                            Icon(Icons.lock_open_rounded, size: 12, color: Color(0xFF16A34A)),
-                            SizedBox(width: 4),
-                            Text('UNLOCKED', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFF16A34A))),
-                          ],
-                        ),
-                      ),
                   ],
                 ),
-                const SizedBox(height: 8),
-                Text(
-                  isFeeGated
-                      ? 'Report card for ${currentChild['name']} is currently fee-gated due to outstanding balance (USD \$${feeBalance.toStringAsFixed(2)}). Pay fee balance to view/download official transcript.'
-                      : 'Term 2 2026 Official Report Card for ${currentChild['name']} is ready for review and PDF download.',
-                  style: const TextStyle(fontSize: 12, color: Color(0xFF4B5563)),
-                ),
-                const SizedBox(height: 10),
-                SizedBox(
-                  width: double.infinity,
-                  child: OutlinedButton.icon(
-                    onPressed: () {
-                      Navigator.push(context, MaterialPageRoute(builder: (_) => const ReportsView()));
-                    },
-                    icon: Icon(isFeeGated ? Icons.lock_rounded : Icons.download_rounded, size: 18),
-                    label: Text(isFeeGated ? 'Locked — Pay Fees to Unlock' : 'View & Download Report Card'),
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: isFeeGated ? const Color(0xFFDC2626) : primaryBlue,
-                      side: BorderSide(color: isFeeGated ? const Color(0xFFDC2626) : primaryBlue),
-                      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
-                    ),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(context, MaterialPageRoute(builder: (_) => const ReportsView()));
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: isFeeGated ? const Color(0xFFDC2626) : primaryBlue,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
                   ),
+                  child: Text(isFeeGated ? 'Unlock' : 'View PDF', style: const TextStyle(fontSize: 11)),
                 ),
               ],
             ),
@@ -471,256 +413,6 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
                 ),
               ],
             ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // --- PREPARATORY (ECD) TIER VIEW ---
-  Widget _buildPreparatoryEcdView() {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(4),
-        border: Border.all(color: borderColor),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Row(
-                children: [
-                  Icon(Icons.child_care_rounded, color: Color(0xFF0284C7), size: 20),
-                  SizedBox(width: 8),
-                  Text('Daily Wellbeing Snapshot (ECD)', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: Color(0xFF0284C7))),
-                ],
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                decoration: BoxDecoration(color: const Color(0xFFE0F2FE), borderRadius: BorderRadius.circular(4)),
-                child: const Text('UNGATED DAY LOG', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFF0369A1))),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-
-          // Wellbeing Grid items
-          _buildWellbeingItem(Icons.restaurant_rounded, 'Meals Eaten', 'Breakfast: Finished • Lunch: Ate 80% • Snack: Fruit Juice', const Color(0xFFF59E0B)),
-          _buildWellbeingItem(Icons.bed_rounded, 'Nap / Rest Period', '12:30 PM - 02:00 PM (Slept peacefully for 1.5 hrs)', const Color(0xFF3B82F6)),
-          _buildWellbeingItem(Icons.clean_hands_rounded, 'Hygiene & Care', 'Diaper changed at 10:00 AM & 01:30 PM (All clean)', const Color(0xFF10B981)),
-          _buildWellbeingItem(Icons.photo_camera_rounded, 'Caregiver Note & Photo', '"Timothy loved finger painting and building wooden blocks today!" — Amai Tendai', const Color(0xFF8B5CF6)),
-
-          const Divider(height: 20, color: borderColor),
-          const Text('Developmental Milestone Notes', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Color(0xFF1F2937))),
-          const SizedBox(height: 4),
-          const Text('• Fine Motor Skills: Holds crayons firmly with tripod grip.\n• Social Skills: Shares toys enthusiastically during group circle.', style: TextStyle(fontSize: 12, color: Color(0xFF4B5563), height: 1.4)),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildWellbeingItem(IconData icon, String title, String detail, Color color) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      padding: const EdgeInsets.all(10),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.06),
-        borderRadius: BorderRadius.circular(4),
-        border: Border.all(color: color.withValues(alpha: 0.2)),
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(icon, color: color, size: 20),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(title, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: color)),
-                const SizedBox(height: 2),
-                Text(detail, style: const TextStyle(fontSize: 12, color: Color(0xFF374151))),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // --- PRIMARY SCHOOL TIER VIEW ---
-  Widget _buildPrimarySchoolView(Map<String, dynamic> child) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(4),
-        border: Border.all(color: borderColor),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              const Icon(Icons.school_rounded, color: primaryBlue, size: 20),
-              const SizedBox(width: 8),
-              const Expanded(
-                child: Text(
-                  'Primary Homeroom & Activities',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: primaryBlue),
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-              const SizedBox(width: 6),
-              Text(
-                'Homeroom: ${child['homeroom_teacher']}',
-                style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFF4B5563)),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          
-          // Daily Attendance Mark
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: const Color(0xFFECFDF5),
-              borderRadius: BorderRadius.circular(4),
-              border: Border.all(color: const Color(0xFFA7F3D0)),
-            ),
-            child: Row(
-              children: [
-                const Icon(Icons.check_circle_rounded, color: Color(0xFF059669), size: 20),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    'Attendance: ${child['attendance_today']}',
-                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Color(0xFF065F46)),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-                const SizedBox(width: 6),
-                Text(
-                  'Rate: ${child['attendance_rate']}',
-                  style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFF047857)),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 12),
-
-          const Text('Grade-Level Extracurricular Activities Today', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Color(0xFF1F2937))),
-          const SizedBox(height: 6),
-          _buildActivityRow('Junior Chess Club', '01:30 PM - 02:30 PM', 'Present', const Color(0xFF059669)),
-          _buildActivityRow('Grade 4 Athletics Practice', '03:00 PM - 04:00 PM', 'Scheduled', const Color(0xFFD97706)),
-        ],
-      ),
-    );
-  }
-
-  // --- SECONDARY SCHOOL TIER VIEW ---
-  Widget _buildSecondarySchoolView(Map<String, dynamic> child) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(4),
-        border: Border.all(color: borderColor),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              const Icon(Icons.view_timeline_rounded, color: Color(0xFF6B21A8), size: 20),
-              const SizedBox(width: 8),
-              const Expanded(
-                child: Text(
-                  'Secondary Timetable & Attendance',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Color(0xFF6B21A8)),
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-              const SizedBox(width: 6),
-              Text(
-                'Tutor: ${child['tutor']}',
-                style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFF4B5563)),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-
-          // Per subject timetable items
-          _buildSubjectRow('08:00 - 08:45 AM', 'Mathematics', 'Mr. Moyo', 'Room 102', 'Present', const Color(0xFF059669)),
-          _buildSubjectRow('09:00 - 09:45 AM', 'Physical Science', 'Mrs. Sibanda', 'Lab 2', 'Present', const Color(0xFF059669)),
-          _buildSubjectRow('10:15 - 11:00 AM', 'English Language', 'Ms. Ncube', 'Room 204', 'Present', const Color(0xFF059669)),
-          _buildSubjectRow('11:15 - 12:00 PM', 'History & Heritage', 'Mr. Ndlovu', 'Room 108', 'Present', const Color(0xFF059669)),
-
-          const SizedBox(height: 10),
-          const Text('Subject-Linked Clubs & Extracurriculars', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Color(0xFF1F2937))),
-          const SizedBox(height: 6),
-          _buildActivityRow('Science & Innovation Club', '02:30 PM - 04:00 PM', 'Science Club', const Color(0xFF6B21A8)),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildActivityRow(String title, String time, String status, Color color) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 6),
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-      decoration: BoxDecoration(color: const Color(0xFFF8FAFC), borderRadius: BorderRadius.circular(4), border: Border.all(color: const Color(0xFFE2E8F0))),
-      child: Row(
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Color(0xFF1F2937)), overflow: TextOverflow.ellipsis),
-                Text(time, style: const TextStyle(fontSize: 11, color: Color(0xFF6B7280))),
-              ],
-            ),
-          ),
-          const SizedBox(width: 8),
-          Text(status, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11, color: color)),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildSubjectRow(String time, String subject, String teacher, String room, String attendance, Color color) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 6),
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-      decoration: BoxDecoration(color: const Color(0xFFF8FAFC), borderRadius: BorderRadius.circular(4), border: Border.all(color: const Color(0xFFE2E8F0))),
-      child: Row(
-        children: [
-          SizedBox(
-            width: 85,
-            child: Text(time, style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFF475569)), overflow: TextOverflow.ellipsis),
-          ),
-          const SizedBox(width: 6),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(subject, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Color(0xFF1F2937)), overflow: TextOverflow.ellipsis),
-                Text('$teacher • $room', style: const TextStyle(fontSize: 11, color: Color(0xFF6B7280)), overflow: TextOverflow.ellipsis),
-              ],
-            ),
-          ),
-          const SizedBox(width: 6),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-            decoration: BoxDecoration(color: color.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(4)),
-            child: Text(attendance, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 10, color: color)),
           ),
         ],
       ),
