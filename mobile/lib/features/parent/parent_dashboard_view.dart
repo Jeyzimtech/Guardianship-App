@@ -4,6 +4,9 @@ import '../dashboard/reports_view.dart';
 import 'learning_journal_view.dart';
 import 'behaviour_view.dart';
 import 'assignments_view.dart';
+import 'guardian_profile_view.dart';
+import 'sms_alerts_log_view.dart';
+import 'messaging_view.dart';
 
 class ParentDashboardView extends StatefulWidget {
   const ParentDashboardView({super.key});
@@ -17,20 +20,54 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
   static const secondaryBlue = Color(0xFF5B7BD5);
   static const borderColor = Color(0xFFD8D8D8);
 
-  final Map<String, dynamic> _linkedChild = {
-    'name': 'Alice Chewe',
-    'class': 'Grade 4 Gold',
-    'tier': 'primary',
-    'school': 'Hillside Primary School',
-    'homeroom_teacher': 'Teacher Grace',
-    'fee_balance': 0.0,
-    'attendance_today': 'Present (Homeroom)',
-    'attendance_rate': '96%',
-  };
+  // Unified Guardian Account Children (across all linked CT Pulse schools)
+  int _selectedChildIndex = 0;
+
+  final List<Map<String, dynamic>> _mockChildren = [
+    {
+      'name': 'Alice Chewe',
+      'class': 'Grade 4 Gold',
+      'tier': 'primary',
+      'school': 'Hillside Primary School',
+      'homeroom_teacher': 'Teacher Grace',
+      'fee_balance': 0.0,
+      'attendance_rate': '96%',
+      'z_score': '+0.45 SD',
+      'velocity_status': 'On Track for A-Level',
+      'merits_pos': 14,
+      'merits_neg': 1,
+    },
+    {
+      'name': 'Timothy Chewe',
+      'class': 'ECD B - Sunflowers',
+      'tier': 'preparatory',
+      'school': 'Hillside Preparatory (ECD)',
+      'caregiver': 'Amai Tendai',
+      'fee_balance': 150.0,
+      'attendance_rate': '98%',
+      'z_score': '+0.20 SD',
+      'velocity_status': 'On Track for Preparatory',
+      'merits_pos': 8,
+      'merits_neg': 0,
+    },
+    {
+      'name': 'Brian Chewe',
+      'class': 'Form 3 Blue',
+      'tier': 'secondary',
+      'school': 'Hillside Secondary School',
+      'tutor': 'Mr. Moyo',
+      'fee_balance': 360.0,
+      'attendance_rate': '94%',
+      'z_score': '+0.60 SD',
+      'velocity_status': 'On Track for O-Level Distinction',
+      'merits_pos': 18,
+      'merits_neg': 2,
+    },
+  ];
 
   @override
   Widget build(BuildContext context) {
-    final currentChild = _linkedChild;
+    final currentChild = _mockChildren[_selectedChildIndex];
     final childTier = currentChild['tier'] as String;
     final feeBalance = currentChild['fee_balance'] as double;
     final isFeeGated = feeBalance > 0;
@@ -41,7 +78,7 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // 1. Student Summary Header & Child Selector
+          // 1. Unified Guardian Account & Always-Visible Child Switcher (Section 5.1)
           Container(
             width: double.infinity,
             padding: const EdgeInsets.all(14),
@@ -70,9 +107,18 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
-                              currentChild['name'],
-                              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF1F2937)),
+                            Row(
+                              children: [
+                                Text(
+                                  currentChild['name'],
+                                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF1F2937)),
+                                ),
+                                const SizedBox(width: 6),
+                                const Tooltip(
+                                  message: 'Student core identity is read-only for parents and managed by School Admin/Teacher.',
+                                  child: Icon(Icons.verified_user_rounded, color: Color(0xFF22C55E), size: 16),
+                                ),
+                              ],
                             ),
                             const SizedBox(height: 2),
                             Text(
@@ -97,12 +143,52 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
                     ),
                   ],
                 ),
+
+                const SizedBox(height: 12),
+                const Text(
+                  'LINKED CHILDREN (Unified Account Across CT Pulse Schools)',
+                  style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFF6B7280), letterSpacing: 0.5),
+                ),
+                const SizedBox(height: 6),
+
+                // Always-Visible Child Switcher Pill Bar
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: List.generate(_mockChildren.length, (index) {
+                      final child = _mockChildren[index];
+                      final isSelected = index == _selectedChildIndex;
+                      return GestureDetector(
+                        onTap: () => setState(() => _selectedChildIndex = index),
+                        child: Container(
+                          margin: const EdgeInsets.only(right: 8),
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: isSelected ? primaryBlue : const Color(0xFFF1F5F9),
+                            borderRadius: BorderRadius.circular(4),
+                            border: Border.all(color: isSelected ? primaryBlue : const Color(0xFFCBD5E1)),
+                          ),
+                          child: Row(
+                            children: [
+                              Icon(Icons.child_care_rounded, size: 14, color: isSelected ? Colors.white : const Color(0xFF64748B)),
+                              const SizedBox(width: 6),
+                              Text(
+                                child['name'],
+                                style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: isSelected ? Colors.white : const Color(0xFF334155)),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    }),
+                  ),
+                ),
               ],
             ),
           ),
           const SizedBox(height: 14),
 
-          // 2. Summary KPI Metric Cards
+          // 2. Above-The-Fold Summary KPI Cards (Section 5.2 Module 1)
           Row(
             children: [
               Expanded(
@@ -110,87 +196,43 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
               ),
               const SizedBox(width: 10),
               Expanded(
-                child: _buildWebKpiCard('FEE BALANCE', isFeeGated ? 'USD \$${feeBalance.toStringAsFixed(2)}' : 'USD \$0.00', Icons.account_balance_wallet_outlined, isFeeGated ? const Color(0xFFEF4444) : primaryBlue),
+                child: _buildWebKpiCard('Z-SCORE TREND', currentChild['z_score'] ?? '+0.45 SD', Icons.trending_up_rounded, primaryBlue),
               ),
               const SizedBox(width: 10),
               Expanded(
-                child: _buildWebKpiCard('MERITS', '+12 Points', Icons.star_outline_rounded, const Color(0xFFF59E0B)),
+                child: _buildWebKpiCard('FEE BALANCE', isFeeGated ? 'USD \$${feeBalance.toStringAsFixed(2)}' : 'USD \$0.00', Icons.account_balance_wallet_outlined, isFeeGated ? const Color(0xFFEF4444) : primaryBlue),
               ),
             ],
           ),
           const SizedBox(height: 14),
 
-          // 2. Fee Balance & Direct Payment Card with Gating Logic
+          // 3. Required Velocity Engine Banner (Above the Fold)
           Container(
             width: double.infinity,
-            padding: const EdgeInsets.all(14),
+            padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: isFeeGated ? const Color(0xFFFEF2F2) : const Color(0xFFF0FDF4),
-              borderRadius: BorderRadius.circular(4),
-              border: Border.all(color: isFeeGated ? const Color(0xFFFCA5A5) : const Color(0xFF86EFAC)),
+              color: const Color(0xFFF0FDF4),
+              borderRadius: BorderRadius.circular(6),
+              border: Border.all(color: const Color(0xFF86EFAC)),
             ),
             child: Row(
               children: [
-                Icon(
-                  isFeeGated ? Icons.error_outline_rounded : Icons.check_circle_outline_rounded,
-                  color: isFeeGated ? const Color(0xFFDC2626) : const Color(0xFF16A34A),
-                  size: 28,
-                ),
-                const SizedBox(width: 12),
+                const Icon(Icons.bolt_rounded, color: Color(0xFF16A34A), size: 20),
+                const SizedBox(width: 8),
                 Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        isFeeGated ? 'OUTSTANDING FEE BALANCE' : 'FEE ACCOUNT IN GOOD STANDING',
-                        style: TextStyle(
-                          fontSize: 11,
-                          fontWeight: FontWeight.bold,
-                          color: isFeeGated ? const Color(0xFF991B1B) : const Color(0xFF166534),
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        isFeeGated
-                            ? 'USD \$${feeBalance.toStringAsFixed(2)} Pending'
-                            : 'USD \$0.00 Balance (Term Fully Paid)',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: isFeeGated ? const Color(0xFF7F1D1D) : const Color(0xFF14532D),
-                        ),
-                      ),
-                      if (isFeeGated)
-                        const Padding(
-                          padding: EdgeInsets.only(top: 4.0),
-                          child: Text(
-                            '⚠️ Fee-gated: Report cards unlock automatically upon zero balance.',
-                            style: TextStyle(fontSize: 11, color: Color(0xFFB91C1C)),
-                          ),
-                        ),
-                    ],
+                  child: Text(
+                    'REQUIRED VELOCITY ENGINE: ${currentChild['velocity_status']} • Positive Merits: +${currentChild['merits_pos']}',
+                    style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFF15803D)),
                   ),
-                ),
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.push(context, MaterialPageRoute(builder: (_) => const PaymentsView()));
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: isFeeGated ? const Color(0xFFDC2626) : primaryBlue,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                    shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
-                  ),
-                  child: Text(isFeeGated ? 'Pay Fees' : 'View Ledger'),
                 ),
               ],
             ),
           ),
           const SizedBox(height: 16),
 
-          // 3. Core Quick Access Modules Grid
+          // 4. Core Modules Grid (Section 5.2 - 10 MVP Modules)
           const Text(
-            'Core Features',
+            'Edu-Connect Core Modules (MVP)',
             style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: primaryBlue),
           ),
           const SizedBox(height: 10),
@@ -207,7 +249,7 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
                 icon: Icons.auto_stories_rounded,
                 color: const Color(0xFF10B981),
                 title: 'Learning Journal',
-                subtitle: 'Ungated Daily Feed',
+                subtitle: 'Ungated Multimedia Feed',
                 onTap: () {
                   Navigator.push(
                     context,
@@ -216,10 +258,22 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
                 },
               ),
               _buildEduModuleCard(
+                icon: Icons.analytics_rounded,
+                color: primaryBlue,
+                title: 'Academic Z-Scores',
+                subtitle: 'Performance Charts',
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const ReportsView()),
+                  );
+                },
+              ),
+              _buildEduModuleCard(
                 icon: Icons.account_balance_wallet_rounded,
                 color: const Color(0xFF8B5CF6),
                 title: 'Fee Payments',
-                subtitle: isFeeGated ? 'USD \$${feeBalance.toStringAsFixed(2)} Due' : 'Paid',
+                subtitle: isFeeGated ? 'USD \$${feeBalance.toStringAsFixed(2)} Due' : 'Dual Currency USD/ZiG',
                 onTap: () {
                   Navigator.push(
                     context,
@@ -231,7 +285,7 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
                 icon: Icons.star_rate_rounded,
                 color: const Color(0xFFF59E0B),
                 title: 'Behaviour & Merits',
-                subtitle: '+12 Merit Points',
+                subtitle: '+${currentChild['merits_pos']} Merits / ${currentChild['merits_neg']} Incidents',
                 onTap: () {
                   Navigator.push(
                     context,
@@ -243,7 +297,7 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
                 icon: Icons.assignment_rounded,
                 color: const Color(0xFF6366F1),
                 title: 'Homework Tracker',
-                subtitle: 'Assignments Due',
+                subtitle: 'Upcoming & Overdue',
                 onTap: () {
                   Navigator.push(
                     context,
@@ -251,11 +305,47 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
                   );
                 },
               ),
+              _buildEduModuleCard(
+                icon: Icons.forum_rounded,
+                color: const Color(0xFFEC4899),
+                title: 'Messaging & Support',
+                subtitle: 'Auto-Translate & PT Tech',
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const MessagingView()),
+                  );
+                },
+              ),
+              _buildEduModuleCard(
+                icon: Icons.sms_rounded,
+                color: const Color(0xFF0EA5E9),
+                title: 'SMS Alerts Log',
+                subtitle: 'Econet / Telecel History',
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const SmsAlertsLogView()),
+                  );
+                },
+              ),
+              _buildEduModuleCard(
+                icon: Icons.person_pin_rounded,
+                color: const Color(0xFF14B8A6),
+                title: 'Guardian Profile',
+                subtitle: 'Paperless Self-Service',
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => GuardianProfileView(child: currentChild)),
+                  );
+                },
+              ),
             ],
           ),
           const SizedBox(height: 16),
 
-          // 4. Official Report Cards Card
+          // 5. Official Report Cards Module (Fee-Gated Communication)
           Container(
             width: double.infinity,
             padding: const EdgeInsets.all(14),
@@ -287,7 +377,7 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
                         ),
                         const SizedBox(height: 2),
                         Text(
-                          isFeeGated ? 'Fee Gated — Pay balance to view' : 'Term 2 2026 Ready',
+                          isFeeGated ? 'Fee Gated — Pay balance to unlock PDF' : 'Term 2 2026 Ready for Download',
                           style: TextStyle(fontSize: 11, color: isFeeGated ? const Color(0xFFDC2626) : const Color(0xFF16A34A)),
                         ),
                       ],
@@ -305,51 +395,6 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
                   ),
                   child: Text(isFeeGated ? 'Unlock' : 'View PDF', style: const TextStyle(fontSize: 11)),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 16),
-
-          // 5. Uniform Shop Quick Access with Direct Payment Link
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(14),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(4),
-              border: Border.all(color: borderColor),
-            ),
-            child: Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(color: const Color(0xFFF3E8FF), borderRadius: BorderRadius.circular(4)),
-                  child: const Icon(Icons.checkroom_rounded, color: Color(0xFF7E22CE), size: 24),
-                ),
-                const SizedBox(width: 12),
-                const Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('School Uniform Shop', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Color(0xFF1F2937))),
-                      SizedBox(height: 2),
-                      Text('Order blazers, PE kits, ties & badges with instant online payment', style: TextStyle(fontSize: 11, color: Color(0xFF6B7280))),
-                    ],
-                  ),
-                ),
-                ElevatedButton(
-                  onPressed: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Opening School Uniform Shop & Payment Gateway...')),
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF7E22CE),
-                    foregroundColor: Colors.white,
-                    shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
-                  ),
-                  child: const Text('Order & Pay'),
                 ),
               ],
             ),
