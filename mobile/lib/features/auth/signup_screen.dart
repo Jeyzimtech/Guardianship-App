@@ -156,30 +156,7 @@ class _SignupScreenState extends State<SignupScreen> {
                         fontWeight: FontWeight.w500,
                       ),
                     ),
-                    const SizedBox(height: 12),
-
-                    // Mobile Exclusivity Banner
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFEFF6FF),
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: const Color(0xFFBFDBFE)),
-                      ),
-                      child: const Row(
-                        children: [
-                          Icon(Icons.family_restroom_rounded, size: 18, color: Color(0xFF1D4ED8)),
-                          SizedBox(width: 8),
-                          Expanded(
-                            child: Text(
-                              'Mobile App registration is restricted to Teachers and Parents/Students.',
-                              style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Color(0xFF1D4ED8)),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 24),
 
                     // Full Name Field
                     TextField(
