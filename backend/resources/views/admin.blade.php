@@ -938,7 +938,6 @@
 
                 <!-- LOGIN FORM -->
                 <form class="auth-form active" id="loginForm" onsubmit="handleLoginSubmit(event)">
-                    <h2 class="auth-title">Welcome Back</h2>
                     <p class="auth-subtitle">Sign in to your Edu+Conect Web Admin Portal</p>
 
                     <div class="form-group">

@@ -100,18 +100,6 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     const SizedBox(height: 32),
                     
-                    // Welcome Header
-                    Text(
-                      'Welcome Back',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 28,
-                        fontWeight: FontWeight.w800,
-                        color: primaryColor,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    
                     // Subtitle
                     Text(
                       'Login to manage your school connection',
