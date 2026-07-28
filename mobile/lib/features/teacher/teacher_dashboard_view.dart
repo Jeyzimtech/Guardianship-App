@@ -63,6 +63,57 @@ class _TeacherDashboardViewState extends State<TeacherDashboardView> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Web Admin Style Page Header
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Teacher Console',
+                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: primaryBlue),
+                  ),
+                  const SizedBox(height: 2),
+                  const Text(
+                    'Faculty Roster, Attendance & Learning Journal Management',
+                    style: TextStyle(fontSize: 12, color: Color(0xFF6B7280)),
+                  ),
+                ],
+              ),
+              ElevatedButton.icon(
+                onPressed: () => ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Attendance Register Saved Successfully!'))),
+                icon: const Icon(Icons.check_circle_rounded, size: 16),
+                label: const Text('Save Register', style: TextStyle(fontSize: 12)),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: primaryBlue,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+
+          // Web Admin Style KPI Cards Grid
+          Row(
+            children: [
+              Expanded(
+                child: _buildWebKpiCard('CLASS ROSTER', '32 Students', Icons.school_outlined, primaryBlue),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: _buildWebKpiCard('ATTENDANCE', '96% Marked', Icons.fact_check_outlined, const Color(0xFF22C55E)),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: _buildWebKpiCard('TASKS DUE', '2 Homework Sets', Icons.assignment_outlined, const Color(0xFFF59E0B)),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+
           // Teacher Mobile Scope Banner
           Container(
             width: double.infinity,
@@ -438,6 +489,57 @@ class _TeacherDashboardViewState extends State<TeacherDashboardView> {
                 ),
               ],
             ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildWebKpiCard(String label, String value, IconData icon, Color color) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(4),
+        border: Border.all(color: borderColor),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: const TextStyle(
+                    fontSize: 9,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF6B7280),
+                    letterSpacing: 0.5,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  value,
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.bold,
+                    color: color,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.all(6),
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(4),
+            ),
+            child: Icon(icon, color: color, size: 18),
           ),
         ],
       ),

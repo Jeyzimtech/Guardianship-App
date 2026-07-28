@@ -68,6 +68,56 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Web Admin Style Page Header
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Parent Portal',
+                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: primaryBlue),
+                  ),
+                  const SizedBox(height: 2),
+                  const Text(
+                    'Student Academic Standing & Guardian Self-Service',
+                    style: TextStyle(fontSize: 12, color: Color(0xFF6B7280)),
+                  ),
+                ],
+              ),
+              ElevatedButton.icon(
+                onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const PaymentsView())),
+                icon: const Icon(Icons.account_balance_wallet_rounded, size: 16),
+                label: const Text('Pay Fees', style: TextStyle(fontSize: 12)),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: isFeeGated ? const Color(0xFFDC2626) : primaryBlue,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+
+          // Web Admin Style KPI Cards Grid
+          Row(
+            children: [
+              Expanded(
+                child: _buildWebKpiCard('ATTENDANCE', currentChild['attendance_rate'] ?? '96%', Icons.fact_check_outlined, const Color(0xFF22C55E)),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: _buildWebKpiCard('OUTSTANDING FEES', 'USD \$${feeBalance.toStringAsFixed(2)}', Icons.account_balance_wallet_outlined, isFeeGated ? const Color(0xFFEF4444) : primaryBlue),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: _buildWebKpiCard('MERITS', '+12 Points', Icons.star_outline_rounded, const Color(0xFFF59E0B)),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
           // 1. Read-Only Child Scope Banner
           Container(
             width: double.infinity,
@@ -811,6 +861,57 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildWebKpiCard(String label, String value, IconData icon, Color color) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(4),
+        border: Border.all(color: borderColor),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: const TextStyle(
+                    fontSize: 9,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF6B7280),
+                    letterSpacing: 0.5,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  value,
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.bold,
+                    color: color,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.all(6),
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(4),
+            ),
+            child: Icon(icon, color: color, size: 18),
+          ),
+        ],
       ),
     );
   }
