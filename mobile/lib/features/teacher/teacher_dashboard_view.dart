@@ -264,20 +264,21 @@ class _TeacherDashboardViewState extends State<TeacherDashboardView> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // 1. Top Teacher Profile Header matching Admin Web User Pill Format
+            // 1. Top Teacher Profile Header — CLASS SCOPED badge on its own line
             Container(
               width: double.infinity,
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(14),
               decoration: BoxDecoration(
                 color: surfaceWhite,
                 borderRadius: BorderRadius.circular(4),
                 border: Border.all(color: borderColor),
               ),
               child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Container(
-                    width: 44,
-                    height: 44,
+                    width: 42,
+                    height: 42,
                     decoration: const BoxDecoration(
                       color: secondaryBlue,
                       shape: BoxShape.circle,
@@ -285,44 +286,43 @@ class _TeacherDashboardViewState extends State<TeacherDashboardView> {
                     alignment: Alignment.center,
                     child: const Text(
                       'TG',
-                      style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
+                      style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15),
                     ),
                   ),
-                  const SizedBox(width: 14),
+                  const SizedBox(width: 12),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Row(
-                          children: [
-                            Text(
-                              teacherName,
-                              style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: textPrimary),
-                            ),
-                            const SizedBox(width: 10),
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                              decoration: BoxDecoration(
-                                color: infoBg,
-                                borderRadius: BorderRadius.circular(4),
-                              ),
-                              child: const Text(
-                                'CLASS SCOPED',
-                                style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: infoText, letterSpacing: 0.5),
-                              ),
-                            ),
-                          ],
+                        Text(
+                          teacherName,
+                          style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: textPrimary),
+                          overflow: TextOverflow.ellipsis,
                         ),
-                        const SizedBox(height: 3),
+                        const SizedBox(height: 2),
                         const Text(
-                          'Homeroom Class Teacher • Grade 4 Gold & Subject Lead',
-                          style: TextStyle(fontSize: 12, color: textSecondary),
+                          'Homeroom Class Teacher • Grade 4 Gold',
+                          style: TextStyle(fontSize: 11, color: textSecondary),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        const SizedBox(height: 4),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: infoBg,
+                            borderRadius: BorderRadius.circular(3),
+                          ),
+                          child: const Text(
+                            'CLASS SCOPED',
+                            style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: infoText, letterSpacing: 0.5),
+                          ),
                         ),
                       ],
                     ),
                   ),
+                  const SizedBox(width: 8),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
                       color: bgLight,
                       borderRadius: BorderRadius.circular(4),
@@ -332,12 +332,12 @@ class _TeacherDashboardViewState extends State<TeacherDashboardView> {
                       value: _selectedClass,
                       underline: const SizedBox(),
                       isDense: true,
-                      icon: const Icon(Icons.keyboard_arrow_down, color: primaryBlue, size: 18),
-                      style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: primaryBlue),
+                      icon: const Icon(Icons.keyboard_arrow_down, color: primaryBlue, size: 16),
+                      style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: primaryBlue),
                       items: const [
-                        DropdownMenuItem(value: 'Grade 4 Gold (Homeroom)', child: Text('Grade 4 Gold')),
-                        DropdownMenuItem(value: 'Grade 5 Blue (Maths)', child: Text('Grade 5 Blue')),
-                        DropdownMenuItem(value: 'Grade 6 Red (Science)', child: Text('Grade 6 Red')),
+                        DropdownMenuItem(value: 'Grade 4 Gold (Homeroom)', child: Text('Gr 4 Gold')),
+                        DropdownMenuItem(value: 'Grade 5 Blue (Maths)', child: Text('Gr 5 Blue')),
+                        DropdownMenuItem(value: 'Grade 6 Red (Science)', child: Text('Gr 6 Red')),
                       ],
                       onChanged: (val) {
                         if (val != null) setState(() => _selectedClass = val);
@@ -347,29 +347,33 @@ class _TeacherDashboardViewState extends State<TeacherDashboardView> {
                 ],
               ),
             ),
-            const SizedBox(height: 14),
+            const SizedBox(height: 12),
 
-            // 2. Summary KPI Cards matching Admin Web .kpi-card Format
+            // 2. Summary KPI Cards — 2×2 grid to prevent value truncation
             Row(
               children: [
                 Expanded(
                   child: _buildWebKpiCard('CLASS ROSTER', '$totalCount Students', Icons.school_outlined, primaryBlue),
                 ),
-                const SizedBox(width: 10),
+                const SizedBox(width: 8),
                 Expanded(
-                  child: _buildWebKpiCard('ATTENDANCE', '$attendancePct% Marked', Icons.fact_check_outlined, successText),
+                  child: _buildWebKpiCard('ATTENDANCE', '$attendancePct% Today', Icons.fact_check_outlined, successText),
                 ),
-                const SizedBox(width: 10),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Row(
+              children: [
                 Expanded(
                   child: _buildWebKpiCard('GRADES PENDING', '2 Tasks Due', Icons.assignment_outlined, warningText),
                 ),
-                const SizedBox(width: 10),
+                const SizedBox(width: 8),
                 Expanded(
                   child: _buildWebKpiCard('TOTAL MERITS', '$totalMerits Stars', Icons.star_outline_rounded, secondaryBlue),
                 ),
               ],
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 14),
 
             // 3. Admin Web Style Navigation Tabs Toolbar
             Container(
