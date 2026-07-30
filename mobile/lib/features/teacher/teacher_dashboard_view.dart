@@ -705,152 +705,185 @@ class _TeacherDashboardViewState extends State<TeacherDashboardView> {
                     }
 
                     return Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              // Roll & ID Badge
-                              Container(
-                                width: 36,
-                                height: 36,
-                                decoration: BoxDecoration(
-                                  color: bgLight,
-                                  borderRadius: BorderRadius.circular(4),
-                                  border: Border.all(color: borderColor),
-                                ),
-                                alignment: Alignment.center,
-                                child: Text(
-                                  student['roll'],
-                                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: primaryBlue),
-                                ),
-                              ),
-                              const SizedBox(width: 12),
-
-                              // Name & Guardian Info
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Row(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: surfaceWhite,
+                          border: Border.all(color: borderColor),
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // === TOP ROW: roll badge + name block + status badges ===
+                            Padding(
+                              padding: const EdgeInsets.fromLTRB(12, 10, 12, 0),
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  // Roll number badge
+                                  Container(
+                                    width: 34,
+                                    height: 34,
+                                    decoration: BoxDecoration(
+                                      color: bgLight,
+                                      borderRadius: BorderRadius.circular(4),
+                                      border: Border.all(color: borderColor),
+                                    ),
+                                    alignment: Alignment.center,
+                                    child: Text(
+                                      student['roll'],
+                                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: primaryBlue),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 10),
+                                  // Name + gender + guardian
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
                                         Text(
                                           student['name'],
                                           style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: textPrimary),
+                                          overflow: TextOverflow.ellipsis,
                                         ),
-                                        const SizedBox(width: 8),
+                                        const SizedBox(height: 2),
                                         Text(
-                                          '(${student['gender']})',
+                                          '${student['gender']} • ID: ${student['id']}',
                                           style: const TextStyle(fontSize: 11, color: textSecondary),
                                         ),
-                                        const SizedBox(width: 8),
-                                        Container(
-                                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                          decoration: BoxDecoration(
-                                            color: bgLight,
-                                            borderRadius: BorderRadius.circular(4),
-                                            border: Border.all(color: borderColor),
-                                          ),
-                                          child: Text(
-                                            '⭐ ${student['merits']} Merits',
-                                            style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: textPrimary),
-                                          ),
+                                        const SizedBox(height: 1),
+                                        Text(
+                                          'Guardian: ${student['guardian']} ${student['guardian_phone']}',
+                                          style: const TextStyle(fontSize: 10, color: textSecondary),
+                                          overflow: TextOverflow.ellipsis,
                                         ),
                                       ],
                                     ),
-                                    const SizedBox(height: 3),
-                                    Text(
-                                      'ID: ${student['id']} • Guardian: ${student['guardian']} (${student['guardian_phone']})',
-                                      style: const TextStyle(fontSize: 11, color: textSecondary),
-                                    ),
-                                  ],
-                                ),
-                              ),
-
-                              // Attendance & Fee Status Badges (.role-badge matching Admin Web)
-                              Row(
-                                children: [
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                    decoration: BoxDecoration(color: feeBg, borderRadius: BorderRadius.circular(4)),
-                                    child: Text(
-                                      fees,
-                                      style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: feeText),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 6),
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                    decoration: BoxDecoration(color: statusBg, borderRadius: BorderRadius.circular(4)),
-                                    child: Text(
-                                      status.toUpperCase(),
-                                      style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: statusText),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 10),
-
-                          // Attendance Button Structure & Action Buttons Bar
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              // Structured Attendance Switcher (P / A / L)
-                              Row(
-                                children: [
-                                  const Text(
-                                    'Attendance:',
-                                    style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: textSecondary),
                                   ),
                                   const SizedBox(width: 8),
-                                  _buildAttendanceButton(originalIndex, 'Present', 'P', successBg, successText, status == 'Present'),
-                                  const SizedBox(width: 4),
-                                  _buildAttendanceButton(originalIndex, 'Absent', 'A', dangerBg, dangerText, status == 'Absent'),
-                                  const SizedBox(width: 4),
-                                  _buildAttendanceButton(originalIndex, 'Late', 'L', warningBg, warningText, status == 'Late'),
+                                  // Status & fee badges stacked vertically on right
+                                  Column(
+                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                    children: [
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
+                                        decoration: BoxDecoration(color: statusBg, borderRadius: BorderRadius.circular(3)),
+                                        child: Text(
+                                          status.toUpperCase(),
+                                          style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: statusText, letterSpacing: 0.3),
+                                        ),
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
+                                        decoration: BoxDecoration(color: feeBg, borderRadius: BorderRadius.circular(3)),
+                                        child: Text(
+                                          fees.contains('Pending') ? 'FEE PENDING' : 'FEES PAID',
+                                          style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: feeText, letterSpacing: 0.3),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ],
                               ),
+                            ),
 
-                              // Extra Action Buttons
-                              Row(
+                            // === MERITS STRIP ===
+                            Padding(
+                              padding: const EdgeInsets.fromLTRB(12, 6, 12, 0),
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                decoration: BoxDecoration(
+                                  color: bgLight,
+                                  borderRadius: BorderRadius.circular(3),
+                                  border: Border.all(color: borderColor),
+                                ),
+                                child: Text(
+                                  '\u2605  ${student['merits']} Merit Points Awarded',
+                                  style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: textSecondary),
+                                ),
+                              ),
+                            ),
+
+                            // === DIVIDER ===
+                            const Padding(
+                              padding: EdgeInsets.symmetric(vertical: 8),
+                              child: Divider(height: 1, color: borderColor),
+                            ),
+
+                            // === BOTTOM ROW: attendance switcher + action buttons ===
+                            Padding(
+                              padding: const EdgeInsets.fromLTRB(12, 0, 12, 10),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
-                                  OutlinedButton.icon(
-                                    onPressed: () => _awardMerit(originalIndex),
-                                    icon: const Icon(Icons.star_outline_rounded, size: 14, color: warningText),
-                                    label: const Text('+1 MERIT', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: textPrimary)),
-                                    style: OutlinedButton.styleFrom(
-                                      side: const BorderSide(color: borderColor),
-                                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-                                      minimumSize: Size.zero,
-                                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(4))),
-                                    ),
+                                  // Attendance P/A/L buttons
+                                  Row(
+                                    children: [
+                                      const Text(
+                                        'Mark:',
+                                        style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: textSecondary),
+                                      ),
+                                      const SizedBox(width: 6),
+                                      _buildAttendanceButton(originalIndex, 'Present', 'P', successBg, successText, status == 'Present'),
+                                      const SizedBox(width: 4),
+                                      _buildAttendanceButton(originalIndex, 'Absent', 'A', dangerBg, dangerText, status == 'Absent'),
+                                      const SizedBox(width: 4),
+                                      _buildAttendanceButton(originalIndex, 'Late', 'L', warningBg, warningText, status == 'Late'),
+                                    ],
                                   ),
-                                  const SizedBox(width: 6),
-                                  OutlinedButton.icon(
-                                    onPressed: () {
-                                      ScaffoldMessenger.of(context).showSnackBar(
-                                        SnackBar(content: Text('Calling parent ${student['guardian']} (${student['guardian_phone']})...')),
-                                      );
-                                    },
-                                    icon: const Icon(Icons.phone_outlined, size: 14, color: primaryBlue),
-                                    label: const Text('CONTACT', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: primaryBlue)),
-                                    style: OutlinedButton.styleFrom(
-                                      side: const BorderSide(color: borderColor),
-                                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-                                      minimumSize: Size.zero,
-                                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(4))),
-                                    ),
+                                  // +Merit and Contact buttons
+                                  Row(
+                                    children: [
+                                      GestureDetector(
+                                        onTap: () => _awardMerit(originalIndex),
+                                        child: Container(
+                                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                                          decoration: BoxDecoration(
+                                            border: Border.all(color: borderColor),
+                                            borderRadius: BorderRadius.circular(4),
+                                            color: surfaceWhite,
+                                          ),
+                                          child: Row(
+                                            children: const [
+                                              Icon(Icons.star_outline_rounded, size: 13, color: warningText),
+                                              SizedBox(width: 4),
+                                              Text('+MERIT', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: textPrimary)),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(width: 6),
+                                      GestureDetector(
+                                        onTap: () {
+                                          ScaffoldMessenger.of(context).showSnackBar(
+                                            SnackBar(content: Text('Contacting ${student['guardian']}...')),
+                                          );
+                                        },
+                                        child: Container(
+                                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                                          decoration: BoxDecoration(
+                                            border: Border.all(color: borderColor),
+                                            borderRadius: BorderRadius.circular(4),
+                                            color: surfaceWhite,
+                                          ),
+                                          child: Row(
+                                            children: const [
+                                              Icon(Icons.phone_outlined, size: 13, color: primaryBlue),
+                                              SizedBox(width: 4),
+                                              Text('CONTACT', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: primaryBlue)),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ],
                               ),
-                            ],
-                          ),
-                        ],
+                            ),
+                          ],
+                        ),
                       ),
                     );
                   },
