@@ -13,7 +13,6 @@ class TeacherDashboardView extends StatefulWidget {
 class _TeacherDashboardViewState extends State<TeacherDashboardView> {
   // Admin Web Design Color Tokens
   static const primaryBlue = Color(0xFF3B5998);
-  static const primaryHover = Color(0xFF2D4373);
   static const secondaryBlue = Color(0xFF5B7BD5);
   static const bgLight = Color(0xFFF9FAFB);
   static const surfaceWhite = Color(0xFFFFFFFF);
@@ -517,74 +516,87 @@ class _TeacherDashboardViewState extends State<TeacherDashboardView> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Table Header / Title Bar
+          // Table Header / Title Bar — responsive header
           Container(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.fromLTRB(0, 0, 14, 0),
             decoration: const BoxDecoration(
-              border: Border(bottom: BorderSide(color: borderColor)),
+              border: Border(
+                bottom: BorderSide(color: borderColor),
+                left: BorderSide(color: primaryBlue, width: 4),
+              ),
             ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        const Icon(Icons.people_alt_outlined, color: primaryBlue, size: 20),
-                        const SizedBox(width: 8),
-                        Text(
-                          'Class Roster & Student Register (${filtered.length} Enrolled)',
-                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: primaryBlue),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 2),
-                    const Text(
-                      'Manage homeroom students, attendance status, fee indicators, and parent contacts.',
-                      style: TextStyle(fontSize: 12, color: textSecondary),
-                    ),
-                  ],
-                ),
-                // Button Structure Action Buttons
-                Row(
-                  children: [
-                    OutlinedButton.icon(
-                      onPressed: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Exporting Class Roster CSV/PDF report...')),
-                        );
-                      },
-                      icon: const Icon(Icons.download_outlined, size: 16),
-                      label: const Text('EXPORT ROSTER', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: textPrimary,
-                        side: const BorderSide(color: borderColor),
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(4))),
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(12, 14, 0, 14),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Row(
+                        children: [
+                          Icon(Icons.people_alt_outlined, color: primaryBlue, size: 18),
+                          SizedBox(width: 6),
+                          Text(
+                            'Class Roster & Student Register',
+                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: primaryBlue),
+                          ),
+                        ],
                       ),
-                    ),
-                    const SizedBox(width: 8),
-                    ElevatedButton.icon(
-                      onPressed: _openAddStudentDialog,
-                      icon: const Icon(Icons.add, size: 16),
-                      label: const Text('ADD STUDENT', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: primaryBlue,
-                        foregroundColor: Colors.white,
-                        elevation: 0,
-                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(4))),
-                      ).copyWith(
-                        backgroundColor: WidgetStateProperty.resolveWith((states) {
-                          if (states.contains(WidgetState.hovered)) return primaryHover;
-                          return primaryBlue;
-                        }),
+                      Row(
+                        children: [
+                          GestureDetector(
+                            onTap: () {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text('Exporting Class Roster...')),
+                              );
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+                              decoration: BoxDecoration(
+                                border: Border.all(color: borderColor),
+                                borderRadius: BorderRadius.circular(4),
+                                color: surfaceWhite,
+                              ),
+                              child: const Row(
+                                children: [
+                                  Icon(Icons.download_outlined, size: 14, color: textPrimary),
+                                  SizedBox(width: 4),
+                                  Text('EXPORT', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: textPrimary)),
+                                ],
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 6),
+                          GestureDetector(
+                            onTap: _openAddStudentDialog,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+                              decoration: BoxDecoration(
+                                border: Border.all(color: primaryBlue),
+                                borderRadius: BorderRadius.circular(4),
+                                color: primaryBlue,
+                              ),
+                              child: const Row(
+                                children: [
+                                  Icon(Icons.add, size: 14, color: Colors.white),
+                                  SizedBox(width: 4),
+                                  Text('ADD', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.white)),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
-                    ),
-                  ],
-                ),
-              ],
+                    ],
+                  ),
+                  const SizedBox(height: 3),
+                  Text(
+                    '${filtered.length} students enrolled in ${_selectedClass.split(' (').first}',
+                    style: const TextStyle(fontSize: 11, color: textSecondary),
+                  ),
+                ],
+              ),
             ),
           ),
 
