@@ -414,65 +414,63 @@ class _TeacherDashboardViewState extends State<TeacherDashboardView> {
     );
   }
 
-  // Admin Web KPI Card Helper
+  // Admin Web KPI Card Helper — with top color accent
   Widget _buildWebKpiCard(String label, String value, IconData icon, Color color) {
     return Container(
       padding: const EdgeInsets.all(12),
+      constraints: const BoxConstraints(minHeight: 68),
       decoration: BoxDecoration(
         color: surfaceWhite,
         borderRadius: BorderRadius.circular(4),
-        border: Border.all(color: borderColor),
+        border: Border(
+          top: BorderSide(color: color, width: 3),
+          left: BorderSide(color: borderColor),
+          right: BorderSide(color: borderColor),
+          bottom: BorderSide(color: borderColor),
+        ),
       ),
-      child: Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  label,
-                  style: const TextStyle(
-                    fontSize: 9,
-                    fontWeight: FontWeight.bold,
-                    color: textSecondary,
-                    letterSpacing: 0.5,
-                  ),
-                  overflow: TextOverflow.ellipsis,
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                label,
+                style: const TextStyle(
+                  fontSize: 9,
+                  fontWeight: FontWeight.bold,
+                  color: textSecondary,
+                  letterSpacing: 0.5,
                 ),
-                const SizedBox(height: 4),
-                Text(
-                  value,
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.bold,
-                    color: color,
-                  ),
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ],
-            ),
+                overflow: TextOverflow.ellipsis,
+              ),
+              Icon(icon, color: color, size: 16),
+            ],
           ),
-          Container(
-            padding: const EdgeInsets.all(6),
-            decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(4),
+          const SizedBox(height: 6),
+          Text(
+            value,
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
+              color: color,
             ),
-            child: Icon(icon, color: color, size: 18),
+            overflow: TextOverflow.ellipsis,
           ),
         ],
       ),
     );
   }
 
-  // Admin Web Toolbar Tab Button Helper
+  // Admin Web Toolbar Tab Button Helper — tighter on mobile
   Widget _buildTabButton(int index, String title, IconData icon) {
     final isActive = _activeTabIndex == index;
     return GestureDetector(
       onTap: () => setState(() => _activeTabIndex = index),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
         decoration: BoxDecoration(
           border: Border(
             bottom: BorderSide(
@@ -480,16 +478,16 @@ class _TeacherDashboardViewState extends State<TeacherDashboardView> {
               width: 3.0,
             ),
           ),
-          color: isActive ? primaryBlue.withValues(alpha: 0.05) : Colors.transparent,
+          color: isActive ? primaryBlue.withValues(alpha: 0.06) : Colors.transparent,
         ),
         child: Row(
           children: [
-            Icon(icon, size: 18, color: isActive ? primaryBlue : textSecondary),
-            const SizedBox(width: 8),
+            Icon(icon, size: 16, color: isActive ? primaryBlue : textSecondary),
+            const SizedBox(width: 6),
             Text(
               title,
               style: TextStyle(
-                fontSize: 13,
+                fontSize: 12,
                 fontWeight: isActive ? FontWeight.bold : FontWeight.w600,
                 color: isActive ? primaryBlue : textSecondary,
               ),
