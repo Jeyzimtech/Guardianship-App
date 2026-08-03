@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../core/auth_provider.dart';
 import '../profile/profile_view.dart';
+import '../parent/uniform_marketplace_view.dart';
 
 class AppDrawer extends StatelessWidget {
   final String currentRoute;
@@ -227,6 +228,15 @@ class AppDrawer extends StatelessWidget {
                       ),
                     ),
                     if (!isTeacher) ...[
+                      _buildDrawerItem(
+                        context,
+                        title: 'Uniform Store',
+                        icon: Icons.shopping_bag_rounded,
+                        onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (_) => const UniformMarketplaceView()),
+                        ),
+                      ),
                       _buildDrawerItem(
                         context,
                         title: 'Learning Journal',

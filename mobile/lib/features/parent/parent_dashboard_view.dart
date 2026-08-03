@@ -8,6 +8,7 @@ import 'assignments_view.dart';
 import 'guardian_profile_view.dart';
 import 'sms_alerts_log_view.dart';
 import 'messaging_view.dart';
+import 'uniform_marketplace_view.dart';
 
 class ParentDashboardView extends StatefulWidget {
   const ParentDashboardView({super.key});
@@ -655,6 +656,18 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(builder: (_) => const SmsAlertsLogView()),
+                  );
+                },
+              ),
+              _buildEduModuleCard(
+                icon: Icons.shopping_bag_rounded,
+                color: const Color(0xFFD97706),
+                title: 'Uniform Store',
+                subtitle: 'Buy Online & Select Sizes',
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => UniformMarketplaceView(child: currentChild)),
                   );
                 },
               ),
