@@ -385,7 +385,7 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
             children: [
               _buildEduModuleCard(
                 icon: Icons.auto_stories_rounded,
-                color: const Color(0xFF10B981),
+                color: primaryBlue,
                 title: 'Learning Journal',
                 subtitle: 'Ungated Multimedia Feed',
                 onTap: () {
@@ -409,7 +409,7 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
               ),
               _buildEduModuleCard(
                 icon: Icons.account_balance_wallet_rounded,
-                color: const Color(0xFF8B5CF6),
+                color: primaryBlue,
                 title: 'Fee Payments',
                 subtitle: isFeeGated ? 'USD \$${feeBalance.toStringAsFixed(2)} Due' : 'Dual Currency USD/ZiG',
                 onTap: () {
@@ -421,7 +421,7 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
               ),
               _buildEduModuleCard(
                 icon: Icons.campaign_rounded,
-                color: const Color(0xFFEC4899),
+                color: primaryBlue,
                 title: 'Announcements',
                 subtitle: 'School & Class Notices',
                 onTap: () {
@@ -433,7 +433,7 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
               ),
               _buildEduModuleCard(
                 icon: Icons.star_rate_rounded,
-                color: const Color(0xFFF59E0B),
+                color: primaryBlue,
                 title: 'Behaviour & Merits',
                 subtitle: '+${currentChild['merits_pos']} Merits / ${currentChild['merits_neg']} Incidents',
                 onTap: () {
@@ -445,7 +445,7 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
               ),
               _buildEduModuleCard(
                 icon: Icons.assignment_rounded,
-                color: const Color(0xFF6366F1),
+                color: primaryBlue,
                 title: 'Homework Tracker',
                 subtitle: 'Upcoming & Overdue',
                 onTap: () {
@@ -457,7 +457,7 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
               ),
               _buildEduModuleCard(
                 icon: Icons.forum_rounded,
-                color: const Color(0xFF0EA5E9),
+                color: primaryBlue,
                 title: 'Messaging & Support',
                 subtitle: 'Direct Teacher Chat',
                 onTap: () {
@@ -469,7 +469,7 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
               ),
               _buildEduModuleCard(
                 icon: Icons.sms_rounded,
-                color: const Color(0xFF14B8A6),
+                color: primaryBlue,
                 title: 'SMS Alerts Log',
                 subtitle: 'Econet / Telecel History',
                 onTap: () {
@@ -481,7 +481,7 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
               ),
               _buildEduModuleCard(
                 icon: Icons.shopping_bag_rounded,
-                color: const Color(0xFFD97706),
+                color: primaryBlue,
                 title: 'Uniform Store',
                 subtitle: 'Buy Online & Select Sizes',
                 onTap: () {
