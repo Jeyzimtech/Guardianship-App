@@ -265,42 +265,51 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Row(
-                      children: [
-                        CircleAvatar(
-                          radius: 22,
-                          backgroundColor: secondaryBlue,
-                          child: Text(
-                            currentChild['name'].toString().substring(0, 1),
-                            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18),
+                    Expanded(
+                      child: Row(
+                        children: [
+                          CircleAvatar(
+                            radius: 22,
+                            backgroundColor: secondaryBlue,
+                            child: Text(
+                              currentChild['name'].toString().substring(0, 1),
+                              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18),
+                            ),
                           ),
-                        ),
-                        const SizedBox(width: 12),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
-                                  currentChild['name'],
-                                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF1F2937)),
+                                Row(
+                                  children: [
+                                    Flexible(
+                                      child: Text(
+                                        currentChild['name'],
+                                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF1F2937)),
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 6),
+                                    const Tooltip(
+                                      message: 'Student identity is verified and added by School Admin.',
+                                      child: Icon(Icons.verified_user_rounded, color: Color(0xFF22C55E), size: 16),
+                                    ),
+                                  ],
                                 ),
-                                const SizedBox(width: 6),
-                                const Tooltip(
-                                  message: 'Student identity is verified and added by School Admin.',
-                                  child: Icon(Icons.verified_user_rounded, color: Color(0xFF22C55E), size: 16),
+                                const SizedBox(height: 2),
+                                Text(
+                                  'Class: ${currentChild['class']} • ${currentChild['school']}',
+                                  style: const TextStyle(fontSize: 12, color: Color(0xFF6B7280)),
+                                  overflow: TextOverflow.ellipsis,
                                 ),
                               ],
                             ),
-                            const SizedBox(height: 2),
-                            Text(
-                              'Class: ${currentChild['class']} • ${currentChild['school']}',
-                              style: const TextStyle(fontSize: 12, color: Color(0xFF6B7280)),
-                            ),
-                          ],
-                        ),
-                      ],
+                          ),
+                        ],
+                      ),
                     ),
+                    const SizedBox(width: 8),
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                       decoration: BoxDecoration(
