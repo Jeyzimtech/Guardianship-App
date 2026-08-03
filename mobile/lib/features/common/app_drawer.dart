@@ -234,14 +234,6 @@ class AppDrawer extends StatelessWidget {
                     ),
                   ),
                 ),
-                const SizedBox(height: 12),
-                const Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text('Guardianship © 2026', style: TextStyle(fontSize: 11, color: Color(0xFF6B7280))),
-                    Text('v1.0', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: primaryBlue)),
-                  ],
-                ),
               ],
             ),
           ),
