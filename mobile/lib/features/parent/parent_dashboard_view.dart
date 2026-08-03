@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../dashboard/payments_view.dart';
 import '../dashboard/reports_view.dart';
+import '../dashboard/announcements_view.dart';
 import 'learning_journal_view.dart';
 import 'behaviour_view.dart';
 import 'assignments_view.dart';
@@ -20,7 +21,7 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
   static const secondaryBlue = Color(0xFF5B7BD5);
   static const borderColor = Color(0xFFD8D8D8);
 
-  // Unified Guardian Account Children (across all linked CT Pulse schools)
+  // Unified Guardian Account Children
   int _selectedChildIndex = 0;
 
   final List<Map<String, dynamic>> _mockChildren = [
@@ -32,6 +33,8 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
       'homeroom_teacher': 'Teacher Grace',
       'fee_balance': 0.0,
       'attendance_rate': '96%',
+      'days_present': 58,
+      'total_days': 60,
       'z_score': '+0.45 SD',
       'velocity_status': 'On Track for A-Level',
       'merits_pos': 14,
@@ -45,6 +48,8 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
       'caregiver': 'Amai Tendai',
       'fee_balance': 150.0,
       'attendance_rate': '98%',
+      'days_present': 59,
+      'total_days': 60,
       'z_score': '+0.20 SD',
       'velocity_status': 'On Track for Preparatory',
       'merits_pos': 8,
@@ -58,10 +63,36 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
       'tutor': 'Mr. Moyo',
       'fee_balance': 360.0,
       'attendance_rate': '94%',
+      'days_present': 56,
+      'total_days': 60,
       'z_score': '+0.60 SD',
       'velocity_status': 'On Track for O-Level Distinction',
       'merits_pos': 18,
       'merits_neg': 2,
+    },
+  ];
+
+  final List<Map<String, dynamic>> _schoolAnnouncements = [
+    {
+      'title': 'Term 2 Report Cards & Fee Clearance',
+      'date': 'July 28, 2026',
+      'category': 'URGENT',
+      'category_color': Color(0xFFEF4444),
+      'summary': 'Term 2 academic reports are now compiled. Please ensure fee balances are settled to unlock digital PDF downloads.',
+    },
+    {
+      'title': 'Annual Parent-Teacher Consultation Day',
+      'date': 'August 05, 2026',
+      'category': 'EVENT',
+      'category_color': Color(0xFF3B5998),
+      'summary': 'All parents are invited to consult with homeroom teachers regarding student progress and merits performance.',
+    },
+    {
+      'title': 'School Transportation & Extension Notice',
+      'date': 'August 01, 2026',
+      'category': 'NOTICE',
+      'category_color': Color(0xFF10B981),
+      'summary': 'Updated bus routes and timetable schedules for Term 3 enrollment are now available in the portal.',
     },
   ];
 
@@ -78,14 +109,17 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // 1. Unified Guardian Account & Always-Visible Child Switcher (Section 5.1)
+          // 1. STUDENT PROFILE & CHILD SWITCHER
           Container(
             width: double.infinity,
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.circular(6),
+              borderRadius: BorderRadius.circular(8),
               border: Border.all(color: borderColor),
+              boxShadow: const [
+                BoxShadow(color: Color(0x06000000), blurRadius: 8, offset: Offset(0, 2)),
+              ],
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -96,14 +130,14 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
                     Row(
                       children: [
                         CircleAvatar(
-                          radius: 20,
+                          radius: 22,
                           backgroundColor: secondaryBlue,
                           child: Text(
                             currentChild['name'].toString().substring(0, 1),
-                            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
+                            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18),
                           ),
                         ),
-                        const SizedBox(width: 10),
+                        const SizedBox(width: 12),
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -115,7 +149,7 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
                                 ),
                                 const SizedBox(width: 6),
                                 const Tooltip(
-                                  message: 'Student core identity is read-only for parents and managed by School Admin/Teacher.',
+                                  message: 'Student core identity is verified and managed by School Admin/Teacher.',
                                   child: Icon(Icons.verified_user_rounded, color: Color(0xFF22C55E), size: 16),
                                 ),
                               ],
@@ -130,10 +164,10 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
                       ],
                     ),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                       decoration: BoxDecoration(
                         color: const Color(0xFFEFF6FF),
-                        borderRadius: BorderRadius.circular(4),
+                        borderRadius: BorderRadius.circular(6),
                         border: Border.all(color: const Color(0xFFBFDBFE)),
                       ),
                       child: Text(
@@ -143,15 +177,32 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
                     ),
                   ],
                 ),
-
                 const SizedBox(height: 12),
-                const Text(
-                  'LINKED CHILDREN (Unified Account Across CT Pulse Schools)',
-                  style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFF6B7280), letterSpacing: 0.5),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      'LINKED CHILDREN (Unified Account)',
+                      style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFF6B7280), letterSpacing: 0.5),
+                    ),
+                    InkWell(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (_) => GuardianProfileView(child: currentChild)),
+                        );
+                      },
+                      child: const Row(
+                        children: [
+                          Text('Student Profile', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: primaryBlue)),
+                          Icon(Icons.chevron_right_rounded, size: 14, color: primaryBlue),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 6),
-
-                // Always-Visible Child Switcher Pill Bar
+                // Child Switcher Pill Bar
                 SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   child: Row(
@@ -162,19 +213,19 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
                         onTap: () => setState(() => _selectedChildIndex = index),
                         child: Container(
                           margin: const EdgeInsets.only(right: 8),
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
                           decoration: BoxDecoration(
                             color: isSelected ? primaryBlue : const Color(0xFFF1F5F9),
-                            borderRadius: BorderRadius.circular(4),
+                            borderRadius: BorderRadius.circular(6),
                             border: Border.all(color: isSelected ? primaryBlue : const Color(0xFFCBD5E1)),
                           ),
                           child: Row(
                             children: [
-                              Icon(Icons.child_care_rounded, size: 14, color: isSelected ? Colors.white : const Color(0xFF64748B)),
+                              Icon(Icons.child_care_rounded, size: 15, color: isSelected ? Colors.white : const Color(0xFF64748B)),
                               const SizedBox(width: 6),
                               Text(
                                 child['name'],
-                                style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: isSelected ? Colors.white : const Color(0xFF334155)),
+                                style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: isSelected ? Colors.white : const Color(0xFF334155)),
                               ),
                             ],
                           ),
@@ -188,25 +239,44 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
           ),
           const SizedBox(height: 14),
 
-          // 2. Above-The-Fold Summary KPI Cards (Section 5.2 Module 1)
+          // 2. ATTENDANCE & FEE BALANCES KEY METRICS CARDS
           Row(
             children: [
               Expanded(
-                child: _buildWebKpiCard('ATTENDANCE', currentChild['attendance_rate'] ?? '96%', Icons.fact_check_outlined, const Color(0xFF22C55E)),
+                child: _buildWebKpiCard(
+                  'ATTENDANCE',
+                  currentChild['attendance_rate'] ?? '96%',
+                  '${currentChild['days_present'] ?? 58}/${currentChild['total_days'] ?? 60} Days Present',
+                  Icons.fact_check_outlined,
+                  const Color(0xFF22C55E),
+                  onTap: () {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Attendance Details: ${currentChild['days_present']} of ${currentChild['total_days']} school days attended (${currentChild['attendance_rate']}).')),
+                    );
+                  },
+                ),
               ),
               const SizedBox(width: 10),
               Expanded(
-                child: _buildWebKpiCard('Z-SCORE TREND', currentChild['z_score'] ?? '+0.45 SD', Icons.trending_up_rounded, primaryBlue),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: _buildWebKpiCard('FEE BALANCE', isFeeGated ? 'USD \$${feeBalance.toStringAsFixed(2)}' : 'USD \$0.00', Icons.account_balance_wallet_outlined, isFeeGated ? const Color(0xFFEF4444) : primaryBlue),
+                child: _buildWebKpiCard(
+                  'FEE BALANCE',
+                  isFeeGated ? 'USD \$${feeBalance.toStringAsFixed(2)}' : 'USD \$0.00',
+                  isFeeGated ? 'Balance Due' : 'Paid in Full',
+                  Icons.account_balance_wallet_outlined,
+                  isFeeGated ? const Color(0xFFEF4444) : const Color(0xFF10B981),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const PaymentsView()),
+                    );
+                  },
+                ),
               ),
             ],
           ),
           const SizedBox(height: 14),
 
-          // 3. Required Velocity Engine Banner (Above the Fold)
+          // 3. VELOCITY ENGINE BANNER
           Container(
             width: double.infinity,
             padding: const EdgeInsets.all(12),
@@ -221,7 +291,7 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
-                    'REQUIRED VELOCITY ENGINE: ${currentChild['velocity_status']} • Positive Merits: +${currentChild['merits_pos']}',
+                    'ACADEMIC VELOCITY ENGINE: ${currentChild['velocity_status']} • Positive Merits: +${currentChild['merits_pos']}',
                     style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFF15803D)),
                   ),
                 ),
@@ -230,9 +300,89 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
           ),
           const SizedBox(height: 16),
 
-          // 4. Core Modules Grid (Section 5.2 - 10 MVP Modules)
+          // 4. SCHOOL ANNOUNCEMENTS SECTION
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Row(
+                children: [
+                  Icon(Icons.campaign_rounded, color: primaryBlue, size: 20),
+                  SizedBox(width: 8),
+                  Text(
+                    'School & Class Announcements',
+                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: primaryBlue),
+                  ),
+                ],
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const AnnouncementsView()),
+                  );
+                },
+                child: const Text(
+                  'View All',
+                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: primaryBlue),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 6),
+          Column(
+            children: _schoolAnnouncements.map((notice) {
+              final Color catColor = notice['category_color'] as Color;
+              return Container(
+                margin: const EdgeInsets.only(bottom: 10),
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: borderColor),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                          decoration: BoxDecoration(
+                            color: catColor.withValues(alpha: 0.12),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: Text(
+                            notice['category'],
+                            style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: catColor),
+                          ),
+                        ),
+                        Text(
+                          notice['date'],
+                          style: const TextStyle(fontSize: 11, color: Color(0xFF6B7280)),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      notice['title'],
+                      style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Color(0xFF1F2937)),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      notice['summary'],
+                      style: const TextStyle(fontSize: 12, color: Color(0xFF4B5563), height: 1.3),
+                    ),
+                  ],
+                ),
+              );
+            }).toList(),
+          ),
+          const SizedBox(height: 16),
+
+          // 5. EDU-CONNECT CORE MODULES GRID
           const Text(
-            'Edu-Connect Core Modules (MVP)',
+            'Edu-Connect Services & Features',
             style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: primaryBlue),
           ),
           const SizedBox(height: 10),
@@ -243,7 +393,7 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
             physics: const NeverScrollableScrollPhysics(),
             crossAxisSpacing: 10,
             mainAxisSpacing: 10,
-            childAspectRatio: 1.6,
+            childAspectRatio: 1.55,
             children: [
               _buildEduModuleCard(
                 icon: Icons.auto_stories_rounded,
@@ -282,6 +432,18 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
                 },
               ),
               _buildEduModuleCard(
+                icon: Icons.campaign_rounded,
+                color: const Color(0xFFEC4899),
+                title: 'Announcements',
+                subtitle: 'School & Class Notices',
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const AnnouncementsView()),
+                  );
+                },
+              ),
+              _buildEduModuleCard(
                 icon: Icons.star_rate_rounded,
                 color: const Color(0xFFF59E0B),
                 title: 'Behaviour & Merits',
@@ -307,9 +469,9 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
               ),
               _buildEduModuleCard(
                 icon: Icons.forum_rounded,
-                color: const Color(0xFFEC4899),
+                color: const Color(0xFF0EA5E9),
                 title: 'Messaging & Support',
-                subtitle: 'Auto-Translate & PT Tech',
+                subtitle: 'Direct Teacher Chat',
                 onTap: () {
                   Navigator.push(
                     context,
@@ -319,7 +481,7 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
               ),
               _buildEduModuleCard(
                 icon: Icons.sms_rounded,
-                color: const Color(0xFF0EA5E9),
+                color: const Color(0xFF14B8A6),
                 title: 'SMS Alerts Log',
                 subtitle: 'Econet / Telecel History',
                 onTap: () {
@@ -329,29 +491,17 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
                   );
                 },
               ),
-              _buildEduModuleCard(
-                icon: Icons.person_pin_rounded,
-                color: const Color(0xFF14B8A6),
-                title: 'Guardian Profile',
-                subtitle: 'Paperless Self-Service',
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => GuardianProfileView(child: currentChild)),
-                  );
-                },
-              ),
             ],
           ),
           const SizedBox(height: 16),
 
-          // 5. Official Report Cards Module (Fee-Gated Communication)
+          // 6. OFFICIAL REPORT CARDS MODULE
           Container(
             width: double.infinity,
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.circular(6),
+              borderRadius: BorderRadius.circular(8),
               border: Border.all(color: borderColor),
             ),
             child: Row(
@@ -363,7 +513,7 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
                         color: primaryBlue.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(4),
+                        borderRadius: BorderRadius.circular(6),
                       ),
                       child: const Icon(Icons.assessment_rounded, color: primaryBlue, size: 22),
                     ),
@@ -391,14 +541,15 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: isFeeGated ? const Color(0xFFDC2626) : primaryBlue,
                     foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
                   ),
-                  child: Text(isFeeGated ? 'Unlock' : 'View PDF', style: const TextStyle(fontSize: 11)),
+                  child: Text(isFeeGated ? 'Unlock' : 'View PDF', style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
                 ),
               ],
             ),
           ),
+          const SizedBox(height: 20),
         ],
       ),
     );
@@ -413,12 +564,12 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
   }) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(6),
+      borderRadius: BorderRadius.circular(8),
       child: Container(
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(6),
+          borderRadius: BorderRadius.circular(8),
           border: Border.all(color: const Color(0xFFE2E8F0)),
           boxShadow: [
             BoxShadow(
@@ -464,53 +615,66 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
     );
   }
 
-  Widget _buildWebKpiCard(String label, String value, IconData icon, Color color) {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(4),
-        border: Border.all(color: borderColor),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  label,
-                  style: const TextStyle(
-                    fontSize: 9,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF6B7280),
-                    letterSpacing: 0.5,
+  Widget _buildWebKpiCard(String label, String value, String subtext, IconData icon, Color color, {VoidCallback? onTap}) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(6),
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(6),
+          border: Border.all(color: borderColor),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    label,
+                    style: const TextStyle(
+                      fontSize: 9,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF6B7280),
+                      letterSpacing: 0.5,
+                    ),
+                    overflow: TextOverflow.ellipsis,
                   ),
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  value,
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.bold,
-                    color: color,
+                  const SizedBox(height: 4),
+                  Text(
+                    value,
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      color: color,
+                    ),
+                    overflow: TextOverflow.ellipsis,
                   ),
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ],
+                  const SizedBox(height: 2),
+                  Text(
+                    subtext,
+                    style: const TextStyle(
+                      fontSize: 10,
+                      color: Color(0xFF6B7280),
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
             ),
-          ),
-          Container(
-            padding: const EdgeInsets.all(6),
-            decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(4),
+            Container(
+              padding: const EdgeInsets.all(6),
+              decoration: BoxDecoration(
+                color: color.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(6),
+              ),
+              child: Icon(icon, color: color, size: 20),
             ),
-            child: Icon(icon, color: color, size: 18),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
