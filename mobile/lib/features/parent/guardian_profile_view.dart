@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../../core/auth_provider.dart';
 
 class GuardianProfileView extends StatefulWidget {
   final Map<String, dynamic> child;
@@ -261,6 +263,70 @@ class _GuardianProfileViewState extends State<GuardianProfileView> {
                   ),
                 ),
               ),
+              const SizedBox(height: 16),
+              SizedBox(
+                width: double.infinity,
+                height: 48,
+                child: OutlinedButton.icon(
+                  onPressed: () {
+                    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+                    showDialog(
+                      context: context,
+                      builder: (ctx) => AlertDialog(
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                        title: const Row(
+                          children: [
+                            Icon(Icons.warning_amber_rounded, color: Colors.red, size: 28),
+                            SizedBox(width: 8),
+                            Text('Delete Account', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+                          ],
+                        ),
+                        content: const Text(
+                          'Are you sure you want to permanently delete your account? All profile details will be erased. This action cannot be undone.',
+                          style: TextStyle(fontSize: 14, color: Color(0xFF475569)),
+                        ),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(ctx),
+                            child: const Text('Cancel', style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold)),
+                          ),
+                          ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.red,
+                              foregroundColor: Colors.white,
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                            ),
+                            onPressed: () async {
+                              Navigator.pop(ctx);
+                              final success = await authProvider.deleteAccount();
+                              if (success && context.mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text('Your account has been deleted successfully.'),
+                                    backgroundColor: Colors.red,
+                                  ),
+                                );
+                                Navigator.of(context).popUntil((route) => route.isFirst);
+                              }
+                            },
+                            child: const Text('Delete Account', style: TextStyle(fontWeight: FontWeight.bold)),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                  icon: const Icon(Icons.delete_forever_rounded, color: Colors.red),
+                  label: const Text(
+                    'Delete Account',
+                    style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 15),
+                  ),
+                  style: OutlinedButton.styleFrom(
+                    side: const BorderSide(color: Colors.red),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
             ],
           ),
         ),

@@ -132,4 +132,27 @@ class AuthProvider extends ChangeNotifier {
     
     notifyListeners();
   }
+
+  Future<bool> deleteAccount() async {
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      await apiClient.dio.post('/auth/delete-account');
+    } catch (_) {
+      // Offline fallback
+    }
+
+    _token = null;
+    _user = null;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('auth_token');
+    await prefs.remove('user_name');
+    await prefs.remove('user_role');
+    await prefs.remove('user_phone');
+
+    _isLoading = false;
+    notifyListeners();
+    return true;
+  }
 }
