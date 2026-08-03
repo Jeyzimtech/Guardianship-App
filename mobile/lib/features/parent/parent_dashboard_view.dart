@@ -325,32 +325,13 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
                   ],
                 ),
                 const SizedBox(height: 12),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                const Row(
                   children: [
-                    const Row(
-                      children: [
-                        Icon(Icons.admin_panel_settings_outlined, size: 14, color: Color(0xFF6B7280)),
-                        SizedBox(width: 4),
-                        Text(
-                          'LINKED CHILDREN (ADMIN MANAGED)',
-                          style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFF6B7280), letterSpacing: 0.5),
-                        ),
-                      ],
-                    ),
-                    InkWell(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (_) => GuardianProfileView(child: currentChild)),
-                        );
-                      },
-                      child: const Row(
-                        children: [
-                          Text('Student Profile', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: primaryBlue)),
-                          Icon(Icons.chevron_right_rounded, size: 14, color: primaryBlue),
-                        ],
-                      ),
+                    Icon(Icons.admin_panel_settings_outlined, size: 14, color: Color(0xFF6B7280)),
+                    SizedBox(width: 4),
+                    Text(
+                      'LINKED CHILDREN (ADMIN MANAGED)',
+                      style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFF6B7280), letterSpacing: 0.5),
                     ),
                   ],
                 ),
