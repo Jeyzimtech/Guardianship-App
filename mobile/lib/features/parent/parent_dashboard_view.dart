@@ -96,6 +96,143 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
     },
   ];
 
+  void _showRequestAddStudentDialog(BuildContext context) {
+    final nameController = TextEditingController();
+    final schoolController = TextEditingController();
+    final notesController = TextEditingController();
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) => Padding(
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.of(ctx).viewInsets.bottom + 20,
+          top: 20,
+          left: 20,
+          right: 20,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: primaryBlue.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: const Icon(Icons.admin_panel_settings_rounded, color: primaryBlue, size: 24),
+                ),
+                const SizedBox(width: 12),
+                const Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Add Student to Account',
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Color(0xFF1F2937)),
+                      ),
+                      Text(
+                        'School Admin Verification Required',
+                        style: TextStyle(fontSize: 12, color: Color(0xFF6B7280)),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: const Color(0xFFEFF6FF),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: const Color(0xFFBFDBFE)),
+              ),
+              child: const Row(
+                children: [
+                  Icon(Icons.shield_outlined, color: primaryBlue, size: 20),
+                  SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      'For student security, additional children are added and linked exclusively by the School Administrator. Submit your request below for admin approval.',
+                      style: TextStyle(fontSize: 12, color: Color(0xFF1E40AF), height: 1.3),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: nameController,
+              decoration: const InputDecoration(
+                labelText: 'Student Full Name or ID Number',
+                hintText: 'e.g. Tendai Chewe (Grade 1)',
+                border: OutlineInputBorder(),
+                prefixIcon: Icon(Icons.person_search_rounded),
+              ),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: schoolController,
+              decoration: const InputDecoration(
+                labelText: 'School Name',
+                hintText: 'e.g. Hillside Primary School',
+                border: OutlineInputBorder(),
+                prefixIcon: Icon(Icons.school_rounded),
+              ),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: notesController,
+              decoration: const InputDecoration(
+                labelText: 'Relationship / Notes to Admin',
+                hintText: 'e.g. Parent / Legal Guardian',
+                border: OutlineInputBorder(),
+                prefixIcon: Icon(Icons.note_alt_rounded),
+              ),
+            ),
+            const SizedBox(height: 20),
+            SizedBox(
+              width: double.infinity,
+              height: 48,
+              child: ElevatedButton.icon(
+                onPressed: () {
+                  final name = nameController.text.trim();
+                  if (name.isEmpty) {
+                    ScaffoldMessenger.of(ctx).showSnackBar(
+                      const SnackBar(content: Text('Please enter student name or ID.')),
+                    );
+                    return;
+                  }
+                  Navigator.pop(ctx);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Link request for "$name" submitted to School Admin! You will be notified once approved.'),
+                      backgroundColor: const Color(0xFF10B981),
+                    ),
+                  );
+                },
+                icon: const Icon(Icons.send_rounded, size: 18),
+                label: const Text('Submit Link Request to Admin', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: primaryBlue,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final currentChild = _mockChildren[_selectedChildIndex];
@@ -149,7 +286,7 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
                                 ),
                                 const SizedBox(width: 6),
                                 const Tooltip(
-                                  message: 'Student core identity is verified and managed by School Admin/Teacher.',
+                                  message: 'Student identity is verified and added by School Admin.',
                                   child: Icon(Icons.verified_user_rounded, color: Color(0xFF22C55E), size: 16),
                                 ),
                               ],
@@ -181,9 +318,15 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
-                      'LINKED CHILDREN (Unified Account)',
-                      style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFF6B7280), letterSpacing: 0.5),
+                    const Row(
+                      children: [
+                        Icon(Icons.admin_panel_settings_outlined, size: 14, color: Color(0xFF6B7280)),
+                        SizedBox(width: 4),
+                        Text(
+                          'LINKED CHILDREN (ADMIN MANAGED)',
+                          style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFF6B7280), letterSpacing: 0.5),
+                        ),
+                      ],
                     ),
                     InkWell(
                       onTap: () {
@@ -202,36 +345,60 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
                   ],
                 ),
                 const SizedBox(height: 6),
-                // Child Switcher Pill Bar
+                // Child Switcher Pill Bar + Admin Add Student Pill
                 SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   child: Row(
-                    children: List.generate(_mockChildren.length, (index) {
-                      final child = _mockChildren[index];
-                      final isSelected = index == _selectedChildIndex;
-                      return GestureDetector(
-                        onTap: () => setState(() => _selectedChildIndex = index),
-                        child: Container(
-                          margin: const EdgeInsets.only(right: 8),
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
-                          decoration: BoxDecoration(
-                            color: isSelected ? primaryBlue : const Color(0xFFF1F5F9),
-                            borderRadius: BorderRadius.circular(6),
-                            border: Border.all(color: isSelected ? primaryBlue : const Color(0xFFCBD5E1)),
+                    children: [
+                      ...List.generate(_mockChildren.length, (index) {
+                        final child = _mockChildren[index];
+                        final isSelected = index == _selectedChildIndex;
+                        return GestureDetector(
+                          onTap: () => setState(() => _selectedChildIndex = index),
+                          child: Container(
+                            margin: const EdgeInsets.only(right: 8),
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+                            decoration: BoxDecoration(
+                              color: isSelected ? primaryBlue : const Color(0xFFF1F5F9),
+                              borderRadius: BorderRadius.circular(6),
+                              border: Border.all(color: isSelected ? primaryBlue : const Color(0xFFCBD5E1)),
+                            ),
+                            child: Row(
+                              children: [
+                                Icon(Icons.child_care_rounded, size: 15, color: isSelected ? Colors.white : const Color(0xFF64748B)),
+                                const SizedBox(width: 6),
+                                Text(
+                                  child['name'],
+                                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: isSelected ? Colors.white : const Color(0xFF334155)),
+                                ),
+                              ],
+                            ),
                           ),
-                          child: Row(
+                        );
+                      }),
+                      // Dashed / Outlined Admin Add Student Button
+                      GestureDetector(
+                        onTap: () => _showRequestAddStudentDialog(context),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(6),
+                            border: Border.all(color: primaryBlue, width: 1.2),
+                          ),
+                          child: const Row(
                             children: [
-                              Icon(Icons.child_care_rounded, size: 15, color: isSelected ? Colors.white : const Color(0xFF64748B)),
-                              const SizedBox(width: 6),
+                              Icon(Icons.person_add_alt_1_rounded, size: 15, color: primaryBlue),
+                              SizedBox(width: 4),
                               Text(
-                                child['name'],
-                                style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: isSelected ? Colors.white : const Color(0xFF334155)),
+                                '+ Add Child (Admin Link)',
+                                style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: primaryBlue),
                               ),
                             ],
                           ),
                         ),
-                      );
-                    }),
+                      ),
+                    ],
                   ),
                 ),
               ],
