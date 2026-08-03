@@ -1067,12 +1067,6 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" onclick="switchTab('attendance')">
-                        <img src="/assets/icons8-attendance.svg" alt="Attendance">
-                        <span>Attendance</span>
-                    </a>
-                </li>
-                <li class="nav-item">
                     <a class="nav-link" onclick="switchTab('payments')">
                         <img src="/assets/icons8-wallet.svg" alt="Payments & Fees">
                         <span>Payments & Fees</span>

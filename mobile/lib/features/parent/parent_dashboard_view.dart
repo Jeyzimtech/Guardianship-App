@@ -444,29 +444,7 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
           ),
           const SizedBox(height: 14),
 
-          // 3. VELOCITY ENGINE BANNER
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: const Color(0xFFF0FDF4),
-              borderRadius: BorderRadius.circular(6),
-              border: Border.all(color: const Color(0xFF86EFAC)),
-            ),
-            child: Row(
-              children: [
-                const Icon(Icons.bolt_rounded, color: Color(0xFF16A34A), size: 20),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    'ACADEMIC VELOCITY ENGINE: ${currentChild['velocity_status']} • Positive Merits: +${currentChild['merits_pos']}',
-                    style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFF15803D)),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 16),
+
 
           // 4. SCHOOL ANNOUNCEMENTS SECTION
           Row(
