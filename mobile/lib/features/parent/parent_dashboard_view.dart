@@ -23,6 +23,14 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
   // Unified Guardian Account Children
   int _selectedChildIndex = 0;
 
+  void selectChild(int index) {
+    if (index >= 0 && index < _mockChildren.length) {
+      setState(() {
+        _selectedChildIndex = index;
+      });
+    }
+  }
+
   final List<Map<String, dynamic>> _mockChildren = [
     {
       'name': 'Alice Chewe',
