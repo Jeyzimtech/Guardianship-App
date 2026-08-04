@@ -5,7 +5,6 @@ import '../dashboard/announcements_view.dart';
 import 'learning_journal_view.dart';
 import 'behaviour_view.dart';
 import 'assignments_view.dart';
-import 'guardian_profile_view.dart';
 import 'sms_alerts_log_view.dart';
 import 'messaging_view.dart';
 import 'uniform_marketplace_view.dart';
@@ -19,7 +18,6 @@ class ParentDashboardView extends StatefulWidget {
 
 class _ParentDashboardViewState extends State<ParentDashboardView> {
   static const primaryBlue = Color(0xFF3B5998);
-  static const secondaryBlue = Color(0xFF5B7BD5);
   static const borderColor = Color(0xFFD8D8D8);
 
   // Unified Guardian Account Children
@@ -237,7 +235,6 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
   @override
   Widget build(BuildContext context) {
     final currentChild = _mockChildren[_selectedChildIndex];
-    final childTier = currentChild['tier'] as String;
     final feeBalance = currentChild['fee_balance'] as double;
     final isFeeGated = feeBalance > 0;
 
@@ -489,6 +486,15 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
                     context,
                     MaterialPageRoute(builder: (_) => UniformMarketplaceView(child: currentChild)),
                   );
+                },
+              ),
+              _buildEduModuleCard(
+                icon: Icons.person_add_alt_1_rounded,
+                color: primaryBlue,
+                title: 'Link Student',
+                subtitle: 'Request Child Account Link',
+                onTap: () {
+                  _showRequestAddStudentDialog(context);
                 },
               ),
             ],
