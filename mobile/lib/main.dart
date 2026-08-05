@@ -59,11 +59,11 @@ class EduConectApp extends StatelessWidget {
           ),
         ),
         useMaterial3: true,
-        cardTheme: CardThemeData(
+        cardTheme: const CardThemeData(
           color: backgroundColor,
           elevation: 0,
-          shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.zero,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(10)),
             side: BorderSide(color: borderColor, width: 1.0),
           ),
         ),
@@ -81,8 +81,8 @@ class EduConectApp extends StatelessWidget {
             foregroundColor: Colors.white,
             elevation: 0,
             padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-            shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.zero,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
             ),
             textStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
           ),
