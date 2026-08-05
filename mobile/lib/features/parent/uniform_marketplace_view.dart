@@ -17,6 +17,7 @@ class _UniformMarketplaceViewState extends State<UniformMarketplaceView> with Si
 
   late TabController _tabController;
   String _selectedCategory = 'All';
+  String _searchQuery = '';
 
   // Uniform Catalog Data
   final List<Map<String, dynamic>> _catalog = [
@@ -499,9 +500,13 @@ class _UniformMarketplaceViewState extends State<UniformMarketplaceView> with Si
     final childName = widget.child?['name'] ?? 'Alice Chewe';
     final childSchool = widget.child?['school'] ?? 'Hillside Primary School';
 
-    final filteredCatalog = _selectedCategory == 'All'
-        ? _catalog
-        : _catalog.where((item) => item['category'] == _selectedCategory).toList();
+    final filteredCatalog = _catalog.where((item) {
+      final matchesCat = _selectedCategory == 'All' || item['category'] == _selectedCategory;
+      final matchesSearch = _searchQuery.isEmpty ||
+          (item['name'] as String).toLowerCase().contains(_searchQuery.toLowerCase()) ||
+          (item['description'] as String).toLowerCase().contains(_searchQuery.toLowerCase());
+      return matchesCat && matchesSearch;
+    }).toList();
 
     return Scaffold(
       backgroundColor: const Color(0xFFF8FAFC),
@@ -607,6 +612,34 @@ class _UniformMarketplaceViewState extends State<UniformMarketplaceView> with Si
                   ),
                 ),
                 const SizedBox(height: 14),
+
+                // Search Bar
+                TextField(
+                  onChanged: (val) => setState(() => _searchQuery = val.trim()),
+                  decoration: InputDecoration(
+                    hintText: 'Search uniforms, sizes, or items...',
+                    hintStyle: const TextStyle(fontSize: 13, color: Color(0xFF94A3B8)),
+                    prefixIcon: const Icon(Icons.search_rounded, color: primaryBlue, size: 20),
+                    suffixIcon: _searchQuery.isNotEmpty
+                        ? IconButton(
+                            icon: const Icon(Icons.clear_rounded, size: 18),
+                            onPressed: () => setState(() => _searchQuery = ''),
+                          )
+                        : null,
+                    filled: true,
+                    fillColor: Colors.white,
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: const BorderSide(color: borderColor),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: const BorderSide(color: borderColor),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
 
                 // Category Filter Pills
                 SingleChildScrollView(
