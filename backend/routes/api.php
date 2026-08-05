@@ -83,8 +83,9 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('/teachers/{id}', [TeacherController::class, 'destroy']);
     });
 
-    // Students List
+    // Students List & Linking
     Route::get('/students', [StudentController::class, 'index']);
+    Route::post('/students/request-link', [StudentController::class, 'requestLink']);
     Route::middleware('role:admin,website_admin')->group(function () {
         Route::post('/students', [StudentController::class, 'store']);
         Route::post('/students/link-guardian', [StudentController::class, 'linkGuardian']);
