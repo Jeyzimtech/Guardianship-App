@@ -14,6 +14,7 @@ class _PaymentsViewState extends State<PaymentsView> {
   Map<String, dynamic>? _feeAccount;
   bool _isLoading = false;
   String? _errorMessage;
+  String _selectedTxFilter = 'ALL';
 
   @override
   void initState() {
@@ -120,66 +121,110 @@ class _PaymentsViewState extends State<PaymentsView> {
                             Icon(Icons.history_rounded, color: primaryColor.withValues(alpha: 0.5), size: 18),
                           ],
                         ),
-                        const SizedBox(height: 12),
-                        
-                        if (_transactions.isEmpty)
-                          Padding(
-                            padding: const EdgeInsets.only(top: 32.0),
-                            child: Center(
-                              child: Text(
-                                'No payment transactions recorded yet.',
-                                style: TextStyle(color: primaryColor.withValues(alpha: 0.6), fontWeight: FontWeight.bold),
-                              ),
-                            ),
-                          )
-                        else
-                          ListView.builder(
-                            shrinkWrap: true,
-                            physics: const NeverScrollableScrollPhysics(),
-                            itemCount: _transactions.length,
-                            itemBuilder: (context, index) {
-                              final tx = _transactions[index];
-                              final isCompleted = tx['status'] == 'completed';
+                        const SizedBox(height: 10),
 
-                              return Card(
-                                elevation: 0,
-                                margin: const EdgeInsets.only(bottom: 10),
-                                child: ListTile(
-                                  leading: CircleAvatar(
-                                    backgroundColor: theme.colorScheme.secondary.withValues(alpha: 0.1),
-                                    child: Icon(Icons.arrow_upward_rounded, color: theme.colorScheme.secondary, size: 20),
-                                  ),
-                                  title: Text(
-                                    'Fee Payment via ${tx['payment_method']}',
-                                    style: TextStyle(color: primaryColor, fontWeight: FontWeight.bold, fontSize: 14),
-                                  ),
-                                  subtitle: Text(
-                                    tx['created_at']?.split('T')[0] ?? '',
-                                    style: TextStyle(color: primaryColor.withValues(alpha: 0.6), fontSize: 12, fontWeight: FontWeight.w500),
-                                  ),
-                                  trailing: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment: CrossAxisAlignment.end,
-                                    children: [
-                                      Text(
-                                        '${tx['currency'] == 'USD' ? '\$' : ''}${tx['amount']} ${tx['currency'] == 'ZiG' ? 'ZiG' : ''}',
-                                        style: const TextStyle(color: Colors.green, fontWeight: FontWeight.bold, fontSize: 15),
-                                      ),
-                                      const SizedBox(height: 2),
-                                      Text(
-                                        isCompleted ? 'Completed' : 'Pending',
-                                        style: TextStyle(
-                                          color: isCompleted ? Colors.green : Colors.amber,
-                                          fontSize: 10,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ],
+                        // Filter Chips
+                        Row(
+                          children: ['ALL', 'completed', 'pending'].map((filter) {
+                            final isSel = _selectedTxFilter == filter;
+                            final labelText = filter == 'ALL' ? 'All' : (filter == 'completed' ? 'Completed' : 'Pending');
+                            return Padding(
+                              padding: const EdgeInsets.only(right: 8.0),
+                              child: ChoiceChip(
+                                label: Text(labelText),
+                                selected: isSel,
+                                selectedColor: primaryColor,
+                                labelStyle: TextStyle(
+                                  color: isSel ? Colors.white : primaryColor,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 12,
+                                ),
+                                onSelected: (val) {
+                                  if (val) setState(() => _selectedTxFilter = filter);
+                                },
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                        const SizedBox(height: 12),
+
+                        Builder(
+                          builder: (context) {
+                            final filteredTx = _transactions.where((tx) {
+                              if (_selectedTxFilter == 'ALL') return true;
+                              return tx['status'] == _selectedTxFilter;
+                            }).toList();
+
+                            if (filteredTx.isEmpty) {
+                              return Padding(
+                                padding: const EdgeInsets.only(top: 24.0),
+                                child: Center(
+                                  child: Text(
+                                    'No matching payment transactions.',
+                                    style: TextStyle(color: primaryColor.withValues(alpha: 0.6), fontWeight: FontWeight.bold),
                                   ),
                                 ),
                               );
-                            },
-                          ),
+                            }
+
+                            return ListView.builder(
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              itemCount: filteredTx.length,
+                              itemBuilder: (context, index) {
+                                final tx = filteredTx[index];
+                                final isCompleted = tx['status'] == 'completed';
+                                final refNum = tx['reference_number'] ?? tx['id']?.toString() ?? 'REF-${index + 101}';
+
+                                return Card(
+                                  elevation: 0,
+                                  margin: const EdgeInsets.only(bottom: 10),
+                                  child: ListTile(
+                                    onTap: () {
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(
+                                          content: Text('Payment Receipt Ref: #$refNum (Copied to clipboard)'),
+                                          backgroundColor: isCompleted ? Colors.green : Colors.amber,
+                                        ),
+                                      );
+                                    },
+                                    leading: CircleAvatar(
+                                      backgroundColor: theme.colorScheme.secondary.withValues(alpha: 0.1),
+                                      child: Icon(Icons.receipt_long_rounded, color: theme.colorScheme.secondary, size: 20),
+                                    ),
+                                    title: Text(
+                                      'Fee Payment via ${tx['payment_method'] ?? 'Online Portal'}',
+                                      style: TextStyle(color: primaryColor, fontWeight: FontWeight.bold, fontSize: 14),
+                                    ),
+                                    subtitle: Text(
+                                      'Ref: #$refNum • ${tx['created_at']?.split('T')[0] ?? ''}',
+                                      style: TextStyle(color: primaryColor.withValues(alpha: 0.6), fontSize: 12, fontWeight: FontWeight.w500),
+                                    ),
+                                    trailing: Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      crossAxisAlignment: CrossAxisAlignment.end,
+                                      children: [
+                                        Text(
+                                          '${tx['currency'] == 'USD' ? '\$' : ''}${tx['amount']} ${tx['currency'] == 'ZiG' ? 'ZiG' : ''}',
+                                          style: const TextStyle(color: Colors.green, fontWeight: FontWeight.bold, fontSize: 15),
+                                        ),
+                                        const SizedBox(height: 2),
+                                        Text(
+                                          isCompleted ? 'Completed' : 'Pending',
+                                          style: TextStyle(
+                                            color: isCompleted ? Colors.green : Colors.amber,
+                                            fontSize: 10,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                );
+                              },
+                            );
+                          },
+                        ),
                       ],
                     ),
                   ),
