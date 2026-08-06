@@ -191,7 +191,8 @@ class AppDrawer extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Color(0xFF1F2937)), overflow: TextOverflow.ellipsis),
-                            Text(roleLabel, style: const TextStyle(fontSize: 11, color: Color(0xFF6B7280))),
+                            if (isTeacher)
+                              const Text('Class Teacher', style: TextStyle(fontSize: 11, color: Color(0xFF6B7280))),
                           ],
                         ),
                       ),

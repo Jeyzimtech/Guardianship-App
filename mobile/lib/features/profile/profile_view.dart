@@ -310,35 +310,38 @@ class ProfileView extends StatelessWidget {
               style: TextStyle(fontSize: 14, color: Colors.grey.shade600),
             ),
             const SizedBox(height: 16),
-            // Role Tag Pill
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-              decoration: BoxDecoration(
-                color: const Color(0xFFEFF6FF),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: const Color(0xFFBFDBFE)),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    isTeacher ? Icons.badge_outlined : Icons.family_restroom_rounded,
-                    size: 18,
-                    color: primaryBlue,
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    roleTitle,
-                    style: const TextStyle(
+            if (isTeacher) ...[
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFEFF6FF),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: const Color(0xFFBFDBFE)),
+                ),
+                child: const Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.badge_outlined,
+                      size: 18,
                       color: primaryBlue,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 14,
                     ),
-                  ),
-                ],
+                    SizedBox(width: 8),
+                    Text(
+                      'Class Teacher',
+                      style: TextStyle(
+                        color: primaryBlue,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
-            const SizedBox(height: 28),
+              const SizedBox(height: 28),
+            ] else ...[
+              const SizedBox(height: 16),
+            ],
 
             // Edit Profile Button
             SizedBox(
