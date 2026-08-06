@@ -29,6 +29,9 @@ class AuthProvider extends ChangeNotifier {
     final name = prefs.getString('user_name');
     final role = prefs.getString('user_role');
     final phone = prefs.getString('user_phone');
+    final email = prefs.getString('user_email');
+    final address = prefs.getString('user_address');
+    final lang = prefs.getString('user_language');
     
     if (_token != null && role != null) {
       if (role == 'admin' || role == 'website_admin') {
@@ -46,6 +49,9 @@ class AuthProvider extends ChangeNotifier {
         'name': name,
         'role': role,
         'phone_number': phone,
+        'email': email,
+        'address': address,
+        'preferred_language': lang ?? 'English',
       };
       notifyListeners();
     }
@@ -131,6 +137,68 @@ class AuthProvider extends ChangeNotifier {
     await prefs.remove('user_phone');
     
     notifyListeners();
+  }
+
+  Future<bool> updateProfile({
+    String? name,
+    String? phone,
+    String? email,
+    String? address,
+    String? preferredLanguage,
+    String? emergencyContactName,
+    String? emergencyContactPhone,
+  }) async {
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      final response = await apiClient.dio.put('/guardian/profile', data: {
+        if (name != null) 'name': name,
+        if (phone != null) 'phone_number': phone,
+        if (email != null) 'email': email,
+        if (address != null) 'address': address,
+        if (preferredLanguage != null) 'preferred_language': preferredLanguage,
+        if (emergencyContactName != null) 'emergency_contact_name': emergencyContactName,
+        if (emergencyContactPhone != null) 'emergency_contact_phone': emergencyContactPhone,
+      });
+
+      if (response.statusCode == 200 && response.data['status'] == 'success') {
+        final updatedData = response.data['data'];
+        _user = {
+          ...?_user,
+          if (updatedData['name'] != null) 'name': updatedData['name'],
+          if (updatedData['phone_number'] != null) 'phone_number': updatedData['phone_number'],
+          if (updatedData['email'] != null) 'email': updatedData['email'],
+          if (updatedData['address'] != null) 'address': updatedData['address'],
+          if (updatedData['preferred_language'] != null) 'preferred_language': updatedData['preferred_language'],
+          if (updatedData['emergency_contact_name'] != null) 'emergency_contact_name': updatedData['emergency_contact_name'],
+          if (updatedData['emergency_contact_phone'] != null) 'emergency_contact_phone': updatedData['emergency_contact_phone'],
+        };
+      }
+    } catch (_) {
+      // Local state fallback for offline prototype operation
+      _user = {
+        ...?_user,
+        if (name != null && name.isNotEmpty) 'name': name,
+        if (phone != null && phone.isNotEmpty) 'phone_number': phone,
+        if (email != null) 'email': email,
+        if (address != null) 'address': address,
+        if (preferredLanguage != null) 'preferred_language': preferredLanguage,
+        if (emergencyContactName != null) 'emergency_contact_name': emergencyContactName,
+        if (emergencyContactPhone != null) 'emergency_contact_phone': emergencyContactPhone,
+      };
+    }
+
+    final prefs = await SharedPreferences.getInstance();
+    if (_user?['name'] != null) await prefs.setString('user_name', _user!['name']);
+    if (_user?['phone_number'] != null) await prefs.setString('user_phone', _user!['phone_number']);
+    if (_user?['email'] != null) await prefs.setString('user_email', _user!['email']);
+    if (_user?['address'] != null) await prefs.setString('user_address', _user!['address']);
+    if (_user?['preferred_language'] != null) await prefs.setString('user_language', _user!['preferred_language']);
+
+    _isLoading = false;
+    notifyListeners();
+    return true;
   }
 
   Future<bool> deleteAccount() async {

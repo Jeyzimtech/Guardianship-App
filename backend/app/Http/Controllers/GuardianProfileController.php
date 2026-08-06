@@ -37,6 +37,8 @@ class GuardianProfileController extends Controller
         $user = $request->user();
 
         $validated = $request->validate([
+            'name' => 'nullable|string|max:255',
+            'phone_number' => 'nullable|string|max:50',
             'email' => 'nullable|email|max:255',
             'address' => 'nullable|string|max:500',
             'preferred_language' => 'nullable|string|max:50',
@@ -45,6 +47,8 @@ class GuardianProfileController extends Controller
         ]);
 
         $user->update(array_filter([
+            'name' => $validated['name'] ?? $user->name,
+            'phone_number' => $validated['phone_number'] ?? $user->phone_number,
             'email' => $validated['email'] ?? $user->email,
             'address' => $validated['address'] ?? $user->address,
             'preferred_language' => $validated['preferred_language'] ?? $user->preferred_language,

@@ -8,6 +8,216 @@ class ProfileView extends StatelessWidget {
   final bool showAppBar;
   const ProfileView({super.key, this.showAppBar = true});
 
+  void _showEditProfileDialog(BuildContext context, AuthProvider authProvider) {
+    final user = authProvider.user;
+    final nameController = TextEditingController(text: user?['name'] ?? '');
+    final phoneController = TextEditingController(text: user?['phone_number'] ?? '');
+    final emailController = TextEditingController(text: user?['email'] ?? '');
+    final addressController = TextEditingController(text: user?['address'] ?? '');
+    final emergencyNameController = TextEditingController(text: user?['emergency_contact_name'] ?? '');
+    final emergencyPhoneController = TextEditingController(text: user?['emergency_contact_phone'] ?? '');
+    String selectedLanguage = user?['preferred_language'] ?? 'English';
+
+    final languages = ['English', 'Shona', 'Ndebele', 'French', 'Portuguese'];
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) => StatefulBuilder(
+        builder: (context, setModalState) {
+          return Padding(
+            padding: EdgeInsets.only(
+              left: 20,
+              right: 20,
+              top: 20,
+              bottom: MediaQuery.of(ctx).viewInsets.bottom + 20,
+            ),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Center(
+                    child: Container(
+                      width: 40,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade300,
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    children: [
+                      const Icon(Icons.edit_note_rounded, color: Color(0xFF2563EB), size: 28),
+                      const SizedBox(width: 8),
+                      const Text(
+                        'Edit Profile Information',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF0B2144),
+                        ),
+                      ),
+                      const Spacer(),
+                      IconButton(
+                        icon: const Icon(Icons.close),
+                        onPressed: () => Navigator.pop(ctx),
+                      ),
+                    ],
+                  ),
+                  const Divider(),
+                  const SizedBox(height: 12),
+
+                  // Full Name
+                  TextField(
+                    controller: nameController,
+                    decoration: InputDecoration(
+                      labelText: 'Full Name',
+                      prefixIcon: const Icon(Icons.person_outline),
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+
+                  // Phone Number
+                  TextField(
+                    controller: phoneController,
+                    keyboardType: TextInputType.phone,
+                    decoration: InputDecoration(
+                      labelText: 'Phone Number',
+                      prefixIcon: const Icon(Icons.phone_outlined),
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+
+                  // Email
+                  TextField(
+                    controller: emailController,
+                    keyboardType: TextInputType.emailAddress,
+                    decoration: InputDecoration(
+                      labelText: 'Email Address',
+                      prefixIcon: const Icon(Icons.email_outlined),
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+
+                  // Physical Address
+                  TextField(
+                    controller: addressController,
+                    maxLines: 2,
+                    decoration: InputDecoration(
+                      labelText: 'Home / Postal Address',
+                      prefixIcon: const Icon(Icons.location_on_outlined),
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+
+                  // Preferred Language
+                  DropdownButtonFormField<String>(
+                    value: languages.contains(selectedLanguage) ? selectedLanguage : languages.first,
+                    decoration: InputDecoration(
+                      labelText: 'Preferred Language',
+                      prefixIcon: const Icon(Icons.language_rounded),
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+                    ),
+                    items: languages.map((lang) {
+                      return DropdownMenuItem(value: lang, child: Text(lang));
+                    }).toList(),
+                    onChanged: (val) {
+                      if (val != null) {
+                        setModalState(() {
+                          selectedLanguage = val;
+                        });
+                      }
+                    },
+                  ),
+                  const SizedBox(height: 12),
+
+                  // Emergency Contact Name
+                  TextField(
+                    controller: emergencyNameController,
+                    decoration: InputDecoration(
+                      labelText: 'Emergency Contact Name',
+                      prefixIcon: const Icon(Icons.contact_phone_outlined),
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+
+                  // Emergency Contact Phone
+                  TextField(
+                    controller: emergencyPhoneController,
+                    keyboardType: TextInputType.phone,
+                    decoration: InputDecoration(
+                      labelText: 'Emergency Contact Phone',
+                      prefixIcon: const Icon(Icons.emergency_outlined),
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+
+                  // Submit Button
+                  SizedBox(
+                    width: double.infinity,
+                    height: 48,
+                    child: ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF2563EB),
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                      ),
+                      onPressed: () async {
+                        final navigator = Navigator.of(ctx);
+                        final scaffoldMessenger = ScaffoldMessenger.of(context);
+                        final success = await authProvider.updateProfile(
+                          name: nameController.text.trim(),
+                          phone: phoneController.text.trim(),
+                          email: emailController.text.trim(),
+                          address: addressController.text.trim(),
+                          preferredLanguage: selectedLanguage,
+                          emergencyContactName: emergencyNameController.text.trim(),
+                          emergencyContactPhone: emergencyPhoneController.text.trim(),
+                        );
+
+                        if (success) {
+                          navigator.pop();
+                          scaffoldMessenger.showSnackBar(
+                            const SnackBar(
+                              content: Text('Profile updated successfully!'),
+                              backgroundColor: Color(0xFF10B981),
+                            ),
+                          );
+                        }
+                      },
+                      icon: const Icon(Icons.check_circle_outline),
+                      label: const Text('Save Profile Changes', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final authProvider = Provider.of<AuthProvider>(context);
@@ -42,6 +252,13 @@ class ProfileView extends StatelessWidget {
                   fontWeight: FontWeight.bold,
                 ),
               ),
+              actions: [
+                IconButton(
+                  icon: const Icon(Icons.edit_rounded, color: primaryBlue),
+                  tooltip: 'Edit Profile',
+                  onPressed: () => _showEditProfileDialog(context, authProvider),
+                ),
+              ],
             )
           : null,
       body: SingleChildScrollView(
@@ -80,6 +297,13 @@ class ProfileView extends StatelessWidget {
               user?['phone_number'] ?? defaultPhone,
               style: TextStyle(fontSize: 14, color: Colors.grey.shade600),
             ),
+            if (user?['email'] != null && (user!['email'] as String).isNotEmpty) ...[
+              const SizedBox(height: 2),
+              Text(
+                user['email'],
+                style: TextStyle(fontSize: 13, color: Colors.grey.shade600),
+              ),
+            ],
             const SizedBox(height: 2),
             Text(
               'Queens High School',
@@ -116,7 +340,24 @@ class ProfileView extends StatelessWidget {
             ),
             const SizedBox(height: 28),
 
-            const SizedBox(height: 24),
+            // Edit Profile Button
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                onPressed: () => _showEditProfileDialog(context, authProvider),
+                icon: const Icon(Icons.edit_rounded),
+                label: const Text('Edit Profile Details', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: primaryBlue,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                  elevation: 1,
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+
             if (isTeacher) ...[
               SizedBox(
                 width: double.infinity,
