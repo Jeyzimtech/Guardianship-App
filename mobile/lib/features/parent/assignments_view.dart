@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
 class AssignmentsView extends StatelessWidget {
-  final Map<String, dynamic> child;
+  final Map<String, dynamic>? child;
 
-  const AssignmentsView({super.key, required this.child});
+  const AssignmentsView({super.key, this.child});
 
   static const primaryBlue = Color(0xFF3B5998);
 

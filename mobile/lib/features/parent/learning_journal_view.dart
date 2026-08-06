@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
 class LearningJournalView extends StatefulWidget {
-  final Map<String, dynamic> child;
+  final Map<String, dynamic>? child;
 
-  const LearningJournalView({super.key, required this.child});
+  const LearningJournalView({super.key, this.child});
 
   @override
   State<LearningJournalView> createState() => _LearningJournalViewState();
@@ -20,8 +20,14 @@ class _LearningJournalViewState extends State<LearningJournalView> {
   @override
   void initState() {
     super.initState();
-    final childName = widget.child['name'] ?? 'Child';
-    final isPrep = (widget.child['tier'] == 'preparatory') || childName.contains('Alice') || childName.contains('Timothy');
+    final activeChild = widget.child ?? {
+      'name': 'Alice Chewe',
+      'class': 'Grade 4 Gold',
+      'tier': 'primary',
+      'school': 'Hillside Primary School',
+    };
+    final childName = activeChild['name'] ?? 'Child';
+    final isPrep = (activeChild['tier'] == 'preparatory') || childName.contains('Alice') || childName.contains('Timothy');
 
     _mockEntries = [
       if (isPrep) ...[

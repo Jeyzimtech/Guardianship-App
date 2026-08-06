@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
 class BehaviourView extends StatelessWidget {
-  final Map<String, dynamic> child;
+  final Map<String, dynamic>? child;
 
-  const BehaviourView({super.key, required this.child});
+  const BehaviourView({super.key, this.child});
 
   static const primaryBlue = Color(0xFF3B5998);
 
