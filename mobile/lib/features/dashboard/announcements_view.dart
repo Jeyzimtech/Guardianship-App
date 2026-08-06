@@ -16,6 +16,8 @@ class _AnnouncementsViewState extends State<AnnouncementsView> {
   String _searchQuery = '';
   String _selectedAudienceFilter = 'ALL';
 
+  static const primaryBlue = Color(0xFF3B5998);
+
   @override
   void initState() {
     super.initState();
@@ -44,7 +46,7 @@ class _AnnouncementsViewState extends State<AnnouncementsView> {
           {
             'audience_role': 'all',
             'created_at': '2026-07-14',
-            'title': 'Welcome to Edu+Conect!',
+            'title': 'Welcome to Upenyu Portal!',
             'content': 'We are pleased to launch the new school communication portal for all parents and teachers.',
           },
           {
@@ -71,7 +73,6 @@ class _AnnouncementsViewState extends State<AnnouncementsView> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final primaryColor = theme.primaryColor;
 
     final filteredAnnouncements = _announcements.where((alert) {
       final audience = (alert['audience_role'] ?? 'all').toString().toUpperCase();
@@ -85,25 +86,46 @@ class _AnnouncementsViewState extends State<AnnouncementsView> {
     }).toList();
 
     return Scaffold(
-      backgroundColor: Colors.transparent,
+      backgroundColor: const Color(0xFFF8FAFC),
+      appBar: AppBar(
+        backgroundColor: primaryBlue,
+        elevation: 1,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () {
+            if (Navigator.canPop(context)) {
+              Navigator.pop(context);
+            }
+          },
+        ),
+        title: const Text(
+          'Announcements & Notices',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
       body: _isLoading
-          ? Center(child: CircularProgressIndicator(color: primaryColor))
+          ? const Center(child: CircularProgressIndicator(color: primaryBlue))
           : _errorMessage != null
-              ? Center(child: Text(_errorMessage!, style: TextStyle(color: primaryColor, fontWeight: FontWeight.bold)))
+              ? Center(child: Text(_errorMessage!, style: const TextStyle(color: primaryBlue, fontWeight: FontWeight.bold)))
               : RefreshIndicator(
                   onRefresh: _fetchAnnouncements,
-                  color: primaryColor,
+                  color: primaryBlue,
                   child: Column(
                     children: [
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+                      Container(
+                        color: Colors.white,
+                        padding: const EdgeInsets.fromLTRB(16, 14, 16, 12),
                         child: Column(
                           children: [
                             TextField(
                               onChanged: (val) => setState(() => _searchQuery = val.trim()),
                               decoration: InputDecoration(
                                 hintText: 'Search announcements...',
-                                prefixIcon: Icon(Icons.search_rounded, color: primaryColor),
+                                prefixIcon: const Icon(Icons.search_rounded, color: primaryBlue),
                                 suffixIcon: _searchQuery.isNotEmpty
                                     ? IconButton(
                                         icon: const Icon(Icons.clear_rounded, size: 18),
@@ -111,12 +133,19 @@ class _AnnouncementsViewState extends State<AnnouncementsView> {
                                       )
                                     : null,
                                 filled: true,
-                                fillColor: Colors.white,
+                                fillColor: const Color(0xFFF1F5F9),
                                 contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                                border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                  borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                  borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+                                ),
                               ),
                             ),
-                            const SizedBox(height: 10),
+                            const SizedBox(height: 12),
                             SingleChildScrollView(
                               scrollDirection: Axis.horizontal,
                               child: Row(
@@ -127,9 +156,10 @@ class _AnnouncementsViewState extends State<AnnouncementsView> {
                                     child: ChoiceChip(
                                       label: Text(role == 'ALL' ? 'All Roles' : role),
                                       selected: isSelected,
-                                      selectedColor: primaryColor,
+                                      selectedColor: primaryBlue,
+                                      backgroundColor: const Color(0xFFF1F5F9),
                                       labelStyle: TextStyle(
-                                        color: isSelected ? Colors.white : primaryColor,
+                                        color: isSelected ? Colors.white : primaryBlue,
                                         fontWeight: FontWeight.bold,
                                         fontSize: 12,
                                       ),
@@ -144,6 +174,7 @@ class _AnnouncementsViewState extends State<AnnouncementsView> {
                           ],
                         ),
                       ),
+                      const SizedBox(height: 8),
                       Expanded(
                         child: ListView.builder(
                           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -155,11 +186,11 @@ class _AnnouncementsViewState extends State<AnnouncementsView> {
                                   padding: const EdgeInsets.only(top: 60.0),
                                   child: Column(
                                     children: [
-                                      Icon(Icons.campaign_outlined, size: 64, color: primaryColor.withValues(alpha: 0.3)),
+                                      Icon(Icons.campaign_outlined, size: 64, color: primaryBlue.withValues(alpha: 0.3)),
                                       const SizedBox(height: 16),
                                       Text(
                                         'No matching announcements.',
-                                        style: TextStyle(color: primaryColor.withValues(alpha: 0.6), fontWeight: FontWeight.bold),
+                                        style: TextStyle(color: primaryBlue.withValues(alpha: 0.6), fontWeight: FontWeight.bold),
                                       ),
                                     ],
                                   ),
@@ -171,8 +202,13 @@ class _AnnouncementsViewState extends State<AnnouncementsView> {
                             final audience = alert['audience_role'] ?? 'all';
 
                             return Card(
-                              margin: const EdgeInsets.only(bottom: 14),
+                              margin: const EdgeInsets.only(bottom: 12),
                               elevation: 0,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                side: const BorderSide(color: Color(0xFFE2E8F0)),
+                              ),
+                              color: Colors.white,
                               child: Padding(
                                 padding: const EdgeInsets.all(16.0),
                                 child: Column(
@@ -184,30 +220,30 @@ class _AnnouncementsViewState extends State<AnnouncementsView> {
                                         Container(
                                           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                                           decoration: BoxDecoration(
-                                            color: theme.colorScheme.secondary.withValues(alpha: 0.08),
+                                            color: const Color(0xFFEFF6FF),
                                             borderRadius: BorderRadius.circular(6),
-                                            border: Border.all(color: theme.colorScheme.secondary.withValues(alpha: 0.3), width: 1.0),
+                                            border: Border.all(color: const Color(0xFFBFDBFE), width: 1.0),
                                           ),
                                           child: Text(
                                             'TO: ${audience.toString().toUpperCase()}',
-                                            style: TextStyle(color: theme.colorScheme.secondary, fontSize: 10, fontWeight: FontWeight.bold),
+                                            style: const TextStyle(color: primaryBlue, fontSize: 10, fontWeight: FontWeight.bold),
                                           ),
                                         ),
                                         Text(
                                           alert['created_at']?.split('T')[0] ?? '',
-                                          style: TextStyle(color: primaryColor.withValues(alpha: 0.5), fontSize: 12, fontWeight: FontWeight.w500),
+                                          style: TextStyle(color: Colors.grey.shade600, fontSize: 12, fontWeight: FontWeight.w500),
                                         ),
                                       ],
                                     ),
                                     const SizedBox(height: 12),
                                     Text(
                                       alert['title'] ?? '',
-                                      style: TextStyle(color: primaryColor, fontWeight: FontWeight.bold, fontSize: 16),
+                                      style: const TextStyle(color: Color(0xFF1E293B), fontWeight: FontWeight.bold, fontSize: 16),
                                     ),
                                     const SizedBox(height: 8),
                                     Text(
                                       alert['content'] ?? '',
-                                      style: TextStyle(color: primaryColor.withValues(alpha: 0.7), fontSize: 14, height: 1.4, fontWeight: FontWeight.w400),
+                                      style: const TextStyle(color: Color(0xFF475569), fontSize: 14, height: 1.4, fontWeight: FontWeight.w400),
                                     ),
                                   ],
                                 ),

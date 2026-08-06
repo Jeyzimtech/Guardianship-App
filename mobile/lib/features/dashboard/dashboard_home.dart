@@ -34,7 +34,7 @@ class _DashboardHomeState extends State<DashboardHome> {
             ),
             const SizedBox(width: 8),
             const Text(
-              'Edu+Conect',
+              'Upenyu',
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Colors.white),
             ),
           ],
@@ -49,13 +49,6 @@ class _DashboardHomeState extends State<DashboardHome> {
             ),
             tooltip: 'Notifications',
             onPressed: () => ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('3 Administrative Notifications'))),
-          ),
-          Consumer<AuthProvider>(
-            builder: (context, auth, _) => IconButton(
-              icon: const Icon(Icons.logout_rounded, color: Colors.white),
-              tooltip: 'Log Out',
-              onPressed: () => auth.logout(),
-            ),
           ),
           const SizedBox(width: 4),
         ],
