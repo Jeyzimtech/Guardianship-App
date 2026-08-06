@@ -34,7 +34,7 @@ class _DashboardHomeState extends State<DashboardHome> {
             ),
             const SizedBox(width: 8),
             const Text(
-              'Upenyu',
+              'Edu+Conect',
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Colors.white),
             ),
           ],

@@ -46,7 +46,7 @@ class _AnnouncementsViewState extends State<AnnouncementsView> {
           {
             'audience_role': 'all',
             'created_at': '2026-07-14',
-            'title': 'Welcome to Upenyu Portal!',
+            'title': 'Welcome to Edu+Conect!',
             'content': 'We are pleased to launch the new school communication portal for all parents and teachers.',
           },
           {
