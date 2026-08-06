@@ -153,26 +153,26 @@ class AuthProvider extends ChangeNotifier {
 
     try {
       final response = await apiClient.dio.put('/guardian/profile', data: {
-        if (name != null) 'name': name,
-        if (phone != null) 'phone_number': phone,
-        if (email != null) 'email': email,
-        if (address != null) 'address': address,
-        if (preferredLanguage != null) 'preferred_language': preferredLanguage,
-        if (emergencyContactName != null) 'emergency_contact_name': emergencyContactName,
-        if (emergencyContactPhone != null) 'emergency_contact_phone': emergencyContactPhone,
+        'name':? name,
+        'phone_number':? phone,
+        'email':? email,
+        'address':? address,
+        'preferred_language':? preferredLanguage,
+        'emergency_contact_name':? emergencyContactName,
+        'emergency_contact_phone':? emergencyContactPhone,
       });
 
       if (response.statusCode == 200 && response.data['status'] == 'success') {
         final updatedData = response.data['data'];
         _user = {
           ...?_user,
-          if (updatedData['name'] != null) 'name': updatedData['name'],
-          if (updatedData['phone_number'] != null) 'phone_number': updatedData['phone_number'],
-          if (updatedData['email'] != null) 'email': updatedData['email'],
-          if (updatedData['address'] != null) 'address': updatedData['address'],
-          if (updatedData['preferred_language'] != null) 'preferred_language': updatedData['preferred_language'],
-          if (updatedData['emergency_contact_name'] != null) 'emergency_contact_name': updatedData['emergency_contact_name'],
-          if (updatedData['emergency_contact_phone'] != null) 'emergency_contact_phone': updatedData['emergency_contact_phone'],
+          'name':? updatedData['name'],
+          'phone_number':? updatedData['phone_number'],
+          'email':? updatedData['email'],
+          'address':? updatedData['address'],
+          'preferred_language':? updatedData['preferred_language'],
+          'emergency_contact_name':? updatedData['emergency_contact_name'],
+          'emergency_contact_phone':? updatedData['emergency_contact_phone'],
         };
       }
     } catch (_) {
@@ -181,11 +181,11 @@ class AuthProvider extends ChangeNotifier {
         ...?_user,
         if (name != null && name.isNotEmpty) 'name': name,
         if (phone != null && phone.isNotEmpty) 'phone_number': phone,
-        if (email != null) 'email': email,
-        if (address != null) 'address': address,
-        if (preferredLanguage != null) 'preferred_language': preferredLanguage,
-        if (emergencyContactName != null) 'emergency_contact_name': emergencyContactName,
-        if (emergencyContactPhone != null) 'emergency_contact_phone': emergencyContactPhone,
+        'email':? email,
+        'address':? address,
+        'preferred_language':? preferredLanguage,
+        'emergency_contact_name':? emergencyContactName,
+        'emergency_contact_phone':? emergencyContactPhone,
       };
     }
 

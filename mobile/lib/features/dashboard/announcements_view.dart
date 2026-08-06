@@ -72,8 +72,6 @@ class _AnnouncementsViewState extends State<AnnouncementsView> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
     final filteredAnnouncements = _announcements.where((alert) {
       final audience = (alert['audience_role'] ?? 'all').toString().toUpperCase();
       final title = (alert['title'] ?? '').toString().toLowerCase();

@@ -103,7 +103,7 @@ class _LearningJournalViewState extends State<LearningJournalView> {
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
             ),
             Text(
-              '${widget.child['name']} • Running Work Record',
+              '${widget.child?['name'] ?? 'Student'} • Running Work Record',
               style: const TextStyle(fontSize: 12, color: Colors.white70),
             ),
           ],

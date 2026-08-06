@@ -46,7 +46,7 @@ class BehaviourView extends StatelessWidget {
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
             ),
             Text(
-              '${child['name']} • Conduct Snapshot',
+              '${child?['name'] ?? 'Student'} • Conduct Snapshot',
               style: const TextStyle(fontSize: 12, color: Colors.white70),
             ),
           ],

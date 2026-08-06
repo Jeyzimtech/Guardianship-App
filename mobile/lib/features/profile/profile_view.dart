@@ -127,7 +127,7 @@ class ProfileView extends StatelessWidget {
 
                   // Preferred Language
                   DropdownButtonFormField<String>(
-                    value: languages.contains(selectedLanguage) ? selectedLanguage : languages.first,
+                    initialValue: languages.contains(selectedLanguage) ? selectedLanguage : languages.first,
                     decoration: InputDecoration(
                       labelText: 'Preferred Language',
                       prefixIcon: const Icon(Icons.language_rounded),
@@ -226,7 +226,6 @@ class ProfileView extends StatelessWidget {
     const primaryBlue = Color(0xFF2563EB);
     const darkTeal = Color(0xFF0B2144);
 
-    final roleTitle = isTeacher ? 'Class Teacher' : 'Parent / Guardian';
     final defaultName = isTeacher ? 'Teacher Grace' : 'Guardian John Chewe';
     final defaultPhone = isTeacher ? '+263772222222' : '+263773333333';
 
