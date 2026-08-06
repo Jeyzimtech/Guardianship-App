@@ -76,22 +76,15 @@ class AppDrawer extends StatelessWidget {
             color: primaryBlue,
             child: Row(
               children: [
-                Container(
-                  padding: const EdgeInsets.all(6),
-                  decoration: BoxDecoration(
+                Image.asset(
+                  'assets/logo.png',
+                  height: 32,
+                  width: 32,
+                  fit: BoxFit.contain,
+                  errorBuilder: (context, error, stackTrace) => const Icon(
+                    Icons.shield_rounded,
                     color: Colors.white,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Image.asset(
-                    'assets/logo.png',
-                    height: 28,
-                    width: 28,
-                    fit: BoxFit.contain,
-                    errorBuilder: (context, error, stackTrace) => const Icon(
-                      Icons.shield_rounded,
-                      color: primaryBlue,
-                      size: 28,
-                    ),
+                    size: 32,
                   ),
                 ),
                 const SizedBox(width: 12),
