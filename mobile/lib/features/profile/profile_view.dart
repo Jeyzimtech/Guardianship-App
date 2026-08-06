@@ -8,53 +8,6 @@ class ProfileView extends StatelessWidget {
   final bool showAppBar;
   const ProfileView({super.key, this.showAppBar = true});
 
-  void _confirmDeleteAccount(BuildContext context, AuthProvider authProvider) {
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Row(
-          children: [
-            Icon(Icons.warning_amber_rounded, color: Colors.red, size: 28),
-            SizedBox(width: 8),
-            Text('Delete Account', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-          ],
-        ),
-        content: const Text(
-          'Are you sure you want to permanently delete your account? All associated profile data will be erased. This action cannot be undone.',
-          style: TextStyle(fontSize: 14, color: Color(0xFF475569)),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('Cancel', style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold)),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
-              foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-            ),
-            onPressed: () async {
-              Navigator.pop(ctx);
-              final success = await authProvider.deleteAccount();
-              if (success && context.mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Your account has been deleted successfully.'),
-                    backgroundColor: Colors.red,
-                  ),
-                );
-                Navigator.of(context).popUntil((route) => route.isFirst);
-              }
-            },
-            child: const Text('Delete Account', style: TextStyle(fontWeight: FontWeight.bold)),
-          ),
-        ],
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final authProvider = Provider.of<AuthProvider>(context);
@@ -219,21 +172,7 @@ class ProfileView extends StatelessWidget {
                 ),
               ),
             ),
-            const SizedBox(height: 12),
-            // Delete Account Button
-            SizedBox(
-              width: double.infinity,
-              child: OutlinedButton.icon(
-                onPressed: () => _confirmDeleteAccount(context, authProvider),
-                icon: const Icon(Icons.delete_forever_rounded, color: Colors.red),
-                label: const Text('Delete Account', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
-                style: OutlinedButton.styleFrom(
-                  side: const BorderSide(color: Colors.red),
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                ),
-              ),
-            ),
+
             const SizedBox(height: 20),
           ],
         ),
