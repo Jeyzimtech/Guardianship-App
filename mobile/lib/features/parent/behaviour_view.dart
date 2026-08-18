@@ -80,6 +80,8 @@ class BehaviourView extends StatelessWidget {
                         const Text(
                           'Positive Merits',
                           style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Color(0xFF15803D)),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ],
                     ),
