@@ -409,15 +409,18 @@ class _LearningJournalViewState extends State<LearningJournalView> {
     return Padding(
       padding: const EdgeInsets.only(bottom: 4.0),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, size: 14, color: primaryBlue),
+          Padding(
+            padding: const EdgeInsets.only(top: 2.0),
+            child: Icon(icon, size: 14, color: primaryBlue),
+          ),
           const SizedBox(width: 6),
           Text('$label: ', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
           Expanded(
             child: Text(
               value,
-              style: const TextStyle(fontSize: 12),
-              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(fontSize: 12, height: 1.3),
             ),
           ),
         ],
