@@ -3,7 +3,8 @@ import 'package:provider/provider.dart';
 import '../../core/student_provider.dart';
 
 class ReportsView extends StatefulWidget {
-  const ReportsView({super.key});
+  final bool showAppBar;
+  const ReportsView({super.key, this.showAppBar = true});
 
   @override
   State<ReportsView> createState() => _ReportsViewState();
@@ -13,6 +14,8 @@ class _ReportsViewState extends State<ReportsView> {
   List<dynamic> _reports = [];
   bool _isLoading = false;
   String? _errorMessage;
+
+  static const primaryBlue = Color(0xFF3B5998);
 
   @override
   void initState() {
@@ -208,7 +211,29 @@ class _ReportsViewState extends State<ReportsView> {
     final primaryColor = theme.primaryColor;
 
     return Scaffold(
-      backgroundColor: Colors.transparent,
+      backgroundColor: const Color(0xFFF8FAFC),
+      appBar: widget.showAppBar
+          ? AppBar(
+              backgroundColor: primaryBlue,
+              elevation: 1,
+              leading: IconButton(
+                icon: const Icon(Icons.arrow_back, color: Colors.white),
+                onPressed: () {
+                  if (Navigator.canPop(context)) {
+                    Navigator.pop(context);
+                  }
+                },
+              ),
+              title: const Text(
+                'Academic Reports & Cards',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            )
+          : null,
       body: _isLoading
           ? Center(child: CircularProgressIndicator(color: primaryColor))
           : _errorMessage != null
