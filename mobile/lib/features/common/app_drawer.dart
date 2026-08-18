@@ -72,7 +72,12 @@ class AppDrawer extends StatelessWidget {
         children: [
           // Drawer Header with App Logo
           Container(
-            padding: const EdgeInsets.only(top: 50, bottom: 20, left: 20, right: 20),
+            padding: EdgeInsets.only(
+              top: MediaQuery.of(context).padding.top + 16,
+              bottom: 16,
+              left: 20,
+              right: 20,
+            ),
             color: primaryBlue,
             child: Row(
               children: [
