@@ -89,9 +89,15 @@ class _CreateStudentDialogState extends State<CreateStudentDialog> {
     const primaryBlue = Color(0xFF3B5998);
 
     return Dialog(
+      insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
       child: Container(
-        padding: const EdgeInsets.all(20.0),
+        padding: EdgeInsets.only(
+          left: 20,
+          right: 20,
+          top: 20,
+          bottom: MediaQuery.of(context).viewInsets.bottom + 20,
+        ),
         decoration: const BoxDecoration(
           color: Colors.white,
           border: Border(top: BorderSide(color: primaryBlue, width: 4.0)),

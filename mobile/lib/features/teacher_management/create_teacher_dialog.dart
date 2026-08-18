@@ -157,9 +157,15 @@ class _CreateTeacherDialogState extends State<CreateTeacherDialog> {
     final isEditing = widget.initialTeacher != null;
 
     return Dialog(
+      insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       child: Padding(
-        padding: const EdgeInsets.all(24.0),
+        padding: EdgeInsets.only(
+          left: 20,
+          right: 20,
+          top: 20,
+          bottom: MediaQuery.of(context).viewInsets.bottom + 20,
+        ),
         child: SingleChildScrollView(
           child: Form(
             key: _formKey,
