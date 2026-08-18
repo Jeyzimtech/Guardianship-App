@@ -252,7 +252,75 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-
+          // 1. GUARDIAN CHILD SELECTOR HEADER CARD
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: borderColor),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Select Linked Student:',
+                      style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.grey.shade700),
+                    ),
+                    InkWell(
+                      onTap: () => _showRequestAddStudentDialog(context),
+                      child: const Row(
+                        children: [
+                          Icon(Icons.add_circle_outline_rounded, size: 14, color: primaryBlue),
+                          SizedBox(width: 4),
+                          Text('Add Child', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: primaryBlue)),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: _mockChildren.asMap().entries.map((entry) {
+                      final idx = entry.key;
+                      final child = entry.value;
+                      final isSelected = idx == _selectedChildIndex;
+                      return Padding(
+                        padding: const EdgeInsets.only(right: 8.0),
+                        child: ChoiceChip(
+                          avatar: CircleAvatar(
+                            backgroundColor: isSelected ? Colors.white : primaryBlue,
+                            child: Text(
+                              child['name'][0],
+                              style: TextStyle(color: isSelected ? primaryBlue : Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                          label: Text('${child['name']} (${child['class'].toString().split(' ').first})'),
+                          selected: isSelected,
+                          selectedColor: primaryBlue,
+                          labelStyle: TextStyle(
+                            color: isSelected ? Colors.white : const Color(0xFF1F2937),
+                            fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                            fontSize: 12,
+                          ),
+                          backgroundColor: const Color(0xFFF3F4F6),
+                          onSelected: (selected) {
+                            if (selected) selectChild(idx);
+                          },
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 12),
 
           // 2. ATTENDANCE & FEE BALANCES KEY METRICS CARDS
           Row(
@@ -290,8 +358,6 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
             ],
           ),
           const SizedBox(height: 14),
-
-
 
           // 4. SCHOOL ANNOUNCEMENTS SECTION
           Row(
@@ -386,7 +452,7 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
             physics: const NeverScrollableScrollPhysics(),
             crossAxisSpacing: 10,
             mainAxisSpacing: 10,
-            childAspectRatio: 1.55,
+            childAspectRatio: 1.25,
             children: [
               _buildEduModuleCard(
                 icon: Icons.auto_stories_rounded,
