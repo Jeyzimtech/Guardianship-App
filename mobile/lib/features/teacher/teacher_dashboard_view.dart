@@ -933,18 +933,18 @@ class _TeacherDashboardViewState extends State<TeacherDashboardView> {
     return GestureDetector(
       onTap: () => _toggleAttendance(index, fullStatus),
       child: Container(
-        width: 28,
-        height: 28,
+        width: 34,
+        height: 34,
         decoration: BoxDecoration(
           color: isCurrent ? text : surfaceWhite,
-          borderRadius: BorderRadius.circular(4),
-          border: Border.all(color: text),
+          borderRadius: BorderRadius.circular(6),
+          border: Border.all(color: text, width: 1.5),
         ),
         alignment: Alignment.center,
         child: Text(
           code,
           style: TextStyle(
-            fontSize: 11,
+            fontSize: 13,
             fontWeight: FontWeight.bold,
             color: isCurrent ? Colors.white : text,
           ),
