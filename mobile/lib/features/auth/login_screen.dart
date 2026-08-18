@@ -141,12 +141,15 @@ class _LoginScreenState extends State<LoginScreen> {
                                       color: _selectedRole == 'Parent / Student' ? Colors.white : const Color(0xFF64748B),
                                     ),
                                     const SizedBox(width: 8),
-                                    Text(
-                                      'Parent / Student',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 13,
-                                        color: _selectedRole == 'Parent / Student' ? Colors.white : const Color(0xFF475569),
+                                    Flexible(
+                                      child: Text(
+                                        'Parent / Student',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 13,
+                                          color: _selectedRole == 'Parent / Student' ? Colors.white : const Color(0xFF475569),
+                                        ),
+                                        overflow: TextOverflow.ellipsis,
                                       ),
                                     ),
                                   ],
