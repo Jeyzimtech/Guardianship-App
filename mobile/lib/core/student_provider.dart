@@ -149,4 +149,14 @@ class StudentProvider extends ChangeNotifier {
     }
     return false;
   }
+
+  void clearData() {
+    _students = [];
+    _selectedStudent = null;
+    _dashboardData = null;
+    _isLoadingStudents = false;
+    _isLoadingDashboard = false;
+    _errorMessage = null;
+    notifyListeners();
+  }
 }
