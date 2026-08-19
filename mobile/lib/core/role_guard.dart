@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'auth_provider.dart';
+import 'student_provider.dart';
 
 class MobileRoleGuard extends StatelessWidget {
   final Widget child;
@@ -62,7 +63,14 @@ class MobileRoleGuard extends StatelessWidget {
                   width: double.infinity,
                   height: 48,
                   child: ElevatedButton.icon(
-                    onPressed: () => authProvider.logout(),
+                    onPressed: () async {
+                      final studentProvider = Provider.of<StudentProvider>(context, listen: false);
+                      studentProvider.clearData();
+                      await authProvider.logout();
+                      if (context.mounted && Navigator.canPop(context)) {
+                        Navigator.of(context).popUntil((route) => route.isFirst);
+                      }
+                    },
                     icon: const Icon(Icons.logout_rounded),
                     label: const Text('Return to Login'),
                     style: ElevatedButton.styleFrom(
