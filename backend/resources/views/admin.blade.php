@@ -2043,6 +2043,13 @@
 
         function handleLogout() {
             if (confirm('Are you sure you want to log out of the Admin Portal?')) {
+                try {
+                    localStorage.clear();
+                    sessionStorage.clear();
+                } catch (_) {}
+                if (document.getElementById('loginForm')) document.getElementById('loginForm').reset();
+                if (document.getElementById('signupForm')) document.getElementById('signupForm').reset();
+                switchAuthTab('login');
                 document.getElementById('authScreen').classList.remove('hidden');
             }
         }
