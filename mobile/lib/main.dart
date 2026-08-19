@@ -8,6 +8,8 @@ import 'core/student_provider.dart';
 import 'features/auth/login_screen.dart';
 import 'features/dashboard/dashboard_home.dart';
 
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   
@@ -39,6 +41,7 @@ class EduConectApp extends StatelessWidget {
     const textSecondaryColor = Color(0xFF6B7280); // Text Muted
 
     return MaterialApp(
+      navigatorKey: navigatorKey,
       title: 'Guardianship App',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
@@ -132,6 +135,12 @@ class AuthGate extends StatelessWidget {
         child: DashboardHome(),
       );
     } else {
+      // Clear any pushed routes when logged out
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (navigatorKey.currentState != null && navigatorKey.currentState!.canPop()) {
+          navigatorKey.currentState!.popUntil((route) => route.isFirst);
+        }
+      });
       return const LoginScreen();
     }
   }
