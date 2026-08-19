@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../core/auth_provider.dart';
+import '../../core/student_provider.dart';
 import '../profile/profile_view.dart';
 import '../parent/uniform_marketplace_view.dart';
 import '../parent/learning_journal_view.dart';
@@ -283,8 +284,13 @@ class AppDrawer extends StatelessWidget {
                 width: double.infinity,
                 child: OutlinedButton.icon(
                   onPressed: () async {
+                    final studentProvider = Provider.of<StudentProvider>(context, listen: false);
+                    studentProvider.clearData();
                     Navigator.pop(context); // Close drawer
                     await auth.logout();
+                    if (context.mounted && Navigator.canPop(context)) {
+                      Navigator.of(context).popUntil((route) => route.isFirst);
+                    }
                   },
                   icon: const Icon(Icons.logout_rounded, color: Colors.red, size: 18),
                   label: const Text(
