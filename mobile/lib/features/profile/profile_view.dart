@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../core/auth_provider.dart';
+import '../../core/student_provider.dart';
 import '../school_management/school_management_screen.dart';
 import '../teacher_management/teacher_management_screen.dart';
 
@@ -405,7 +406,14 @@ class ProfileView extends StatelessWidget {
             SizedBox(
               width: double.infinity,
               child: OutlinedButton.icon(
-                onPressed: () => authProvider.logout(),
+                onPressed: () async {
+                  final studentProvider = Provider.of<StudentProvider>(context, listen: false);
+                  studentProvider.clearData();
+                  await authProvider.logout();
+                  if (context.mounted && Navigator.canPop(context)) {
+                    Navigator.of(context).popUntil((route) => route.isFirst);
+                  }
+                },
                 icon: const Icon(Icons.logout_rounded, color: Colors.grey),
                 label: const Text('Log Out', style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold)),
                 style: OutlinedButton.styleFrom(
