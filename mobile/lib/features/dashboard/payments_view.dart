@@ -288,85 +288,277 @@ class _PaymentsViewState extends State<PaymentsView> {
     double balanceZig = double.parse(_feeAccount?['balance_zig']?.toString() ?? '0.0');
     bool hasFees = balanceUsd > 0 || balanceZig > 0;
 
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFE2E8F0), width: 1.0),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.02),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          )
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text('OUTSTANDING BALANCE', style: TextStyle(color: primaryColor.withValues(alpha: 0.5), fontSize: 12, fontWeight: FontWeight.bold, letterSpacing: 1.1)),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Dual-Currency Balance Cards
+        Row(
+          children: [
+            // USD Balance Card
+            Expanded(
+              child: Container(
                 decoration: BoxDecoration(
-                  color: hasFees ? Colors.red.withValues(alpha: 0.08) : Colors.green.withValues(alpha: 0.08),
-                  borderRadius: BorderRadius.circular(6),
-                  border: Border.all(color: hasFees ? Colors.red.withValues(alpha: 0.5) : Colors.green.withValues(alpha: 0.5), width: 1.0),
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: const Color(0xFFE2E8F0)),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.03),
+                      blurRadius: 4,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
                 ),
-                child: Text(
-                  hasFees ? 'PAYMENT DUE' : 'CLEARED',
-                  style: TextStyle(color: hasFees ? Colors.red : Colors.green, fontSize: 10, fontWeight: FontWeight.bold),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      height: 5,
+                      decoration: BoxDecoration(
+                        color: hasFees ? const Color(0xFFEF4444) : const Color(0xFF22C55E),
+                        borderRadius: const BorderRadius.only(
+                          topLeft: Radius.circular(10),
+                          topRight: Radius.circular(10),
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(14),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'USD BALANCE',
+                            style: TextStyle(
+                              fontSize: 9,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF6B7280),
+                              letterSpacing: 0.8,
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          Text(
+                            '\$${balanceUsd.toStringAsFixed(2)}',
+                            style: TextStyle(
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold,
+                              color: hasFees ? const Color(0xFFEF4444) : const Color(0xFF22C55E),
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                            decoration: BoxDecoration(
+                              color: hasFees
+                                  ? const Color(0xFFFEE2E2)
+                                  : const Color(0xFFDCFCE7),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Text(
+                              hasFees ? 'OUTSTANDING' : 'CLEARED',
+                              style: TextStyle(
+                                fontSize: 9,
+                                fontWeight: FontWeight.bold,
+                                color: hasFees
+                                    ? const Color(0xFFB91C1C)
+                                    : const Color(0xFF15803D),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
               ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          Row(
-            children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('\$$balanceUsd', style: TextStyle(color: primaryColor, fontSize: 32, fontWeight: FontWeight.bold)),
-                  Text('USD Balance', style: TextStyle(color: primaryColor.withValues(alpha: 0.6), fontSize: 12, fontWeight: FontWeight.bold)),
-                ],
+            ),
+            const SizedBox(width: 12),
+            // ZiG Balance Card
+            Expanded(
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: const Color(0xFFE2E8F0)),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.03),
+                      blurRadius: 4,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      height: 5,
+                      decoration: BoxDecoration(
+                        color: balanceZig > 0
+                            ? const Color(0xFFF59E0B)
+                            : const Color(0xFF22C55E),
+                        borderRadius: const BorderRadius.only(
+                          topLeft: Radius.circular(10),
+                          topRight: Radius.circular(10),
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(14),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'ZiG BALANCE',
+                            style: TextStyle(
+                              fontSize: 9,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF6B7280),
+                              letterSpacing: 0.8,
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          Text(
+                            '${balanceZig.toInt()} ZiG',
+                            style: TextStyle(
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold,
+                              color: balanceZig > 0
+                                  ? const Color(0xFFF59E0B)
+                                  : const Color(0xFF22C55E),
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                            decoration: BoxDecoration(
+                              color: balanceZig > 0
+                                  ? const Color(0xFFFEF3C7)
+                                  : const Color(0xFFDCFCE7),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Text(
+                              balanceZig > 0 ? 'OUTSTANDING' : 'CLEARED',
+                              style: TextStyle(
+                                fontSize: 9,
+                                fontWeight: FontWeight.bold,
+                                color: balanceZig > 0
+                                    ? const Color(0xFFB45309)
+                                    : const Color(0xFF15803D),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
               ),
-              const SizedBox(width: 48),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('${balanceZig.toInt()} ZiG', style: TextStyle(color: primaryColor, fontSize: 32, fontWeight: FontWeight.bold)),
-                  Text('ZiG Balance', style: TextStyle(color: primaryColor.withValues(alpha: 0.6), fontSize: 12, fontWeight: FontWeight.bold)),
-                ],
-              ),
-            ],
-          ),
-          const SizedBox(height: 24),
-          if (hasFees)
-            ElevatedButton.icon(
-              onPressed: _showPaymentBottomSheet,
-              icon: const Icon(Icons.payment_rounded, size: 18),
-              label: const Text('Pay Outstanding Fees', style: TextStyle(fontWeight: FontWeight.bold)),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: primaryColor,
-                foregroundColor: Colors.white,
-                minimumSize: const Size(double.infinity, 48),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                elevation: 0,
-              ),
-            )
-          else
-            const Row(
+            ),
+          ],
+        ),
+
+        const SizedBox(height: 16),
+
+        // Pay Now Button
+        if (hasFees)
+          ElevatedButton(
+            onPressed: _showPaymentBottomSheet,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: primaryColor,
+              foregroundColor: Colors.white,
+              minimumSize: const Size(double.infinity, 50),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              elevation: 0,
+            ),
+            child: const Text(
+              'Pay Outstanding Fees Now',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+            ),
+          )
+        else
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              color: const Color(0xFFDCFCE7),
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: const Color(0xFF86EFAC)),
+            ),
+            child: const Row(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.check_circle_rounded, color: Colors.green, size: 20),
+                Icon(Icons.check_circle_rounded, color: Color(0xFF15803D), size: 18),
                 SizedBox(width: 8),
-                Text('Thank you! Your fee account is up-to-date.', style: TextStyle(color: Colors.green, fontSize: 14, fontWeight: FontWeight.bold)),
+                Text(
+                  'Your fee account is up to date.',
+                  style: TextStyle(
+                      color: Color(0xFF15803D),
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold),
+                ),
               ],
-            )
-        ],
+            ),
+          ),
+
+        const SizedBox(height: 22),
+
+        // Payment Methods section
+        const Text(
+          'Payment Methods',
+          style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
+              color: primaryBlue),
+        ),
+        const SizedBox(height: 10),
+        GridView.count(
+          crossAxisCount: 2,
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          crossAxisSpacing: 10,
+          mainAxisSpacing: 10,
+          childAspectRatio: 2.4,
+          children: [
+            _buildMethodTile('EcoCash', 'Mobile Money', const Color(0xFF16A34A), const Color(0xFFDCFCE7)),
+            _buildMethodTile('Paynow', 'Online Gateway', const Color(0xFF3B5998), const Color(0xFFEFF6FF)),
+            _buildMethodTile('ZIPIT', 'Bank Transfer', const Color(0xFF7C3AED), const Color(0xFFF5F3FF)),
+            _buildMethodTile('Bank Wire', 'International', const Color(0xFF374151), const Color(0xFFF3F4F6)),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildMethodTile(String name, String subtitle, Color textColor, Color bgColor) {
+    return GestureDetector(
+      onTap: _showPaymentBottomSheet,
+      child: Container(
+        decoration: BoxDecoration(
+          color: bgColor,
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: textColor.withValues(alpha: 0.2)),
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              name,
+              style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 13,
+                  color: textColor),
+            ),
+            Text(
+              subtitle,
+              style: TextStyle(
+                  fontSize: 10,
+                  color: textColor.withValues(alpha: 0.7)),
+            ),
+          ],
+        ),
       ),
     );
   }
