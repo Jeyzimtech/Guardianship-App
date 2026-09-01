@@ -16,7 +16,12 @@
         /* 14. Global Color Palette & Variables */
         :root {
             --primary-blue: #3B5998;
+            --primary-hover: #2d4373;
+            --primary-light: #4A69BD;
+            --primary-accent: #2980B9;
             --secondary-blue: #5B7BD5;
+            --soft-blue: #F0F4FA;
+            --blue-border: #D0DCEE;
             --white: #FFFFFF;
             --sidebar-bg: #F5F6F7;
             --border-color: #D8D8D8;
