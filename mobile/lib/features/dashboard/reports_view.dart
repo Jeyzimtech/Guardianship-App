@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../core/student_provider.dart';
+import '../../core/app_colors.dart';
 
 class ReportsView extends StatefulWidget {
   final bool showAppBar;
@@ -14,8 +15,6 @@ class _ReportsViewState extends State<ReportsView> {
   List<dynamic> _reports = [];
   bool _isLoading = false;
   String? _errorMessage;
-
-  static const primaryBlue = Color(0xFF3B5998);
 
   @override
   void initState() {
@@ -69,33 +68,31 @@ class _ReportsViewState extends State<ReportsView> {
 
   void _downloadReport(Map<String, dynamic> report) async {
     final studentProvider = Provider.of<StudentProvider>(context, listen: false);
-    final theme = Theme.of(context);
-    final primaryColor = theme.primaryColor;
     
     if (report['is_locked'] == true) {
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
-          backgroundColor: Colors.white,
+          backgroundColor: AppColors.surface,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
-            side: const BorderSide(color: Color(0xFFE2E8F0), width: 1.0),
+            side: const BorderSide(color: AppColors.cardBorder, width: 1.0),
           ),
-          title: Row(
+          title: const Row(
             children: [
-              const Icon(Icons.lock_rounded, color: Colors.red),
-              const SizedBox(width: 10),
-              Text('Access Locked', style: TextStyle(color: primaryColor, fontWeight: FontWeight.bold)),
+              Icon(Icons.lock_rounded, color: AppColors.error),
+              SizedBox(width: 10),
+              Text('Access Locked', style: TextStyle(color: AppColors.primaryDark, fontWeight: FontWeight.bold)),
             ],
           ),
-          content: Text(
+          content: const Text(
             'This report card is locked. Please settle your child\'s outstanding fee balance in the Payments tab to unlock academic records.',
-            style: TextStyle(color: primaryColor),
+            style: TextStyle(color: AppColors.textSecondary),
           ),
           actions: [
             ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor: primaryColor,
+                backgroundColor: AppColors.primary,
                 foregroundColor: Colors.white,
                 elevation: 0,
               ),
@@ -111,7 +108,7 @@ class _ReportsViewState extends State<ReportsView> {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => Center(child: CircularProgressIndicator(color: primaryColor)),
+      builder: (context) => const Center(child: CircularProgressIndicator(color: AppColors.primary)),
     );
 
     try {
@@ -123,29 +120,29 @@ class _ReportsViewState extends State<ReportsView> {
           showDialog(
             context: context,
             builder: (context) => AlertDialog(
-              backgroundColor: Colors.white,
+              backgroundColor: AppColors.surface,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
-                side: const BorderSide(color: Color(0xFFE2E8F0), width: 1.0),
+                side: const BorderSide(color: AppColors.cardBorder, width: 1.0),
               ),
-              title: Text(report['title'], style: TextStyle(color: primaryColor, fontWeight: FontWeight.bold)),
+              title: Text(report['title'], style: const TextStyle(color: AppColors.primaryDark, fontWeight: FontWeight.bold)),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Report download authorized successfully.', style: TextStyle(color: primaryColor)),
+                  const Text('Report download authorized successfully.', style: TextStyle(color: AppColors.textPrimary)),
                   const SizedBox(height: 12),
                   Container(
                     width: double.infinity,
                     padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(color: const Color(0xFFF1F5F9), borderRadius: BorderRadius.circular(8)),
-                    child: Text(response.data['file_content_mock'] ?? '', style: TextStyle(color: primaryColor, fontFamily: 'monospace', fontWeight: FontWeight.bold, fontSize: 11)),
+                    decoration: BoxDecoration(color: AppColors.softBlue, borderRadius: BorderRadius.circular(8)),
+                    child: Text(response.data['file_content_mock'] ?? '', style: const TextStyle(color: AppColors.primaryDark, fontFamily: 'monospace', fontWeight: FontWeight.bold, fontSize: 11)),
                   ),
                 ],
               ),
               actions: [
                 TextButton(
-                  child: Text('Close', style: TextStyle(color: primaryColor, fontWeight: FontWeight.bold)),
+                  child: const Text('Close', style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold)),
                   onPressed: () => Navigator.pop(context),
                 )
               ],
@@ -160,22 +157,22 @@ class _ReportsViewState extends State<ReportsView> {
         showDialog(
           context: context,
           builder: (context) => AlertDialog(
-            backgroundColor: Colors.white,
+            backgroundColor: AppColors.surface,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
-              side: const BorderSide(color: Color(0xFFE2E8F0), width: 1.0),
+              side: const BorderSide(color: AppColors.cardBorder, width: 1.0),
             ),
-            title: Text(report['title'], style: TextStyle(color: primaryColor, fontWeight: FontWeight.bold)),
+            title: Text(report['title'], style: const TextStyle(color: AppColors.primaryDark, fontWeight: FontWeight.bold)),
             content: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Report loaded successfully (Offline Mode).', style: TextStyle(color: primaryColor)),
+                const Text('Report loaded successfully (Offline Mode).', style: TextStyle(color: AppColors.textPrimary)),
                 const SizedBox(height: 12),
                 Container(
                   width: double.infinity,
                   padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(color: const Color(0xFFF1F5F9), borderRadius: BorderRadius.circular(8)),
+                  decoration: BoxDecoration(color: AppColors.softBlue, borderRadius: BorderRadius.circular(8)),
                   child: Text(
                     '===================================\n'
                     '     OFFICIAL ACADEMIC REPORT      \n'
@@ -188,14 +185,14 @@ class _ReportsViewState extends State<ReportsView> {
                     'Science: A\n'
                     'Overall Position: 3rd in Class\n'
                     '===================================',
-                    style: TextStyle(color: primaryColor, fontFamily: 'monospace', fontWeight: FontWeight.bold, fontSize: 11),
+                    style: const TextStyle(color: AppColors.primaryDark, fontFamily: 'monospace', fontWeight: FontWeight.bold, fontSize: 11),
                   ),
                 ),
               ],
             ),
             actions: [
               TextButton(
-                child: Text('Close', style: TextStyle(color: primaryColor, fontWeight: FontWeight.bold)),
+                child: const Text('Close', style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold)),
                 onPressed: () => Navigator.pop(context),
               )
             ],
@@ -207,15 +204,12 @@ class _ReportsViewState extends State<ReportsView> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final primaryColor = theme.primaryColor;
-
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: AppColors.background,
       appBar: widget.showAppBar
           ? AppBar(
-              backgroundColor: primaryBlue,
-              elevation: 1,
+              backgroundColor: AppColors.primary,
+              elevation: 0,
               leading: IconButton(
                 icon: const Icon(Icons.arrow_back, color: Colors.white),
                 onPressed: () {
@@ -235,12 +229,12 @@ class _ReportsViewState extends State<ReportsView> {
             )
           : null,
       body: _isLoading
-          ? Center(child: CircularProgressIndicator(color: primaryColor))
+          ? const Center(child: CircularProgressIndicator(color: AppColors.primary))
           : _errorMessage != null
-              ? Center(child: Text(_errorMessage!, style: TextStyle(color: primaryColor, fontWeight: FontWeight.bold)))
+              ? Center(child: Text(_errorMessage!, style: const TextStyle(color: AppColors.error, fontWeight: FontWeight.bold)))
               : RefreshIndicator(
                   onRefresh: _fetchReports,
-                  color: primaryColor,
+                  color: AppColors.primary,
                   child: ListView.builder(
                     padding: const EdgeInsets.all(16),
                     itemCount: _reports.isEmpty ? 1 : _reports.length,
@@ -251,11 +245,11 @@ class _ReportsViewState extends State<ReportsView> {
                             padding: const EdgeInsets.only(top: 100.0),
                             child: Column(
                               children: [
-                                Icon(Icons.assignment_outlined, size: 64, color: primaryColor.withValues(alpha: 0.3)),
+                                Icon(Icons.assignment_outlined, size: 64, color: AppColors.primary.withValues(alpha: 0.3)),
                                 const SizedBox(height: 16),
-                                Text(
+                                const Text(
                                   'No report documents uploaded.',
-                                  style: TextStyle(color: primaryColor.withValues(alpha: 0.6), fontWeight: FontWeight.bold),
+                                  style: TextStyle(color: AppColors.textMuted, fontWeight: FontWeight.bold),
                                 ),
                               ],
                             ),
@@ -269,41 +263,45 @@ class _ReportsViewState extends State<ReportsView> {
                       return Card(
                         margin: const EdgeInsets.only(bottom: 12),
                         elevation: 0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          side: const BorderSide(color: AppColors.cardBorder),
+                        ),
                         child: ListTile(
                           contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                           leading: Container(
                             padding: const EdgeInsets.all(10),
                             decoration: BoxDecoration(
-                              color: isGated ? Colors.red.withValues(alpha: 0.08) : primaryColor.withValues(alpha: 0.08),
+                              color: isGated ? AppColors.errorLight : AppColors.softBlue,
                               shape: BoxShape.circle,
                             ),
                             child: isGated
                                 ? const Icon(
                                     Icons.lock_rounded,
-                                    color: Colors.red,
+                                    color: AppColors.error,
                                     size: 24,
                                   )
                                 : Image.network(
                                     'https://img.icons8.com/?id=13184&format=png&size=96',
                                     width: 24,
                                     height: 24,
-                                    errorBuilder: (context, error, stackTrace) => Icon(
+                                    errorBuilder: (context, error, stackTrace) => const Icon(
                                       Icons.file_present_rounded,
-                                      color: primaryColor,
+                                      color: AppColors.primary,
                                       size: 24,
                                     ),
                                   ),
                           ),
                           title: Text(
                             report['title'] ?? '',
-                            style: TextStyle(color: primaryColor, fontWeight: FontWeight.bold),
+                            style: const TextStyle(color: AppColors.primaryDark, fontWeight: FontWeight.bold),
                           ),
                           subtitle: Padding(
                             padding: const EdgeInsets.only(top: 4.0),
                             child: Text(
                               isGated ? 'Locked due to outstanding fees' : 'Academic Report card • Available for download',
                               style: TextStyle(
-                                color: isGated ? Colors.red : primaryColor.withValues(alpha: 0.6),
+                                color: isGated ? AppColors.error : AppColors.textMuted,
                                 fontSize: 12,
                                 fontWeight: FontWeight.w500,
                               ),
@@ -311,7 +309,7 @@ class _ReportsViewState extends State<ReportsView> {
                           ),
                           trailing: isGated
                               ? IconButton(
-                                  icon: const Icon(Icons.info_rounded, color: Colors.red),
+                                  icon: const Icon(Icons.info_rounded, color: AppColors.error),
                                   onPressed: () => _downloadReport(report),
                                 )
                               : ElevatedButton.icon(
@@ -319,7 +317,7 @@ class _ReportsViewState extends State<ReportsView> {
                                   icon: const Icon(Icons.download_rounded, size: 14),
                                   label: const Text('Get', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
                                   style: ElevatedButton.styleFrom(
-                                    backgroundColor: primaryColor,
+                                    backgroundColor: AppColors.primary,
                                     foregroundColor: Colors.white,
                                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),

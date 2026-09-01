@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../core/student_provider.dart';
+import '../../core/app_colors.dart';
 
 class AnnouncementsView extends StatefulWidget {
   const AnnouncementsView({super.key});
@@ -15,8 +16,6 @@ class _AnnouncementsViewState extends State<AnnouncementsView> {
   String? _errorMessage;
   String _searchQuery = '';
   String _selectedFilter = 'All';
-
-  static const primaryBlue = Color(0xFF3B5998);
 
   final List<String> _filters = ['All', 'Urgent', 'Fee Circulars', 'School Events', 'General'];
 
@@ -91,28 +90,28 @@ class _AnnouncementsViewState extends State<AnnouncementsView> {
   Color _categoryColor(String category) {
     switch (category) {
       case 'Urgent':
-        return const Color(0xFFEF4444);
+        return AppColors.error;
       case 'Fee Circulars':
-        return const Color(0xFFF59E0B);
+        return AppColors.warning;
       case 'School Events':
-        return const Color(0xFF3B5998);
+        return AppColors.primary;
       case 'General':
       default:
-        return const Color(0xFF22C55E);
+        return AppColors.primaryLight;
     }
   }
 
   Color _categoryBg(String category) {
     switch (category) {
       case 'Urgent':
-        return const Color(0xFFFEE2E2);
+        return AppColors.errorLight;
       case 'Fee Circulars':
-        return const Color(0xFFFEF3C7);
+        return AppColors.warningLight;
       case 'School Events':
-        return const Color(0xFFEFF6FF);
+        return AppColors.softBlue;
       case 'General':
       default:
-        return const Color(0xFFDCFCE7);
+        return AppColors.softBlue;
     }
   }
 
@@ -133,10 +132,10 @@ class _AnnouncementsViewState extends State<AnnouncementsView> {
     }).toList();
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: AppColors.background,
       appBar: AppBar(
-        backgroundColor: primaryBlue,
-        elevation: 1,
+        backgroundColor: AppColors.primary,
+        elevation: 0,
         iconTheme: const IconThemeData(color: Colors.white),
         title: const Text(
           'Announcements',
@@ -145,20 +144,20 @@ class _AnnouncementsViewState extends State<AnnouncementsView> {
         ),
       ),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator(color: primaryBlue))
+          ? const Center(child: CircularProgressIndicator(color: AppColors.primary))
           : _errorMessage != null
               ? Center(
                   child: Text(_errorMessage!,
                       style: const TextStyle(
-                          color: primaryBlue, fontWeight: FontWeight.bold)))
+                          color: AppColors.error, fontWeight: FontWeight.bold)))
               : RefreshIndicator(
                   onRefresh: _fetchAnnouncements,
-                  color: primaryBlue,
+                  color: AppColors.primary,
                   child: Column(
                     children: [
                       // Search + Filter bar
                       Container(
-                        color: Colors.white,
+                        color: AppColors.surface,
                         padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
                         child: Column(
                           children: [
@@ -168,9 +167,9 @@ class _AnnouncementsViewState extends State<AnnouncementsView> {
                                   setState(() => _searchQuery = val.trim()),
                               decoration: InputDecoration(
                                 hintText: 'Search announcements...',
-                                hintStyle: const TextStyle(fontSize: 14),
+                                hintStyle: const TextStyle(fontSize: 13, color: AppColors.textLight),
                                 prefixIcon: const Icon(Icons.search_rounded,
-                                    color: primaryBlue, size: 20),
+                                    color: AppColors.primaryLight, size: 20),
                                 suffixIcon: _searchQuery.isNotEmpty
                                     ? IconButton(
                                         icon: const Icon(Icons.clear_rounded,
@@ -180,23 +179,23 @@ class _AnnouncementsViewState extends State<AnnouncementsView> {
                                       )
                                     : null,
                                 filled: true,
-                                fillColor: const Color(0xFFF1F5F9),
+                                fillColor: AppColors.softBlue,
                                 contentPadding: const EdgeInsets.symmetric(
                                     horizontal: 14, vertical: 10),
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(10),
                                   borderSide: const BorderSide(
-                                      color: Color(0xFFE2E8F0)),
+                                      color: AppColors.blueBorder),
                                 ),
                                 enabledBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(10),
                                   borderSide: const BorderSide(
-                                      color: Color(0xFFE2E8F0)),
+                                      color: AppColors.blueBorder),
                                 ),
                                 focusedBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(10),
                                   borderSide: const BorderSide(
-                                      color: primaryBlue, width: 1.5),
+                                      color: AppColors.primaryLight, width: 1.5),
                                 ),
                               ),
                             ),
@@ -217,14 +216,14 @@ class _AnnouncementsViewState extends State<AnnouncementsView> {
                                             horizontal: 14, vertical: 7),
                                         decoration: BoxDecoration(
                                           color: isSel
-                                              ? primaryBlue
-                                              : const Color(0xFFF1F5F9),
+                                              ? AppColors.primary
+                                              : AppColors.softBlue,
                                           borderRadius:
                                               BorderRadius.circular(20),
                                           border: Border.all(
                                             color: isSel
-                                                ? primaryBlue
-                                                : const Color(0xFFCBD5E1),
+                                                ? AppColors.primary
+                                                : AppColors.blueBorder,
                                           ),
                                         ),
                                         child: Text(
@@ -232,7 +231,7 @@ class _AnnouncementsViewState extends State<AnnouncementsView> {
                                           style: TextStyle(
                                             color: isSel
                                                 ? Colors.white
-                                                : const Color(0xFF475569),
+                                                : AppColors.primaryDark,
                                             fontWeight: FontWeight.bold,
                                             fontSize: 12,
                                           ),
@@ -246,7 +245,7 @@ class _AnnouncementsViewState extends State<AnnouncementsView> {
                           ],
                         ),
                       ),
-                      const Divider(height: 1, color: Color(0xFFE2E8F0)),
+                      const Divider(height: 1, color: AppColors.divider),
 
                       // Announcement list
                       Expanded(
@@ -260,19 +259,19 @@ class _AnnouncementsViewState extends State<AnnouncementsView> {
                                         width: 64,
                                         height: 64,
                                         decoration: BoxDecoration(
-                                          color: primaryBlue.withValues(alpha: 0.08),
+                                          color: AppColors.softBlue,
                                           borderRadius: BorderRadius.circular(32),
                                         ),
                                         child: const Icon(
                                             Icons.campaign_outlined,
-                                            color: primaryBlue,
+                                            color: AppColors.primary,
                                             size: 32),
                                       ),
                                       const SizedBox(height: 16),
                                       const Text(
                                         'No announcements found.',
                                         style: TextStyle(
-                                            color: Color(0xFF6B7280),
+                                            color: AppColors.textMuted,
                                             fontWeight: FontWeight.bold),
                                       ),
                                     ],
@@ -293,22 +292,22 @@ class _AnnouncementsViewState extends State<AnnouncementsView> {
                                   return Container(
                                     margin: const EdgeInsets.only(bottom: 12),
                                     decoration: BoxDecoration(
-                                      color: Colors.white,
-                                      borderRadius: BorderRadius.circular(8),
+                                      color: AppColors.surface,
+                                      borderRadius: BorderRadius.circular(10),
                                       border: Border(
                                         left: BorderSide(
                                             color: catColor, width: 4),
                                         top: const BorderSide(
-                                            color: Color(0xFFE2E8F0)),
+                                            color: AppColors.cardBorder),
                                         right: const BorderSide(
-                                            color: Color(0xFFE2E8F0)),
+                                            color: AppColors.cardBorder),
                                         bottom: const BorderSide(
-                                            color: Color(0xFFE2E8F0)),
+                                            color: AppColors.cardBorder),
                                       ),
                                       boxShadow: [
                                         BoxShadow(
                                           color: Colors.black
-                                              .withValues(alpha: 0.03),
+                                              .withValues(alpha: 0.02),
                                           blurRadius: 4,
                                           offset: const Offset(0, 2),
                                         ),
@@ -349,7 +348,7 @@ class _AnnouncementsViewState extends State<AnnouncementsView> {
                                                     '',
                                                 style: const TextStyle(
                                                     fontSize: 11,
-                                                    color: Color(0xFF6B7280),
+                                                    color: AppColors.textMuted,
                                                     fontWeight: FontWeight.w500),
                                               ),
                                             ],
@@ -358,15 +357,15 @@ class _AnnouncementsViewState extends State<AnnouncementsView> {
                                           Text(
                                             alert['title'] ?? '',
                                             style: const TextStyle(
-                                                color: Color(0xFF1E293B),
+                                                color: AppColors.textPrimary,
                                                 fontWeight: FontWeight.bold,
-                                                fontSize: 15),
+                                                fontSize: 14),
                                           ),
                                           const SizedBox(height: 6),
                                           Text(
                                             alert['content'] ?? '',
                                             style: const TextStyle(
-                                                color: Color(0xFF475569),
+                                                color: AppColors.textSecondary,
                                                 fontSize: 13,
                                                 height: 1.4),
                                           ),
@@ -381,14 +380,14 @@ class _AnnouncementsViewState extends State<AnnouncementsView> {
                                                       content: Text(
                                                           'Opening detailed view...'),
                                                       backgroundColor:
-                                                          primaryBlue,
+                                                          AppColors.primary,
                                                     ),
                                                   );
                                                 },
                                                 child: const Text(
                                                   'View Details →',
                                                   style: TextStyle(
-                                                    color: primaryBlue,
+                                                    color: AppColors.primary,
                                                     fontWeight: FontWeight.bold,
                                                     fontSize: 13,
                                                   ),

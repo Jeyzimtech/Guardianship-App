@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../core/app_colors.dart';
 
 class AttendanceCalendarView extends StatelessWidget {
   final bool showAppBar;
@@ -6,20 +7,14 @@ class AttendanceCalendarView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const mintGreen = Color(0xFF2563EB);
-    const darkTeal = Color(0xFF0B2144);
-    const redAccent = Color(0xFFFF2D55);
-    const orangeAccent = Color(0xFFFF9500);
-    const cyanAccent = Color(0xFF00E5FF);
-
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.background,
       appBar: showAppBar
           ? AppBar(
-              backgroundColor: Colors.white,
+              backgroundColor: AppColors.primary,
               elevation: 0,
               leading: IconButton(
-                icon: const Icon(Icons.arrow_back, color: mintGreen),
+                icon: const Icon(Icons.arrow_back, color: Colors.white),
                 onPressed: () {
                   if (Navigator.canPop(context)) {
                     Navigator.pop(context);
@@ -27,24 +22,17 @@ class AttendanceCalendarView extends StatelessWidget {
                 },
               ),
               title: const Text(
-                'Attendance',
+                'Attendance Calendar',
                 style: TextStyle(
-                  color: mintGreen,
-                  fontSize: 20,
+                  color: Colors.white,
+                  fontSize: 18,
                   fontWeight: FontWeight.bold,
                 ),
               ),
               actions: [
-                Container(
-                  margin: const EdgeInsets.only(right: 16),
-                  decoration: const BoxDecoration(
-                    color: mintGreen,
-                    shape: BoxShape.circle,
-                  ),
-                  child: IconButton(
-                    icon: const Icon(Icons.sync_rounded, color: Colors.white),
-                    onPressed: () {},
-                  ),
+                IconButton(
+                  icon: const Icon(Icons.sync_rounded, color: Colors.white),
+                  onPressed: () {},
                 ),
               ],
             )
@@ -53,13 +41,20 @@ class AttendanceCalendarView extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            // Mint Green Calendar Card
+            // Blue Calendar Card
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: mintGreen,
-                borderRadius: BorderRadius.circular(20),
+                gradient: AppColors.primaryGradient,
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.primary.withValues(alpha: 0.2),
+                    blurRadius: 8,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
               ),
               child: Column(
                 children: [
@@ -95,9 +90,9 @@ class AttendanceCalendarView extends StatelessWidget {
                                 child: Text(
                                   day,
                                   style: const TextStyle(
-                                    color: Colors.white,
+                                    color: Colors.white70,
                                     fontWeight: FontWeight.bold,
-                                    fontSize: 13,
+                                    fontSize: 12,
                                   ),
                                 ),
                               ),
@@ -114,25 +109,26 @@ class AttendanceCalendarView extends StatelessWidget {
                     crossAxisSpacing: 8,
                     children: List.generate(30, (index) {
                       final day = index + 1;
-                      bool isDarkTeal = [3, 4, 5, 7, 8, 9, 10].contains(day);
-                      bool isRed = day == 6;
+                      bool isPresent = [3, 4, 5, 7, 8, 9, 10].contains(day);
+                      bool isAbsent = day == 6;
 
                       Widget dayWidget = Center(
                         child: Text(
                           '$day',
                           style: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.9),
-                            fontWeight: FontWeight.w600,
-                            fontSize: 14,
+                            color: Colors.white.withValues(alpha: 0.8),
+                            fontWeight: FontWeight.w500,
+                            fontSize: 13,
                           ),
                         ),
                       );
 
-                      if (isDarkTeal) {
+                      if (isPresent) {
                         dayWidget = Container(
-                          decoration: const BoxDecoration(
-                            color: darkTeal,
+                          decoration: BoxDecoration(
+                            color: Colors.white.withValues(alpha: 0.25),
                             shape: BoxShape.circle,
+                            border: Border.all(color: Colors.white, width: 1.5),
                           ),
                           child: Center(
                             child: Text(
@@ -144,10 +140,10 @@ class AttendanceCalendarView extends StatelessWidget {
                             ),
                           ),
                         );
-                      } else if (isRed) {
+                      } else if (isAbsent) {
                         dayWidget = Container(
                           decoration: const BoxDecoration(
-                            color: redAccent,
+                            color: AppColors.error,
                             shape: BoxShape.circle,
                           ),
                           child: Center(
@@ -171,13 +167,13 @@ class AttendanceCalendarView extends StatelessWidget {
             const SizedBox(height: 20),
 
             // Status Pills
-            _buildStatusPill('Present', '7', mintGreen, darkTeal),
-            const SizedBox(height: 12),
-            _buildStatusPill('Absent', '1', mintGreen, redAccent),
-            const SizedBox(height: 12),
-            _buildStatusPill('Late', '0', mintGreen, orangeAccent),
-            const SizedBox(height: 12),
-            _buildStatusPill('Excused', '0', mintGreen, cyanAccent),
+            _buildStatusPill('Present', '7', AppColors.primary, AppColors.softBlue),
+            const SizedBox(height: 10),
+            _buildStatusPill('Absent', '1', AppColors.error, AppColors.errorLight),
+            const SizedBox(height: 10),
+            _buildStatusPill('Late', '0', AppColors.warning, AppColors.warningLight),
+            const SizedBox(height: 10),
+            _buildStatusPill('Excused', '0', AppColors.primaryLight, AppColors.softBlue),
           ],
         ),
       ),
@@ -185,39 +181,54 @@ class AttendanceCalendarView extends StatelessWidget {
   }
 
   Widget _buildStatusPill(
-      String label, String count, Color backgroundColor, Color badgeColor) {
+      String label, String count, Color accentColor, Color bg) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
-        color: backgroundColor,
-        borderRadius: BorderRadius.circular(30),
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.cardBorder),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            label,
-            style: const TextStyle(
-              color: Color(0xFF0B5549),
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-            ),
+          Row(
+            children: [
+              Container(
+                width: 10,
+                height: 10,
+                decoration: BoxDecoration(
+                  color: accentColor,
+                  shape: BoxShape.circle,
+                ),
+              ),
+              const SizedBox(width: 10),
+              Text(
+                label,
+                style: const TextStyle(
+                  color: AppColors.textPrimary,
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
           ),
           Container(
-            width: 44,
-            height: 44,
+            width: 36,
+            height: 36,
             decoration: BoxDecoration(
-              color: badgeColor,
-              shape: BoxShape.circle,
+              color: bg,
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: accentColor.withValues(alpha: 0.3)),
             ),
             child: Center(
               child: Text(
                 count,
-                style: const TextStyle(
-                  color: Colors.white,
+                style: TextStyle(
+                  color: accentColor,
                   fontWeight: FontWeight.bold,
-                  fontSize: 16,
+                  fontSize: 14,
                 ),
               ),
             ),
