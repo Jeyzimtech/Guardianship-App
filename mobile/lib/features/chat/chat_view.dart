@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../core/app_colors.dart';
 
 class ChatView extends StatefulWidget {
   final bool showAppBar;
@@ -40,16 +41,14 @@ class _ChatViewState extends State<ChatView> {
 
   @override
   Widget build(BuildContext context) {
-    const darkTeal = Color(0xFF0B2144);
-    
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.background,
       appBar: widget.showAppBar
           ? AppBar(
-              backgroundColor: Colors.white,
+              backgroundColor: AppColors.primary,
               elevation: 0,
               leading: IconButton(
-                icon: const Icon(Icons.arrow_back, color: darkTeal),
+                icon: const Icon(Icons.arrow_back, color: Colors.white),
                 onPressed: () {
                   if (Navigator.canPop(context)) {
                     Navigator.pop(context);
@@ -59,7 +58,7 @@ class _ChatViewState extends State<ChatView> {
               title: const Text(
                 'Student 1 [Student]',
                 style: TextStyle(
-                  color: darkTeal,
+                  color: Colors.white,
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                 ),
@@ -85,8 +84,8 @@ class _ChatViewState extends State<ChatView> {
                         padding: const EdgeInsets.symmetric(vertical: 12.0),
                         child: Text(
                           msg['timestamp'],
-                          style: TextStyle(
-                            color: Colors.grey.shade500,
+                          style: const TextStyle(
+                            color: AppColors.textMuted,
                             fontSize: 12,
                             fontWeight: FontWeight.w500,
                           ),
@@ -103,14 +102,17 @@ class _ChatViewState extends State<ChatView> {
                         padding: const EdgeInsets.symmetric(
                             horizontal: 16, vertical: 12),
                         decoration: BoxDecoration(
-                          color: isMe ? darkTeal : const Color(0xFFF3F4F6),
+                          color: isMe ? AppColors.primary : AppColors.surface,
                           borderRadius: BorderRadius.circular(16),
+                          border: Border.all(
+                            color: isMe ? AppColors.primary : AppColors.cardBorder,
+                          ),
                         ),
                         child: Text(
                           msg['text'],
                           style: TextStyle(
-                            color: isMe ? Colors.white : const Color(0xFF1F2937),
-                            fontSize: 15,
+                            color: isMe ? Colors.white : AppColors.textPrimary,
+                            fontSize: 14,
                             height: 1.3,
                           ),
                         ),
@@ -124,9 +126,9 @@ class _ChatViewState extends State<ChatView> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
             decoration: const BoxDecoration(
-              color: Colors.white,
+              color: AppColors.surface,
               border: Border(
-                top: BorderSide(color: Color(0xFFF3F4F6), width: 1),
+                top: BorderSide(color: AppColors.divider, width: 1),
               ),
             ),
             child: SafeArea(
@@ -137,14 +139,15 @@ class _ChatViewState extends State<ChatView> {
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFF3F4F6),
+                        color: AppColors.softBlue,
                         borderRadius: BorderRadius.circular(14),
+                        border: Border.all(color: AppColors.blueBorder),
                       ),
                       child: TextField(
                         controller: _messageController,
                         decoration: const InputDecoration(
                           hintText: 'Type your message...',
-                          hintStyle: TextStyle(color: Color(0xFF9CA3AF), fontSize: 14),
+                          hintStyle: TextStyle(color: AppColors.textLight, fontSize: 13),
                           border: InputBorder.none,
                           enabledBorder: InputBorder.none,
                           focusedBorder: InputBorder.none,
@@ -158,7 +161,7 @@ class _ChatViewState extends State<ChatView> {
                   ElevatedButton(
                     onPressed: _sendMessage,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: darkTeal,
+                      backgroundColor: AppColors.primary,
                       foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
                       shape: RoundedRectangleBorder(

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../core/app_colors.dart';
 
 class SmsAlertsLogView extends StatefulWidget {
   const SmsAlertsLogView({super.key});
@@ -8,8 +9,6 @@ class SmsAlertsLogView extends StatefulWidget {
 }
 
 class _SmsAlertsLogViewState extends State<SmsAlertsLogView> {
-  static const primaryBlue = Color(0xFF3B5998);
-
   String _searchQuery = '';
 
   final List<Map<String, String>> _mockSmsLog = [
@@ -44,12 +43,13 @@ class _SmsAlertsLogViewState extends State<SmsAlertsLogView> {
     }).toList();
 
     return Scaffold(
+      backgroundColor: AppColors.background,
       appBar: AppBar(
         title: const Text(
           'Guardian SMS Alerts Log',
           style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
         ),
-        backgroundColor: primaryBlue,
+        backgroundColor: AppColors.primary,
         iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: Column(
@@ -57,15 +57,15 @@ class _SmsAlertsLogViewState extends State<SmsAlertsLogView> {
           // Info banner for low-connectivity guardians
           Container(
             padding: const EdgeInsets.all(12),
-            color: const Color(0xFFEFF6FF),
+            color: AppColors.softBlue,
             child: const Row(
               children: [
-                Icon(Icons.sms_rounded, color: primaryBlue, size: 18),
+                Icon(Icons.sms_rounded, color: AppColors.primary, size: 18),
                 SizedBox(width: 8),
                 Expanded(
                   child: Text(
                     'SMS guarantees delivery for low-connectivity guardians. Search complete alert history below.',
-                    style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: primaryBlue),
+                    style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppColors.primaryDark),
                   ),
                 ),
               ],
@@ -79,8 +79,13 @@ class _SmsAlertsLogViewState extends State<SmsAlertsLogView> {
               onChanged: (val) => setState(() => _searchQuery = val),
               decoration: InputDecoration(
                 hintText: 'Search SMS alerts by keyword or date...',
-                prefixIcon: const Icon(Icons.search),
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(6)),
+                hintStyle: const TextStyle(color: AppColors.textLight, fontSize: 13),
+                prefixIcon: const Icon(Icons.search, color: AppColors.primaryLight),
+                filled: true,
+                fillColor: AppColors.surface,
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: AppColors.cardBorder)),
+                enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: AppColors.cardBorder)),
+                focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: AppColors.primaryLight, width: 1.5)),
                 contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
               ),
             ),
@@ -89,7 +94,7 @@ class _SmsAlertsLogViewState extends State<SmsAlertsLogView> {
           // Searchable List
           Expanded(
             child: filtered.isEmpty
-                ? const Center(child: Text('No SMS alerts match your search.', style: TextStyle(color: Colors.grey)))
+                ? const Center(child: Text('No SMS alerts match your search.', style: TextStyle(color: AppColors.textMuted)))
                 : ListView.builder(
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     itemCount: filtered.length,
@@ -99,9 +104,9 @@ class _SmsAlertsLogViewState extends State<SmsAlertsLogView> {
                         margin: const EdgeInsets.only(bottom: 12),
                         padding: const EdgeInsets.all(14),
                         decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(6),
-                          border: Border.all(color: const Color(0xFFE2E8F0)),
+                          color: AppColors.surface,
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(color: AppColors.cardBorder),
                         ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -111,27 +116,27 @@ class _SmsAlertsLogViewState extends State<SmsAlertsLogView> {
                               children: [
                                 Text(
                                   item['sender'] ?? '',
-                                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: primaryBlue),
+                                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AppColors.primaryDark),
                                 ),
                                 Text(
                                   item['date'] ?? '',
-                                  style: const TextStyle(fontSize: 11, color: Colors.grey),
+                                  style: const TextStyle(fontSize: 11, color: AppColors.textMuted),
                                 ),
                               ],
                             ),
                             const SizedBox(height: 6),
                             Text(
                               item['message'] ?? '',
-                              style: const TextStyle(fontSize: 13, height: 1.3),
+                              style: const TextStyle(fontSize: 13, height: 1.3, color: AppColors.textPrimary),
                             ),
                             const SizedBox(height: 6),
                             Row(
                               children: [
-                                const Icon(Icons.check_circle_outline, size: 12, color: Color(0xFF10B981)),
+                                const Icon(Icons.check_circle_outline, size: 14, color: AppColors.primaryLight),
                                 const SizedBox(width: 4),
                                 Text(
                                   item['channel'] ?? '',
-                                  style: const TextStyle(fontSize: 10, color: Color(0xFF10B981), fontWeight: FontWeight.w600),
+                                  style: const TextStyle(fontSize: 10, color: AppColors.primary, fontWeight: FontWeight.w600),
                                 ),
                               ],
                             ),

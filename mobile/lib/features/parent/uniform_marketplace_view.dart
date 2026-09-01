@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../core/app_colors.dart';
 
 class UniformMarketplaceView extends StatefulWidget {
   final Map<String, dynamic>? child;
@@ -10,10 +11,10 @@ class UniformMarketplaceView extends StatefulWidget {
 }
 
 class _UniformMarketplaceViewState extends State<UniformMarketplaceView> with SingleTickerProviderStateMixin {
-  static const primaryBlue = Color(0xFF3B5998);
-  static const secondaryBlue = Color(0xFF5B7BD5);
-  static const accentGreen = Color(0xFF10B981);
-  static const borderColor = Color(0xFFE2E8F0);
+  static const primaryBlue = AppColors.primary;
+  static const secondaryBlue = AppColors.primaryLight;
+  static const accentGreen = AppColors.primaryLight;
+  static const borderColor = AppColors.cardBorder;
 
   late TabController _tabController;
   String _selectedCategory = 'All';
