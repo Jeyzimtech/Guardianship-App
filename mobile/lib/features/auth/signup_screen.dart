@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../core/auth_provider.dart';
+import '../../core/app_colors.dart';
 import 'login_screen.dart';
 
 class SignupScreen extends StatefulWidget {
@@ -90,13 +91,8 @@ class _SignupScreenState extends State<SignupScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final primaryColor = theme.primaryColor;
-    final accentColor = theme.colorScheme.secondary;
-    final backgroundColor = theme.scaffoldBackgroundColor;
-
     return Scaffold(
-      backgroundColor: backgroundColor,
+      backgroundColor: AppColors.background,
       body: SafeArea(
         child: Stack(
           children: [
@@ -105,7 +101,7 @@ class _SignupScreenState extends State<SignupScreen> {
               top: 10,
               left: 10,
               child: IconButton(
-                icon: Icon(Icons.arrow_back_ios_new_rounded, color: primaryColor),
+                icon: const Icon(Icons.arrow_back_ios_new_rounded, color: AppColors.primary),
                 onPressed: () {
                   Navigator.of(context).pushReplacement(
                     MaterialPageRoute(builder: (_) => const LoginScreen()),
@@ -123,36 +119,44 @@ class _SignupScreenState extends State<SignupScreen> {
                   children: [
                     const SizedBox(height: 40),
                     
-                    // Logo Graphic Embedded directly on Background
+                    // Logo Graphic
                     Center(
-                      child: Image.asset(
-                        'assets/logo.png',
-                        height: 80,
-                        width: 80,
-                        fit: BoxFit.contain,
+                      child: Container(
+                        padding: const EdgeInsets.all(14),
+                        decoration: BoxDecoration(
+                          color: AppColors.softBlue,
+                          shape: BoxShape.circle,
+                          border: Border.all(color: AppColors.blueBorder, width: 1.5),
+                        ),
+                        child: Image.asset(
+                          'assets/logo.png',
+                          height: 60,
+                          width: 60,
+                          fit: BoxFit.contain,
+                        ),
                       ),
                     ),
-                    const SizedBox(height: 24),
+                    const SizedBox(height: 20),
                     
                     // Header
-                    Text(
+                    const Text(
                       'Create Account',
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                        fontSize: 28,
-                        fontWeight: FontWeight.w800,
-                        color: primaryColor,
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.primaryDark,
                       ),
                     ),
                     const SizedBox(height: 6),
                     
                     // Subtitle
-                    Text(
+                    const Text(
                       'Register as a Parent or Teacher to get started',
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 14,
-                        color: Colors.grey[600],
+                        color: AppColors.textMuted,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -161,26 +165,26 @@ class _SignupScreenState extends State<SignupScreen> {
                     // Full Name Field
                     TextField(
                       controller: _nameController,
-                      style: TextStyle(color: primaryColor, fontWeight: FontWeight.w500),
+                      style: const TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w500),
                       keyboardType: TextInputType.name,
                       decoration: InputDecoration(
                         hintText: 'Full Name',
-                        hintStyle: TextStyle(color: Colors.grey[400], fontSize: 14),
-                        prefixIcon: Icon(Icons.person_outline_rounded, color: Colors.grey[400]),
+                        hintStyle: const TextStyle(color: AppColors.textLight, fontSize: 14),
+                        prefixIcon: const Icon(Icons.person_outline_rounded, color: AppColors.primaryLight),
                         filled: true,
-                        fillColor: Colors.white,
+                        fillColor: AppColors.surface,
                         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(color: Color(0xFFE2E8F0), width: 1.0),
+                          borderSide: const BorderSide(color: AppColors.cardBorder, width: 1.0),
                         ),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(color: Color(0xFFE2E8F0), width: 1.0),
+                          borderSide: const BorderSide(color: AppColors.cardBorder, width: 1.0),
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(color: accentColor, width: 1.5),
+                          borderSide: const BorderSide(color: AppColors.primaryLight, width: 1.8),
                         ),
                       ),
                     ),
@@ -189,26 +193,26 @@ class _SignupScreenState extends State<SignupScreen> {
                     // Email Field
                     TextField(
                       controller: _emailController,
-                      style: TextStyle(color: primaryColor, fontWeight: FontWeight.w500),
+                      style: const TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w500),
                       keyboardType: TextInputType.emailAddress,
                       decoration: InputDecoration(
                         hintText: 'Email Address',
-                        hintStyle: TextStyle(color: Colors.grey[400], fontSize: 14),
-                        prefixIcon: Icon(Icons.email_outlined, color: Colors.grey[400]),
+                        hintStyle: const TextStyle(color: AppColors.textLight, fontSize: 14),
+                        prefixIcon: const Icon(Icons.email_outlined, color: AppColors.primaryLight),
                         filled: true,
-                        fillColor: Colors.white,
+                        fillColor: AppColors.surface,
                         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(color: Color(0xFFE2E8F0), width: 1.0),
+                          borderSide: const BorderSide(color: AppColors.cardBorder, width: 1.0),
                         ),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(color: Color(0xFFE2E8F0), width: 1.0),
+                          borderSide: const BorderSide(color: AppColors.cardBorder, width: 1.0),
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(color: accentColor, width: 1.5),
+                          borderSide: const BorderSide(color: AppColors.primaryLight, width: 1.8),
                         ),
                       ),
                     ),
@@ -218,32 +222,32 @@ class _SignupScreenState extends State<SignupScreen> {
                     TextField(
                       controller: _passwordController,
                       obscureText: _isObscuredPassword,
-                      style: TextStyle(color: primaryColor, fontWeight: FontWeight.w500),
+                      style: const TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w500),
                       decoration: InputDecoration(
                         hintText: 'Password',
-                        hintStyle: TextStyle(color: Colors.grey[400], fontSize: 14),
-                        prefixIcon: Icon(Icons.lock_outline_rounded, color: Colors.grey[400]),
+                        hintStyle: const TextStyle(color: AppColors.textLight, fontSize: 14),
+                        prefixIcon: const Icon(Icons.lock_outline_rounded, color: AppColors.primaryLight),
                         suffixIcon: IconButton(
                           icon: Icon(
                             _isObscuredPassword ? Icons.visibility_off_outlined : Icons.visibility_outlined,
-                            color: Colors.grey[400],
+                            color: AppColors.textLight,
                           ),
                           onPressed: () => setState(() => _isObscuredPassword = !_isObscuredPassword),
                         ),
                         filled: true,
-                        fillColor: Colors.white,
+                        fillColor: AppColors.surface,
                         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(color: Color(0xFFE2E8F0), width: 1.0),
+                          borderSide: const BorderSide(color: AppColors.cardBorder, width: 1.0),
                         ),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(color: Color(0xFFE2E8F0), width: 1.0),
+                          borderSide: const BorderSide(color: AppColors.cardBorder, width: 1.0),
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(color: accentColor, width: 1.5),
+                          borderSide: const BorderSide(color: AppColors.primaryLight, width: 1.8),
                         ),
                       ),
                     ),
@@ -253,32 +257,32 @@ class _SignupScreenState extends State<SignupScreen> {
                     TextField(
                       controller: _confirmPasswordController,
                       obscureText: _isObscuredConfirm,
-                      style: TextStyle(color: primaryColor, fontWeight: FontWeight.w500),
+                      style: const TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w500),
                       decoration: InputDecoration(
                         hintText: 'Confirm Password',
-                        hintStyle: TextStyle(color: Colors.grey[400], fontSize: 14),
-                        prefixIcon: Icon(Icons.lock_outline_rounded, color: Colors.grey[400]),
+                        hintStyle: const TextStyle(color: AppColors.textLight, fontSize: 14),
+                        prefixIcon: const Icon(Icons.lock_outline_rounded, color: AppColors.primaryLight),
                         suffixIcon: IconButton(
                           icon: Icon(
                             _isObscuredConfirm ? Icons.visibility_off_outlined : Icons.visibility_outlined,
-                            color: Colors.grey[400],
+                            color: AppColors.textLight,
                           ),
                           onPressed: () => setState(() => _isObscuredConfirm = !_isObscuredConfirm),
                         ),
                         filled: true,
-                        fillColor: Colors.white,
+                        fillColor: AppColors.surface,
                         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(color: Color(0xFFE2E8F0), width: 1.0),
+                          borderSide: const BorderSide(color: AppColors.cardBorder, width: 1.0),
                         ),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(color: Color(0xFFE2E8F0), width: 1.0),
+                          borderSide: const BorderSide(color: AppColors.cardBorder, width: 1.0),
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(color: accentColor, width: 1.5),
+                          borderSide: const BorderSide(color: AppColors.primaryLight, width: 1.8),
                         ),
                       ),
                     ),
@@ -287,32 +291,32 @@ class _SignupScreenState extends State<SignupScreen> {
                     // Account Type Select Dropdown
                     DropdownButtonFormField<String>(
                       initialValue: _selectedRole,
-                      dropdownColor: Colors.white,
-                      style: TextStyle(color: primaryColor, fontWeight: FontWeight.w500),
+                      dropdownColor: AppColors.surface,
+                      style: const TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w500),
                       decoration: InputDecoration(
                         hintText: 'Account Type',
-                        hintStyle: TextStyle(color: Colors.grey[400], fontSize: 14),
-                        prefixIcon: Icon(Icons.group_outlined, color: Colors.grey[400]),
+                        hintStyle: const TextStyle(color: AppColors.textLight, fontSize: 14),
+                        prefixIcon: const Icon(Icons.group_outlined, color: AppColors.primaryLight),
                         filled: true,
-                        fillColor: Colors.white,
+                        fillColor: AppColors.surface,
                         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(color: Color(0xFFE2E8F0), width: 1.0),
+                          borderSide: const BorderSide(color: AppColors.cardBorder, width: 1.0),
                         ),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(color: Color(0xFFE2E8F0), width: 1.0),
+                          borderSide: const BorderSide(color: AppColors.cardBorder, width: 1.0),
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(color: accentColor, width: 1.5),
+                          borderSide: const BorderSide(color: AppColors.primaryLight, width: 1.8),
                         ),
                       ),
                       items: ['Parent / Student', 'Teacher'].map((role) {
                         return DropdownMenuItem<String>(
                           value: role,
-                          child: Text(role, style: TextStyle(color: primaryColor)),
+                          child: Text(role, style: const TextStyle(color: AppColors.textPrimary)),
                         );
                       }).toList(),
                       onChanged: (val) {
@@ -327,13 +331,14 @@ class _SignupScreenState extends State<SignupScreen> {
                     ElevatedButton(
                       onPressed: _isAuthenticating ? null : _signup,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: accentColor,
+                        backgroundColor: AppColors.primary,
                         foregroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
-                        elevation: 0,
+                        elevation: 1,
+                        shadowColor: AppColors.primary.withValues(alpha: 0.4),
                       ),
                       child: _isAuthenticating
                           ? const SizedBox(
@@ -349,9 +354,9 @@ class _SignupScreenState extends State<SignupScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text(
+                        const Text(
                           'Already have an account? ',
-                          style: TextStyle(color: Colors.grey[500], fontWeight: FontWeight.w500, fontSize: 14),
+                          style: TextStyle(color: AppColors.textMuted, fontWeight: FontWeight.w500, fontSize: 14),
                         ),
                         TextButton(
                           onPressed: () {
@@ -359,10 +364,10 @@ class _SignupScreenState extends State<SignupScreen> {
                               MaterialPageRoute(builder: (_) => const LoginScreen()),
                             );
                           },
-                          child: Text(
+                          child: const Text(
                             'Log In',
                             style: TextStyle(
-                              color: accentColor,
+                              color: AppColors.primaryLight,
                               fontWeight: FontWeight.bold,
                               fontSize: 14,
                             ),
