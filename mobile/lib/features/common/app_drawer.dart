@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../core/auth_provider.dart';
 import '../../core/student_provider.dart';
+import '../../core/app_colors.dart';
 import '../profile/profile_view.dart';
 import '../parent/uniform_marketplace_view.dart';
 import '../parent/learning_journal_view.dart';
@@ -19,9 +20,9 @@ class AppDrawer extends StatelessWidget {
     required this.currentRoute,
   });
 
-  static const primaryBlue = Color(0xFF3B5998);
-  static const sidebarBg = Color(0xFFF5F6F7);
-  static const borderColor = Color(0xFFD8D8D8);
+  static const primaryBlue = AppColors.primary;
+  static const sidebarBg = AppColors.surface;
+  static const borderColor = AppColors.cardBorder;
 
   Widget _buildDrawerItem(
     BuildContext context, {
@@ -33,7 +34,7 @@ class AppDrawer extends StatelessWidget {
 
     return Container(
       decoration: BoxDecoration(
-        color: isSelected ? const Color(0x143B5998) : Colors.transparent,
+        color: isSelected ? AppColors.softBlue : Colors.transparent,
         border: Border(
           left: BorderSide(
             color: isSelected ? primaryBlue : Colors.transparent,
@@ -46,13 +47,13 @@ class AppDrawer extends StatelessWidget {
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
         leading: Icon(
           icon,
-          color: isSelected ? primaryBlue : const Color(0xFF64748B),
+          color: isSelected ? primaryBlue : AppColors.textMuted,
           size: 20,
         ),
         title: Text(
           title,
           style: TextStyle(
-            color: isSelected ? primaryBlue : const Color(0xFF1F2937),
+            color: isSelected ? primaryBlue : AppColors.textPrimary,
             fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
             fontSize: 14,
           ),

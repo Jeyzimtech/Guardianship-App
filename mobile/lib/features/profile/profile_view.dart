@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../core/auth_provider.dart';
 import '../../core/student_provider.dart';
+import '../../core/app_colors.dart';
 import '../school_management/school_management_screen.dart';
 import '../teacher_management/teacher_management_screen.dart';
 
@@ -24,7 +25,7 @@ class ProfileView extends StatelessWidget {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.surface,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -47,7 +48,7 @@ class ProfileView extends StatelessWidget {
                       width: 40,
                       height: 4,
                       decoration: BoxDecoration(
-                        color: Colors.grey.shade300,
+                        color: AppColors.blueBorder,
                         borderRadius: BorderRadius.circular(2),
                       ),
                     ),
@@ -55,24 +56,24 @@ class ProfileView extends StatelessWidget {
                   const SizedBox(height: 16),
                   Row(
                     children: [
-                      const Icon(Icons.edit_note_rounded, color: Color(0xFF2563EB), size: 28),
+                      const Icon(Icons.edit_note_rounded, color: AppColors.primary, size: 28),
                       const SizedBox(width: 8),
                       const Text(
                         'Edit Profile Information',
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
-                          color: Color(0xFF0B2144),
+                          color: AppColors.primaryDark,
                         ),
                       ),
                       const Spacer(),
                       IconButton(
-                        icon: const Icon(Icons.close),
+                        icon: const Icon(Icons.close, color: AppColors.textMuted),
                         onPressed: () => Navigator.pop(ctx),
                       ),
                     ],
                   ),
-                  const Divider(),
+                  const Divider(color: AppColors.divider),
                   const SizedBox(height: 12),
 
                   // Full Name
@@ -80,8 +81,10 @@ class ProfileView extends StatelessWidget {
                     controller: nameController,
                     decoration: InputDecoration(
                       labelText: 'Full Name',
-                      prefixIcon: const Icon(Icons.person_outline),
+                      labelStyle: const TextStyle(color: AppColors.textMuted),
+                      prefixIcon: const Icon(Icons.person_outline, color: AppColors.primaryLight),
                       border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                      focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: AppColors.primaryLight, width: 1.5)),
                       contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
                     ),
                   ),
@@ -93,8 +96,10 @@ class ProfileView extends StatelessWidget {
                     keyboardType: TextInputType.phone,
                     decoration: InputDecoration(
                       labelText: 'Phone Number',
-                      prefixIcon: const Icon(Icons.phone_outlined),
+                      labelStyle: const TextStyle(color: AppColors.textMuted),
+                      prefixIcon: const Icon(Icons.phone_outlined, color: AppColors.primaryLight),
                       border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                      focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: AppColors.primaryLight, width: 1.5)),
                       contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
                     ),
                   ),
@@ -106,8 +111,10 @@ class ProfileView extends StatelessWidget {
                     keyboardType: TextInputType.emailAddress,
                     decoration: InputDecoration(
                       labelText: 'Email Address',
-                      prefixIcon: const Icon(Icons.email_outlined),
+                      labelStyle: const TextStyle(color: AppColors.textMuted),
+                      prefixIcon: const Icon(Icons.email_outlined, color: AppColors.primaryLight),
                       border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                      focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: AppColors.primaryLight, width: 1.5)),
                       contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
                     ),
                   ),
@@ -119,8 +126,10 @@ class ProfileView extends StatelessWidget {
                     maxLines: 2,
                     decoration: InputDecoration(
                       labelText: 'Home / Postal Address',
-                      prefixIcon: const Icon(Icons.location_on_outlined),
+                      labelStyle: const TextStyle(color: AppColors.textMuted),
+                      prefixIcon: const Icon(Icons.location_on_outlined, color: AppColors.primaryLight),
                       border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                      focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: AppColors.primaryLight, width: 1.5)),
                       contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
                     ),
                   ),
@@ -128,11 +137,13 @@ class ProfileView extends StatelessWidget {
 
                   // Preferred Language
                   DropdownButtonFormField<String>(
-                    initialValue: languages.contains(selectedLanguage) ? selectedLanguage : languages.first,
+                    value: languages.contains(selectedLanguage) ? selectedLanguage : languages.first,
                     decoration: InputDecoration(
                       labelText: 'Preferred Language',
-                      prefixIcon: const Icon(Icons.language_rounded),
+                      labelStyle: const TextStyle(color: AppColors.textMuted),
+                      prefixIcon: const Icon(Icons.language_rounded, color: AppColors.primaryLight),
                       border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                      focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: AppColors.primaryLight, width: 1.5)),
                       contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
                     ),
                     items: languages.map((lang) {
@@ -140,21 +151,32 @@ class ProfileView extends StatelessWidget {
                     }).toList(),
                     onChanged: (val) {
                       if (val != null) {
-                        setModalState(() {
-                          selectedLanguage = val;
-                        });
+                        setModalState(() => selectedLanguage = val);
                       }
                     },
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 16),
+
+                  // Emergency Contact Section Header
+                  const Text(
+                    'Emergency Contact Details',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.primaryDark,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
 
                   // Emergency Contact Name
                   TextField(
                     controller: emergencyNameController,
                     decoration: InputDecoration(
-                      labelText: 'Emergency Contact Name',
-                      prefixIcon: const Icon(Icons.contact_phone_outlined),
+                      labelText: 'Emergency Contact Person',
+                      labelStyle: const TextStyle(color: AppColors.textMuted),
+                      prefixIcon: const Icon(Icons.contact_phone_outlined, color: AppColors.primaryLight),
                       border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                      focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: AppColors.primaryLight, width: 1.5)),
                       contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
                     ),
                   ),
@@ -165,27 +187,30 @@ class ProfileView extends StatelessWidget {
                     controller: emergencyPhoneController,
                     keyboardType: TextInputType.phone,
                     decoration: InputDecoration(
-                      labelText: 'Emergency Contact Phone',
-                      prefixIcon: const Icon(Icons.emergency_outlined),
+                      labelText: 'Emergency Contact Phone Number',
+                      labelStyle: const TextStyle(color: AppColors.textMuted),
+                      prefixIcon: const Icon(Icons.phone_in_talk_outlined, color: AppColors.primaryLight),
                       border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                      focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: AppColors.primaryLight, width: 1.5)),
                       contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
                     ),
                   ),
                   const SizedBox(height: 20),
 
-                  // Submit Button
+                  // Save Button
                   SizedBox(
                     width: double.infinity,
                     height: 48,
                     child: ElevatedButton.icon(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF2563EB),
+                        backgroundColor: AppColors.primary,
                         foregroundColor: Colors.white,
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                       ),
                       onPressed: () async {
-                        final navigator = Navigator.of(ctx);
+                        final navigator = Navigator.of(context);
                         final scaffoldMessenger = ScaffoldMessenger.of(context);
+
                         final success = await authProvider.updateProfile(
                           name: nameController.text.trim(),
                           phone: phoneController.text.trim(),
@@ -201,7 +226,7 @@ class ProfileView extends StatelessWidget {
                           scaffoldMessenger.showSnackBar(
                             const SnackBar(
                               content: Text('Profile updated successfully!'),
-                              backgroundColor: Color(0xFF10B981),
+                              backgroundColor: AppColors.primary,
                             ),
                           );
                         }
@@ -224,20 +249,18 @@ class ProfileView extends StatelessWidget {
     final authProvider = Provider.of<AuthProvider>(context);
     final user = authProvider.user;
     final isTeacher = authProvider.isTeacher;
-    const primaryBlue = Color(0xFF2563EB);
-    const darkTeal = Color(0xFF0B2144);
 
     final defaultName = isTeacher ? 'Teacher Grace' : 'Guardian John Chewe';
     final defaultPhone = isTeacher ? '+263772222222' : '+263773333333';
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.background,
       appBar: showAppBar
           ? AppBar(
-              backgroundColor: Colors.white,
+              backgroundColor: AppColors.primary,
               elevation: 0,
               leading: IconButton(
-                icon: const Icon(Icons.arrow_back, color: primaryBlue),
+                icon: const Icon(Icons.arrow_back, color: Colors.white),
                 onPressed: () {
                   if (Navigator.canPop(context)) {
                     Navigator.pop(context);
@@ -247,14 +270,14 @@ class ProfileView extends StatelessWidget {
               title: const Text(
                 'My Profile',
                 style: TextStyle(
-                  color: primaryBlue,
+                  color: Colors.white,
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
                 ),
               ),
               actions: [
                 IconButton(
-                  icon: const Icon(Icons.edit_rounded, color: primaryBlue),
+                  icon: const Icon(Icons.edit_rounded, color: Colors.white),
                   tooltip: 'Edit Profile',
                   onPressed: () => _showEditProfileDialog(context, authProvider),
                 ),
@@ -271,15 +294,15 @@ class ProfileView extends StatelessWidget {
               padding: const EdgeInsets.all(4),
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                border: Border.all(color: primaryBlue, width: 2.5),
+                border: Border.all(color: AppColors.primary, width: 2.5),
               ),
               child: CircleAvatar(
                 radius: 46,
-                backgroundColor: isTeacher ? const Color(0xFFDBEAFE) : const Color(0xFFE5E7EB),
-                child: Icon(
-                  isTeacher ? Icons.person_rounded : Icons.person_rounded,
+                backgroundColor: AppColors.softBlue,
+                child: const Icon(
+                  Icons.person_rounded,
                   size: 54,
-                  color: isTeacher ? primaryBlue : Colors.grey.shade700,
+                  color: AppColors.primary,
                 ),
               ),
             ),
@@ -289,34 +312,34 @@ class ProfileView extends StatelessWidget {
               style: const TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.bold,
-                color: darkTeal,
+                color: AppColors.textPrimary,
               ),
             ),
             const SizedBox(height: 4),
             Text(
               user?['phone_number'] ?? defaultPhone,
-              style: TextStyle(fontSize: 14, color: Colors.grey.shade600),
+              style: const TextStyle(fontSize: 14, color: AppColors.textMuted),
             ),
             if (user?['email'] != null && (user!['email'] as String).isNotEmpty) ...[
               const SizedBox(height: 2),
               Text(
                 user['email'],
-                style: TextStyle(fontSize: 13, color: Colors.grey.shade600),
+                style: const TextStyle(fontSize: 13, color: AppColors.textMuted),
               ),
             ],
             const SizedBox(height: 2),
-            Text(
+            const Text(
               'Queens High School',
-              style: TextStyle(fontSize: 14, color: Colors.grey.shade600),
+              style: TextStyle(fontSize: 14, color: AppColors.textMuted),
             ),
             const SizedBox(height: 16),
             if (isTeacher) ...[
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFEFF6FF),
+                  color: AppColors.softBlue,
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: const Color(0xFFBFDBFE)),
+                  border: Border.all(color: AppColors.blueBorder),
                 ),
                 child: const Row(
                   mainAxisSize: MainAxisSize.min,
@@ -324,13 +347,13 @@ class ProfileView extends StatelessWidget {
                     Icon(
                       Icons.badge_outlined,
                       size: 18,
-                      color: primaryBlue,
+                      color: AppColors.primary,
                     ),
                     SizedBox(width: 8),
                     Text(
                       'Class Teacher',
                       style: TextStyle(
-                        color: primaryBlue,
+                        color: AppColors.primaryDark,
                         fontWeight: FontWeight.bold,
                         fontSize: 14,
                       ),
@@ -351,10 +374,10 @@ class ProfileView extends StatelessWidget {
                 icon: const Icon(Icons.edit_rounded),
                 label: const Text('Edit Profile Details', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: primaryBlue,
+                  backgroundColor: AppColors.primary,
                   foregroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(vertical: 14),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   elevation: 1,
                 ),
               ),
@@ -374,10 +397,10 @@ class ProfileView extends StatelessWidget {
                   icon: const Icon(Icons.badge_rounded),
                   label: const Text('View Class & Teacher Roster', style: TextStyle(fontWeight: FontWeight.bold)),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF0B5549),
+                    backgroundColor: AppColors.primaryLight,
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   ),
                 ),
               ),
@@ -395,10 +418,10 @@ class ProfileView extends StatelessWidget {
                 icon: const Icon(Icons.school_rounded),
                 label: const Text('View School & Class Information', style: TextStyle(fontWeight: FontWeight.bold)),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF0284C7),
+                  backgroundColor: AppColors.primaryAccent,
                   foregroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(vertical: 14),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 ),
               ),
             ),
@@ -414,12 +437,12 @@ class ProfileView extends StatelessWidget {
                     Navigator.of(context).popUntil((route) => route.isFirst);
                   }
                 },
-                icon: const Icon(Icons.logout_rounded, color: Colors.grey),
-                label: const Text('Log Out', style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold)),
+                icon: const Icon(Icons.logout_rounded, color: AppColors.textMuted),
+                label: const Text('Log Out', style: TextStyle(color: AppColors.textMuted, fontWeight: FontWeight.bold)),
                 style: OutlinedButton.styleFrom(
-                  side: const BorderSide(color: Colors.grey),
+                  side: const BorderSide(color: AppColors.blueBorder),
                   padding: const EdgeInsets.symmetric(vertical: 14),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 ),
               ),
             ),

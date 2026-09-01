@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../core/api_client.dart';
+import '../../core/app_colors.dart';
 import 'create_teacher_dialog.dart';
 
 class TeacherManagementScreen extends StatefulWidget {
@@ -11,8 +12,8 @@ class TeacherManagementScreen extends StatefulWidget {
 }
 
 class _TeacherManagementScreenState extends State<TeacherManagementScreen> {
-  static const darkTeal = Color(0xFF0B2144);
-  static const mintGreen = Color(0xFF2563EB);
+  static const darkTeal = AppColors.primary;
+  static const mintGreen = AppColors.primaryLight;
 
   bool _isLoading = true;
   String _searchQuery = '';

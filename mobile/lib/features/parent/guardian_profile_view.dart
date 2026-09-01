@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../core/auth_provider.dart';
+import '../../core/app_colors.dart';
 
 class GuardianProfileView extends StatefulWidget {
   final Map<String, dynamic> child;
@@ -12,7 +13,7 @@ class GuardianProfileView extends StatefulWidget {
 }
 
 class _GuardianProfileViewState extends State<GuardianProfileView> {
-  static const primaryBlue = Color(0xFF3B5998);
+  static const primaryBlue = AppColors.primary;
 
   final _formKey = GlobalKey<FormState>();
 

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../core/api_client.dart';
+import '../../core/app_colors.dart';
 import 'create_academic_year_dialog.dart';
 import 'create_class_dialog.dart';
 import 'create_school_dialog.dart';
@@ -13,8 +14,8 @@ class SchoolManagementScreen extends StatefulWidget {
 }
 
 class _SchoolManagementScreenState extends State<SchoolManagementScreen> with SingleTickerProviderStateMixin {
-  static const darkTeal = Color(0xFF0B2144);
-  static const mintGreen = Color(0xFF2563EB);
+  static const darkTeal = AppColors.primary;
+  static const mintGreen = AppColors.primaryLight;
 
   late TabController _tabController;
   bool _isLoading = true;

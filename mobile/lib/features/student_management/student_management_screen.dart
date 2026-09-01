@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../core/app_colors.dart';
 import '../common/app_drawer.dart';
 import 'create_student_dialog.dart';
 
@@ -10,8 +11,8 @@ class StudentManagementScreen extends StatefulWidget {
 }
 
 class _StudentManagementScreenState extends State<StudentManagementScreen> {
-  static const primaryBlue = Color(0xFF3B5998);
-  static const borderColor = Color(0xFFD8D8D8);
+  static const primaryBlue = AppColors.primary;
+  static const borderColor = AppColors.cardBorder;
 
   final TextEditingController _searchController = TextEditingController();
   String _selectedClassFilter = 'all';
