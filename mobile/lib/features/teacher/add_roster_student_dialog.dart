@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../core/app_colors.dart';
 
 class AddRosterStudentDialog extends StatefulWidget {
   const AddRosterStudentDialog({super.key});
@@ -8,10 +9,6 @@ class AddRosterStudentDialog extends StatefulWidget {
 }
 
 class _AddRosterStudentDialogState extends State<AddRosterStudentDialog> {
-  static const primaryBlue = Color(0xFF3B5998);
-  static const primaryHover = Color(0xFF2D4373);
-  static const borderColor = Color(0xFFD8D8D8);
-
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _rollController = TextEditingController();
@@ -51,22 +48,22 @@ class _AddRosterStudentDialogState extends State<AddRosterStudentDialog> {
   InputDecoration _buildInputDecoration(String labelText, IconData icon) {
     return InputDecoration(
       labelText: labelText,
-      labelStyle: const TextStyle(color: Color(0xFF6B7280), fontSize: 13, fontWeight: FontWeight.w500),
-      prefixIcon: Icon(icon, color: primaryBlue, size: 20),
+      labelStyle: const TextStyle(color: AppColors.textMuted, fontSize: 13, fontWeight: FontWeight.w500),
+      prefixIcon: Icon(icon, color: AppColors.primaryLight, size: 20),
       filled: true,
-      fillColor: Colors.white,
+      fillColor: AppColors.surface,
       contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-      border: const OutlineInputBorder(
-        borderRadius: BorderRadius.all(Radius.circular(4)),
-        borderSide: BorderSide(color: borderColor),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(10),
+        borderSide: const BorderSide(color: AppColors.cardBorder),
       ),
-      enabledBorder: const OutlineInputBorder(
-        borderRadius: BorderRadius.all(Radius.circular(4)),
-        borderSide: BorderSide(color: borderColor),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(10),
+        borderSide: const BorderSide(color: AppColors.cardBorder),
       ),
-      focusedBorder: const OutlineInputBorder(
-        borderRadius: BorderRadius.all(Radius.circular(4)),
-        borderSide: BorderSide(color: primaryBlue, width: 2),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(10),
+        borderSide: const BorderSide(color: AppColors.primaryLight, width: 1.8),
       ),
     );
   }
@@ -74,15 +71,15 @@ class _AddRosterStudentDialogState extends State<AddRosterStudentDialog> {
   @override
   Widget build(BuildContext context) {
     return Dialog(
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(6))),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       elevation: 4,
       child: Container(
         width: 480,
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(6),
-          border: Border.all(color: borderColor),
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: AppColors.cardBorder),
         ),
         child: SingleChildScrollView(
           child: Form(
@@ -97,27 +94,27 @@ class _AddRosterStudentDialogState extends State<AddRosterStudentDialog> {
                   children: [
                     const Row(
                       children: [
-                        Icon(Icons.person_add_alt_1_outlined, color: primaryBlue, size: 22),
+                        Icon(Icons.person_add_alt_1_outlined, color: AppColors.primary, size: 22),
                         SizedBox(width: 10),
                         Text(
                           'Add Student to Class Roster',
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
-                            color: primaryBlue,
+                            color: AppColors.primaryDark,
                           ),
                         ),
                       ],
                     ),
                     IconButton(
-                      icon: const Icon(Icons.close, color: Color(0xFF6B7280), size: 20),
+                      icon: const Icon(Icons.close, color: AppColors.textMuted, size: 20),
                       onPressed: () => Navigator.of(context).pop(),
                       padding: EdgeInsets.zero,
                       constraints: const BoxConstraints(),
                     ),
                   ],
                 ),
-                const Divider(height: 24, color: borderColor),
+                const Divider(height: 24, color: AppColors.divider),
 
                 // Form Fields
                 TextFormField(
@@ -199,17 +196,17 @@ class _AddRosterStudentDialogState extends State<AddRosterStudentDialog> {
 
                 const SizedBox(height: 20),
 
-                // Button Structure matching Admin Web
+                // Action Buttons
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     OutlinedButton(
                       onPressed: () => Navigator.of(context).pop(),
                       style: OutlinedButton.styleFrom(
-                        foregroundColor: const Color(0xFF1F2937),
-                        side: const BorderSide(color: borderColor),
+                        foregroundColor: AppColors.textSecondary,
+                        side: const BorderSide(color: AppColors.cardBorder),
                         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(4))),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                       ),
                       child: const Text('CANCEL', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
                     ),
@@ -219,16 +216,11 @@ class _AddRosterStudentDialogState extends State<AddRosterStudentDialog> {
                       icon: const Icon(Icons.check, size: 16),
                       label: const Text('ADD TO ROSTER', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: primaryBlue,
+                        backgroundColor: AppColors.primary,
                         foregroundColor: Colors.white,
                         elevation: 0,
                         padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
-                        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(4))),
-                      ).copyWith(
-                        backgroundColor: WidgetStateProperty.resolveWith((states) {
-                          if (states.contains(WidgetState.hovered)) return primaryHover;
-                          return primaryBlue;
-                        }),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                       ),
                     ),
                   ],

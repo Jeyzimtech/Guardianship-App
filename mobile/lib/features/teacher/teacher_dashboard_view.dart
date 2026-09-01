@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../core/auth_provider.dart';
+import '../../core/app_colors.dart';
 import 'add_roster_student_dialog.dart';
 
 class TeacherDashboardView extends StatefulWidget {
@@ -11,24 +12,24 @@ class TeacherDashboardView extends StatefulWidget {
 }
 
 class _TeacherDashboardViewState extends State<TeacherDashboardView> {
-  // Admin Web Design Color Tokens
-  static const primaryBlue = Color(0xFF3B5998);
-  static const secondaryBlue = Color(0xFF5B7BD5);
-  static const bgLight = Color(0xFFF9FAFB);
-  static const surfaceWhite = Color(0xFFFFFFFF);
-  static const borderColor = Color(0xFFD8D8D8);
-  static const textPrimary = Color(0xFF1F2937);
-  static const textSecondary = Color(0xFF6B7280);
+  // Cohesive Blue Design System Color Tokens
+  static const primaryBlue = AppColors.primary;
+  static const secondaryBlue = AppColors.primaryLight;
+  static const bgLight = AppColors.background;
+  static const surfaceWhite = AppColors.surface;
+  static const borderColor = AppColors.cardBorder;
+  static const textPrimary = AppColors.textPrimary;
+  static const textSecondary = AppColors.textSecondary;
 
-  // Admin Web Badge Colors
-  static const successBg = Color(0xFFDCFCE7);
-  static const successText = Color(0xFF16A34A);
-  static const dangerBg = Color(0xFFFEE2E2);
-  static const dangerText = Color(0xFFDC2626);
-  static const warningBg = Color(0xFFFEF3C7);
-  static const warningText = Color(0xFFD97706);
-  static const infoBg = Color(0xFFE0F2FE);
-  static const infoText = Color(0xFF0284C7);
+  // Status Badge Colors (Harmonized with Blue Theme)
+  static const successBg = AppColors.softBlue;
+  static const successText = AppColors.primary;
+  static const dangerBg = AppColors.errorLight;
+  static const dangerText = AppColors.error;
+  static const warningBg = AppColors.warningLight;
+  static const warningText = AppColors.warning;
+  static const infoBg = AppColors.blueBadgeBg;
+  static const infoText = AppColors.blueBadgeText;
 
   String _selectedClass = 'Grade 4 Gold (Homeroom)';
   int _activeTabIndex = 0; // 0: Class Roster, 1: Daily Attendance, 2: Gradebook, 3: Activities, 4: Class Notices

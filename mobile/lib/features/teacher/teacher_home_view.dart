@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../core/auth_provider.dart';
+import '../../core/app_colors.dart';
 
 /// Teacher Home screen — matches the "Good Morning" Stitch MCP design
 class TeacherHomeView extends StatefulWidget {
@@ -11,8 +12,6 @@ class TeacherHomeView extends StatefulWidget {
 }
 
 class _TeacherHomeViewState extends State<TeacherHomeView> {
-  static const primaryBlue = Color(0xFF3B5998);
-
   String _selectedClass = 'Grade 4A';
 
   final List<Map<String, dynamic>> _schedule = [
@@ -90,13 +89,13 @@ class _TeacherHomeViewState extends State<TeacherHomeView> {
             style: const TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.bold,
-              color: Color(0xFF1F2937),
+              color: AppColors.primaryDark,
             ),
           ),
           const SizedBox(height: 4),
           const Text(
             'Here is your overview for today.',
-            style: TextStyle(fontSize: 14, color: Color(0xFF6B7280)),
+            style: TextStyle(fontSize: 14, color: AppColors.textMuted),
           ),
           const SizedBox(height: 20),
 
@@ -105,12 +104,12 @@ class _TeacherHomeViewState extends State<TeacherHomeView> {
             width: double.infinity,
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: AppColors.surface,
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: const Color(0xFFE5E7EB)),
+              border: Border.all(color: AppColors.cardBorder),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.03),
+                  color: Colors.black.withValues(alpha: 0.02),
                   blurRadius: 4,
                   offset: const Offset(0, 2),
                 ),
@@ -122,7 +121,7 @@ class _TeacherHomeViewState extends State<TeacherHomeView> {
                   width: 46,
                   height: 46,
                   decoration: BoxDecoration(
-                    color: primaryBlue,
+                    color: AppColors.primary,
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: const Icon(Icons.group_rounded,
@@ -138,7 +137,7 @@ class _TeacherHomeViewState extends State<TeacherHomeView> {
                         style: TextStyle(
                           fontSize: 10,
                           fontWeight: FontWeight.bold,
-                          color: Color(0xFF9CA3AF),
+                          color: AppColors.textMuted,
                           letterSpacing: 0.8,
                         ),
                       ),
@@ -148,11 +147,11 @@ class _TeacherHomeViewState extends State<TeacherHomeView> {
                         underline: const SizedBox(),
                         isDense: true,
                         icon: const Icon(Icons.keyboard_arrow_down_rounded,
-                            color: primaryBlue, size: 18),
+                            color: AppColors.primary, size: 18),
                         style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
-                          color: Color(0xFF1F2937),
+                          color: AppColors.textPrimary,
                         ),
                         items: const [
                           DropdownMenuItem(
@@ -185,7 +184,7 @@ class _TeacherHomeViewState extends State<TeacherHomeView> {
             onTap: () => ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
                   content: Text('Opening attendance sheet...'),
-                  backgroundColor: primaryBlue),
+                  backgroundColor: AppColors.primary),
             ),
           ),
           const SizedBox(height: 12),
@@ -217,14 +216,14 @@ class _TeacherHomeViewState extends State<TeacherHomeView> {
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xFF1F2937),
+                  color: AppColors.primaryDark,
                 ),
               ),
               Container(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFF1F5F9),
+                  color: AppColors.softBlue,
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
@@ -232,7 +231,7 @@ class _TeacherHomeViewState extends State<TeacherHomeView> {
                   style: const TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.w600,
-                    color: Color(0xFF6B7280),
+                    color: AppColors.primaryDark,
                   ),
                 ),
               ),
@@ -242,12 +241,12 @@ class _TeacherHomeViewState extends State<TeacherHomeView> {
 
           Container(
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: AppColors.surface,
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: const Color(0xFFE5E7EB)),
+              border: Border.all(color: AppColors.cardBorder),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.03),
+                  color: Colors.black.withValues(alpha: 0.02),
                   blurRadius: 4,
                   offset: const Offset(0, 2),
                 ),
@@ -258,7 +257,7 @@ class _TeacherHomeViewState extends State<TeacherHomeView> {
               physics: const NeverScrollableScrollPhysics(),
               itemCount: _schedule.length,
               separatorBuilder: (ctx, i) =>
-                  const Divider(height: 1, color: Color(0xFFE5E7EB)),
+                  const Divider(height: 1, color: AppColors.divider),
               itemBuilder: (ctx, i) {
                 final item = _schedule[i];
                 final isDone = item['done'] as bool;
@@ -277,8 +276,8 @@ class _TeacherHomeViewState extends State<TeacherHomeView> {
                             fontSize: 13,
                             fontWeight: FontWeight.bold,
                             color: isDone
-                                ? const Color(0xFF9CA3AF)
-                                : primaryBlue,
+                                ? AppColors.textLight
+                                : AppColors.primary,
                           ),
                         ),
                       ),
@@ -289,8 +288,8 @@ class _TeacherHomeViewState extends State<TeacherHomeView> {
                         margin: const EdgeInsets.symmetric(horizontal: 10),
                         decoration: BoxDecoration(
                           color: isDone
-                              ? const Color(0xFFD1D5DB)
-                              : primaryBlue,
+                              ? AppColors.cardBorder
+                              : AppColors.primary,
                           borderRadius: BorderRadius.circular(2),
                         ),
                       ),
@@ -305,8 +304,8 @@ class _TeacherHomeViewState extends State<TeacherHomeView> {
                                 fontSize: 13,
                                 fontWeight: FontWeight.w600,
                                 color: isDone
-                                    ? const Color(0xFF9CA3AF)
-                                    : const Color(0xFF1F2937),
+                                    ? AppColors.textLight
+                                    : AppColors.textPrimary,
                                 decoration: isDone
                                     ? TextDecoration.lineThrough
                                     : null,
@@ -315,7 +314,7 @@ class _TeacherHomeViewState extends State<TeacherHomeView> {
                             Text(
                               item['duration'],
                               style: const TextStyle(
-                                  fontSize: 11, color: Color(0xFF9CA3AF)),
+                                  fontSize: 11, color: AppColors.textLight),
                             ),
                           ],
                         ),
@@ -326,7 +325,7 @@ class _TeacherHomeViewState extends State<TeacherHomeView> {
                           padding: const EdgeInsets.symmetric(
                               horizontal: 8, vertical: 3),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFDCFCE7),
+                            color: AppColors.softBlue,
                             borderRadius: BorderRadius.circular(10),
                           ),
                           child: const Text(
@@ -334,7 +333,7 @@ class _TeacherHomeViewState extends State<TeacherHomeView> {
                             style: TextStyle(
                               fontSize: 10,
                               fontWeight: FontWeight.bold,
-                              color: Color(0xFF15803D),
+                              color: AppColors.primary,
                             ),
                           ),
                         )
@@ -345,17 +344,17 @@ class _TeacherHomeViewState extends State<TeacherHomeView> {
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 8, vertical: 3),
                             decoration: BoxDecoration(
-                              color: const Color(0xFFEFF6FF),
+                              color: AppColors.softBlue,
                               borderRadius: BorderRadius.circular(10),
                               border: Border.all(
-                                  color: primaryBlue.withValues(alpha: 0.3)),
+                                  color: AppColors.blueBorder),
                             ),
                             child: const Text(
                               'Mark Done',
                               style: TextStyle(
                                 fontSize: 10,
                                 fontWeight: FontWeight.bold,
-                                color: primaryBlue,
+                                color: AppColors.primary,
                               ),
                             ),
                           ),
@@ -373,17 +372,17 @@ class _TeacherHomeViewState extends State<TeacherHomeView> {
             children: [
               Expanded(
                 child: _buildQuickStat(
-                    '32', 'Students', const Color(0xFF3B5998), const Color(0xFFEFF6FF)),
+                    '32', 'Students', AppColors.primary, AppColors.softBlue),
               ),
               const SizedBox(width: 10),
               Expanded(
                 child: _buildQuickStat(
-                    '94%', 'Attendance', const Color(0xFF16A34A), const Color(0xFFDCFCE7)),
+                    '94%', 'Attendance', AppColors.primaryLight, AppColors.softBlue),
               ),
               const SizedBox(width: 10),
               Expanded(
                 child: _buildQuickStat(
-                    '3', 'Pending Tasks', const Color(0xFFD97706), const Color(0xFFFEF3C7)),
+                    '3', 'Pending Tasks', AppColors.primaryAccent, AppColors.softBlue),
               ),
             ],
           ),
@@ -405,15 +404,15 @@ class _TeacherHomeViewState extends State<TeacherHomeView> {
         width: double.infinity,
         padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 20),
         decoration: BoxDecoration(
-          color: filled ? primaryBlue : Colors.white,
+          color: filled ? AppColors.primary : AppColors.surface,
           borderRadius: BorderRadius.circular(10),
           border: Border.all(
-            color: filled ? primaryBlue : const Color(0xFFE5E7EB),
+            color: filled ? AppColors.primary : AppColors.cardBorder,
             width: filled ? 0 : 1.5,
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: filled ? 0.08 : 0.03),
+              color: Colors.black.withValues(alpha: filled ? 0.08 : 0.02),
               blurRadius: 4,
               offset: const Offset(0, 2),
             ),
@@ -427,7 +426,7 @@ class _TeacherHomeViewState extends State<TeacherHomeView> {
               style: TextStyle(
                 fontSize: 15,
                 fontWeight: FontWeight.bold,
-                color: filled ? Colors.white : primaryBlue,
+                color: filled ? Colors.white : AppColors.primary,
               ),
             ),
             const SizedBox(height: 2),
@@ -436,8 +435,8 @@ class _TeacherHomeViewState extends State<TeacherHomeView> {
               style: TextStyle(
                 fontSize: 12,
                 color: filled
-                    ? Colors.white.withValues(alpha: 0.75)
-                    : const Color(0xFF6B7280),
+                    ? Colors.white.withValues(alpha: 0.85)
+                    : AppColors.textMuted,
               ),
             ),
           ],
@@ -452,7 +451,7 @@ class _TeacherHomeViewState extends State<TeacherHomeView> {
       decoration: BoxDecoration(
         color: bg,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: color.withValues(alpha: 0.2)),
+        border: Border.all(color: AppColors.blueBorder),
       ),
       child: Column(
         children: [
