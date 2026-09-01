@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../core/api_client.dart';
+import '../../core/app_colors.dart';
 
 class CreateSchoolDialog extends StatefulWidget {
   final Map<String, dynamic>? initialSchool;
@@ -54,7 +55,10 @@ class _CreateSchoolDialogState extends State<CreateSchoolDialog> {
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(isEditing ? 'School updated successfully.' : 'School created successfully.')),
+          SnackBar(
+            content: Text(isEditing ? 'School updated successfully.' : 'School created successfully.'),
+            backgroundColor: AppColors.primary,
+          ),
         );
         widget.onSaved();
         Navigator.pop(context);
@@ -62,7 +66,10 @@ class _CreateSchoolDialogState extends State<CreateSchoolDialog> {
     } catch (_) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Saved school (Offline/Demo mode success).')),
+          const SnackBar(
+            content: Text('Saved school (Offline/Demo mode success).'),
+            backgroundColor: AppColors.primary,
+          ),
         );
         widget.onSaved();
         Navigator.pop(context);
@@ -74,13 +81,14 @@ class _CreateSchoolDialogState extends State<CreateSchoolDialog> {
 
   @override
   Widget build(BuildContext context) {
-    const darkTeal = Color(0xFF0B2144);
-    const mintGreen = Color(0xFF2563EB);
+    const darkTeal = AppColors.primary;
+    const mintGreen = AppColors.primaryLight;
     final isEditing = widget.initialSchool != null;
 
     return Dialog(
+      backgroundColor: AppColors.surface,
       insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Padding(
         padding: EdgeInsets.only(
           left: 20,

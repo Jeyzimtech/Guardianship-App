@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../core/api_client.dart';
+import '../../core/app_colors.dart';
 
 class CreateAcademicYearDialog extends StatefulWidget {
   final Map<String, dynamic>? initialYear;
@@ -56,7 +57,10 @@ class _CreateAcademicYearDialogState extends State<CreateAcademicYearDialog> {
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(isEditing ? 'Academic year updated.' : 'Academic year created.')),
+          SnackBar(
+            content: Text(isEditing ? 'Academic year updated.' : 'Academic year created.'),
+            backgroundColor: AppColors.primary,
+          ),
         );
         widget.onSaved();
         Navigator.pop(context);
@@ -64,7 +68,10 @@ class _CreateAcademicYearDialogState extends State<CreateAcademicYearDialog> {
     } catch (_) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Saved academic year (Offline/Demo mode success).')),
+          const SnackBar(
+            content: Text('Saved academic year (Offline/Demo mode success).'),
+            backgroundColor: AppColors.primary,
+          ),
         );
         widget.onSaved();
         Navigator.pop(context);
@@ -76,12 +83,13 @@ class _CreateAcademicYearDialogState extends State<CreateAcademicYearDialog> {
 
   @override
   Widget build(BuildContext context) {
-    const darkTeal = Color(0xFF0B2144);
-    const mintGreen = Color(0xFF2563EB);
+    const darkTeal = AppColors.primary;
+    const mintGreen = AppColors.primaryLight;
     final isEditing = widget.initialYear != null;
 
     return Dialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      backgroundColor: AppColors.surface,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Padding(
         padding: const EdgeInsets.all(24.0),
         child: SingleChildScrollView(

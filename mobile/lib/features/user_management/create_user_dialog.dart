@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../core/api_client.dart';
+import '../../core/app_colors.dart';
 
 class CreateUserDialog extends StatefulWidget {
   final Map<String, dynamic>? initialUser;
@@ -74,7 +75,7 @@ class _CreateUserDialogState extends State<CreateUserDialog> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Saved user (Offline/Demo mode success).')),
+          const SnackBar(content: Text('Saved user (Offline/Demo mode success).')),
         );
         widget.onUserSaved();
         Navigator.pop(context);
@@ -86,12 +87,13 @@ class _CreateUserDialogState extends State<CreateUserDialog> {
 
   @override
   Widget build(BuildContext context) {
-    const darkTeal = Color(0xFF0B2144);
-    const mintGreen = Color(0xFF2563EB);
+    const darkTeal = AppColors.primary;
+    const mintGreen = AppColors.primaryLight;
     final isEditing = widget.initialUser != null;
 
     return Dialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      backgroundColor: AppColors.surface,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Padding(
         padding: const EdgeInsets.all(24.0),
         child: SingleChildScrollView(

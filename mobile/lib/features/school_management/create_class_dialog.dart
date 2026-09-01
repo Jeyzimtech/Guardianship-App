@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../core/api_client.dart';
+import '../../core/app_colors.dart';
 
 class CreateClassDialog extends StatefulWidget {
   final List<Map<String, dynamic>> schools;
@@ -82,7 +83,10 @@ class _CreateClassDialogState extends State<CreateClassDialog> {
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(isEditing ? 'Class stream updated.' : 'Class stream created.')),
+          SnackBar(
+            content: Text(isEditing ? 'Class stream updated.' : 'Class stream created.'),
+            backgroundColor: AppColors.primary,
+          ),
         );
         widget.onSaved();
         Navigator.pop(context);
@@ -90,7 +94,10 @@ class _CreateClassDialogState extends State<CreateClassDialog> {
     } catch (_) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Saved class stream (Offline/Demo mode success).')),
+          const SnackBar(
+            content: Text('Saved class stream (Offline/Demo mode success).'),
+            backgroundColor: AppColors.primary,
+          ),
         );
         widget.onSaved();
         Navigator.pop(context);
@@ -102,13 +109,14 @@ class _CreateClassDialogState extends State<CreateClassDialog> {
 
   @override
   Widget build(BuildContext context) {
-    const darkTeal = Color(0xFF0B2144);
-    const mintGreen = Color(0xFF2563EB);
+    const darkTeal = AppColors.primary;
+    const mintGreen = AppColors.primaryLight;
     final isEditing = widget.initialClass != null;
 
     return Dialog(
+      backgroundColor: AppColors.surface,
       insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Padding(
         padding: EdgeInsets.only(
           left: 20,

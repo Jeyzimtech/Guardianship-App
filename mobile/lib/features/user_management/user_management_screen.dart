@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../core/api_client.dart';
+import '../../core/app_colors.dart';
 import 'create_user_dialog.dart';
 
 class UserManagementScreen extends StatefulWidget {
@@ -28,8 +29,8 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
     },
     {
       'id': 2,
-      'name': 'Teacher Grace',
-      'email': 'grace@hillside.ac.zw',
+      'name': 'Teacher Grace Mupfumi',
+      'email': 'grace.m@hillside.ac.zw',
       'phone_number': '+263772222222',
       'role': 'teacher',
     },
@@ -38,6 +39,13 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
       'name': 'Guardian John Chewe',
       'email': 'john.chewe@gmail.com',
       'phone_number': '+263773333333',
+      'role': 'guardian',
+    },
+    {
+      'id': 4,
+      'name': 'Guardian Farai Moyo',
+      'email': 'farai.moyo@gmail.com',
+      'phone_number': '+263774444444',
       'role': 'guardian',
     },
   ];
@@ -59,38 +67,33 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
     final apiClient = Provider.of<ApiClient>(context, listen: false);
 
     try {
-      final queryParams = <String, dynamic>{};
-      if (_selectedRoleFilter != 'all') {
-        queryParams['role'] = _selectedRoleFilter;
-      }
-      if (_searchQuery.isNotEmpty) {
-        queryParams['search'] = _searchQuery;
-      }
+      final response = await apiClient.dio.get('/users', queryParameters: {
+        if (_selectedRoleFilter != 'all') 'role': _selectedRoleFilter,
+        if (_searchQuery.isNotEmpty) 'search': _searchQuery,
+      });
 
-      final response = await apiClient.dio.get('/users', queryParameters: queryParams);
-      if (response.statusCode == 200 && response.data['status'] == 'success') {
-        final List list = response.data['users'] ?? [];
+      if (response.statusCode == 200 && response.data['data'] != null) {
         setState(() {
-          _users = list.map((e) => Map<String, dynamic>.from(e)).toList();
+          _users = List<Map<String, dynamic>>.from(response.data['data']);
           _isLoading = false;
         });
         return;
       }
     } catch (_) {
-      // Fallback offline mock filtering
+      // Fallback to rich offline/demo users
     }
 
-    // Apply local mock filter
-    var filtered = _mockUsers;
+    // Apply local filter to mock dataset
+    List<Map<String, dynamic>> filtered = List.from(_mockUsers);
     if (_selectedRoleFilter != 'all') {
       filtered = filtered.where((u) => u['role'] == _selectedRoleFilter).toList();
     }
     if (_searchQuery.isNotEmpty) {
       final q = _searchQuery.toLowerCase();
       filtered = filtered.where((u) =>
-          u['name'].toString().toLowerCase().contains(q) ||
-          (u['email'] != null && u['email'].toString().toLowerCase().contains(q)) ||
-          u['phone_number'].toString().toLowerCase().contains(q)
+        (u['name'] ?? '').toLowerCase().contains(q) ||
+        (u['email'] ?? '').toLowerCase().contains(q) ||
+        (u['phone_number'] ?? '').toLowerCase().contains(q)
       ).toList();
     }
 
@@ -100,37 +103,45 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
     });
   }
 
-  Future<void> _deleteUser(int id, String name) async {
-    final apiClient = Provider.of<ApiClient>(context, listen: false);
+  void _openCreateDialog([Map<String, dynamic>? user]) {
+    showDialog(
+      context: context,
+      builder: (ctx) => CreateUserDialog(
+        initialUser: user,
+        onUserSaved: _fetchUsers,
+      ),
+    );
+  }
+
+  Future<void> _deleteUser(int userId) async {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Delete User Account'),
-        content: Text('Are you sure you want to delete account "$name"? This action cannot be undone.'),
+        title: const Text('Delete User'),
+        content: const Text('Are you sure you want to permanently delete this user account?'),
         actions: [
           TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
           ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.red, foregroundColor: Colors.white),
+            style: ElevatedButton.styleFrom(backgroundColor: AppColors.error),
             onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('Delete'),
+            child: const Text('Delete', style: TextStyle(color: Colors.white)),
           ),
         ],
       ),
     );
 
-    if (confirmed != true) return;
-
-    try {
-      await apiClient.dio.delete('/users/$id');
-    } catch (_) {
-      // Offline fallback
-    }
-
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('User "$name" deleted successfully.')),
-      );
+    if (confirmed == true) {
+      final apiClient = Provider.of<ApiClient>(context, listen: false);
+      try {
+        await apiClient.dio.delete('/users/$userId');
+      } catch (_) {}
+      setState(() {
+        _mockUsers.removeWhere((u) => u['id'] == userId);
+      });
       _fetchUsers();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('User deleted.')));
+      }
     }
   }
 
@@ -141,19 +152,19 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
 
     switch (role.toLowerCase()) {
       case 'admin':
-        bg = const Color(0xFFF3E8FF);
-        fg = const Color(0xFF6B21A8);
+        bg = AppColors.softBlue;
+        fg = AppColors.primaryDark;
         label = 'Admin';
         break;
       case 'teacher':
-        bg = const Color(0xFFEFF6FF);
-        fg = const Color(0xFF2563EB);
+        bg = AppColors.softBlue;
+        fg = AppColors.primary;
         label = 'Teacher';
         break;
       case 'guardian':
       default:
-        bg = const Color(0xFFF1F5F9);
-        fg = const Color(0xFF0B2144);
+        bg = AppColors.softBlue;
+        fg = AppColors.primaryAccent;
         label = 'Guardian';
         break;
     }
@@ -163,6 +174,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
       decoration: BoxDecoration(
         color: bg,
         borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: AppColors.blueBorder),
       ),
       child: Text(
         label,
@@ -173,18 +185,18 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
 
   Widget _buildFilterChip(String label, String value) {
     final isSelected = _selectedRoleFilter == value;
-    const darkTeal = Color(0xFF0B2144);
 
     return FilterChip(
       selected: isSelected,
       label: Text(label),
       labelStyle: TextStyle(
-        color: isSelected ? Colors.white : darkTeal,
+        color: isSelected ? Colors.white : AppColors.primaryDark,
         fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
       ),
-      selectedColor: darkTeal,
-      backgroundColor: const Color(0xFFF3F4F6),
+      selectedColor: AppColors.primary,
+      backgroundColor: AppColors.softBlue,
       checkmarkColor: Colors.white,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16), side: const BorderSide(color: AppColors.blueBorder)),
       onSelected: (bool selected) {
         setState(() {
           _selectedRoleFilter = value;
@@ -196,25 +208,22 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
 
   @override
   Widget build(BuildContext context) {
-    const darkTeal = Color(0xFF0B2144);
-    const mintGreen = Color(0xFF2563EB);
-
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.background,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.primary,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: darkTeal),
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () => Navigator.pop(context),
         ),
         title: const Text(
           'User Management',
-          style: TextStyle(color: darkTeal, fontSize: 20, fontWeight: FontWeight.bold),
+          style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
         ),
       ),
       floatingActionButton: FloatingActionButton.extended(
-        backgroundColor: mintGreen,
+        backgroundColor: AppColors.primary,
         foregroundColor: Colors.white,
         icon: const Icon(Icons.person_add_rounded),
         label: const Text('Add User', style: TextStyle(fontWeight: FontWeight.bold)),

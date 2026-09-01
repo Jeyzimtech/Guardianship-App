@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../core/app_colors.dart';
 
 class CreateStudentDialog extends StatefulWidget {
   final Map<String, dynamic>? initialStudent;
@@ -78,7 +79,10 @@ class _CreateStudentDialogState extends State<CreateStudentDialog> {
 
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(widget.initialStudent != null ? 'Student record updated.' : 'New student record added.')),
+        SnackBar(
+          content: Text(widget.initialStudent != null ? 'Student record updated.' : 'New student record added.'),
+          backgroundColor: AppColors.primary,
+        ),
       );
       Navigator.pop(context);
     }
@@ -86,11 +90,10 @@ class _CreateStudentDialogState extends State<CreateStudentDialog> {
 
   @override
   Widget build(BuildContext context) {
-    const primaryBlue = Color(0xFF3B5998);
-
     return Dialog(
+      backgroundColor: AppColors.surface,
       insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Container(
         padding: EdgeInsets.only(
           left: 20,
@@ -98,9 +101,10 @@ class _CreateStudentDialogState extends State<CreateStudentDialog> {
           top: 20,
           bottom: MediaQuery.of(context).viewInsets.bottom + 20,
         ),
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          border: Border(top: BorderSide(color: primaryBlue, width: 4.0)),
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(16),
+          border: const Border(top: BorderSide(color: AppColors.primary, width: 4.0)),
         ),
         child: SingleChildScrollView(
           child: Form(
@@ -111,11 +115,11 @@ class _CreateStudentDialogState extends State<CreateStudentDialog> {
               children: [
                 Row(
                   children: [
-                    const Icon(Icons.person_add_rounded, color: primaryBlue, size: 24),
+                    const Icon(Icons.person_add_rounded, color: AppColors.primary, size: 24),
                     const SizedBox(width: 10),
                     Text(
                       widget.initialStudent != null ? 'Edit Student Record' : 'Add New Student',
-                      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: primaryBlue),
+                      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.primaryDark),
                     ),
                   ],
                 ),
@@ -127,7 +131,7 @@ class _CreateStudentDialogState extends State<CreateStudentDialog> {
                   decoration: const InputDecoration(
                     labelText: 'Student Full Name',
                     hintText: 'e.g. Alice Chewe',
-                    prefixIcon: Icon(Icons.person_outline, color: primaryBlue, size: 20),
+                    prefixIcon: Icon(Icons.person_outline, color: AppColors.primary, size: 20),
                   ),
                   validator: (val) => val == null || val.trim().isEmpty ? 'Student name is required' : null,
                 ),
