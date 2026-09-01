@@ -5,6 +5,7 @@ import 'core/api_client.dart';
 import 'core/auth_provider.dart';
 import 'core/role_guard.dart';
 import 'core/student_provider.dart';
+import 'core/app_colors.dart';
 import 'features/auth/login_screen.dart';
 import 'features/dashboard/dashboard_home.dart';
 
@@ -31,90 +32,81 @@ class EduConectApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Global Color Palette Specifications
-    const primaryBlue = Color(0xFF3B5998); // Facebook Blue
-    const secondaryBlue = Color(0xFF5B7BD5); // Secondary Blue
-    const backgroundColor = Color(0xFFFFFFFF); // Pitch White Background
-    const surfaceColor = Color(0xFFF5F6F7); // Sidebar / Surface Tint
-    const borderColor = Color(0xFFD8D8D8); // Card & Table Border
-    const textPrimaryColor = Color(0xFF1F2937); // Text Dark
-    const textSecondaryColor = Color(0xFF6B7280); // Text Muted
-
     return MaterialApp(
       navigatorKey: navigatorKey,
       title: 'Guardianship App',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         brightness: Brightness.light,
-        primaryColor: primaryBlue,
-        scaffoldBackgroundColor: backgroundColor,
+        primaryColor: AppColors.primary,
+        scaffoldBackgroundColor: AppColors.background,
         colorScheme: const ColorScheme.light(
-          primary: primaryBlue,
-          secondary: secondaryBlue,
-          surface: surfaceColor,
+          primary: AppColors.primary,
+          secondary: AppColors.primaryLight,
+          surface: AppColors.surface,
         ),
         fontFamily: GoogleFonts.cabin().fontFamily,
         textTheme: GoogleFonts.cabinTextTheme(
           const TextTheme(
-            bodyLarge: TextStyle(color: textPrimaryColor, fontSize: 14),
-            bodyMedium: TextStyle(color: textPrimaryColor, fontSize: 14),
-            titleLarge: TextStyle(color: primaryBlue, fontSize: 24, fontWeight: FontWeight.bold),
+            bodyLarge: TextStyle(color: AppColors.textPrimary, fontSize: 14),
+            bodyMedium: TextStyle(color: AppColors.textPrimary, fontSize: 14),
+            titleLarge: TextStyle(color: AppColors.primary, fontSize: 24, fontWeight: FontWeight.bold),
           ),
         ),
         useMaterial3: true,
         cardTheme: const CardThemeData(
-          color: backgroundColor,
+          color: AppColors.surface,
           elevation: 0,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(Radius.circular(10)),
-            side: BorderSide(color: borderColor, width: 1.0),
+            borderRadius: BorderRadius.all(Radius.circular(12)),
+            side: BorderSide(color: AppColors.cardBorder, width: 1.0),
           ),
         ),
         appBarTheme: const AppBarTheme(
-          backgroundColor: primaryBlue,
+          backgroundColor: AppColors.primary,
           foregroundColor: Colors.white,
-          elevation: 2,
+          elevation: 0,
           centerTitle: false,
           iconTheme: IconThemeData(color: Colors.white),
           titleTextStyle: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
         ),
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
-            backgroundColor: primaryBlue,
+            backgroundColor: AppColors.primary,
             foregroundColor: Colors.white,
             elevation: 0,
             padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(10),
             ),
             textStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
           ),
         ),
         outlinedButtonTheme: OutlinedButtonThemeData(
           style: OutlinedButton.styleFrom(
-            foregroundColor: primaryBlue,
-            side: const BorderSide(color: primaryBlue, width: 1.5),
-            shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+            foregroundColor: AppColors.primary,
+            side: const BorderSide(color: AppColors.primary, width: 1.5),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
             textStyle: const TextStyle(fontWeight: FontWeight.bold),
           ),
         ),
         inputDecorationTheme: InputDecorationTheme(
           filled: true,
-          fillColor: backgroundColor,
-          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-          labelStyle: const TextStyle(color: textSecondaryColor, fontSize: 13),
-          hintStyle: TextStyle(color: textSecondaryColor.withValues(alpha: 0.6), fontSize: 13),
-          border: const OutlineInputBorder(
-            borderRadius: BorderRadius.zero,
-            borderSide: BorderSide(color: borderColor, width: 1.0),
+          fillColor: AppColors.surface,
+          contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+          labelStyle: const TextStyle(color: AppColors.textMuted, fontSize: 13),
+          hintStyle: const TextStyle(color: AppColors.textLight, fontSize: 13),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: const BorderSide(color: AppColors.cardBorder, width: 1.0),
           ),
-          enabledBorder: const OutlineInputBorder(
-            borderRadius: BorderRadius.zero,
-            borderSide: BorderSide(color: borderColor, width: 1.0),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: const BorderSide(color: AppColors.cardBorder, width: 1.0),
           ),
-          focusedBorder: const OutlineInputBorder(
-            borderRadius: BorderRadius.zero,
-            borderSide: BorderSide(color: secondaryBlue, width: 1.5),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: const BorderSide(color: AppColors.primaryLight, width: 1.8),
           ),
         ),
       ),
