@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
+import '../../core/app_colors.dart';
 
 class BehaviourView extends StatelessWidget {
   final Map<String, dynamic>? child;
 
   const BehaviourView({super.key, this.child});
-
-  static const primaryBlue = Color(0xFF3B5998);
 
   @override
   Widget build(BuildContext context) {
@@ -38,18 +37,18 @@ class BehaviourView extends StatelessWidget {
     final totalPoints = (positiveCount * 5) + 27; // mock house points tally
 
     final badges = [
-      {'label': 'Star Reader', 'color': const Color(0xFF3B5998), 'bg': const Color(0xFFEFF6FF)},
-      {'label': 'Helpful Peer', 'color': const Color(0xFF059669), 'bg': const Color(0xFFDCFCE7)},
-      {'label': 'Math Champion', 'color': const Color(0xFF7C3AED), 'bg': const Color(0xFFF5F3FF)},
-      {'label': 'Punctual', 'color': const Color(0xFFD97706), 'bg': const Color(0xFFFEF3C7)},
-      {'label': 'Clean Desk', 'color': const Color(0xFF0891B2), 'bg': const Color(0xFFE0F2FE)},
-      {'label': 'Team Player', 'color': const Color(0xFF16A34A), 'bg': const Color(0xFFF0FDF4)},
+      {'label': 'Star Reader', 'color': AppColors.primary, 'bg': AppColors.softBlue},
+      {'label': 'Helpful Peer', 'color': AppColors.primaryLight, 'bg': AppColors.softBlue},
+      {'label': 'Math Champion', 'color': AppColors.primaryDark, 'bg': AppColors.softBlue},
+      {'label': 'Punctual', 'color': AppColors.primaryAccent, 'bg': AppColors.softBlue},
+      {'label': 'Clean Desk', 'color': AppColors.primary, 'bg': AppColors.softBlue},
+      {'label': 'Team Player', 'color': AppColors.primaryLight, 'bg': AppColors.softBlue},
     ];
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: AppColors.background,
       appBar: AppBar(
-        backgroundColor: primaryBlue,
+        backgroundColor: AppColors.primary,
         iconTheme: const IconThemeData(color: Colors.white),
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -75,8 +74,15 @@ class BehaviourView extends StatelessWidget {
               width: double.infinity,
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: primaryBlue,
-                borderRadius: BorderRadius.circular(10),
+                gradient: AppColors.primaryGradient,
+                borderRadius: BorderRadius.circular(14),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.primary.withValues(alpha: 0.25),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
               ),
               child: Column(
                 children: [
@@ -107,9 +113,9 @@ class BehaviourView extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      _buildMiniStat('$positiveCount', 'Merits', const Color(0xFF86EFAC)),
+                      _buildMiniStat('$positiveCount', 'Merits', Colors.white),
                       const SizedBox(width: 32),
-                      _buildMiniStat('$negativeCount', 'Conduct Alerts', const Color(0xFFFCA5A5)),
+                      _buildMiniStat('$negativeCount', 'Conduct Alerts', const Color(0xFFFED7AA)),
                     ],
                   ),
                 ],
@@ -121,7 +127,7 @@ class BehaviourView extends StatelessWidget {
             const Text(
               'Badges Earned',
               style: TextStyle(
-                  fontSize: 15, fontWeight: FontWeight.bold, color: primaryBlue),
+                  fontSize: 15, fontWeight: FontWeight.bold, color: AppColors.primaryDark),
             ),
             const SizedBox(height: 10),
             GridView.builder(
@@ -141,7 +147,7 @@ class BehaviourView extends StatelessWidget {
                     color: badge['bg'] as Color,
                     borderRadius: BorderRadius.circular(8),
                     border: Border.all(
-                      color: (badge['color'] as Color).withValues(alpha: 0.25),
+                      color: AppColors.blueBorder,
                     ),
                   ),
                   alignment: Alignment.center,
@@ -164,7 +170,7 @@ class BehaviourView extends StatelessWidget {
             const Text(
               'Conduct Record',
               style: TextStyle(
-                  fontSize: 15, fontWeight: FontWeight.bold, color: primaryBlue),
+                  fontSize: 15, fontWeight: FontWeight.bold, color: AppColors.primaryDark),
             ),
             const SizedBox(height: 10),
 
@@ -179,18 +185,18 @@ class BehaviourView extends StatelessWidget {
                 return Container(
                   margin: const EdgeInsets.only(bottom: 12),
                   decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(8),
+                    color: AppColors.surface,
+                    borderRadius: BorderRadius.circular(10),
                     border: Border(
                       left: BorderSide(
                         color: isPositive
-                            ? const Color(0xFF22C55E)
-                            : const Color(0xFFEF4444),
+                            ? AppColors.primaryLight
+                            : AppColors.error,
                         width: 4,
                       ),
-                      top: const BorderSide(color: Color(0xFFE2E8F0)),
-                      right: const BorderSide(color: Color(0xFFE2E8F0)),
-                      bottom: const BorderSide(color: Color(0xFFE2E8F0)),
+                      top: const BorderSide(color: AppColors.cardBorder),
+                      right: const BorderSide(color: AppColors.cardBorder),
+                      bottom: const BorderSide(color: AppColors.cardBorder),
                     ),
                   ),
                   child: Padding(
@@ -207,7 +213,7 @@ class BehaviourView extends StatelessWidget {
                                 style: const TextStyle(
                                     fontWeight: FontWeight.bold,
                                     fontSize: 13,
-                                    color: Color(0xFF1F2937)),
+                                    color: AppColors.textPrimary),
                               ),
                             ),
                             const SizedBox(width: 8),
@@ -216,8 +222,8 @@ class BehaviourView extends StatelessWidget {
                                   horizontal: 10, vertical: 3),
                               decoration: BoxDecoration(
                                 color: isPositive
-                                    ? const Color(0xFFDCFCE7)
-                                    : const Color(0xFFFEF3C7),
+                                    ? AppColors.softBlue
+                                    : AppColors.errorLight,
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               child: Text(
@@ -226,8 +232,8 @@ class BehaviourView extends StatelessWidget {
                                   fontSize: 10,
                                   fontWeight: FontWeight.bold,
                                   color: isPositive
-                                      ? const Color(0xFF15803D)
-                                      : const Color(0xFFB45309),
+                                      ? AppColors.primary
+                                      : AppColors.error,
                                 ),
                               ),
                             ),
@@ -238,7 +244,7 @@ class BehaviourView extends StatelessWidget {
                           incident['note'] ?? '',
                           style: const TextStyle(
                               fontSize: 12,
-                              color: Color(0xFF4B5563),
+                              color: AppColors.textSecondary,
                               height: 1.3),
                         ),
                         const SizedBox(height: 6),
@@ -248,12 +254,12 @@ class BehaviourView extends StatelessWidget {
                             Text(
                               'Logged by ${incident['author']}',
                               style: const TextStyle(
-                                  fontSize: 10, color: Colors.grey),
+                                  fontSize: 10, color: AppColors.textMuted),
                             ),
                             Text(
                               incident['date'] ?? '',
                               style: const TextStyle(
-                                  fontSize: 10, color: Colors.grey),
+                                  fontSize: 10, color: AppColors.textMuted),
                             ),
                           ],
                         ),
@@ -268,16 +274,16 @@ class BehaviourView extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: const Color(0xFFF1F5F9),
-                borderRadius: BorderRadius.circular(6),
-                border: Border.all(color: const Color(0xFFCBD5E1)),
+                color: AppColors.softBlue,
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: AppColors.blueBorder),
               ),
               child: const Text(
                 'Conduct records are submitted by class teachers and visible only to the linked guardian.',
                 style: TextStyle(
                     fontSize: 11,
                     fontStyle: FontStyle.italic,
-                    color: Color(0xFF6B7280)),
+                    color: AppColors.primaryDark),
               ),
             ),
           ],

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../core/app_colors.dart';
 
 class LearningJournalView extends StatefulWidget {
   final Map<String, dynamic>? child;
@@ -10,9 +11,6 @@ class LearningJournalView extends StatefulWidget {
 }
 
 class _LearningJournalViewState extends State<LearningJournalView> {
-  static const primaryBlue = Color(0xFF3B5998);
-  static const secondaryBlue = Color(0xFF5B7BD5);
-
   String _selectedFilter = 'all';
 
   late final List<Map<String, dynamic>> _mockEntries;
@@ -94,6 +92,7 @@ class _LearningJournalViewState extends State<LearningJournalView> {
     }).toList();
 
     return Scaffold(
+      backgroundColor: AppColors.background,
       appBar: AppBar(
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -108,7 +107,7 @@ class _LearningJournalViewState extends State<LearningJournalView> {
             ),
           ],
         ),
-        backgroundColor: primaryBlue,
+        backgroundColor: AppColors.primary,
         iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: Column(
@@ -117,18 +116,18 @@ class _LearningJournalViewState extends State<LearningJournalView> {
           Container(
             width: double.infinity,
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-            color: const Color(0xFFEFF6FF),
-            child: Row(
+            color: AppColors.softBlue,
+            child: const Row(
               children: [
-                const Icon(Icons.verified_rounded, color: primaryBlue, size: 18),
-                const SizedBox(width: 8),
+                Icon(Icons.verified_rounded, color: AppColors.primary, size: 18),
+                SizedBox(width: 8),
                 Expanded(
                   child: Text(
                     'Day-to-day learning journal & wellbeing logs are NEVER fee-gated. Always visible.',
                     style: TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.w600,
-                      color: primaryBlue.withValues(alpha: 0.9),
+                      color: AppColors.primaryDark,
                     ),
                   ),
                 ),
@@ -156,7 +155,7 @@ class _LearningJournalViewState extends State<LearningJournalView> {
           Expanded(
             child: filteredEntries.isEmpty
                 ? const Center(
-                    child: Text('No journal entries match the selected filter.', style: TextStyle(color: Colors.grey)),
+                    child: Text('No journal entries match the selected filter.', style: TextStyle(color: AppColors.textMuted)),
                   )
                 : ListView.builder(
                     padding: const EdgeInsets.all(16),
@@ -182,14 +181,15 @@ class _LearningJournalViewState extends State<LearningJournalView> {
         onSelected: (val) {
           if (val) setState(() => _selectedFilter = key);
         },
-        selectedColor: primaryBlue,
+        selectedColor: AppColors.primary,
         labelStyle: TextStyle(
-          color: isSelected ? Colors.white : Colors.black87,
+          color: isSelected ? Colors.white : AppColors.primaryDark,
           fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
           fontSize: 12,
         ),
-        backgroundColor: Colors.grey.shade100,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+        backgroundColor: AppColors.softBlue,
+        side: BorderSide(color: isSelected ? AppColors.primary : AppColors.blueBorder),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       ),
     );
   }
@@ -202,12 +202,12 @@ class _LearningJournalViewState extends State<LearningJournalView> {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(6),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: AppColors.cardBorder),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.03),
+            color: Colors.black.withValues(alpha: 0.02),
             blurRadius: 6,
             offset: const Offset(0, 2),
           ),
@@ -219,15 +219,19 @@ class _LearningJournalViewState extends State<LearningJournalView> {
           // Header
           Container(
             padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: isWellbeing ? const Color(0xFFF0FDF4) : const Color(0xFFF8FAFC),
-              border: const Border(bottom: BorderSide(color: Color(0xFFE2E8F0))),
+            decoration: const BoxDecoration(
+              color: AppColors.softBlue,
+              border: Border(bottom: BorderSide(color: AppColors.blueBorder)),
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(10),
+                topRight: Radius.circular(10),
+              ),
             ),
             child: Row(
               children: [
                 CircleAvatar(
                   radius: 16,
-                  backgroundColor: isWellbeing ? const Color(0xFF10B981) : primaryBlue,
+                  backgroundColor: AppColors.primary,
                   child: Icon(
                     isWellbeing ? Icons.child_care : Icons.face,
                     color: Colors.white,
@@ -241,11 +245,11 @@ class _LearningJournalViewState extends State<LearningJournalView> {
                     children: [
                       Text(
                         entry['author'] ?? 'Teacher',
-                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AppColors.textPrimary),
                       ),
                       Text(
                         entry['date'] ?? '',
-                        style: const TextStyle(fontSize: 11, color: Colors.grey),
+                        style: const TextStyle(fontSize: 11, color: AppColors.textMuted),
                       ),
                     ],
                   ),
@@ -253,19 +257,18 @@ class _LearningJournalViewState extends State<LearningJournalView> {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                   decoration: BoxDecoration(
-                    color: isWellbeing
-                        ? const Color(0xFFDCFCE7)
-                        : const Color(0xFFDBEAFE),
+                    color: AppColors.surface,
                     borderRadius: BorderRadius.circular(4),
+                    border: Border.all(color: AppColors.blueBorder),
                   ),
                   child: Text(
                     isWellbeing
                         ? 'PREPARATORY LOG'
                         : (entry['subject'] ?? entry['type'].toString().toUpperCase()),
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 10,
                       fontWeight: FontWeight.bold,
-                      color: isWellbeing ? const Color(0xFF15803D) : const Color(0xFF1E40AF),
+                      color: AppColors.primaryDark,
                     ),
                   ),
                 ),
@@ -282,7 +285,7 @@ class _LearningJournalViewState extends State<LearningJournalView> {
                 if (entry['caption'] != null)
                   Text(
                     entry['caption'],
-                    style: const TextStyle(fontSize: 14, height: 1.4),
+                    style: const TextStyle(fontSize: 14, height: 1.4, color: AppColors.textPrimary),
                   ),
 
                 // Preparatory Wellbeing Details Box
@@ -292,16 +295,16 @@ class _LearningJournalViewState extends State<LearningJournalView> {
                     width: double.infinity,
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFF8FAFC),
-                      borderRadius: BorderRadius.circular(4),
-                      border: Border.all(color: const Color(0xFFCBD5E1)),
+                      color: AppColors.softBlue,
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: AppColors.blueBorder),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const Text(
                           'DAILY WELLBEING SNAPSHOT',
-                          style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.grey, letterSpacing: 0.5),
+                          style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: AppColors.primaryDark, letterSpacing: 0.5),
                         ),
                         const SizedBox(height: 6),
                         _buildWellbeingRow(Icons.restaurant_rounded, 'Meals', entry['wellbeing']['meals']),
@@ -317,18 +320,18 @@ class _LearningJournalViewState extends State<LearningJournalView> {
                 if (hasImage) ...[
                   const SizedBox(height: 12),
                   ClipRRect(
-                    borderRadius: BorderRadius.circular(4),
+                    borderRadius: BorderRadius.circular(8),
                     child: Container(
                       height: 180,
                       width: double.infinity,
-                      color: Colors.grey.shade200,
+                      color: AppColors.softBlue,
                       child: Image.network(
                         entry['image_url'],
                         fit: BoxFit.cover,
                         errorBuilder: (context, error, stackTrace) => Container(
-                          color: Colors.grey.shade300,
+                          color: AppColors.softBlue,
                           child: const Center(
-                            child: Icon(Icons.image, size: 48, color: Colors.grey),
+                            child: Icon(Icons.image, size: 48, color: AppColors.primaryLight),
                           ),
                         ),
                       ),
@@ -342,14 +345,15 @@ class _LearningJournalViewState extends State<LearningJournalView> {
                   Container(
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFF1F5F9),
-                      borderRadius: BorderRadius.circular(4),
+                      color: AppColors.softBlue,
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: AppColors.blueBorder),
                     ),
                     child: Row(
                       children: [
                         const CircleAvatar(
                           radius: 16,
-                          backgroundColor: primaryBlue,
+                          backgroundColor: AppColors.primary,
                           child: Icon(Icons.play_arrow_rounded, color: Colors.white, size: 20),
                         ),
                         const SizedBox(width: 12),
@@ -357,14 +361,14 @@ class _LearningJournalViewState extends State<LearningJournalView> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text('Voice Recording', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
-                              Text('Audio sample • Click to play', style: TextStyle(fontSize: 10, color: Colors.grey)),
+                              Text('Voice Recording', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppColors.textPrimary)),
+                              Text('Audio sample • Click to play', style: TextStyle(fontSize: 10, color: AppColors.textMuted)),
                             ],
                           ),
                         ),
                         Text(
                           entry['duration'] ?? '',
-                          style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: primaryBlue),
+                          style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppColors.primary),
                         ),
                       ],
                     ),
@@ -377,19 +381,19 @@ class _LearningJournalViewState extends State<LearningJournalView> {
                   Container(
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFEFF6FF),
-                      borderRadius: BorderRadius.circular(4),
-                      border: const Border(left: BorderSide(color: secondaryBlue, width: 3)),
+                      color: AppColors.softBlue,
+                      borderRadius: BorderRadius.circular(8),
+                      border: const Border(left: BorderSide(color: AppColors.primary, width: 3)),
                     ),
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Icon(Icons.chat_bubble_outline_rounded, size: 16, color: secondaryBlue),
+                        const Icon(Icons.chat_bubble_outline_rounded, size: 16, color: AppColors.primary),
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
                             'Teacher Feedback: ${entry['feedback']}',
-                            style: const TextStyle(fontSize: 12, fontStyle: FontStyle.italic, color: Color(0xFF1E3A8A)),
+                            style: const TextStyle(fontSize: 12, fontStyle: FontStyle.italic, color: AppColors.primaryDark),
                           ),
                         ),
                       ],
@@ -413,14 +417,14 @@ class _LearningJournalViewState extends State<LearningJournalView> {
         children: [
           Padding(
             padding: const EdgeInsets.only(top: 2.0),
-            child: Icon(icon, size: 14, color: primaryBlue),
+            child: Icon(icon, size: 14, color: AppColors.primary),
           ),
           const SizedBox(width: 6),
-          Text('$label: ', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+          Text('$label: ', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppColors.textPrimary)),
           Expanded(
             child: Text(
               value,
-              style: const TextStyle(fontSize: 12, height: 1.3),
+              style: const TextStyle(fontSize: 12, height: 1.3, color: AppColors.textSecondary),
             ),
           ),
         ],

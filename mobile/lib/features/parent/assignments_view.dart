@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../core/app_colors.dart';
 
 class AssignmentsView extends StatefulWidget {
   final Map<String, dynamic>? child;
@@ -10,14 +11,13 @@ class AssignmentsView extends StatefulWidget {
 }
 
 class _AssignmentsViewState extends State<AssignmentsView> {
-  static const primaryBlue = Color(0xFF3B5998);
   String _selectedFilter = 'All';
 
   final List<Map<String, dynamic>> _mockAssignments = [
     {
       'title': 'Fractions & Decimals Exercise Set 3',
       'subject': 'MATHEMATICS',
-      'subject_color': Color(0xFF3B5998),
+      'subject_color': AppColors.primary,
       'description': 'Complete problems 1 to 15 on page 42 of Math workbook.',
       'due_date': 'Due 22 Aug 2026',
       'status': 'PENDING',
@@ -26,7 +26,7 @@ class _AssignmentsViewState extends State<AssignmentsView> {
     {
       'title': 'Photosynthesis Observation Journal',
       'subject': 'SCIENCE',
-      'subject_color': Color(0xFF059669),
+      'subject_color': AppColors.primaryLight,
       'description': 'Document daily plant growth progress in project notebook.',
       'due_date': 'Overdue — 26 Jul 2026',
       'status': 'OVERDUE',
@@ -35,7 +35,7 @@ class _AssignmentsViewState extends State<AssignmentsView> {
     {
       'title': 'Shona Comprehension & Vocabulary',
       'subject': 'SHONA',
-      'subject_color': Color(0xFF7C3AED),
+      'subject_color': AppColors.primaryDark,
       'description': 'Read Chapter 4 and answer review questions 1-5.',
       'due_date': 'Due 2 Aug 2026',
       'status': 'SUBMITTED',
@@ -44,7 +44,7 @@ class _AssignmentsViewState extends State<AssignmentsView> {
     {
       'title': 'English Essay — My Community',
       'subject': 'ENGLISH',
-      'subject_color': Color(0xFFD97706),
+      'subject_color': AppColors.primaryAccent,
       'description': 'Write a 3-paragraph descriptive essay on your community.',
       'due_date': 'Graded — 15 Jul 2026',
       'status': 'GRADED',
@@ -62,30 +62,30 @@ class _AssignmentsViewState extends State<AssignmentsView> {
   Color _statusColor(String status) {
     switch (status) {
       case 'PENDING':
-        return const Color(0xFFF59E0B);
+        return AppColors.warning;
       case 'OVERDUE':
-        return const Color(0xFFEF4444);
+        return AppColors.error;
       case 'SUBMITTED':
-        return primaryBlue;
+        return AppColors.primary;
       case 'GRADED':
-        return const Color(0xFF22C55E);
+        return AppColors.primaryLight;
       default:
-        return Colors.grey;
+        return AppColors.textMuted;
     }
   }
 
   Color _statusBg(String status) {
     switch (status) {
       case 'PENDING':
-        return const Color(0xFFFEF3C7);
+        return AppColors.warningLight;
       case 'OVERDUE':
-        return const Color(0xFFFEE2E2);
+        return AppColors.errorLight;
       case 'SUBMITTED':
-        return const Color(0xFFEFF6FF);
+        return AppColors.softBlue;
       case 'GRADED':
-        return const Color(0xFFDCFCE7);
+        return AppColors.softBlue;
       default:
-        return const Color(0xFFF3F4F6);
+        return AppColors.softBlue;
     }
   }
 
@@ -94,9 +94,9 @@ class _AssignmentsViewState extends State<AssignmentsView> {
     final filters = ['All', 'Pending', 'Submitted', 'Graded'];
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: AppColors.background,
       appBar: AppBar(
-        backgroundColor: primaryBlue,
+        backgroundColor: AppColors.primary,
         iconTheme: const IconThemeData(color: Colors.white),
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -117,7 +117,7 @@ class _AssignmentsViewState extends State<AssignmentsView> {
         children: [
           // Filter Chips
           Container(
-            color: Colors.white,
+            color: AppColors.surface,
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
             child: SingleChildScrollView(
               scrollDirection: Axis.horizontal,
@@ -132,19 +132,19 @@ class _AssignmentsViewState extends State<AssignmentsView> {
                         padding: const EdgeInsets.symmetric(
                             horizontal: 14, vertical: 7),
                         decoration: BoxDecoration(
-                          color: isSel ? primaryBlue : const Color(0xFFF1F5F9),
+                          color: isSel ? AppColors.primary : AppColors.softBlue,
                           borderRadius: BorderRadius.circular(20),
                           border: Border.all(
                             color:
-                                isSel ? primaryBlue : const Color(0xFFCBD5E1),
+                                isSel ? AppColors.primary : AppColors.blueBorder,
                           ),
                         ),
                         child: Text(
                           f,
                           style: TextStyle(
-                            color: isSel ? Colors.white : const Color(0xFF475569),
+                            color: isSel ? Colors.white : AppColors.primaryDark,
                             fontWeight: FontWeight.bold,
-                            fontSize: 13,
+                            fontSize: 12,
                           ),
                         ),
                       ),
@@ -154,7 +154,7 @@ class _AssignmentsViewState extends State<AssignmentsView> {
               ),
             ),
           ),
-          const Divider(height: 1, color: Color(0xFFE2E8F0)),
+          const Divider(height: 1, color: AppColors.divider),
 
           // Assignment List
           Expanded(
@@ -167,17 +167,17 @@ class _AssignmentsViewState extends State<AssignmentsView> {
                           width: 64,
                           height: 64,
                           decoration: BoxDecoration(
-                            color: primaryBlue.withValues(alpha: 0.08),
+                            color: AppColors.softBlue,
                             borderRadius: BorderRadius.circular(32),
                           ),
                           child: const Icon(Icons.assignment_outlined,
-                              color: primaryBlue, size: 32),
+                              color: AppColors.primary, size: 32),
                         ),
                         const SizedBox(height: 16),
                         const Text(
                           'No assignments in this category.',
                           style: TextStyle(
-                              color: Color(0xFF6B7280),
+                              color: AppColors.textMuted,
                               fontWeight: FontWeight.bold),
                         ),
                       ],
@@ -194,12 +194,12 @@ class _AssignmentsViewState extends State<AssignmentsView> {
                       return Container(
                         margin: const EdgeInsets.only(bottom: 12),
                         decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(color: const Color(0xFFE2E8F0)),
+                          color: AppColors.surface,
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(color: AppColors.cardBorder),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.03),
+                              color: Colors.black.withValues(alpha: 0.02),
                               blurRadius: 4,
                               offset: const Offset(0, 2),
                             ),
@@ -214,8 +214,8 @@ class _AssignmentsViewState extends State<AssignmentsView> {
                               decoration: BoxDecoration(
                                 color: subjectColor,
                                 borderRadius: const BorderRadius.only(
-                                  topLeft: Radius.circular(8),
-                                  topRight: Radius.circular(8),
+                                  topLeft: Radius.circular(10),
+                                  topRight: Radius.circular(10),
                                 ),
                               ),
                             ),
@@ -270,14 +270,14 @@ class _AssignmentsViewState extends State<AssignmentsView> {
                                     style: const TextStyle(
                                         fontSize: 14,
                                         fontWeight: FontWeight.bold,
-                                        color: Color(0xFF1F2937)),
+                                        color: AppColors.textPrimary),
                                   ),
                                   const SizedBox(height: 4),
                                   Text(
                                     item['description'] as String,
                                     style: const TextStyle(
                                         fontSize: 13,
-                                        color: Color(0xFF6B7280),
+                                        color: AppColors.textSecondary,
                                         height: 1.3),
                                   ),
                                   const SizedBox(height: 10),
@@ -306,16 +306,17 @@ class _AssignmentsViewState extends State<AssignmentsView> {
                                           padding: const EdgeInsets.symmetric(
                                               horizontal: 8, vertical: 3),
                                           decoration: BoxDecoration(
-                                            color: const Color(0xFFDCFCE7),
+                                            color: AppColors.softBlue,
                                             borderRadius:
                                                 BorderRadius.circular(4),
+                                            border: Border.all(color: AppColors.blueBorder),
                                           ),
                                           child: Text(
                                             'Score: ${item['score']}',
                                             style: const TextStyle(
                                               fontSize: 12,
                                               fontWeight: FontWeight.bold,
-                                              color: Color(0xFF15803D),
+                                              color: AppColors.primaryDark,
                                             ),
                                           ),
                                         ),
