@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../core/app_colors.dart';
 import '../dashboard/payments_view.dart';
 import '../dashboard/reports_view.dart';
 import '../dashboard/announcements_view.dart';
@@ -17,9 +18,6 @@ class ParentDashboardView extends StatefulWidget {
 }
 
 class _ParentDashboardViewState extends State<ParentDashboardView> {
-  static const primaryBlue = Color(0xFF3B5998);
-  static const borderColor = Color(0xFFD8D8D8);
-
   // Unified Guardian Account Children
   int _selectedChildIndex = 0;
 
@@ -84,21 +82,21 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
       'title': 'Term 2 Report Cards & Fee Clearance',
       'date': 'July 28, 2026',
       'category': 'URGENT',
-      'category_color': Color(0xFFEF4444),
+      'category_color': AppColors.error,
       'summary': 'Term 2 academic reports are now compiled. Please ensure fee balances are settled to unlock digital PDF downloads.',
     },
     {
       'title': 'Annual Parent-Teacher Consultation Day',
       'date': 'August 05, 2026',
       'category': 'EVENT',
-      'category_color': Color(0xFF3B5998),
+      'category_color': AppColors.primary,
       'summary': 'All parents are invited to consult with homeroom teachers regarding student progress and merits performance.',
     },
     {
       'title': 'School Transportation & Extension Notice',
       'date': 'August 01, 2026',
       'category': 'NOTICE',
-      'category_color': Color(0xFF10B981),
+      'category_color': AppColors.primaryLight,
       'summary': 'Updated bus routes and timetable schedules for Term 3 enrollment are now available in the portal.',
     },
   ];
@@ -130,10 +128,10 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: primaryBlue.withValues(alpha: 0.1),
+                    color: AppColors.softBlue,
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: const Icon(Icons.admin_panel_settings_rounded, color: primaryBlue, size: 24),
+                  child: const Icon(Icons.admin_panel_settings_rounded, color: AppColors.primary, size: 24),
                 ),
                 const SizedBox(width: 12),
                 const Expanded(
@@ -142,11 +140,11 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
                     children: [
                       Text(
                         'Add Student to Account',
-                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Color(0xFF1F2937)),
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: AppColors.textPrimary),
                       ),
                       Text(
                         'School Admin Verification Required',
-                        style: TextStyle(fontSize: 12, color: Color(0xFF6B7280)),
+                        style: TextStyle(fontSize: 12, color: AppColors.textMuted),
                       ),
                     ],
                   ),
@@ -157,18 +155,18 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: const Color(0xFFEFF6FF),
+                color: AppColors.softBlue,
                 borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: const Color(0xFFBFDBFE)),
+                border: Border.all(color: AppColors.blueBorder),
               ),
               child: const Row(
                 children: [
-                  Icon(Icons.shield_outlined, color: primaryBlue, size: 20),
+                  Icon(Icons.shield_outlined, color: AppColors.primary, size: 20),
                   SizedBox(width: 10),
                   Expanded(
                     child: Text(
                       'For student security, additional children are added and linked exclusively by the School Administrator. Submit your request below for admin approval.',
-                      style: TextStyle(fontSize: 12, color: Color(0xFF1E40AF), height: 1.3),
+                      style: TextStyle(fontSize: 12, color: AppColors.primaryDark, height: 1.3),
                     ),
                   ),
                 ],
@@ -221,14 +219,14 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text('Link request for "$name" submitted to School Admin! You will be notified once approved.'),
-                      backgroundColor: const Color(0xFF10B981),
+                      backgroundColor: AppColors.primary,
                     ),
                   );
                 },
                 icon: const Icon(Icons.send_rounded, size: 18),
                 label: const Text('Submit Link Request to Admin', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: primaryBlue,
+                  backgroundColor: AppColors.primary,
                   foregroundColor: Colors.white,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                 ),
@@ -256,9 +254,9 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: borderColor),
+              color: AppColors.surface,
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: AppColors.cardBorder),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -266,17 +264,17 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
+                    const Text(
                       'Select Linked Student:',
-                      style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.grey.shade700),
+                      style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppColors.textMuted),
                     ),
                     InkWell(
                       onTap: () => _showRequestAddStudentDialog(context),
                       child: const Row(
                         children: [
-                          Icon(Icons.add_circle_outline_rounded, size: 14, color: primaryBlue),
+                          Icon(Icons.add_circle_outline_rounded, size: 14, color: AppColors.primaryLight),
                           SizedBox(width: 4),
-                          Text('Add Child', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: primaryBlue)),
+                          Text('Add Child', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppColors.primaryLight)),
                         ],
                       ),
                     ),
@@ -294,21 +292,22 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
                         padding: const EdgeInsets.only(right: 8.0),
                         child: ChoiceChip(
                           avatar: CircleAvatar(
-                            backgroundColor: isSelected ? Colors.white : primaryBlue,
+                            backgroundColor: isSelected ? Colors.white : AppColors.primary,
                             child: Text(
                               child['name'][0],
-                              style: TextStyle(color: isSelected ? primaryBlue : Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
+                              style: TextStyle(color: isSelected ? AppColors.primary : Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
                             ),
                           ),
                           label: Text('${child['name']} (${child['class'].toString().split(' ').first})'),
                           selected: isSelected,
-                          selectedColor: primaryBlue,
+                          selectedColor: AppColors.primary,
                           labelStyle: TextStyle(
-                            color: isSelected ? Colors.white : const Color(0xFF1F2937),
+                            color: isSelected ? Colors.white : AppColors.textPrimary,
                             fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
                             fontSize: 12,
                           ),
-                          backgroundColor: const Color(0xFFF3F4F6),
+                          backgroundColor: AppColors.softBlue,
+                          side: BorderSide(color: isSelected ? AppColors.primary : AppColors.blueBorder),
                           onSelected: (selected) {
                             if (selected) selectChild(idx);
                           },
@@ -331,7 +330,7 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
                   currentChild['attendance_rate'] ?? '96%',
                   '${currentChild['days_present'] ?? 58}/${currentChild['total_days'] ?? 60} Days Present',
                   Icons.fact_check_outlined,
-                  const Color(0xFF22C55E),
+                  AppColors.primaryLight,
                   onTap: () {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(content: Text('Attendance Details: ${currentChild['days_present']} of ${currentChild['total_days']} school days attended (${currentChild['attendance_rate']}).')),
@@ -346,7 +345,7 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
                   isFeeGated ? 'USD \$${feeBalance.toStringAsFixed(2)}' : 'USD \$0.00',
                   isFeeGated ? 'Balance Due' : 'Paid in Full',
                   Icons.account_balance_wallet_outlined,
-                  isFeeGated ? const Color(0xFFEF4444) : const Color(0xFF10B981),
+                  isFeeGated ? AppColors.error : AppColors.primaryLight,
                   onTap: () {
                     Navigator.push(
                       context,
@@ -365,11 +364,11 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
             children: [
               const Row(
                 children: [
-                  Icon(Icons.campaign_rounded, color: primaryBlue, size: 20),
+                  Icon(Icons.campaign_rounded, color: AppColors.primary, size: 20),
                   SizedBox(width: 8),
                   Text(
                     'School & Class Announcements',
-                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: primaryBlue),
+                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: AppColors.primaryDark),
                   ),
                 ],
               ),
@@ -382,7 +381,7 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
                 },
                 child: const Text(
                   'View All',
-                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: primaryBlue),
+                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppColors.primaryLight),
                 ),
               ),
             ],
@@ -394,17 +393,17 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
               return Container(
                 margin: const EdgeInsets.only(bottom: 10),
                 decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(8),
+                  color: AppColors.surface,
+                  borderRadius: BorderRadius.circular(10),
                   border: Border(
                     left: BorderSide(color: catColor, width: 4),
-                    top: const BorderSide(color: Color(0xFFE2E8F0)),
-                    right: const BorderSide(color: Color(0xFFE2E8F0)),
-                    bottom: const BorderSide(color: Color(0xFFE2E8F0)),
+                    top: const BorderSide(color: AppColors.cardBorder),
+                    right: const BorderSide(color: AppColors.cardBorder),
+                    bottom: const BorderSide(color: AppColors.cardBorder),
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.03),
+                      color: Colors.black.withValues(alpha: 0.02),
                       blurRadius: 4,
                       offset: const Offset(0, 2),
                     ),
@@ -431,19 +430,19 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
                           ),
                           Text(
                             notice['date'],
-                            style: const TextStyle(fontSize: 11, color: Color(0xFF6B7280), fontWeight: FontWeight.w500),
+                            style: const TextStyle(fontSize: 11, color: AppColors.textMuted, fontWeight: FontWeight.w500),
                           ),
                         ],
                       ),
                       const SizedBox(height: 8),
                       Text(
                         notice['title'],
-                        style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Color(0xFF1F2937)),
+                        style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
                       ),
                       const SizedBox(height: 4),
                       Text(
                         notice['summary'],
-                        style: const TextStyle(fontSize: 12, color: Color(0xFF4B5563), height: 1.3),
+                        style: const TextStyle(fontSize: 12, color: AppColors.textSecondary, height: 1.3),
                       ),
                     ],
                   ),
@@ -456,7 +455,7 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
           // 5. EDU-CONNECT CORE MODULES GRID
           const Text(
             'Edu-Connect Services & Features',
-            style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: primaryBlue),
+            style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: AppColors.primaryDark),
           ),
           const SizedBox(height: 10),
 
@@ -470,7 +469,7 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
             children: [
               _buildEduModuleCard(
                 icon: Icons.auto_stories_rounded,
-                color: primaryBlue,
+                color: AppColors.primary,
                 title: 'Learning Journal',
                 subtitle: 'Ungated Multimedia Feed',
                 onTap: () {
@@ -482,7 +481,7 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
               ),
               _buildEduModuleCard(
                 icon: Icons.analytics_rounded,
-                color: primaryBlue,
+                color: AppColors.primary,
                 title: 'Academic Z-Scores',
                 subtitle: 'Performance Charts',
                 onTap: () {
@@ -494,7 +493,7 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
               ),
               _buildEduModuleCard(
                 icon: Icons.account_balance_wallet_rounded,
-                color: primaryBlue,
+                color: AppColors.primary,
                 title: 'Fee Payments',
                 subtitle: isFeeGated ? 'USD \$${feeBalance.toStringAsFixed(2)} Due' : 'Dual Currency USD/ZiG',
                 onTap: () {
@@ -506,7 +505,7 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
               ),
               _buildEduModuleCard(
                 icon: Icons.campaign_rounded,
-                color: primaryBlue,
+                color: AppColors.primary,
                 title: 'Announcements',
                 subtitle: 'School & Class Notices',
                 onTap: () {
@@ -518,7 +517,7 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
               ),
               _buildEduModuleCard(
                 icon: Icons.star_rate_rounded,
-                color: primaryBlue,
+                color: AppColors.primary,
                 title: 'Behaviour & Merits',
                 subtitle: '+${currentChild['merits_pos']} Merits / ${currentChild['merits_neg']} Incidents',
                 onTap: () {
@@ -530,7 +529,7 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
               ),
               _buildEduModuleCard(
                 icon: Icons.assignment_rounded,
-                color: primaryBlue,
+                color: AppColors.primary,
                 title: 'Homework Tracker',
                 subtitle: 'Upcoming & Overdue',
                 onTap: () {
@@ -542,7 +541,7 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
               ),
               _buildEduModuleCard(
                 icon: Icons.forum_rounded,
-                color: primaryBlue,
+                color: AppColors.primary,
                 title: 'Messaging & Support',
                 subtitle: 'Direct Teacher Chat',
                 onTap: () {
@@ -554,7 +553,7 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
               ),
               _buildEduModuleCard(
                 icon: Icons.sms_rounded,
-                color: primaryBlue,
+                color: AppColors.primary,
                 title: 'SMS Alerts Log',
                 subtitle: 'Econet / Telecel History',
                 onTap: () {
@@ -566,7 +565,7 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
               ),
               _buildEduModuleCard(
                 icon: Icons.shopping_bag_rounded,
-                color: primaryBlue,
+                color: AppColors.primary,
                 title: 'Uniform Store',
                 subtitle: 'Buy Online & Select Sizes',
                 onTap: () {
@@ -578,7 +577,7 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
               ),
               _buildEduModuleCard(
                 icon: Icons.person_add_alt_1_rounded,
-                color: primaryBlue,
+                color: AppColors.primary,
                 title: 'Link Student',
                 subtitle: 'Request Child Account Link',
                 onTap: () {
@@ -594,9 +593,9 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
             width: double.infinity,
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: borderColor),
+              color: AppColors.surface,
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: AppColors.cardBorder),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -606,10 +605,10 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
                     Container(
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                        color: primaryBlue.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(6),
+                        color: AppColors.softBlue,
+                        borderRadius: BorderRadius.circular(8),
                       ),
-                      child: const Icon(Icons.assessment_rounded, color: primaryBlue, size: 22),
+                      child: const Icon(Icons.assessment_rounded, color: AppColors.primary, size: 22),
                     ),
                     const SizedBox(width: 12),
                     Column(
@@ -617,12 +616,12 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
                       children: [
                         const Text(
                           'Term Report Card',
-                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Color(0xFF1F2937)),
+                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: AppColors.textPrimary),
                         ),
                         const SizedBox(height: 2),
                         Text(
                           isFeeGated ? 'Fee Gated — Pay balance to unlock PDF' : 'Term 2 2026 Ready for Download',
-                          style: TextStyle(fontSize: 11, color: isFeeGated ? const Color(0xFFDC2626) : const Color(0xFF16A34A)),
+                          style: TextStyle(fontSize: 11, color: isFeeGated ? AppColors.error : AppColors.primaryLight),
                         ),
                       ],
                     ),
@@ -633,10 +632,10 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
                     Navigator.push(context, MaterialPageRoute(builder: (_) => const ReportsView()));
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: isFeeGated ? const Color(0xFFDC2626) : primaryBlue,
+                    backgroundColor: isFeeGated ? AppColors.error : AppColors.primary,
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                   ),
                   child: Text(isFeeGated ? 'Unlock' : 'View PDF', style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
                 ),
@@ -657,18 +656,18 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
     required VoidCallback onTap,
     Color? accentColor,
   }) {
-    final topColor = accentColor ?? color;
+    final topColor = accentColor ?? AppColors.primary;
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(8),
+      borderRadius: BorderRadius.circular(10),
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: const Color(0xFFE2E8F0)),
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(color: AppColors.cardBorder),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.03),
+              color: Colors.black.withValues(alpha: 0.02),
               blurRadius: 4,
               offset: const Offset(0, 2),
             ),
@@ -679,28 +678,28 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
           children: [
             // Colored top accent strip
             Container(
-              height: 5,
+              height: 4,
               decoration: BoxDecoration(
                 color: topColor,
                 borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(8),
-                  topRight: Radius.circular(8),
+                  topLeft: Radius.circular(10),
+                  topRight: Radius.circular(10),
                 ),
               ),
             ),
             Expanded(
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(10, 8, 10, 8),
+                padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       title,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 12,
-                        color: color,
+                        color: AppColors.primaryDark,
                       ),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
@@ -710,7 +709,7 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
                       subtitle,
                       style: const TextStyle(
                         fontSize: 10,
-                        color: Color(0xFF6B7280),
+                        color: AppColors.textMuted,
                       ),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
@@ -728,20 +727,20 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
   Widget _buildWebKpiCard(String label, String value, String subtext, IconData icon, Color color, {VoidCallback? onTap}) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(8),
+      borderRadius: BorderRadius.circular(10),
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(8),
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(10),
           border: Border(
             left: BorderSide(color: color, width: 4),
-            top: const BorderSide(color: Color(0xFFE2E8F0)),
-            right: const BorderSide(color: Color(0xFFE2E8F0)),
-            bottom: const BorderSide(color: Color(0xFFE2E8F0)),
+            top: const BorderSide(color: AppColors.cardBorder),
+            right: const BorderSide(color: AppColors.cardBorder),
+            bottom: const BorderSide(color: AppColors.cardBorder),
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.03),
+              color: Colors.black.withValues(alpha: 0.02),
               blurRadius: 4,
               offset: const Offset(0, 2),
             ),
@@ -756,7 +755,7 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
               style: const TextStyle(
                 fontSize: 9,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFF6B7280),
+                color: AppColors.textMuted,
                 letterSpacing: 0.8,
               ),
               overflow: TextOverflow.ellipsis,
@@ -776,7 +775,7 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
               subtext,
               style: const TextStyle(
                 fontSize: 10,
-                color: Color(0xFF6B7280),
+                color: AppColors.textMuted,
               ),
               overflow: TextOverflow.ellipsis,
             ),

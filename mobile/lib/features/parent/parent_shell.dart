@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../core/student_provider.dart';
+import '../../core/app_colors.dart';
 import '../common/app_drawer.dart';
 import '../parent/parent_dashboard_view.dart';
 import '../parent/learning_journal_view.dart';
@@ -17,7 +18,6 @@ class ParentShell extends StatefulWidget {
 }
 
 class _ParentShellState extends State<ParentShell> {
-  static const primaryBlue = Color(0xFF3B5998);
   int _currentIndex = 0;
 
   static final Map<String, dynamic> _defaultChild = {
@@ -50,10 +50,10 @@ class _ParentShellState extends State<ParentShell> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF9FAFB),
+      backgroundColor: AppColors.background,
       drawer: const AppDrawer(currentRoute: 'Dashboard'),
       appBar: AppBar(
-        backgroundColor: primaryBlue,
+        backgroundColor: AppColors.primary,
         elevation: 0,
         leading: Builder(
           builder: (context) => IconButton(
@@ -83,7 +83,7 @@ class _ParentShellState extends State<ParentShell> {
                   width: 8,
                   height: 8,
                   decoration: const BoxDecoration(
-                    color: Color(0xFFEF4444),
+                    color: AppColors.error,
                     shape: BoxShape.circle,
                   ),
                 ),
@@ -99,17 +99,17 @@ class _ParentShellState extends State<ParentShell> {
       ),
       bottomNavigationBar: Container(
         decoration: const BoxDecoration(
-          color: Colors.white,
+          color: AppColors.surface,
           border:
-              Border(top: BorderSide(color: Color(0xFFE5E7EB), width: 1)),
+              Border(top: BorderSide(color: AppColors.cardBorder, width: 1)),
         ),
         child: BottomNavigationBar(
           currentIndex: _currentIndex,
           onTap: (i) => setState(() => _currentIndex = i),
           type: BottomNavigationBarType.fixed,
-          backgroundColor: Colors.white,
-          selectedItemColor: primaryBlue,
-          unselectedItemColor: const Color(0xFF9CA3AF),
+          backgroundColor: AppColors.surface,
+          selectedItemColor: AppColors.primary,
+          unselectedItemColor: AppColors.textLight,
           selectedLabelStyle:
               const TextStyle(fontWeight: FontWeight.bold, fontSize: 11),
           unselectedLabelStyle: const TextStyle(fontSize: 11),
