@@ -27,4 +27,14 @@ class SchoolClass extends Model
                     ->withPivot('id', 'subject_name')
                     ->withTimestamps();
     }
+
+    public function getFullDisplayNameAttribute()
+    {
+        return "{$this->grade} {$this->class_name}";
+    }
+
+    public function scopeForSchool($query, $schoolId)
+    {
+        return $query->where('school_id', $schoolId);
+    }
 }

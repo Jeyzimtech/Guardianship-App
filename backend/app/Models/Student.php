@@ -60,4 +60,9 @@ class Student extends Model
     {
         return $this->hasMany(UniformOrder::class);
     }
+
+    public function scopeForSchool($query, $schoolId)
+    {
+        return $query->where('school_id', $schoolId);
+    }
 }
