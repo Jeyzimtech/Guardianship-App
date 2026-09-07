@@ -9,7 +9,14 @@ class SmsAlertsLogView extends StatefulWidget {
 }
 
 class _SmsAlertsLogViewState extends State<SmsAlertsLogView> {
+  final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
 
   final List<Map<String, String>> _mockSmsLog = [
     {
@@ -76,11 +83,21 @@ class _SmsAlertsLogViewState extends State<SmsAlertsLogView> {
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: TextField(
-              onChanged: (val) => setState(() => _searchQuery = val),
+              controller: _searchController,
+              onChanged: (val) => setState(() => _searchQuery = val.trim()),
               decoration: InputDecoration(
                 hintText: 'Search SMS alerts by keyword or date...',
                 hintStyle: const TextStyle(color: AppColors.textLight, fontSize: 13),
                 prefixIcon: const Icon(Icons.search, color: AppColors.primaryLight),
+                suffixIcon: _searchQuery.isNotEmpty
+                    ? IconButton(
+                        icon: const Icon(Icons.clear, color: AppColors.textMuted, size: 18),
+                        onPressed: () {
+                          _searchController.clear();
+                          setState(() => _searchQuery = '');
+                        },
+                      )
+                    : null,
                 filled: true,
                 fillColor: AppColors.surface,
                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: AppColors.cardBorder)),
@@ -94,7 +111,18 @@ class _SmsAlertsLogViewState extends State<SmsAlertsLogView> {
           // Searchable List
           Expanded(
             child: filtered.isEmpty
-                ? const Center(child: Text('No SMS alerts match your search.', style: TextStyle(color: AppColors.textMuted)))
+                ? Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.sms_failed_outlined, size: 48, color: AppColors.primaryLight.withValues(alpha: 0.4)),
+                        const SizedBox(height: 12),
+                        const Text('No SMS alerts match your search.', style: TextStyle(color: AppColors.textMuted, fontWeight: FontWeight.bold)),
+                        const SizedBox(height: 4),
+                        const Text('Try searching by school name, keyword or date.', style: TextStyle(color: AppColors.textLight, fontSize: 12)),
+                      ],
+                    ),
+                  )
                 : ListView.builder(
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     itemCount: filtered.length,
