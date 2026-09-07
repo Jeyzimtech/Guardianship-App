@@ -172,6 +172,15 @@ class _CreateStudentDialogState extends State<CreateStudentDialog> {
                     hintText: 'e.g. 150.00',
                     prefixIcon: Icon(Icons.attach_money_rounded, color: AppColors.primary, size: 20),
                   ),
+                  validator: (val) {
+                    if (val != null && val.trim().isNotEmpty) {
+                      final parsed = double.tryParse(val.trim());
+                      if (parsed == null || parsed < 0) {
+                        return 'Enter a valid non-negative amount';
+                      }
+                    }
+                    return null;
+                  },
                 ),
                 const SizedBox(height: 12),
 

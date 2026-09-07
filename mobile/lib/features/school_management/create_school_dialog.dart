@@ -128,7 +128,11 @@ class _CreateSchoolDialogState extends State<CreateSchoolDialog> {
                     prefixIcon: const Icon(Icons.school_outlined, color: darkTeal),
                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                   ),
-                  validator: (val) => val == null || val.trim().isEmpty ? 'School name is required' : null,
+                  validator: (val) {
+                    if (val == null || val.trim().isEmpty) return 'School name is required';
+                    if (val.trim().length < 3) return 'School name must be at least 3 characters';
+                    return null;
+                  },
                 ),
                 const SizedBox(height: 16),
 

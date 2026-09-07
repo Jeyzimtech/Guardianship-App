@@ -141,10 +141,15 @@ class _CreateUserDialogState extends State<CreateUserDialog> {
                   keyboardType: TextInputType.phone,
                   decoration: InputDecoration(
                     labelText: 'Phone Number',
+                    hintText: 'e.g. +263771234567',
                     prefixIcon: const Icon(Icons.phone_outlined, color: darkTeal),
                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                   ),
-                  validator: (val) => val == null || val.trim().isEmpty ? 'Phone number is required' : null,
+                  validator: (val) {
+                    if (val == null || val.trim().isEmpty) return 'Phone number is required';
+                    if (val.trim().length < 8) return 'Enter a valid phone number (min 8 digits)';
+                    return null;
+                  },
                 ),
                 const SizedBox(height: 14),
 
@@ -154,9 +159,18 @@ class _CreateUserDialogState extends State<CreateUserDialog> {
                   keyboardType: TextInputType.emailAddress,
                   decoration: InputDecoration(
                     labelText: 'Email Address (Optional)',
+                    hintText: 'e.g. user@domain.com',
                     prefixIcon: const Icon(Icons.email_outlined, color: darkTeal),
                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                   ),
+                  validator: (val) {
+                    if (val != null && val.trim().isNotEmpty) {
+                      if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(val.trim())) {
+                        return 'Enter a valid email address';
+                      }
+                    }
+                    return null;
+                  },
                 ),
                 const SizedBox(height: 14),
 
@@ -188,6 +202,12 @@ class _CreateUserDialogState extends State<CreateUserDialog> {
                     prefixIcon: const Icon(Icons.lock_outline, color: darkTeal),
                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                   ),
+                  validator: (val) {
+                    if (!isEditing && (val == null || val.length < 6)) {
+                      return 'Password must be at least 6 characters';
+                    }
+                    return null;
+                  },
                 ),
                 const SizedBox(height: 24),
 
