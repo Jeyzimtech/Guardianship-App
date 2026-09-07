@@ -82,8 +82,8 @@ class _PaymentsViewState extends State<PaymentsView> {
     final selectedStudent = studentProvider.selectedStudent;
     if (selectedStudent == null) return;
 
-    double balanceUsd = double.parse(_feeAccount?['balance_usd']?.toString() ?? '0.0');
-    double balanceZig = double.parse(_feeAccount?['balance_zig']?.toString() ?? '0.0');
+    double balanceUsd = double.tryParse(_feeAccount?['balance_usd']?.toString().replaceAll(RegExp(r'[^0-9.]'), '') ?? '0.0') ?? 0.0;
+    double balanceZig = double.tryParse(_feeAccount?['balance_zig']?.toString().replaceAll(RegExp(r'[^0-9.]'), '') ?? '0.0') ?? 0.0;
 
     if (balanceUsd <= 0 && balanceZig <= 0) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -284,8 +284,8 @@ class _PaymentsViewState extends State<PaymentsView> {
   }
 
   Widget _buildBalanceHeader(BuildContext context) {
-    double balanceUsd = double.parse(_feeAccount?['balance_usd']?.toString() ?? '0.0');
-    double balanceZig = double.parse(_feeAccount?['balance_zig']?.toString() ?? '0.0');
+    double balanceUsd = double.tryParse(_feeAccount?['balance_usd']?.toString().replaceAll(RegExp(r'[^0-9.]'), '') ?? '0.0') ?? 0.0;
+    double balanceZig = double.tryParse(_feeAccount?['balance_zig']?.toString().replaceAll(RegExp(r'[^0-9.]'), '') ?? '0.0') ?? 0.0;
     bool hasFees = balanceUsd > 0 || balanceZig > 0;
 
     return Column(

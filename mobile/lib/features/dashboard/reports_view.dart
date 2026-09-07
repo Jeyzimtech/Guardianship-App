@@ -41,8 +41,8 @@ class _ReportsViewState extends State<ReportsView> {
       }
     } catch (e) {
       // Offline fallback: load mock reports
-      final double balanceUsd = double.parse(studentProvider.dashboardData?['fee_snapshot']?['balance_usd']?.toString() ?? '0.0');
-      final double balanceZig = double.parse(studentProvider.dashboardData?['fee_snapshot']?['balance_zig']?.toString() ?? '0.0');
+      final double balanceUsd = double.tryParse(studentProvider.dashboardData?['fee_snapshot']?['balance_usd']?.toString() ?? '0.0') ?? 0.0;
+      final double balanceZig = double.tryParse(studentProvider.dashboardData?['fee_snapshot']?['balance_zig']?.toString() ?? '0.0') ?? 0.0;
       final bool hasFees = balanceUsd > 0 || balanceZig > 0;
 
       setState(() {
