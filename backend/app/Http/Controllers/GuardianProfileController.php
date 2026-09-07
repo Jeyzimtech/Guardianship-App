@@ -59,7 +59,16 @@ class GuardianProfileController extends Controller
         return response()->json([
             'status' => 'success',
             'message' => 'Guardian profile updated successfully.',
-            'data' => $user
+            'data' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'phone_number' => $user->phone_number,
+                'address' => $user->address,
+                'preferred_language' => $user->preferred_language ?? 'English',
+                'emergency_contact_name' => $user->emergency_contact_name,
+                'emergency_contact_phone' => $user->emergency_contact_phone,
+            ]
         ]);
     }
 }

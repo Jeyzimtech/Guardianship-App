@@ -115,6 +115,16 @@ class TeacherController extends Controller
         if ($request->has('subject_specialties')) $teacher->subject_specialties = $request->subject_specialties;
         $teacher->save();
 
+        if ($request->has('name') || $request->has('email') || $request->has('phone_number')) {
+            $user = $teacher->user;
+            if ($user) {
+                if ($request->filled('name')) $user->name = $request->name;
+                if ($request->filled('email')) $user->email = $request->email;
+                if ($request->filled('phone_number')) $user->phone_number = $request->phone_number;
+                $user->save();
+            }
+        }
+
         if ($request->has('class_assignments')) {
             $teacher->assignedClasses()->detach();
             foreach ($request->class_assignments as $assignment) {
