@@ -2090,19 +2090,23 @@
                 filtered = filtered.filter(u => u.name.toLowerCase().includes(search) || u.email.toLowerCase().includes(search) || u.phone.includes(search));
             }
 
-            tbody.innerHTML = filtered.map(u => `
-                <tr>
-                    <td>#${u.id}</td>
-                    <td><strong>${u.name}</strong></td>
-                    <td>${u.email}</td>
-                    <td>${u.phone}</td>
-                    <td><span class="role-badge ${u.role}">${u.role}</span></td>
-                    <td>
-                        <button class="btn-sm" onclick="alert('Editing user #${u.id}')">Edit</button>
-                        <button class="btn-sm btn-danger" onclick="deleteUser(${u.id})">Delete</button>
-                    </td>
-                </tr>
-            `).join('');
+            if (filtered.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding: 24px; color: var(--text-secondary);">No matching users found</td></tr>';
+            } else {
+                tbody.innerHTML = filtered.map(u => `
+                    <tr>
+                        <td>#${u.id}</td>
+                        <td><strong>${u.name}</strong></td>
+                        <td>${u.email}</td>
+                        <td>${u.phone}</td>
+                        <td><span class="role-badge ${u.role}">${u.role}</span></td>
+                        <td>
+                            <button class="btn-sm" onclick="alert('Editing user #${u.id}')">Edit</button>
+                            <button class="btn-sm btn-danger" onclick="deleteUser(${u.id})">Delete</button>
+                        </td>
+                    </tr>
+                `).join('');
+            }
 
             document.getElementById('kpiStudents').innerText = (1250 + studentsList.length - 2).toLocaleString();
         }
@@ -2116,6 +2120,10 @@
 
         function renderTeachersTable() {
             const tbody = document.getElementById('teachersTableBody');
+            if (teachersList.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding: 24px; color: var(--text-secondary);">No teachers registered yet</td></tr>';
+                return;
+            }
             tbody.innerHTML = teachersList.map(t => `
                 <tr>
                     <td><strong>${t.name}</strong></td>
@@ -2133,6 +2141,10 @@
 
         function renderStudentsTable() {
             const tbody = document.getElementById('studentsTableBody');
+            if (studentsList.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding: 24px; color: var(--text-secondary);">No enrolled students found</td></tr>';
+                return;
+            }
             tbody.innerHTML = studentsList.map(s => `
                 <tr>
                     <td><code>${s.reg}</code></td>
@@ -2406,6 +2418,22 @@
             renderStudentsTable();
             recalculateStatistics();
             initDashboardCharts();
+
+            // Keyboard ESC to close modals
+            window.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    document.querySelectorAll('.modal-overlay.open').forEach(m => m.classList.remove('open'));
+                }
+            });
+
+            // Backdrop click to close modals
+            document.querySelectorAll('.modal-overlay').forEach(overlay => {
+                overlay.addEventListener('click', (e) => {
+                    if (e.target === overlay) {
+                        overlay.classList.remove('open');
+                    }
+                });
+            });
         });
     </script>
 </body>
