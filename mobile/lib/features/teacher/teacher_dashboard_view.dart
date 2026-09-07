@@ -1103,6 +1103,78 @@ class _TeacherDashboardViewState extends State<TeacherDashboardView> {
     );
   }
 
+  void _showEditMarksDialog(int index) {
+    final student = _roster[index];
+    final mathController = TextEditingController(text: student['math_mark']?.toString() ?? '75');
+    final scienceController = TextEditingController(text: student['science_mark']?.toString() ?? '80');
+    final formKey = GlobalKey<FormState>();
+
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text('Edit Marks: ${student['name']}', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: primaryBlue)),
+        content: Form(
+          key: formKey,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextFormField(
+                controller: mathController,
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(
+                  labelText: 'Mathematics Mark (%)',
+                  border: OutlineInputBorder(),
+                  prefixIcon: Icon(Icons.calculate_outlined, color: primaryBlue),
+                ),
+                validator: (v) {
+                  final val = int.tryParse(v ?? '');
+                  if (val == null || val < 0 || val > 100) return 'Enter mark between 0 and 100';
+                  return null;
+                },
+              ),
+              const SizedBox(height: 12),
+              TextFormField(
+                controller: scienceController,
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(
+                  labelText: 'Science Mark (%)',
+                  border: OutlineInputBorder(),
+                  prefixIcon: Icon(Icons.science_outlined, color: primaryBlue),
+                ),
+                validator: (v) {
+                  final val = int.tryParse(v ?? '');
+                  if (val == null || val < 0 || val > 100) return 'Enter mark between 0 and 100';
+                  return null;
+                },
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: primaryBlue, foregroundColor: Colors.white),
+            onPressed: () {
+              if (!formKey.currentState!.validate()) return;
+              setState(() {
+                _roster[index]['math_mark'] = int.parse(mathController.text.trim());
+                _roster[index]['science_mark'] = int.parse(scienceController.text.trim());
+              });
+              Navigator.pop(ctx);
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('Updated assessment marks for ${student['name']}!'),
+                  backgroundColor: primaryBlue,
+                ),
+              );
+            },
+            child: const Text('Save Marks'),
+          ),
+        ],
+      ),
+    );
+  }
+
   // ==========================================
   // TAB 3: GRADEBOOK & MARKS ENTRY
   // ==========================================
@@ -1172,11 +1244,7 @@ class _TeacherDashboardViewState extends State<TeacherDashboardView> {
                         ),
                         const SizedBox(width: 8),
                         OutlinedButton(
-                          onPressed: () {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text('Gradebook entry opened for ${student['name']}')),
-                            );
-                          },
+                          onPressed: () => _showEditMarksDialog(index),
                           style: OutlinedButton.styleFrom(
                             side: const BorderSide(color: borderColor),
                             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
