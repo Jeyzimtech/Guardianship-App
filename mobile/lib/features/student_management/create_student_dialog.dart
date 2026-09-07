@@ -143,7 +143,7 @@ class _CreateStudentDialogState extends State<CreateStudentDialog> {
                   decoration: const InputDecoration(
                     labelText: 'Guardian Name & Phone Number',
                     hintText: 'e.g. John Chewe (+26377...)',
-                    prefixIcon: Icon(Icons.phone_outlined, color: primaryBlue, size: 20),
+                    prefixIcon: Icon(Icons.phone_outlined, color: AppColors.primary, size: 20),
                   ),
                   validator: (val) => val == null || val.trim().isEmpty ? 'Guardian contact details required' : null,
                 ),
@@ -154,7 +154,7 @@ class _CreateStudentDialogState extends State<CreateStudentDialog> {
                   initialValue: _selectedClass,
                   decoration: const InputDecoration(
                     labelText: 'Class Stream',
-                    prefixIcon: Icon(Icons.meeting_room_outlined, color: primaryBlue, size: 20),
+                    prefixIcon: Icon(Icons.meeting_room_outlined, color: AppColors.primary, size: 20),
                   ),
                   items: _classList.map((cls) => DropdownMenuItem(value: cls, child: Text(cls))).toList(),
                   onChanged: (val) {
@@ -170,7 +170,7 @@ class _CreateStudentDialogState extends State<CreateStudentDialog> {
                   decoration: const InputDecoration(
                     labelText: 'Outstanding Fees (USD)',
                     hintText: 'e.g. 150.00',
-                    prefixIcon: Icon(Icons.attach_money_rounded, color: primaryBlue, size: 20),
+                    prefixIcon: Icon(Icons.attach_money_rounded, color: AppColors.primary, size: 20),
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -180,7 +180,7 @@ class _CreateStudentDialogState extends State<CreateStudentDialog> {
                   initialValue: _selectedStatus,
                   decoration: const InputDecoration(
                     labelText: 'Payment Status',
-                    prefixIcon: Icon(Icons.verified_outlined, color: primaryBlue, size: 20),
+                    prefixIcon: Icon(Icons.verified_outlined, color: AppColors.primary, size: 20),
                   ),
                   items: const [
                     DropdownMenuItem(value: 'paid', child: Text('Paid')),

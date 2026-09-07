@@ -137,7 +137,7 @@ class ProfileView extends StatelessWidget {
 
                   // Preferred Language
                   DropdownButtonFormField<String>(
-                    value: languages.contains(selectedLanguage) ? selectedLanguage : languages.first,
+                    initialValue: languages.contains(selectedLanguage) ? selectedLanguage : languages.first,
                     decoration: InputDecoration(
                       labelText: 'Preferred Language',
                       labelStyle: const TextStyle(color: AppColors.textMuted),

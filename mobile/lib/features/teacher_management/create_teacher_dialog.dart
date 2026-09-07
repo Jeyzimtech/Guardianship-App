@@ -6,14 +6,14 @@ import '../../core/app_colors.dart';
 class CreateTeacherDialog extends StatefulWidget {
   final Map<String, dynamic>? initialTeacher;
   final List<Map<String, dynamic>> schools;
-  final List<Map<String, dynamic>> classes;
+  final List<Map<String, dynamic>> availableClasses;
   final VoidCallback onSaved;
 
   const CreateTeacherDialog({
     super.key,
     this.initialTeacher,
     required this.schools,
-    required this.classes,
+    required this.availableClasses,
     required this.onSaved,
   });
 
@@ -29,7 +29,9 @@ class _CreateTeacherDialogState extends State<CreateTeacherDialog> {
   late TextEditingController _staffIdController;
   late TextEditingController _departmentController;
   late TextEditingController _qualificationController;
+  late TextEditingController _subjectSpecialtyController;
 
+  List<String> _specialties = [];
   int? _selectedSchoolId;
   int? _selectedClassId;
   String _selectedEmploymentType = 'full_time';
@@ -45,6 +47,11 @@ class _CreateTeacherDialogState extends State<CreateTeacherDialog> {
     _staffIdController = TextEditingController(text: t?['staff_id'] ?? '');
     _departmentController = TextEditingController(text: t?['department'] ?? '');
     _qualificationController = TextEditingController(text: t?['qualification'] ?? '');
+    _subjectSpecialtyController = TextEditingController();
+
+    if (t?['subject_specialties'] != null && t!['subject_specialties'] is List) {
+      _specialties = List<String>.from(t['subject_specialties']);
+    }
 
     _selectedSchoolId = t?['school_id'];
     _selectedClassId = t?['class_id'];
@@ -65,7 +72,18 @@ class _CreateTeacherDialogState extends State<CreateTeacherDialog> {
     _staffIdController.dispose();
     _departmentController.dispose();
     _qualificationController.dispose();
+    _subjectSpecialtyController.dispose();
     super.dispose();
+  }
+
+  void _addSpecialty() {
+    final text = _subjectSpecialtyController.text.trim();
+    if (text.isNotEmpty && !_specialties.contains(text)) {
+      setState(() {
+        _specialties.add(text);
+        _subjectSpecialtyController.clear();
+      });
+    }
   }
 
   Future<void> _saveTeacher() async {
@@ -88,6 +106,7 @@ class _CreateTeacherDialogState extends State<CreateTeacherDialog> {
         'department': _departmentController.text.trim().isEmpty ? null : _departmentController.text.trim(),
         'qualification': _qualificationController.text.trim().isEmpty ? null : _qualificationController.text.trim(),
         'employment_type': _selectedEmploymentType,
+        'subject_specialties': _specialties,
       };
 
       if (isEditing) {

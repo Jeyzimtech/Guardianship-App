@@ -12,6 +12,7 @@ class UserManagementScreen extends StatefulWidget {
 }
 
 class _UserManagementScreenState extends State<UserManagementScreen> {
+  static const darkTeal = AppColors.primary;
   List<Map<String, dynamic>> _users = [];
   bool _isLoading = true;
   String _selectedRoleFilter = 'all';
@@ -130,18 +131,17 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
       ),
     );
 
-    if (confirmed == true) {
+    if (confirmed == true && mounted) {
       final apiClient = Provider.of<ApiClient>(context, listen: false);
       try {
         await apiClient.dio.delete('/users/$userId');
       } catch (_) {}
+      if (!mounted) return;
       setState(() {
         _mockUsers.removeWhere((u) => u['id'] == userId);
       });
       _fetchUsers();
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('User deleted.')));
-      }
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('User deleted.')));
     }
   }
 
@@ -227,12 +227,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
         foregroundColor: Colors.white,
         icon: const Icon(Icons.person_add_rounded),
         label: const Text('Add User', style: TextStyle(fontWeight: FontWeight.bold)),
-        onPressed: () {
-          showDialog(
-            context: context,
-            builder: (_) => CreateUserDialog(onUserSaved: _fetchUsers),
-          );
-        },
+        onPressed: () => _openCreateDialog(),
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
@@ -387,15 +382,9 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
                                   icon: const Icon(Icons.more_vert_rounded, color: Colors.grey),
                                   onSelected: (val) {
                                     if (val == 'edit') {
-                                      showDialog(
-                                        context: context,
-                                        builder: (_) => CreateUserDialog(
-                                          initialUser: user,
-                                          onUserSaved: _fetchUsers,
-                                        ),
-                                      );
+                                      _openCreateDialog(user);
                                     } else if (val == 'delete') {
-                                      _deleteUser(id, name);
+                                      _deleteUser(id);
                                     }
                                   },
                                   itemBuilder: (context) => [
