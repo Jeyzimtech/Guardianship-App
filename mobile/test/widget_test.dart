@@ -19,7 +19,7 @@ void main() {
       ),
     );
 
-    // Verify App Title is present
-    expect(find.text('Edu+Conect'), findsOneWidget);
+    // Verify Login Screen is present
+    expect(find.text('Welcome Back'), findsOneWidget);
   });
 }
