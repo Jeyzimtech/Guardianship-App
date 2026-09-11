@@ -16,7 +16,7 @@ class TeacherHomeView extends StatefulWidget {
 }
 
 class _TeacherHomeViewState extends State<TeacherHomeView> {
-  String _selectedClass = 'Grade 4A';
+  final String _selectedClass = 'Grade 4A';
 
   final List<Map<String, dynamic>> _schedule = [
     {
@@ -111,29 +111,7 @@ class _TeacherHomeViewState extends State<TeacherHomeView> {
                 height: 1.5,
               ),
             ),
-            const SizedBox(height: 12),
-            DropdownButton<String>(
-              value: _selectedClass,
-              isExpanded: true,
-              style: const TextStyle(
-                fontFamily: 'Cabin',
-                color: AppColors.primaryDark,
-                fontSize: 14,
-              ),
-              underline: const Divider(color: AppColors.cardBorder),
-              items: students.entries
-                  .map(
-                    (e) => DropdownMenuItem(
-                      value: e.key,
-                      child: Text('${e.key} / ${e.value} students'),
-                    ),
-                  )
-                  .toList(),
-              onChanged: (value) {
-                if (value != null) setState(() => _selectedClass = value);
-              },
-            ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 16),
             const Text('Make room\nfor learning.', style: Editorial.headline),
             const SizedBox(height: 28),
             EditorialFeature(

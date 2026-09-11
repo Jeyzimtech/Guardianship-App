@@ -249,34 +249,6 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
         child: ListView(
           padding: const EdgeInsets.fromLTRB(24, 12, 24, 32),
           children: [
-            DropdownButton<int>(
-              value: _selectedChildIndex,
-              isExpanded: true,
-              style: const TextStyle(
-                fontFamily: 'Cabin',
-                color: AppColors.primaryDark,
-                fontSize: 14,
-              ),
-              underline: const Divider(color: AppColors.cardBorder),
-              items: _mockChildren
-                  .asMap()
-                  .entries
-                  .map(
-                    (e) => DropdownMenuItem(
-                      value: e.key,
-                      child: Text(
-                        '${e.value['name']} / ${e.value['class']}',
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                  )
-                  .toList(),
-              onChanged: (value) {
-                if (value != null) selectChild(value);
-              },
-            ),
-            const SizedBox(height: 24),
             const Text('A good day\nto learn.', style: Editorial.headline),
             const SizedBox(height: 28),
             EditorialFeature(
