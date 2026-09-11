@@ -193,137 +193,110 @@ class _AssignmentsViewState extends State<AssignmentsView> {
 
                       return Container(
                         margin: const EdgeInsets.only(bottom: 12),
+                        padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
                           color: AppColors.surface,
                           borderRadius: BorderRadius.circular(10),
                           border: Border.all(color: AppColors.cardBorder),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.02),
-                              blurRadius: 4,
-                              offset: const Offset(0, 2),
-                            ),
-                          ],
                         ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            // Colored top accent strip
-                            Container(
-                              height: 4,
-                              decoration: BoxDecoration(
-                                color: subjectColor,
-                                borderRadius: const BorderRadius.only(
-                                  topLeft: Radius.circular(10),
-                                  topRight: Radius.circular(10),
+                            Row(
+                              children: [
+                                // Subject badge
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 8, vertical: 3),
+                                  decoration: BoxDecoration(
+                                    color: subjectColor.withValues(alpha: 0.1),
+                                    borderRadius: BorderRadius.circular(4),
+                                  ),
+                                  child: Text(
+                                    item['subject'] as String,
+                                    style: TextStyle(
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.bold,
+                                      color: subjectColor,
+                                      letterSpacing: 0.5,
+                                    ),
+                                  ),
                                 ),
-                              ),
+                                const Spacer(),
+                                // Status chip
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 10, vertical: 4),
+                                  decoration: BoxDecoration(
+                                    color: _statusBg(status),
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: Text(
+                                    status,
+                                    style: TextStyle(
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.bold,
+                                      color: _statusColor(status),
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
-                            Padding(
-                              padding: const EdgeInsets.all(14),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    children: [
-                                      // Subject badge
-                                      Container(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 8, vertical: 3),
-                                        decoration: BoxDecoration(
-                                          color: subjectColor.withValues(alpha: 0.1),
-                                          borderRadius: BorderRadius.circular(4),
-                                        ),
-                                        child: Text(
-                                          item['subject'] as String,
-                                          style: TextStyle(
-                                            fontSize: 10,
-                                            fontWeight: FontWeight.bold,
-                                            color: subjectColor,
-                                            letterSpacing: 0.5,
-                                          ),
-                                        ),
+                            const SizedBox(height: 10),
+                            Text(
+                              item['title'] as String,
+                              style: const TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                  color: AppColors.textPrimary),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              item['description'] as String,
+                              style: const TextStyle(
+                                  fontSize: 13,
+                                  color: AppColors.textSecondary,
+                                  height: 1.3),
+                            ),
+                            const SizedBox(height: 12),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Row(
+                                  children: [
+                                    Icon(Icons.calendar_today_outlined,
+                                        size: 13,
+                                        color: _statusColor(status)),
+                                    const SizedBox(width: 5),
+                                    Text(
+                                      item['due_date'] as String,
+                                      style: TextStyle(
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.w600,
+                                        color: _statusColor(status),
                                       ),
-                                      const Spacer(),
-                                      // Status chip
-                                      Container(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 10, vertical: 4),
-                                        decoration: BoxDecoration(
-                                          color: _statusBg(status),
-                                          borderRadius: BorderRadius.circular(12),
-                                        ),
-                                        child: Text(
-                                          status,
-                                          style: TextStyle(
-                                            fontSize: 10,
-                                            fontWeight: FontWeight.bold,
-                                            color: _statusColor(status),
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 10),
-                                  Text(
-                                    item['title'] as String,
-                                    style: const TextStyle(
-                                        fontSize: 14,
+                                    ),
+                                  ],
+                                ),
+                                if (item['score'] != null)
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 8, vertical: 3),
+                                    decoration: BoxDecoration(
+                                      color: AppColors.softBlue,
+                                      borderRadius: BorderRadius.circular(4),
+                                      border: Border.all(color: AppColors.blueBorder),
+                                    ),
+                                    child: Text(
+                                      'Score: ${item['score']}',
+                                      style: const TextStyle(
+                                        fontSize: 12,
                                         fontWeight: FontWeight.bold,
-                                        color: AppColors.textPrimary),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    item['description'] as String,
-                                    style: const TextStyle(
-                                        fontSize: 13,
-                                        color: AppColors.textSecondary,
-                                        height: 1.3),
-                                  ),
-                                  const SizedBox(height: 10),
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Row(
-                                        children: [
-                                          Icon(Icons.calendar_today_outlined,
-                                              size: 12,
-                                              color: _statusColor(status)),
-                                          const SizedBox(width: 4),
-                                          Text(
-                                            item['due_date'] as String,
-                                            style: TextStyle(
-                                              fontSize: 11,
-                                              fontWeight: FontWeight.w600,
-                                              color: _statusColor(status),
-                                            ),
-                                          ),
-                                        ],
+                                        color: AppColors.primaryDark,
                                       ),
-                                      if (item['score'] != null)
-                                        Container(
-                                          padding: const EdgeInsets.symmetric(
-                                              horizontal: 8, vertical: 3),
-                                          decoration: BoxDecoration(
-                                            color: AppColors.softBlue,
-                                            borderRadius:
-                                                BorderRadius.circular(4),
-                                            border: Border.all(color: AppColors.blueBorder),
-                                          ),
-                                          child: Text(
-                                            'Score: ${item['score']}',
-                                            style: const TextStyle(
-                                              fontSize: 12,
-                                              fontWeight: FontWeight.bold,
-                                              color: AppColors.primaryDark,
-                                            ),
-                                          ),
-                                        ),
-                                    ],
+                                    ),
                                   ),
-                                ],
-                              ),
+                              ],
                             ),
                           ],
                         ),
