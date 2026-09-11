@@ -25,7 +25,7 @@ class _MessagingViewState extends State<MessagingView> {
       'name': 'Mr. Sithole — School Accoun...',
       'initials': 'MS',
       'color': AppColors.primaryDark,
-      'preview': 'The term fees have been cleared.',
+      'preview': 'Thank you for the school update.',
       'time': 'Fri 14:15',
       'unread': 0,
     },
@@ -50,9 +50,15 @@ class _MessagingViewState extends State<MessagingView> {
   List<Map<String, dynamic>> get _filtered {
     if (_searchQuery.isEmpty) return _conversations;
     return _conversations
-        .where((c) =>
-            c['name'].toString().toLowerCase().contains(_searchQuery.toLowerCase()) ||
-            c['preview'].toString().toLowerCase().contains(_searchQuery.toLowerCase()))
+        .where(
+          (c) =>
+              c['name'].toString().toLowerCase().contains(
+                _searchQuery.toLowerCase(),
+              ) ||
+              c['preview'].toString().toLowerCase().contains(
+                _searchQuery.toLowerCase(),
+              ),
+        )
         .toList();
   }
 
@@ -77,10 +83,15 @@ class _MessagingViewState extends State<MessagingView> {
               onChanged: (val) => setState(() => _searchQuery = val.trim()),
               decoration: InputDecoration(
                 hintText: 'Search conversations...',
-                hintStyle:
-                    const TextStyle(fontSize: 13, color: AppColors.textLight),
-                prefixIcon: const Icon(Icons.search_rounded,
-                    color: AppColors.primaryLight, size: 20),
+                hintStyle: const TextStyle(
+                  fontSize: 13,
+                  color: AppColors.textLight,
+                ),
+                prefixIcon: const Icon(
+                  Icons.search_rounded,
+                  color: AppColors.primaryLight,
+                  size: 20,
+                ),
                 suffixIcon: _searchQuery.isNotEmpty
                     ? IconButton(
                         icon: const Icon(Icons.clear_rounded, size: 18),
@@ -93,7 +104,9 @@ class _MessagingViewState extends State<MessagingView> {
                 filled: true,
                 fillColor: AppColors.softBlue,
                 contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 16, vertical: 12),
+                  horizontal: 16,
+                  vertical: 12,
+                ),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10),
                   borderSide: const BorderSide(color: AppColors.blueBorder),
@@ -104,8 +117,10 @@ class _MessagingViewState extends State<MessagingView> {
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10),
-                  borderSide:
-                      const BorderSide(color: AppColors.primaryLight, width: 1.5),
+                  borderSide: const BorderSide(
+                    color: AppColors.primaryLight,
+                    width: 1.5,
+                  ),
                 ),
               ),
             ),
@@ -119,8 +134,9 @@ class _MessagingViewState extends State<MessagingView> {
                     child: Text(
                       'No conversations found.',
                       style: TextStyle(
-                          color: AppColors.textMuted,
-                          fontWeight: FontWeight.w500),
+                        color: AppColors.textMuted,
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
                   )
                 : ListView.separated(
@@ -136,7 +152,9 @@ class _MessagingViewState extends State<MessagingView> {
                         child: Container(
                           color: AppColors.surface,
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 16, vertical: 14),
+                            horizontal: 16,
+                            vertical: 14,
+                          ),
                           child: Row(
                             children: [
                               // Avatar
@@ -261,9 +279,7 @@ class _MessagingViewState extends State<MessagingView> {
   void _openConversation(BuildContext context, Map<String, dynamic> conv) {
     Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (_) => _ConversationPage(conv: conv),
-      ),
+      MaterialPageRoute(builder: (_) => _ConversationPage(conv: conv)),
     );
   }
 
@@ -292,13 +308,15 @@ class _MessagingViewState extends State<MessagingView> {
                 const Text(
                   'New Message',
                   style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.primaryDark),
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.primaryDark,
+                  ),
                 ),
                 IconButton(
-                    icon: const Icon(Icons.close, color: AppColors.textMuted),
-                    onPressed: () => Navigator.pop(ctx)),
+                  icon: const Icon(Icons.close, color: AppColors.textMuted),
+                  onPressed: () => Navigator.pop(ctx),
+                ),
               ],
             ),
             const SizedBox(height: 14),
@@ -306,8 +324,16 @@ class _MessagingViewState extends State<MessagingView> {
               decoration: InputDecoration(
                 labelText: 'To (Teacher / School Staff)',
                 labelStyle: const TextStyle(color: AppColors.textMuted),
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-                focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: AppColors.primaryLight, width: 1.5)),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: const BorderSide(
+                    color: AppColors.primaryLight,
+                    width: 1.5,
+                  ),
+                ),
               ),
             ),
             const SizedBox(height: 14),
@@ -317,8 +343,16 @@ class _MessagingViewState extends State<MessagingView> {
                 labelText: 'Message',
                 alignLabelWithHint: true,
                 labelStyle: const TextStyle(color: AppColors.textMuted),
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-                focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: AppColors.primaryLight, width: 1.5)),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: const BorderSide(
+                    color: AppColors.primaryLight,
+                    width: 1.5,
+                  ),
+                ),
               ),
             ),
             const SizedBox(height: 16),
@@ -330,19 +364,23 @@ class _MessagingViewState extends State<MessagingView> {
                   Navigator.pop(ctx);
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
-                        content: Text('Message sent!'),
-                        backgroundColor: AppColors.primary),
+                      content: Text('Message sent!'),
+                      backgroundColor: AppColors.primary,
+                    ),
                   );
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primary,
                   foregroundColor: Colors.white,
                   shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10)),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
                   elevation: 0,
                 ),
-                child: const Text('Send Message',
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+                child: const Text(
+                  'Send Message',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                ),
               ),
             ),
           ],
@@ -367,7 +405,8 @@ class _ConversationPageState extends State<_ConversationPage> {
   final List<Map<String, dynamic>> _messages = [
     {
       'isMe': false,
-      'text': 'Good morning! Alice performed excellently in today\'s Mathematics session.',
+      'text':
+          'Good morning! Alice performed excellently in today\'s Mathematics session.',
       'time': '09:15',
     },
     {
@@ -412,9 +451,10 @@ class _ConversationPageState extends State<_ConversationPage> {
                 child: Text(
                   widget.conv['initials'],
                   style: const TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 13),
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 13,
+                  ),
                 ),
               ),
             ),
@@ -423,9 +463,10 @@ class _ConversationPageState extends State<_ConversationPage> {
               child: Text(
                 widget.conv['name'],
                 style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold),
+                  color: Colors.white,
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
                 overflow: TextOverflow.ellipsis,
               ),
             ),
@@ -442,21 +483,23 @@ class _ConversationPageState extends State<_ConversationPage> {
                 final msg = _messages[i];
                 final isMe = msg['isMe'] as bool;
                 return Align(
-                  alignment:
-                      isMe ? Alignment.centerRight : Alignment.centerLeft,
+                  alignment: isMe
+                      ? Alignment.centerRight
+                      : Alignment.centerLeft,
                   child: Container(
                     margin: const EdgeInsets.only(bottom: 10),
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 14, vertical: 10),
+                      horizontal: 14,
+                      vertical: 10,
+                    ),
                     constraints: BoxConstraints(
-                        maxWidth: MediaQuery.of(context).size.width * 0.75),
+                      maxWidth: MediaQuery.of(context).size.width * 0.75,
+                    ),
                     decoration: BoxDecoration(
                       color: isMe ? AppColors.primary : AppColors.surface,
                       borderRadius: BorderRadius.circular(10),
                       border: Border.all(
-                        color: isMe
-                            ? AppColors.primary
-                            : AppColors.cardBorder,
+                        color: isMe ? AppColors.primary : AppColors.cardBorder,
                       ),
                     ),
                     child: Column(
@@ -474,9 +517,7 @@ class _ConversationPageState extends State<_ConversationPage> {
                           msg['time'],
                           style: TextStyle(
                             fontSize: 10,
-                            color: isMe
-                                ? Colors.white60
-                                : AppColors.textMuted,
+                            color: isMe ? Colors.white60 : AppColors.textMuted,
                           ),
                         ),
                       ],
@@ -507,7 +548,10 @@ class _ConversationPageState extends State<_ConversationPage> {
                   ),
                 ),
                 IconButton(
-                  icon: const Icon(Icons.send_rounded, color: AppColors.primary),
+                  icon: const Icon(
+                    Icons.send_rounded,
+                    color: AppColors.primary,
+                  ),
                   onPressed: _send,
                 ),
               ],

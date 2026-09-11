@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../core/app_colors.dart';
-import '../dashboard/payments_view.dart';
+import '../common/editorial_widgets.dart';
+import '../dashboard/attendance_view.dart';
 import '../dashboard/reports_view.dart';
 import '../dashboard/announcements_view.dart';
 import 'learning_journal_view.dart';
@@ -36,7 +37,6 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
       'tier': 'primary',
       'school': 'Hillside Primary School',
       'homeroom_teacher': 'Teacher Grace',
-      'fee_balance': 0.0,
       'attendance_rate': '96%',
       'days_present': 58,
       'total_days': 60,
@@ -51,7 +51,6 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
       'tier': 'preparatory',
       'school': 'Hillside Preparatory (ECD)',
       'caregiver': 'Amai Tendai',
-      'fee_balance': 150.0,
       'attendance_rate': '98%',
       'days_present': 59,
       'total_days': 60,
@@ -66,7 +65,6 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
       'tier': 'secondary',
       'school': 'Hillside Secondary School',
       'tutor': 'Mr. Moyo',
-      'fee_balance': 360.0,
       'attendance_rate': '94%',
       'days_present': 56,
       'total_days': 60,
@@ -74,30 +72,6 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
       'velocity_status': 'On Track for O-Level Distinction',
       'merits_pos': 18,
       'merits_neg': 2,
-    },
-  ];
-
-  final List<Map<String, dynamic>> _schoolAnnouncements = [
-    {
-      'title': 'Term 2 Report Cards & Fee Clearance',
-      'date': 'July 28, 2026',
-      'category': 'URGENT',
-      'category_color': AppColors.error,
-      'summary': 'Term 2 academic reports are now compiled. Please ensure fee balances are settled to unlock digital PDF downloads.',
-    },
-    {
-      'title': 'Annual Parent-Teacher Consultation Day',
-      'date': 'August 05, 2026',
-      'category': 'EVENT',
-      'category_color': AppColors.primary,
-      'summary': 'All parents are invited to consult with homeroom teachers regarding student progress and merits performance.',
-    },
-    {
-      'title': 'School Transportation & Extension Notice',
-      'date': 'August 01, 2026',
-      'category': 'NOTICE',
-      'category_color': AppColors.primaryLight,
-      'summary': 'Updated bus routes and timetable schedules for Term 3 enrollment are now available in the portal.',
     },
   ];
 
@@ -131,7 +105,11 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
                     color: AppColors.softBlue,
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: const Icon(Icons.admin_panel_settings_rounded, color: AppColors.primary, size: 24),
+                  child: const Icon(
+                    Icons.admin_panel_settings_rounded,
+                    color: AppColors.primary,
+                    size: 24,
+                  ),
                 ),
                 const SizedBox(width: 12),
                 const Expanded(
@@ -140,11 +118,18 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
                     children: [
                       Text(
                         'Add Student to Account',
-                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: AppColors.textPrimary),
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                          color: AppColors.textPrimary,
+                        ),
                       ),
                       Text(
                         'School Admin Verification Required',
-                        style: TextStyle(fontSize: 12, color: AppColors.textMuted),
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: AppColors.textMuted,
+                        ),
                       ),
                     ],
                   ),
@@ -161,12 +146,20 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
               ),
               child: const Row(
                 children: [
-                  Icon(Icons.shield_outlined, color: AppColors.primary, size: 20),
+                  Icon(
+                    Icons.shield_outlined,
+                    color: AppColors.primary,
+                    size: 20,
+                  ),
                   SizedBox(width: 10),
                   Expanded(
                     child: Text(
                       'For student security, additional children are added and linked exclusively by the School Administrator. Submit your request below for admin approval.',
-                      style: TextStyle(fontSize: 12, color: AppColors.primaryDark, height: 1.3),
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: AppColors.primaryDark,
+                        height: 1.3,
+                      ),
                     ),
                   ),
                 ],
@@ -211,24 +204,33 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
                   final name = nameController.text.trim();
                   if (name.isEmpty) {
                     ScaffoldMessenger.of(ctx).showSnackBar(
-                      const SnackBar(content: Text('Please enter student name or ID.')),
+                      const SnackBar(
+                        content: Text('Please enter student name or ID.'),
+                      ),
                     );
                     return;
                   }
                   Navigator.pop(ctx);
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text('Link request for "$name" submitted to School Admin! You will be notified once approved.'),
+                      content: Text(
+                        'Link request for "$name" submitted to School Admin! You will be notified once approved.',
+                      ),
                       backgroundColor: AppColors.primary,
                     ),
                   );
                 },
                 icon: const Icon(Icons.send_rounded, size: 18),
-                label: const Text('Submit Link Request to Admin', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                label: const Text(
+                  'Submit Link Request to Admin',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                ),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primary,
                   foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
                 ),
               ),
             ),
@@ -240,483 +242,126 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
 
   @override
   Widget build(BuildContext context) {
-    final currentChild = _mockChildren[_selectedChildIndex];
-    final feeBalance = currentChild['fee_balance'] as double;
-    final isFeeGated = feeBalance > 0;
-
-    return SingleChildScrollView(
-      physics: const AlwaysScrollableScrollPhysics(),
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // 1. GUARDIAN CHILD SELECTOR HEADER CARD
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: AppColors.surface,
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: AppColors.cardBorder),
+    final child = _mockChildren[_selectedChildIndex];
+    return ColoredBox(
+      color: Editorial.canvas,
+      child: SafeArea(
+        child: ListView(
+          padding: const EdgeInsets.fromLTRB(24, 12, 24, 32),
+          children: [
+            DropdownButton<int>(
+              value: _selectedChildIndex,
+              isExpanded: true,
+              style: const TextStyle(
+                fontFamily: 'Cabin',
+                color: AppColors.primaryDark,
+                fontSize: 14,
+              ),
+              underline: const Divider(color: AppColors.cardBorder),
+              items: _mockChildren
+                  .asMap()
+                  .entries
+                  .map(
+                    (e) => DropdownMenuItem(
+                      value: e.key,
+                      child: Text(
+                        '${e.value['name']} / ${e.value['class']}',
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  )
+                  .toList(),
+              onChanged: (value) {
+                if (value != null) selectChild(value);
+              },
             ),
-            child: Column(
+            const SizedBox(height: 24),
+            const Text('A good day\nto learn.', style: Editorial.headline),
+            const SizedBox(height: 28),
+            EditorialFeature(
+              eyebrow: 'TODAY AT SCHOOL',
+              title: 'Learning in focus',
+              subtitle: 'Your child’s day, at a glance.',
+              onTap: () => _open(LearningJournalView(child: child)),
+            ),
+            const SizedBox(height: 16),
+            Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text(
-                      'Select Linked Student:',
-                      style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppColors.textMuted),
-                    ),
-                    InkWell(
-                      onTap: () => _showRequestAddStudentDialog(context),
-                      child: const Row(
-                        children: [
-                          Icon(Icons.add_circle_outline_rounded, size: 14, color: AppColors.primaryLight),
-                          SizedBox(width: 4),
-                          Text('Add Child', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppColors.primaryLight)),
-                        ],
-                      ),
-                    ),
-                  ],
+                Expanded(
+                  child: EditorialMetric(
+                    value: child['attendance_rate'],
+                    label: 'Attendance',
+                  ),
                 ),
-                const SizedBox(height: 8),
-                SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    children: _mockChildren.asMap().entries.map((entry) {
-                      final idx = entry.key;
-                      final child = entry.value;
-                      final isSelected = idx == _selectedChildIndex;
-                      return Padding(
-                        padding: const EdgeInsets.only(right: 8.0),
-                        child: ChoiceChip(
-                          avatar: CircleAvatar(
-                            backgroundColor: isSelected ? Colors.white : AppColors.primary,
-                            child: Text(
-                              child['name'][0],
-                              style: TextStyle(color: isSelected ? AppColors.primary : Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
-                            ),
-                          ),
-                          label: Text('${child['name']} (${child['class'].toString().split(' ').first})'),
-                          selected: isSelected,
-                          selectedColor: AppColors.primary,
-                          labelStyle: TextStyle(
-                            color: isSelected ? Colors.white : AppColors.textPrimary,
-                            fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                            fontSize: 12,
-                          ),
-                          backgroundColor: AppColors.softBlue,
-                          side: BorderSide(color: isSelected ? AppColors.primary : AppColors.blueBorder),
-                          onSelected: (selected) {
-                            if (selected) selectChild(idx);
-                          },
-                        ),
-                      );
-                    }).toList(),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: EditorialMetric(
+                    value: '${child['merits_pos']}',
+                    label: 'Positive merits',
                   ),
                 ),
               ],
             ),
-          ),
-          const SizedBox(height: 12),
-
-          // 2. ATTENDANCE & FEE BALANCES KEY METRICS CARDS
-          Row(
-            children: [
-              Expanded(
-                child: _buildWebKpiCard(
-                  'ATTENDANCE',
-                  currentChild['attendance_rate'] ?? '96%',
-                  '${currentChild['days_present'] ?? 58}/${currentChild['total_days'] ?? 60} Days Present',
-                  Icons.fact_check_outlined,
-                  AppColors.primaryLight,
-                  onTap: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Attendance Details: ${currentChild['days_present']} of ${currentChild['total_days']} school days attended (${currentChild['attendance_rate']}).')),
-                    );
-                  },
-                ),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: _buildWebKpiCard(
-                  'FEE BALANCE',
-                  isFeeGated ? 'USD \$${feeBalance.toStringAsFixed(2)}' : 'USD \$0.00',
-                  isFeeGated ? 'Balance Due' : 'Paid in Full',
-                  Icons.account_balance_wallet_outlined,
-                  isFeeGated ? AppColors.error : AppColors.primaryLight,
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (_) => const PaymentsView()),
-                    );
-                  },
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 14),
-
-          // 4. SCHOOL ANNOUNCEMENTS SECTION
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Row(
-                children: [
-                  Icon(Icons.campaign_rounded, color: AppColors.primary, size: 20),
-                  SizedBox(width: 8),
-                  Text(
-                    'School & Class Announcements',
-                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: AppColors.primaryDark),
-                  ),
-                ],
-              ),
-              TextButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const AnnouncementsView()),
-                  );
-                },
-                child: const Text(
-                  'View All',
-                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppColors.primaryLight),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 6),
-          Column(
-            children: _schoolAnnouncements.map((notice) {
-              final Color catColor = notice['category_color'] as Color;
-              return Container(
-                margin: const EdgeInsets.only(bottom: 10),
-                decoration: BoxDecoration(
-                  color: AppColors.surface,
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border(
-                    left: BorderSide(color: catColor, width: 4),
-                    top: const BorderSide(color: AppColors.cardBorder),
-                    right: const BorderSide(color: AppColors.cardBorder),
-                    bottom: const BorderSide(color: AppColors.cardBorder),
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.02),
-                      blurRadius: 4,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(12),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                            decoration: BoxDecoration(
-                              color: catColor.withValues(alpha: 0.12),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Text(
-                              notice['category'],
-                              style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: catColor),
-                            ),
-                          ),
-                          Text(
-                            notice['date'],
-                            style: const TextStyle(fontSize: 11, color: AppColors.textMuted, fontWeight: FontWeight.w500),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        notice['title'],
-                        style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        notice['summary'],
-                        style: const TextStyle(fontSize: 12, color: AppColors.textSecondary, height: 1.3),
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            }).toList(),
-          ),
-          const SizedBox(height: 16),
-
-          // 5. EDU-CONNECT CORE MODULES GRID
-          const Text(
-            'Edu-Connect Services & Features',
-            style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: AppColors.primaryDark),
-          ),
-          const SizedBox(height: 10),
-
-          GridView.count(
-            crossAxisCount: 2,
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            crossAxisSpacing: 10,
-            mainAxisSpacing: 10,
-            childAspectRatio: 1.25,
-            children: [
-              _buildEduModuleCard(
-                icon: Icons.auto_stories_rounded,
-                color: AppColors.primary,
-                title: 'Learning Journal',
-                subtitle: 'Ungated Multimedia Feed',
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => LearningJournalView(child: currentChild)),
-                  );
-                },
-              ),
-              _buildEduModuleCard(
-                icon: Icons.analytics_rounded,
-                color: AppColors.primary,
-                title: 'Academic Z-Scores',
-                subtitle: 'Performance Charts',
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const ReportsView()),
-                  );
-                },
-              ),
-              _buildEduModuleCard(
-                icon: Icons.account_balance_wallet_rounded,
-                color: AppColors.primary,
-                title: 'Fee Payments',
-                subtitle: isFeeGated ? 'USD \$${feeBalance.toStringAsFixed(2)} Due' : 'Dual Currency USD/ZiG',
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const PaymentsView()),
-                  );
-                },
-              ),
-              _buildEduModuleCard(
-                icon: Icons.campaign_rounded,
-                color: AppColors.primary,
-                title: 'Announcements',
-                subtitle: 'School & Class Notices',
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const AnnouncementsView()),
-                  );
-                },
-              ),
-              _buildEduModuleCard(
-                icon: Icons.star_rate_rounded,
-                color: AppColors.primary,
-                title: 'Behaviour & Merits',
-                subtitle: '+${currentChild['merits_pos']} Merits / ${currentChild['merits_neg']} Incidents',
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => BehaviourView(child: currentChild)),
-                  );
-                },
-              ),
-              _buildEduModuleCard(
-                icon: Icons.assignment_rounded,
-                color: AppColors.primary,
-                title: 'Homework Tracker',
-                subtitle: 'Upcoming & Overdue',
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => AssignmentsView(child: currentChild)),
-                  );
-                },
-              ),
-              _buildEduModuleCard(
-                icon: Icons.forum_rounded,
-                color: AppColors.primary,
-                title: 'Messaging & Support',
-                subtitle: 'Direct Teacher Chat',
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const MessagingView()),
-                  );
-                },
-              ),
-              _buildEduModuleCard(
-                icon: Icons.sms_rounded,
-                color: AppColors.primary,
-                title: 'SMS Alerts Log',
-                subtitle: 'Econet / Telecel History',
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const SmsAlertsLogView()),
-                  );
-                },
-              ),
-              _buildEduModuleCard(
-                icon: Icons.shopping_bag_rounded,
-                color: AppColors.primary,
-                title: 'Uniform Store',
-                subtitle: 'Buy Online & Select Sizes',
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => UniformMarketplaceView(child: currentChild)),
-                  );
-                },
-              ),
-              _buildEduModuleCard(
-                icon: Icons.person_add_alt_1_rounded,
-                color: AppColors.primary,
-                title: 'Link Student',
-                subtitle: 'Request Child Account Link',
-                onTap: () {
-                  _showRequestAddStudentDialog(context);
-                },
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-
-          // 6. OFFICIAL REPORT CARDS MODULE
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(14),
-            decoration: BoxDecoration(
-              color: AppColors.surface,
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: AppColors.cardBorder),
+            const SizedBox(height: 32),
+            const Text('Latest from school', style: Editorial.section),
+            const SizedBox(height: 16),
+            EditorialLink(
+              title: 'School notices',
+              subtitle: 'News, events and updates from your school',
+              onTap: () => _open(const AnnouncementsView()),
             ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: AppColors.softBlue,
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: const Icon(Icons.assessment_rounded, color: AppColors.primary, size: 22),
-                    ),
-                    const SizedBox(width: 12),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          'Term Report Card',
-                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: AppColors.textPrimary),
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          isFeeGated ? 'Fee Gated — Pay balance to unlock PDF' : 'Term 2 2026 Ready for Download',
-                          style: TextStyle(fontSize: 11, color: isFeeGated ? AppColors.error : AppColors.primaryLight),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.push(context, MaterialPageRoute(builder: (_) => const ReportsView()));
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: isFeeGated ? AppColors.error : AppColors.primary,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                  ),
-                  child: Text(isFeeGated ? 'Unlock' : 'View PDF', style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
-                ),
-              ],
+            EditorialLink(
+              title: 'Teacher conversations',
+              subtitle: 'Keep in touch about your child’s progress',
+              onTap: () => _open(const MessagingView()),
             ),
-          ),
-          const SizedBox(height: 20),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildEduModuleCard({
-    required IconData icon,
-    required Color color,
-    required String title,
-    required String subtitle,
-    required VoidCallback onTap,
-    Color? accentColor,
-  }) {
-    final topColor = accentColor ?? AppColors.primary;
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(10),
-      child: Container(
-        decoration: BoxDecoration(
-          color: AppColors.surface,
-          borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: AppColors.cardBorder),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.02),
-              blurRadius: 4,
-              offset: const Offset(0, 2),
+            const SizedBox(height: 20),
+            const Text('Learning & progress', style: Editorial.section),
+            const SizedBox(height: 16),
+            EditorialLink(
+              title: 'Learning journal',
+              subtitle: 'Classroom moments and teacher feedback',
+              onTap: () => _open(LearningJournalView(child: child)),
             ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Colored top accent strip
-            Container(
-              height: 4,
-              decoration: BoxDecoration(
-                color: topColor,
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(10),
-                  topRight: Radius.circular(10),
-                ),
-              ),
+            EditorialLink(
+              title: 'Homework',
+              subtitle: 'Assignments and upcoming due dates',
+              onTap: () => _open(AssignmentsView(child: child)),
             ),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      title,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 12,
-                        color: AppColors.primaryDark,
-                      ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const SizedBox(height: 3),
-                    Text(
-                      subtitle,
-                      style: const TextStyle(
-                        fontSize: 10,
-                        color: AppColors.textMuted,
-                      ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
-                ),
-              ),
+            EditorialLink(
+              title: 'Attendance',
+              subtitle: 'Review your child’s attendance record',
+              onTap: () => _open(const AttendanceView()),
+            ),
+            EditorialLink(
+              title: 'Behaviour & merits',
+              subtitle: 'Achievements and wellbeing',
+              onTap: () => _open(BehaviourView(child: child)),
+            ),
+            EditorialLink(
+              title: 'Academic reports',
+              subtitle: 'Review term reports and progress',
+              onTap: () => _open(const ReportsView()),
+            ),
+            const SizedBox(height: 20),
+            const Text('School essentials', style: Editorial.section),
+            const SizedBox(height: 16),
+            EditorialLink(
+              title: 'SMS history',
+              subtitle: 'Review school text messages',
+              onTap: () => _open(const SmsAlertsLogView()),
+            ),
+            EditorialLink(
+              title: 'Uniform store',
+              subtitle: 'Browse school essentials',
+              onTap: () => _open(UniformMarketplaceView(child: child)),
+            ),
+            const SizedBox(height: 8),
+            OutlinedButton(
+              onPressed: () => _showRequestAddStudentDialog(context),
+              child: const Text('Link another child'),
             ),
           ],
         ),
@@ -724,64 +369,6 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
     );
   }
 
-  Widget _buildWebKpiCard(String label, String value, String subtext, IconData icon, Color color, {VoidCallback? onTap}) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(10),
-      child: Container(
-        decoration: BoxDecoration(
-          color: AppColors.surface,
-          borderRadius: BorderRadius.circular(10),
-          border: Border(
-            left: BorderSide(color: color, width: 4),
-            top: const BorderSide(color: AppColors.cardBorder),
-            right: const BorderSide(color: AppColors.cardBorder),
-            bottom: const BorderSide(color: AppColors.cardBorder),
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.02),
-              blurRadius: 4,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        padding: const EdgeInsets.fromLTRB(14, 12, 12, 12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              label,
-              style: const TextStyle(
-                fontSize: 9,
-                fontWeight: FontWeight.bold,
-                color: AppColors.textMuted,
-                letterSpacing: 0.8,
-              ),
-              overflow: TextOverflow.ellipsis,
-            ),
-            const SizedBox(height: 6),
-            Text(
-              value,
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: color,
-              ),
-              overflow: TextOverflow.ellipsis,
-            ),
-            const SizedBox(height: 2),
-            Text(
-              subtext,
-              style: const TextStyle(
-                fontSize: 10,
-                color: AppColors.textMuted,
-              ),
-              overflow: TextOverflow.ellipsis,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+  void _open(Widget page) =>
+      Navigator.push(context, MaterialPageRoute(builder: (_) => page));
 }

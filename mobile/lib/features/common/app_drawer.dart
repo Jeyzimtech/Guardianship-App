@@ -3,22 +3,19 @@ import 'package:provider/provider.dart';
 import '../../core/auth_provider.dart';
 import '../../core/student_provider.dart';
 import '../../core/app_colors.dart';
+import '../../core/app_icon.dart';
 import '../profile/profile_view.dart';
 import '../parent/uniform_marketplace_view.dart';
 import '../parent/learning_journal_view.dart';
 import '../parent/behaviour_view.dart';
 import '../parent/assignments_view.dart';
-import '../dashboard/payments_view.dart';
 import '../dashboard/announcements_view.dart';
 import '../dashboard/attendance_view.dart';
 
 class AppDrawer extends StatelessWidget {
   final String currentRoute;
 
-  const AppDrawer({
-    super.key,
-    required this.currentRoute,
-  });
+  const AppDrawer({super.key, required this.currentRoute});
 
   static const primaryBlue = AppColors.primary;
   static const sidebarBg = AppColors.surface;
@@ -27,7 +24,6 @@ class AppDrawer extends StatelessWidget {
   Widget _buildDrawerItem(
     BuildContext context, {
     required String title,
-    required IconData icon,
     required VoidCallback onTap,
   }) {
     final isSelected = currentRoute == title;
@@ -45,8 +41,8 @@ class AppDrawer extends StatelessWidget {
       child: ListTile(
         dense: true,
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
-        leading: Icon(
-          icon,
+        leading: AppIcon(
+          symbolForFeature(title),
           color: isSelected ? primaryBlue : AppColors.textMuted,
           size: 20,
         ),
@@ -101,7 +97,11 @@ class AppDrawer extends StatelessWidget {
                     children: [
                       Text(
                         'Edu+Conect',
-                        style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                       Text(
                         'Guardianship Portal',
@@ -118,7 +118,9 @@ class AppDrawer extends StatelessWidget {
           Consumer<AuthProvider>(
             builder: (context, auth, _) {
               final isTeacher = auth.isTeacher;
-              final name = auth.user?['name'] ?? (isTeacher ? 'Teacher Grace' : 'Guardian John Chewe');
+              final name =
+                  auth.user?['name'] ??
+                  (isTeacher ? 'Teacher Grace' : 'Guardian John Chewe');
               final initials = isTeacher ? 'TG' : 'JC';
 
               return InkWell(
@@ -130,7 +132,10 @@ class AppDrawer extends StatelessWidget {
                   );
                 },
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 12,
+                  ),
                   decoration: const BoxDecoration(
                     color: Colors.white,
                     border: Border(bottom: BorderSide(color: borderColor)),
@@ -139,20 +144,47 @@ class AppDrawer extends StatelessWidget {
                     children: [
                       CircleAvatar(
                         radius: 16,
-                        backgroundColor: isTeacher ? const Color(0xFF5B7BD5) : const Color(0xFF3B5998),
-                        child: Text(initials, style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold)),
+                        backgroundColor: isTeacher
+                            ? const Color(0xFF5B7BD5)
+                            : const Color(0xFF3B5998),
+                        child: Text(
+                          initials,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ),
                       const SizedBox(width: 10),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Color(0xFF1F2937)), overflow: TextOverflow.ellipsis),
-                            Text(isTeacher ? 'Class Teacher' : 'My Profile', style: const TextStyle(fontSize: 11, color: Color(0xFF6B7280))),
+                            Text(
+                              name,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 13,
+                                color: Color(0xFF1F2937),
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            Text(
+                              isTeacher ? 'Class Teacher' : 'My Profile',
+                              style: const TextStyle(
+                                fontSize: 11,
+                                color: Color(0xFF6B7280),
+                              ),
+                            ),
                           ],
                         ),
                       ),
-                      const Icon(Icons.chevron_right_rounded, color: Color(0xFF9CA3AF), size: 20),
+                      const Icon(
+                        Icons.chevron_right_rounded,
+                        color: Color(0xFF9CA3AF),
+                        size: 20,
+                      ),
                     ],
                   ),
                 ),
@@ -172,13 +204,14 @@ class AppDrawer extends StatelessWidget {
                     _buildDrawerItem(
                       context,
                       title: 'Dashboard',
-                      icon: Icons.space_dashboard_rounded,
-                      onTap: () => Navigator.popUntil(context, (r) => r.isFirst),
+
+                      onTap: () =>
+                          Navigator.popUntil(context, (r) => r.isFirst),
                     ),
                     _buildDrawerItem(
                       context,
                       title: 'My Profile',
-                      icon: Icons.person_outline_rounded,
+
                       onTap: () => Navigator.push(
                         context,
                         MaterialPageRoute(builder: (_) => const ProfileView()),
@@ -188,84 +221,91 @@ class AppDrawer extends StatelessWidget {
                       _buildDrawerItem(
                         context,
                         title: 'Uniform Store',
-                        icon: Icons.shopping_bag_rounded,
+
                         onTap: () => Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (_) => const UniformMarketplaceView()),
+                          MaterialPageRoute(
+                            builder: (_) => const UniformMarketplaceView(),
+                          ),
                         ),
                       ),
                       _buildDrawerItem(
                         context,
                         title: 'Learning Journal',
-                        icon: Icons.auto_stories_rounded,
+
                         onTap: () => Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (_) => const LearningJournalView()),
-                        ),
-                      ),
-                      _buildDrawerItem(
-                        context,
-                        title: 'Fee Payments',
-                        icon: Icons.account_balance_wallet_rounded,
-                        onTap: () => Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (_) => const PaymentsView()),
+                          MaterialPageRoute(
+                            builder: (_) => const LearningJournalView(),
+                          ),
                         ),
                       ),
                       _buildDrawerItem(
                         context,
                         title: 'Behaviour & Merits',
-                        icon: Icons.star_rate_rounded,
+
                         onTap: () => Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (_) => const BehaviourView()),
+                          MaterialPageRoute(
+                            builder: (_) => const BehaviourView(),
+                          ),
                         ),
                       ),
                       _buildDrawerItem(
                         context,
                         title: 'Homework Tasks',
-                        icon: Icons.assignment_rounded,
+
                         onTap: () => Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (_) => const AssignmentsView()),
+                          MaterialPageRoute(
+                            builder: (_) => const AssignmentsView(),
+                          ),
                         ),
                       ),
                     ] else ...[
                       _buildDrawerItem(
                         context,
                         title: 'Class Attendance',
-                        icon: Icons.fact_check_rounded,
+
                         onTap: () => Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (_) => const AttendanceView()),
+                          MaterialPageRoute(
+                            builder: (_) => const AttendanceView(),
+                          ),
                         ),
                       ),
                       _buildDrawerItem(
                         context,
                         title: 'Post Learning Entry',
-                        icon: Icons.add_a_photo_rounded,
+
                         onTap: () => Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (_) => const LearningJournalView()),
+                          MaterialPageRoute(
+                            builder: (_) => const LearningJournalView(),
+                          ),
                         ),
                       ),
                       _buildDrawerItem(
                         context,
                         title: 'Class Assignments',
-                        icon: Icons.assignment_rounded,
+
                         onTap: () => Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (_) => const AssignmentsView()),
+                          MaterialPageRoute(
+                            builder: (_) => const AssignmentsView(),
+                          ),
                         ),
                       ),
                     ],
                     _buildDrawerItem(
                       context,
                       title: 'Notifications',
-                      icon: Icons.notifications_active_rounded,
+
                       onTap: () => Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (_) => const AnnouncementsView()),
+                        MaterialPageRoute(
+                          builder: (_) => const AnnouncementsView(),
+                        ),
                       ),
                     ),
                   ],
@@ -285,7 +325,10 @@ class AppDrawer extends StatelessWidget {
                 width: double.infinity,
                 child: OutlinedButton.icon(
                   onPressed: () async {
-                    final studentProvider = Provider.of<StudentProvider>(context, listen: false);
+                    final studentProvider = Provider.of<StudentProvider>(
+                      context,
+                      listen: false,
+                    );
                     studentProvider.clearData();
                     Navigator.pop(context); // Close drawer
                     await auth.logout();
@@ -293,15 +336,25 @@ class AppDrawer extends StatelessWidget {
                       Navigator.of(context).popUntil((route) => route.isFirst);
                     }
                   },
-                  icon: const Icon(Icons.logout_rounded, color: Colors.red, size: 18),
+                  icon: const Icon(
+                    Icons.logout_rounded,
+                    color: Colors.red,
+                    size: 18,
+                  ),
                   label: const Text(
                     'LOG OUT',
-                    style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 13),
+                    style: TextStyle(
+                      color: Colors.red,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 13,
+                    ),
                   ),
                   style: OutlinedButton.styleFrom(
                     side: const BorderSide(color: Colors.red),
                     padding: const EdgeInsets.symmetric(vertical: 10),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
                   ),
                 ),
               ),

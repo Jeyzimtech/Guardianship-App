@@ -7,7 +7,8 @@ class StudentManagementScreen extends StatefulWidget {
   const StudentManagementScreen({super.key});
 
   @override
-  State<StudentManagementScreen> createState() => _StudentManagementScreenState();
+  State<StudentManagementScreen> createState() =>
+      _StudentManagementScreenState();
 }
 
 class _StudentManagementScreenState extends State<StudentManagementScreen> {
@@ -26,9 +27,7 @@ class _StudentManagementScreenState extends State<StudentManagementScreen> {
       'guardian': 'John Chewe (+263773333333)',
       'class_name': 'ECD B (Butterflies)',
       'attendance': '92%',
-      'fee': 'USD 150.00',
-      'fee_amount': 150.00,
-      'status': 'outstanding',
+      'status': 'inactive',
     },
     {
       'id': 2,
@@ -36,9 +35,7 @@ class _StudentManagementScreenState extends State<StudentManagementScreen> {
       'guardian': 'John Chewe (+263773333333)',
       'class_name': 'Grade 4 (Gold)',
       'attendance': '100%',
-      'fee': 'USD 0.00',
-      'fee_amount': 0.00,
-      'status': 'paid',
+      'status': 'active',
     },
     {
       'id': 3,
@@ -46,8 +43,6 @@ class _StudentManagementScreenState extends State<StudentManagementScreen> {
       'guardian': 'Tariro Moyo (+263778888888)',
       'class_name': 'Grade 7 (Alpha)',
       'attendance': '96%',
-      'fee': 'USD 50.00',
-      'fee_amount': 50.00,
       'status': 'pending',
     },
     {
@@ -56,9 +51,7 @@ class _StudentManagementScreenState extends State<StudentManagementScreen> {
       'guardian': 'Sipho Mpofu (+263779999999)',
       'class_name': 'Form 1 (Green)',
       'attendance': '98%',
-      'fee': 'USD 0.00',
-      'fee_amount': 0.00,
-      'status': 'paid',
+      'status': 'active',
     },
   ];
 
@@ -71,21 +64,32 @@ class _StudentManagementScreenState extends State<StudentManagementScreen> {
   List<Map<String, dynamic>> get _filteredStudents {
     return _students.where((s) {
       final q = _searchQuery.toLowerCase();
-      final matchesSearch = q.isEmpty ||
+      final matchesSearch =
+          q.isEmpty ||
           s['name'].toString().toLowerCase().contains(q) ||
           s['guardian'].toString().toLowerCase().contains(q);
 
-      final matchesClass = _selectedClassFilter == 'all' ||
+      final matchesClass =
+          _selectedClassFilter == 'all' ||
           s['class_name'].toString().contains(_selectedClassFilter);
 
-      final matchesStatus = _selectedStatusFilter == 'all' ||
-          s['status'].toString().toLowerCase() == _selectedStatusFilter.toLowerCase();
+      final matchesStatus =
+          _selectedStatusFilter == 'all' ||
+          s['status'].toString().toLowerCase() ==
+              _selectedStatusFilter.toLowerCase();
 
       return matchesSearch && matchesClass && matchesStatus;
     }).toList();
   }
 
-  Widget _buildKpiCard(String title, String value, IconData icon, {Color? valueColor, Color? iconBg, Color? iconColor}) {
+  Widget _buildKpiCard(
+    String title,
+    String value,
+    IconData icon, {
+    Color? valueColor,
+    Color? iconBg,
+    Color? iconColor,
+  }) {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: const BoxDecoration(
@@ -104,9 +108,23 @@ class _StudentManagementScreenState extends State<StudentManagementScreen> {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(title.toUpperCase(), style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFF6B7280))),
+              Text(
+                title.toUpperCase(),
+                style: const TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF6B7280),
+                ),
+              ),
               const SizedBox(height: 4),
-              Text(value, style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: valueColor ?? const Color(0xFF1F2937))),
+              Text(
+                value,
+                style: TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                  color: valueColor ?? const Color(0xFF1F2937),
+                ),
+              ),
             ],
           ),
           Container(
@@ -128,21 +146,21 @@ class _StudentManagementScreenState extends State<StudentManagementScreen> {
     String label;
 
     switch (status.toLowerCase()) {
-      case 'paid':
+      case 'active':
         bg = const Color(0xFFE8F5E9);
         fg = const Color(0xFF4CAF50);
-        label = 'PAID';
+        label = 'ACTIVE';
         break;
       case 'pending':
         bg = const Color(0xFFFEF9E7);
         fg = const Color(0xFFF39C12);
         label = 'PENDING';
         break;
-      case 'outstanding':
+      case 'inactive':
       default:
         bg = const Color(0xFFFDEDEC);
         fg = const Color(0xFFE74C3C);
-        label = 'OUTSTANDING FEES';
+        label = 'INACTIVE';
         break;
     }
 
@@ -167,7 +185,10 @@ class _StudentManagementScreenState extends State<StudentManagementScreen> {
       backgroundColor: const Color(0xFFF9FAFB),
       appBar: AppBar(
         backgroundColor: primaryBlue,
-        title: const Text('Edu+Conect', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+        title: const Text(
+          'Edu+Conect',
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+        ),
         actions: [
           IconButton(
             icon: const Stack(
@@ -176,11 +197,16 @@ class _StudentManagementScreenState extends State<StudentManagementScreen> {
                 Positioned(
                   right: 0,
                   top: 0,
-                  child: CircleAvatar(radius: 6, backgroundColor: Color(0xFFE74C3C)),
+                  child: CircleAvatar(
+                    radius: 6,
+                    backgroundColor: Color(0xFFE74C3C),
+                  ),
                 ),
               ],
             ),
-            onPressed: () => ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('3 New Notifications'))),
+            onPressed: () => ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('3 New Notifications')),
+            ),
           ),
           IconButton(
             icon: const Stack(
@@ -189,11 +215,16 @@ class _StudentManagementScreenState extends State<StudentManagementScreen> {
                 Positioned(
                   right: 0,
                   top: 0,
-                  child: CircleAvatar(radius: 6, backgroundColor: Color(0xFFE74C3C)),
+                  child: CircleAvatar(
+                    radius: 6,
+                    backgroundColor: Color(0xFFE74C3C),
+                  ),
                 ),
               ],
             ),
-            onPressed: () => ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('15 Unread Messages'))),
+            onPressed: () => ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(const SnackBar(content: Text('15 Unread Messages'))),
           ),
           const SizedBox(width: 8),
         ],
@@ -207,11 +238,30 @@ class _StudentManagementScreenState extends State<StudentManagementScreen> {
             // Breadcrumbs & Header
             Row(
               children: [
-                Text('Dashboard', style: TextStyle(color: Colors.grey.shade600, fontSize: 12)),
-                const Text(' > ', style: TextStyle(color: Colors.grey, fontSize: 12)),
-                const Text('Students', style: TextStyle(color: primaryBlue, fontWeight: FontWeight.bold, fontSize: 12)),
-                const Text(' > ', style: TextStyle(color: Colors.grey, fontSize: 12)),
-                const Text('Grade 7', style: TextStyle(color: Colors.grey, fontSize: 12)),
+                Text(
+                  'Dashboard',
+                  style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
+                ),
+                const Text(
+                  ' > ',
+                  style: TextStyle(color: Colors.grey, fontSize: 12),
+                ),
+                const Text(
+                  'Students',
+                  style: TextStyle(
+                    color: primaryBlue,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 12,
+                  ),
+                ),
+                const Text(
+                  ' > ',
+                  style: TextStyle(color: Colors.grey, fontSize: 12),
+                ),
+                const Text(
+                  'Grade 7',
+                  style: TextStyle(color: Colors.grey, fontSize: 12),
+                ),
               ],
             ),
             const SizedBox(height: 8),
@@ -231,7 +281,7 @@ class _StudentManagementScreenState extends State<StudentManagementScreen> {
                   SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      'Teacher Access Scope: View student records & fee status for assigned class. Student identity editing is managed by School Admin.',
+                      'Teacher Access Scope: View student records & attendance for assigned class. Student identity editing is managed by School Admin.',
                       style: TextStyle(fontSize: 11, color: Color(0xFF1E40AF)),
                     ),
                   ),
@@ -246,11 +296,15 @@ class _StudentManagementScreenState extends State<StudentManagementScreen> {
                   children: [
                     Text(
                       'Student Management',
-                      style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Color(0xFF1F2937)),
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF1F2937),
+                      ),
                     ),
                     SizedBox(height: 2),
                     Text(
-                      'Manage student records, attendance & fees',
+                      'Manage student records and attendance',
                       style: TextStyle(fontSize: 12, color: Color(0xFF6B7280)),
                     ),
                   ],
@@ -282,10 +336,35 @@ class _StudentManagementScreenState extends State<StudentManagementScreen> {
               mainAxisSpacing: 10,
               childAspectRatio: 2.1,
               children: [
-                _buildKpiCard('Students', '${_students.length}', Icons.school_rounded),
-                _buildKpiCard('Attendance', '95%', Icons.fact_check_rounded, valueColor: const Color(0xFF4CAF50), iconBg: const Color(0xFFE8F5E9), iconColor: const Color(0xFF4CAF50)),
-                _buildKpiCard('Outstanding', 'USD 24,000', Icons.file_present_rounded, valueColor: const Color(0xFFE74C3C), iconBg: const Color(0xFFFDEDEC), iconColor: const Color(0xFFE74C3C)),
-                _buildKpiCard('Unread', '15', Icons.forum_rounded, valueColor: const Color(0xFFF39C12), iconBg: const Color(0xFFFEF9E7), iconColor: const Color(0xFFF39C12)),
+                _buildKpiCard(
+                  'Students',
+                  '${_students.length}',
+                  Icons.school_rounded,
+                ),
+                _buildKpiCard(
+                  'Attendance',
+                  '95%',
+                  Icons.fact_check_rounded,
+                  valueColor: const Color(0xFF4CAF50),
+                  iconBg: const Color(0xFFE8F5E9),
+                  iconColor: const Color(0xFF4CAF50),
+                ),
+                _buildKpiCard(
+                  'Inactive',
+                  'USD 24,000',
+                  Icons.file_present_rounded,
+                  valueColor: const Color(0xFFE74C3C),
+                  iconBg: const Color(0xFFFDEDEC),
+                  iconColor: const Color(0xFFE74C3C),
+                ),
+                _buildKpiCard(
+                  'Unread',
+                  '15',
+                  Icons.forum_rounded,
+                  valueColor: const Color(0xFFF39C12),
+                  iconBg: const Color(0xFFFEF9E7),
+                  iconColor: const Color(0xFFF39C12),
+                ),
               ],
             ),
             const SizedBox(height: 16),
@@ -305,7 +384,11 @@ class _StudentManagementScreenState extends State<StudentManagementScreen> {
                     controller: _searchController,
                     decoration: InputDecoration(
                       hintText: 'Search Students by name or guardian...',
-                      prefixIcon: const Icon(Icons.search_rounded, color: primaryBlue, size: 20),
+                      prefixIcon: const Icon(
+                        Icons.search_rounded,
+                        color: primaryBlue,
+                        size: 20,
+                      ),
                       suffixIcon: _searchQuery.isNotEmpty
                           ? IconButton(
                               icon: const Icon(Icons.clear, size: 18),
@@ -326,16 +409,52 @@ class _StudentManagementScreenState extends State<StudentManagementScreen> {
                       Expanded(
                         child: DropdownButtonFormField<String>(
                           initialValue: _selectedClassFilter,
-                          decoration: const InputDecoration(contentPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 8)),
+                          decoration: const InputDecoration(
+                            contentPadding: EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 8,
+                            ),
+                          ),
                           items: const [
-                            DropdownMenuItem(value: 'all', child: Text('Class: All', style: TextStyle(fontSize: 12))),
-                            DropdownMenuItem(value: 'Grade 7', child: Text('Grade 7', style: TextStyle(fontSize: 12))),
-                            DropdownMenuItem(value: 'Grade 4', child: Text('Grade 4', style: TextStyle(fontSize: 12))),
-                            DropdownMenuItem(value: 'ECD B', child: Text('ECD B', style: TextStyle(fontSize: 12))),
-                            DropdownMenuItem(value: 'Form 1', child: Text('Form 1', style: TextStyle(fontSize: 12))),
+                            DropdownMenuItem(
+                              value: 'all',
+                              child: Text(
+                                'Class: All',
+                                style: TextStyle(fontSize: 12),
+                              ),
+                            ),
+                            DropdownMenuItem(
+                              value: 'Grade 7',
+                              child: Text(
+                                'Grade 7',
+                                style: TextStyle(fontSize: 12),
+                              ),
+                            ),
+                            DropdownMenuItem(
+                              value: 'Grade 4',
+                              child: Text(
+                                'Grade 4',
+                                style: TextStyle(fontSize: 12),
+                              ),
+                            ),
+                            DropdownMenuItem(
+                              value: 'ECD B',
+                              child: Text(
+                                'ECD B',
+                                style: TextStyle(fontSize: 12),
+                              ),
+                            ),
+                            DropdownMenuItem(
+                              value: 'Form 1',
+                              child: Text(
+                                'Form 1',
+                                style: TextStyle(fontSize: 12),
+                              ),
+                            ),
                           ],
                           onChanged: (val) {
-                            if (val != null) setState(() => _selectedClassFilter = val);
+                            if (val != null)
+                              setState(() => _selectedClassFilter = val);
                           },
                         ),
                       ),
@@ -343,24 +462,63 @@ class _StudentManagementScreenState extends State<StudentManagementScreen> {
                       Expanded(
                         child: DropdownButtonFormField<String>(
                           initialValue: _selectedStatusFilter,
-                          decoration: const InputDecoration(contentPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 8)),
+                          decoration: const InputDecoration(
+                            contentPadding: EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 8,
+                            ),
+                          ),
                           items: const [
-                            DropdownMenuItem(value: 'all', child: Text('Status: All', style: TextStyle(fontSize: 12))),
-                            DropdownMenuItem(value: 'paid', child: Text('Paid', style: TextStyle(fontSize: 12))),
-                            DropdownMenuItem(value: 'pending', child: Text('Pending', style: TextStyle(fontSize: 12))),
-                            DropdownMenuItem(value: 'outstanding', child: Text('Outstanding', style: TextStyle(fontSize: 12))),
+                            DropdownMenuItem(
+                              value: 'all',
+                              child: Text(
+                                'Status: All',
+                                style: TextStyle(fontSize: 12),
+                              ),
+                            ),
+                            DropdownMenuItem(
+                              value: 'active',
+                              child: Text(
+                                'Active',
+                                style: TextStyle(fontSize: 12),
+                              ),
+                            ),
+                            DropdownMenuItem(
+                              value: 'pending',
+                              child: Text(
+                                'Pending',
+                                style: TextStyle(fontSize: 12),
+                              ),
+                            ),
+                            DropdownMenuItem(
+                              value: 'inactive',
+                              child: Text(
+                                'Inactive',
+                                style: TextStyle(fontSize: 12),
+                              ),
+                            ),
                           ],
                           onChanged: (val) {
-                            if (val != null) setState(() => _selectedStatusFilter = val);
+                            if (val != null)
+                              setState(() => _selectedStatusFilter = val);
                           },
                         ),
                       ),
                       const SizedBox(width: 8),
                       IconButton(
-                        icon: const Icon(Icons.file_download_outlined, color: primaryBlue),
+                        icon: const Icon(
+                          Icons.file_download_outlined,
+                          color: primaryBlue,
+                        ),
                         tooltip: 'Export CSV',
                         onPressed: () {
-                          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Exporting student roster to CSV...')));
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text(
+                                'Exporting student roster to CSV...',
+                              ),
+                            ),
+                          );
                         },
                       ),
                     ],
@@ -376,7 +534,11 @@ class _StudentManagementScreenState extends State<StudentManagementScreen> {
               children: [
                 Text(
                   'Student Roster (${filteredList.length})',
-                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: primaryBlue),
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: primaryBlue,
+                  ),
                 ),
                 TextButton.icon(
                   onPressed: () {
@@ -398,7 +560,13 @@ class _StudentManagementScreenState extends State<StudentManagementScreen> {
               const Padding(
                 padding: EdgeInsets.symmetric(vertical: 32.0),
                 child: Center(
-                  child: Text('No student records match filters.', style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold)),
+                  child: Text(
+                    'No student records match filters.',
+                    style: TextStyle(
+                      color: Colors.grey,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ),
               )
             else
@@ -409,11 +577,18 @@ class _StudentManagementScreenState extends State<StudentManagementScreen> {
                 separatorBuilder: (_, _) => const SizedBox(height: 10),
                 itemBuilder: (context, index) {
                   final s = filteredList[index];
-                  final initials = s['name'].toString().split(' ').map((e) => e.isNotEmpty ? e[0] : '').join('').toUpperCase();
+                  final initials = s['name']
+                      .toString()
+                      .split(' ')
+                      .map((e) => e.isNotEmpty ? e[0] : '')
+                      .join('')
+                      .toUpperCase();
 
                   return Container(
                     decoration: BoxDecoration(
-                      color: index % 2 == 0 ? Colors.white : const Color(0xFFF8FAFC),
+                      color: index % 2 == 0
+                          ? Colors.white
+                          : const Color(0xFFF8FAFC),
                       borderRadius: BorderRadius.circular(4),
                       border: Border.all(color: borderColor),
                     ),
@@ -426,15 +601,35 @@ class _StudentManagementScreenState extends State<StudentManagementScreen> {
                             CircleAvatar(
                               radius: 18,
                               backgroundColor: const Color(0xFFEEF2FF),
-                              child: Text(initials, style: const TextStyle(fontWeight: FontWeight.bold, color: primaryBlue, fontSize: 13)),
+                              child: Text(
+                                initials,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: primaryBlue,
+                                  fontSize: 13,
+                                ),
+                              ),
                             ),
                             const SizedBox(width: 10),
                             Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(s['name'], style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: Color(0xFF1F2937))),
-                                  Text(s['class_name'], style: const TextStyle(fontSize: 12, color: Color(0xFF6B7280))),
+                                  Text(
+                                    s['name'],
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 15,
+                                      color: Color(0xFF1F2937),
+                                    ),
+                                  ),
+                                  Text(
+                                    s['class_name'],
+                                    style: const TextStyle(
+                                      fontSize: 12,
+                                      color: Color(0xFF6B7280),
+                                    ),
+                                  ),
                                 ],
                               ),
                             ),
@@ -447,23 +642,43 @@ class _StudentManagementScreenState extends State<StudentManagementScreen> {
                           children: [
                             Row(
                               children: [
-                                const Icon(Icons.phone_outlined, size: 14, color: Colors.grey),
+                                const Icon(
+                                  Icons.phone_outlined,
+                                  size: 14,
+                                  color: Colors.grey,
+                                ),
                                 const SizedBox(width: 4),
-                                Text(s['guardian'], style: const TextStyle(fontSize: 12, color: Color(0xFF1F2937))),
+                                Text(
+                                  s['guardian'],
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    color: Color(0xFF1F2937),
+                                  ),
+                                ),
                               ],
                             ),
-                            Text('Att: ${s['attendance']}', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Color(0xFF4CAF50))),
+                            Text(
+                              'Att: ${s['attendance']}',
+                              style: const TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFF4CAF50),
+                              ),
+                            ),
                           ],
                         ),
                         const SizedBox(height: 6),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text('Balance: ${s['fee']}', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: primaryBlue)),
                             Row(
                               children: [
                                 IconButton(
-                                  icon: const Icon(Icons.edit_outlined, size: 18, color: primaryBlue),
+                                  icon: const Icon(
+                                    Icons.edit_outlined,
+                                    size: 18,
+                                    color: primaryBlue,
+                                  ),
                                   onPressed: () {
                                     showDialog(
                                       context: context,
@@ -471,8 +686,11 @@ class _StudentManagementScreenState extends State<StudentManagementScreen> {
                                         initialStudent: s,
                                         onSaved: (updated) {
                                           setState(() {
-                                            final idx = _students.indexWhere((item) => item['id'] == s['id']);
-                                            if (idx != -1) _students[idx] = updated;
+                                            final idx = _students.indexWhere(
+                                              (item) => item['id'] == s['id'],
+                                            );
+                                            if (idx != -1)
+                                              _students[idx] = updated;
                                           });
                                         },
                                       ),
@@ -480,9 +698,17 @@ class _StudentManagementScreenState extends State<StudentManagementScreen> {
                                   },
                                 ),
                                 IconButton(
-                                  icon: const Icon(Icons.delete_outline, size: 18, color: Colors.red),
+                                  icon: const Icon(
+                                    Icons.delete_outline,
+                                    size: 18,
+                                    color: Colors.red,
+                                  ),
                                   onPressed: () {
-                                    setState(() => _students.removeWhere((item) => item['id'] == s['id']));
+                                    setState(
+                                      () => _students.removeWhere(
+                                        (item) => item['id'] == s['id'],
+                                      ),
+                                    );
                                   },
                                 ),
                               ],

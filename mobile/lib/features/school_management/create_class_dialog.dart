@@ -33,9 +33,15 @@ class _CreateClassDialogState extends State<CreateClassDialog> {
   @override
   void initState() {
     super.initState();
-    _gradeController = TextEditingController(text: widget.initialClass?['grade'] ?? '');
-    _classNameController = TextEditingController(text: widget.initialClass?['class_name'] ?? '');
-    _capacityController = TextEditingController(text: (widget.initialClass?['capacity'] ?? 30).toString());
+    _gradeController = TextEditingController(
+      text: widget.initialClass?['grade'] ?? '',
+    );
+    _classNameController = TextEditingController(
+      text: widget.initialClass?['class_name'] ?? '',
+    );
+    _capacityController = TextEditingController(
+      text: (widget.initialClass?['capacity'] ?? 30).toString(),
+    );
 
     if (widget.initialClass != null) {
       _selectedSchoolId = widget.initialClass!['school_id'];
@@ -44,7 +50,11 @@ class _CreateClassDialogState extends State<CreateClassDialog> {
       if (widget.schools.isNotEmpty) {
         _selectedSchoolId = widget.schools.first['id'];
       }
-      final currentYear = widget.academicYears.firstWhere((y) => y['is_current'] == true, orElse: () => widget.academicYears.isNotEmpty ? widget.academicYears.first : {});
+      final currentYear = widget.academicYears.firstWhere(
+        (y) => y['is_current'] == true,
+        orElse: () =>
+            widget.academicYears.isNotEmpty ? widget.academicYears.first : {},
+      );
       if (currentYear.isNotEmpty) {
         _selectedAcademicYearId = currentYear['id'];
       }
@@ -76,7 +86,10 @@ class _CreateClassDialogState extends State<CreateClassDialog> {
       };
 
       if (isEditing) {
-        await apiClient.dio.put('/school-classes/${widget.initialClass!['id']}', data: payload);
+        await apiClient.dio.put(
+          '/school-classes/${widget.initialClass!['id']}',
+          data: payload,
+        );
       } else {
         await apiClient.dio.post('/school-classes', data: payload);
       }
@@ -84,7 +97,9 @@ class _CreateClassDialogState extends State<CreateClassDialog> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(isEditing ? 'Class stream updated.' : 'Class stream created.'),
+            content: Text(
+              isEditing ? 'Class stream updated.' : 'Class stream created.',
+            ),
             backgroundColor: AppColors.primary,
           ),
         );
@@ -134,14 +149,20 @@ class _CreateClassDialogState extends State<CreateClassDialog> {
                 Row(
                   children: [
                     Icon(
-                      isEditing ? Icons.edit_calendar_rounded : Icons.meeting_room_rounded,
+                      isEditing
+                          ? Icons.edit_calendar_rounded
+                          : Icons.meeting_room_rounded,
                       color: darkTeal,
                       size: 28,
                     ),
                     const SizedBox(width: 10),
                     Text(
                       isEditing ? 'Edit Grade Class' : 'Add Grade Class',
-                      style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: darkTeal),
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: darkTeal,
+                      ),
                     ),
                   ],
                 ),
@@ -152,8 +173,13 @@ class _CreateClassDialogState extends State<CreateClassDialog> {
                   initialValue: _selectedSchoolId,
                   decoration: InputDecoration(
                     labelText: 'School Campus',
-                    prefixIcon: const Icon(Icons.school_outlined, color: darkTeal),
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                    prefixIcon: const Icon(
+                      Icons.school_outlined,
+                      color: darkTeal,
+                    ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                   ),
                   items: widget.schools.map((school) {
                     return DropdownMenuItem<int>(
@@ -173,10 +199,17 @@ class _CreateClassDialogState extends State<CreateClassDialog> {
                   decoration: InputDecoration(
                     labelText: 'Grade / Form Level',
                     hintText: 'e.g. Grade 4 or Form 1',
-                    prefixIcon: const Icon(Icons.auto_awesome_motion_rounded, color: darkTeal),
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                    prefixIcon: const Icon(
+                      Icons.layers_outlined,
+                      color: darkTeal,
+                    ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                   ),
-                  validator: (val) => val == null || val.trim().isEmpty ? 'Grade is required' : null,
+                  validator: (val) => val == null || val.trim().isEmpty
+                      ? 'Grade is required'
+                      : null,
                 ),
                 const SizedBox(height: 16),
 
@@ -186,10 +219,17 @@ class _CreateClassDialogState extends State<CreateClassDialog> {
                   decoration: InputDecoration(
                     labelText: 'Stream / Section Name',
                     hintText: 'e.g. Green or Room 4',
-                    prefixIcon: const Icon(Icons.door_sliding_outlined, color: darkTeal),
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                    prefixIcon: const Icon(
+                      Icons.door_sliding_outlined,
+                      color: darkTeal,
+                    ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                   ),
-                  validator: (val) => val == null || val.trim().isEmpty ? 'Class name is required' : null,
+                  validator: (val) => val == null || val.trim().isEmpty
+                      ? 'Class name is required'
+                      : null,
                 ),
                 const SizedBox(height: 16),
 
@@ -199,8 +239,13 @@ class _CreateClassDialogState extends State<CreateClassDialog> {
                   keyboardType: TextInputType.number,
                   decoration: InputDecoration(
                     labelText: 'Maximum Capacity',
-                    prefixIcon: const Icon(Icons.groups_outlined, color: darkTeal),
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                    prefixIcon: const Icon(
+                      Icons.groups_outlined,
+                      color: darkTeal,
+                    ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                   ),
                 ),
                 const SizedBox(height: 24),
@@ -211,7 +256,10 @@ class _CreateClassDialogState extends State<CreateClassDialog> {
                   children: [
                     TextButton(
                       onPressed: () => Navigator.pop(context),
-                      child: const Text('Cancel', style: TextStyle(color: Colors.grey)),
+                      child: const Text(
+                        'Cancel',
+                        style: TextStyle(color: Colors.grey),
+                      ),
                     ),
                     const SizedBox(width: 12),
                     ElevatedButton(
@@ -219,11 +267,23 @@ class _CreateClassDialogState extends State<CreateClassDialog> {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: mintGreen,
                         foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 12,
+                        ),
                       ),
                       child: _isSubmitting
-                          ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                          ? const SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                color: Colors.white,
+                                strokeWidth: 2,
+                              ),
+                            )
                           : Text(isEditing ? 'Save Changes' : 'Create Class'),
                     ),
                   ],

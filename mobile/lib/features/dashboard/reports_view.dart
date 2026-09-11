@@ -23,7 +23,10 @@ class _ReportsViewState extends State<ReportsView> {
   }
 
   Future<void> _fetchReports() async {
-    final studentProvider = Provider.of<StudentProvider>(context, listen: false);
+    final studentProvider = Provider.of<StudentProvider>(
+      context,
+      listen: false,
+    );
     final selectedStudent = studentProvider.selectedStudent;
     if (selectedStudent == null) return;
 
@@ -33,7 +36,9 @@ class _ReportsViewState extends State<ReportsView> {
     });
 
     try {
-      final response = await studentProvider.apiClient.dio.get('/reports/${selectedStudent['id']}');
+      final response = await studentProvider.apiClient.dio.get(
+        '/reports/${selectedStudent['id']}',
+      );
       if (response.statusCode == 200 && response.data['status'] == 'success') {
         setState(() {
           _reports = response.data['reports'];
@@ -41,22 +46,19 @@ class _ReportsViewState extends State<ReportsView> {
       }
     } catch (e) {
       // Offline fallback: load mock reports
-      final double balanceUsd = double.tryParse(studentProvider.dashboardData?['fee_snapshot']?['balance_usd']?.toString() ?? '0.0') ?? 0.0;
-      final double balanceZig = double.tryParse(studentProvider.dashboardData?['fee_snapshot']?['balance_zig']?.toString() ?? '0.0') ?? 0.0;
-      final bool hasFees = balanceUsd > 0 || balanceZig > 0;
 
       setState(() {
         _reports = [
           {
             'id': 101,
             'title': 'Term 1 Academic Report Card',
-            'is_locked': hasFees,
+            'is_locked': false,
           },
           {
             'id': 102,
             'title': 'Term 2 Mid-Term Progress Card',
-            'is_locked': hasFees,
-          }
+            'is_locked': false,
+          },
         ];
       });
     }
@@ -67,52 +69,23 @@ class _ReportsViewState extends State<ReportsView> {
   }
 
   void _downloadReport(Map<String, dynamic> report) async {
-    final studentProvider = Provider.of<StudentProvider>(context, listen: false);
-    
-    if (report['is_locked'] == true) {
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          backgroundColor: AppColors.surface,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-            side: const BorderSide(color: AppColors.cardBorder, width: 1.0),
-          ),
-          title: const Row(
-            children: [
-              Icon(Icons.lock_rounded, color: AppColors.error),
-              SizedBox(width: 10),
-              Text('Access Locked', style: TextStyle(color: AppColors.primaryDark, fontWeight: FontWeight.bold)),
-            ],
-          ),
-          content: const Text(
-            'This report card is locked. Please settle your child\'s outstanding fee balance in the Payments tab to unlock academic records.',
-            style: TextStyle(color: AppColors.textSecondary),
-          ),
-          actions: [
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
-                foregroundColor: Colors.white,
-                elevation: 0,
-              ),
-              child: const Text('OK', style: TextStyle(fontWeight: FontWeight.bold)),
-              onPressed: () => Navigator.pop(context),
-            ),
-          ],
-        ),
-      );
-      return;
-    }
+    final studentProvider = Provider.of<StudentProvider>(
+      context,
+      listen: false,
+    );
 
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => const Center(child: CircularProgressIndicator(color: AppColors.primary)),
+      builder: (context) => const Center(
+        child: CircularProgressIndicator(color: AppColors.primary),
+      ),
     );
 
     try {
-      final response = await studentProvider.apiClient.dio.get('/reports/download/${report['id']}');
+      final response = await studentProvider.apiClient.dio.get(
+        '/reports/download/${report['id']}',
+      );
       if (mounted) Navigator.pop(context); // Close spinner
 
       if (response.statusCode == 200 && response.data['status'] == 'success') {
@@ -125,26 +98,52 @@ class _ReportsViewState extends State<ReportsView> {
                 borderRadius: BorderRadius.circular(12),
                 side: const BorderSide(color: AppColors.cardBorder, width: 1.0),
               ),
-              title: Text(report['title'], style: const TextStyle(color: AppColors.primaryDark, fontWeight: FontWeight.bold)),
+              title: Text(
+                report['title'],
+                style: const TextStyle(
+                  color: AppColors.primaryDark,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('Report download authorized successfully.', style: TextStyle(color: AppColors.textPrimary)),
+                  const Text(
+                    'Report download authorized successfully.',
+                    style: TextStyle(color: AppColors.textPrimary),
+                  ),
                   const SizedBox(height: 12),
                   Container(
                     width: double.infinity,
                     padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(color: AppColors.softBlue, borderRadius: BorderRadius.circular(8)),
-                    child: Text(response.data['file_content_mock'] ?? '', style: const TextStyle(color: AppColors.primaryDark, fontFamily: 'monospace', fontWeight: FontWeight.bold, fontSize: 11)),
+                    decoration: BoxDecoration(
+                      color: AppColors.softBlue,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      response.data['file_content_mock'] ?? '',
+                      style: const TextStyle(
+                        color: AppColors.primaryDark,
+                        fontFamily: 'monospace',
+                        fontWeight: FontWeight.bold,
+                        fontSize: 11,
+                      ),
+                    ),
                   ),
                 ],
               ),
               actions: [
                 TextButton(
-                  child: const Text('Close', style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold)),
+                  child: const Text(
+                    'Close',
+                    style: TextStyle(
+                      color: AppColors.primary,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                   onPressed: () => Navigator.pop(context),
-                )
+                ),
               ],
             ),
           );
@@ -162,17 +161,29 @@ class _ReportsViewState extends State<ReportsView> {
               borderRadius: BorderRadius.circular(12),
               side: const BorderSide(color: AppColors.cardBorder, width: 1.0),
             ),
-            title: Text(report['title'], style: const TextStyle(color: AppColors.primaryDark, fontWeight: FontWeight.bold)),
+            title: Text(
+              report['title'],
+              style: const TextStyle(
+                color: AppColors.primaryDark,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
             content: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('Report loaded successfully (Offline Mode).', style: TextStyle(color: AppColors.textPrimary)),
+                const Text(
+                  'Report loaded successfully (Offline Mode).',
+                  style: TextStyle(color: AppColors.textPrimary),
+                ),
                 const SizedBox(height: 12),
                 Container(
                   width: double.infinity,
                   padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(color: AppColors.softBlue, borderRadius: BorderRadius.circular(8)),
+                  decoration: BoxDecoration(
+                    color: AppColors.softBlue,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
                   child: Text(
                     '===================================\n'
                     '     OFFICIAL ACADEMIC REPORT      \n'
@@ -185,16 +196,27 @@ class _ReportsViewState extends State<ReportsView> {
                     'Science: A\n'
                     'Overall Position: 3rd in Class\n'
                     '===================================',
-                    style: const TextStyle(color: AppColors.primaryDark, fontFamily: 'monospace', fontWeight: FontWeight.bold, fontSize: 11),
+                    style: const TextStyle(
+                      color: AppColors.primaryDark,
+                      fontFamily: 'monospace',
+                      fontWeight: FontWeight.bold,
+                      fontSize: 11,
+                    ),
                   ),
                 ),
               ],
             ),
             actions: [
               TextButton(
-                child: const Text('Close', style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold)),
+                child: const Text(
+                  'Close',
+                  style: TextStyle(
+                    color: AppColors.primary,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
                 onPressed: () => Navigator.pop(context),
-              )
+              ),
             ],
           ),
         );
@@ -229,106 +251,111 @@ class _ReportsViewState extends State<ReportsView> {
             )
           : null,
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator(color: AppColors.primary))
+          ? const Center(
+              child: CircularProgressIndicator(color: AppColors.primary),
+            )
           : _errorMessage != null
-              ? Center(child: Text(_errorMessage!, style: const TextStyle(color: AppColors.error, fontWeight: FontWeight.bold)))
-              : RefreshIndicator(
-                  onRefresh: _fetchReports,
-                  color: AppColors.primary,
-                  child: ListView.builder(
-                    padding: const EdgeInsets.all(16),
-                    itemCount: _reports.isEmpty ? 1 : _reports.length,
-                    itemBuilder: (context, index) {
-                      if (_reports.isEmpty) {
-                        return Center(
-                          child: Padding(
-                            padding: const EdgeInsets.only(top: 100.0),
-                            child: Column(
-                              children: [
-                                Icon(Icons.assignment_outlined, size: 64, color: AppColors.primary.withValues(alpha: 0.3)),
-                                const SizedBox(height: 16),
-                                const Text(
-                                  'No report documents uploaded.',
-                                  style: TextStyle(color: AppColors.textMuted, fontWeight: FontWeight.bold),
-                                ),
-                              ],
+          ? Center(
+              child: Text(
+                _errorMessage!,
+                style: const TextStyle(
+                  color: AppColors.error,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            )
+          : RefreshIndicator(
+              onRefresh: _fetchReports,
+              color: AppColors.primary,
+              child: ListView.builder(
+                padding: const EdgeInsets.all(16),
+                itemCount: _reports.isEmpty ? 1 : _reports.length,
+                itemBuilder: (context, index) {
+                  if (_reports.isEmpty) {
+                    return Center(
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: 100.0),
+                        child: Column(
+                          children: [
+                            Icon(
+                              Icons.assignment_outlined,
+                              size: 64,
+                              color: AppColors.primary.withValues(alpha: 0.3),
                             ),
-                          ),
-                        );
-                      }
-
-                      final report = _reports[index];
-                      final isGated = report['is_locked'] == true;
-
-                      return Card(
-                        margin: const EdgeInsets.only(bottom: 12),
-                        elevation: 0,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                          side: const BorderSide(color: AppColors.cardBorder),
-                        ),
-                        child: ListTile(
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                          leading: Container(
-                            padding: const EdgeInsets.all(10),
-                            decoration: BoxDecoration(
-                              color: isGated ? AppColors.errorLight : AppColors.softBlue,
-                              shape: BoxShape.circle,
-                            ),
-                            child: isGated
-                                ? const Icon(
-                                    Icons.lock_rounded,
-                                    color: AppColors.error,
-                                    size: 24,
-                                  )
-                                : Image.network(
-                                    'https://img.icons8.com/?id=13184&format=png&size=96',
-                                    width: 24,
-                                    height: 24,
-                                    errorBuilder: (context, error, stackTrace) => const Icon(
-                                      Icons.file_present_rounded,
-                                      color: AppColors.primary,
-                                      size: 24,
-                                    ),
-                                  ),
-                          ),
-                          title: Text(
-                            report['title'] ?? '',
-                            style: const TextStyle(color: AppColors.primaryDark, fontWeight: FontWeight.bold),
-                          ),
-                          subtitle: Padding(
-                            padding: const EdgeInsets.only(top: 4.0),
-                            child: Text(
-                              isGated ? 'Locked due to outstanding fees' : 'Academic Report card • Available for download',
+                            const SizedBox(height: 16),
+                            const Text(
+                              'No report documents uploaded.',
                               style: TextStyle(
-                                color: isGated ? AppColors.error : AppColors.textMuted,
-                                fontSize: 12,
-                                fontWeight: FontWeight.w500,
+                                color: AppColors.textMuted,
+                                fontWeight: FontWeight.bold,
                               ),
                             ),
-                          ),
-                          trailing: isGated
-                              ? IconButton(
-                                  icon: const Icon(Icons.info_rounded, color: AppColors.error),
-                                  onPressed: () => _downloadReport(report),
-                                )
-                              : ElevatedButton.icon(
-                                  onPressed: () => _downloadReport(report),
-                                  icon: const Icon(Icons.download_rounded, size: 14),
-                                  label: const Text('Get', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: AppColors.primary,
-                                    foregroundColor: Colors.white,
-                                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
-                                    elevation: 0,
-                                  ),
-                                ),
+                          ],
                         ),
-                      );
-                    },
-                  ),
-                ),
+                      ),
+                    );
+                  }
+
+                  final report = _reports[index];
+
+                  return Card(
+                    margin: const EdgeInsets.only(bottom: 12),
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      side: const BorderSide(color: AppColors.cardBorder),
+                    ),
+                    child: ListTile(
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 8,
+                      ),
+                      title: Text(
+                        report['title'] ?? '',
+                        style: const TextStyle(
+                          color: AppColors.primaryDark,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      subtitle: Padding(
+                        padding: const EdgeInsets.only(top: 4.0),
+                        child: Text(
+                          'Academic Report card • Available for download',
+                          style: TextStyle(
+                            color: AppColors.textMuted,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                      trailing: ElevatedButton.icon(
+                        onPressed: () => _downloadReport(report),
+                        icon: const Icon(Icons.download_rounded, size: 14),
+                        label: const Text(
+                          'Get',
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primary,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 8,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          elevation: 0,
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
     );
   }
 }

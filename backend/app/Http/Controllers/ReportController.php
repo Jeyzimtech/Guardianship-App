@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\FeeAccount;
 use App\Models\ReportDocument;
 use App\Models\Student;
 use Illuminate\Http\Request;
@@ -12,7 +11,7 @@ class ReportController extends Controller
 {
     /**
      * Get list of reports/merits/certificates for a student.
-     * Enforces the fee-gating rule by masking file paths if fees are outstanding.
+     * Returns reports for authorised users.
      */
     public function getStudentReports(Request $request, $studentId)
     {
@@ -30,44 +29,35 @@ class ReportController extends Controller
             }
         }
 
-        // Check if student has outstanding fee balances
-        $feeAccount = FeeAccount::where('student_id', $studentId)->first();
-        $hasOutstandingFees = false;
-        if ($feeAccount) {
-            $hasOutstandingFees = ($feeAccount->balance_usd > 0 || $feeAccount->balance_zig > 0);
-        }
-
         $reports = ReportDocument::where('student_id', $studentId)
             ->orderBy('created_at', 'desc')
             ->get();
 
-        // Map reports to mask file paths if gated
-        $processedReports = $reports->map(function ($report) use ($hasOutstandingFees) {
-            $isGated = $report->fee_gated && $hasOutstandingFees;
+        // Map report metadata
+        $processedReports = $reports->map(function ($report) {
+
             
             return [
                 'id' => $report->id,
                 'student_id' => $report->student_id,
                 'title' => $report->title,
                 'type' => $report->type,
-                'fee_gated' => $report->fee_gated,
-                'is_locked' => $isGated,
-                // Mask the file path if locked
-                'file_path' => $isGated ? 'LOCKED_DUE_TO_FEES' : $report->file_path,
+                'fee_gated' => false,
+                'is_locked' => false,
+                'file_path' => $report->file_path,
                 'created_at' => $report->created_at,
             ];
         });
 
         return response()->json([
             'status' => 'success',
-            'has_outstanding_fees' => $hasOutstandingFees,
             'reports' => $processedReports
         ]);
     }
 
     /**
      * Download a report.
-     * Enforces the fee-gating business rule explicitly.
+     * Retains student access scoping.
      */
     public function downloadReport(Request $request, $reportId)
     {
@@ -82,17 +72,6 @@ class ReportController extends Controller
                 return response()->json([
                     'status' => 'error',
                     'message' => 'Unauthorized. This student is not linked to your account.'
-                ], 403);
-            }
-        }
-
-        // Enforce fee-gating rule
-        if ($report->fee_gated) {
-            $feeAccount = FeeAccount::where('student_id', $studentId)->first();
-            if ($feeAccount && ($feeAccount->balance_usd > 0 || $feeAccount->balance_zig > 0)) {
-                return response()->json([
-                    'status' => 'error',
-                    'message' => 'Outstanding fees: Access to report card is locked until balance is cleared.'
                 ], 403);
             }
         }
@@ -125,7 +104,6 @@ class ReportController extends Controller
             'student_id' => 'required|exists:students,id',
             'title' => 'required|string|max:255',
             'type' => 'required|in:report,merit,certificate',
-            'fee_gated' => 'required|boolean',
             'file_path' => 'required|string', // Send a path or simulated path
         ]);
 
@@ -133,7 +111,7 @@ class ReportController extends Controller
             'student_id' => $request->student_id,
             'title' => $request->title,
             'type' => $request->type,
-            'fee_gated' => $request->fee_gated,
+            'fee_gated' => false,
             'file_path' => $request->file_path,
             'uploaded_by' => $user->id,
         ]);

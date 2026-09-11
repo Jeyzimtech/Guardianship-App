@@ -18,14 +18,19 @@ class _LearningJournalViewState extends State<LearningJournalView> {
   @override
   void initState() {
     super.initState();
-    final activeChild = widget.child ?? {
-      'name': 'Alice Chewe',
-      'class': 'Grade 4 Gold',
-      'tier': 'primary',
-      'school': 'Hillside Primary School',
-    };
+    final activeChild =
+        widget.child ??
+        {
+          'name': 'Alice Chewe',
+          'class': 'Grade 4 Gold',
+          'tier': 'primary',
+          'school': 'Hillside Primary School',
+        };
     final childName = activeChild['name'] ?? 'Child';
-    final isPrep = (activeChild['tier'] == 'preparatory') || childName.contains('Alice') || childName.contains('Timothy');
+    final isPrep =
+        (activeChild['tier'] == 'preparatory') ||
+        childName.contains('Alice') ||
+        childName.contains('Timothy');
 
     _mockEntries = [
       if (isPrep) ...[
@@ -33,14 +38,14 @@ class _LearningJournalViewState extends State<LearningJournalView> {
           'type': 'wellbeing',
           'author': 'Caregiver Amai Tendai',
           'date': 'Today, 11:30 AM',
-          'caption': 'Alice had a wonderful morning during circle time and outdoor play!',
+          'caption':
+              'Alice had a wonderful morning during circle time and outdoor play!',
           'wellbeing': {
             'meals': 'Ate all of lunch (chicken & rice)',
             'nap': 'Rested 45 mins quietly',
             'hygiene': 'Hands washed before and after meals',
-            'mood': 'Cheerful & Energetic'
+            'mood': 'Cheerful & Energetic',
           },
-          'fee_gated': false,
         },
         {
           'type': 'drawing',
@@ -49,7 +54,6 @@ class _LearningJournalViewState extends State<LearningJournalView> {
           'caption': 'Finger painting activity: "My Family at Home"',
           'image_url': 'https://picsum.photos/400/300?random=1',
           'feedback': 'Great color choice and hand-eye coordination!',
-          'fee_gated': false,
         },
       ],
       {
@@ -57,10 +61,10 @@ class _LearningJournalViewState extends State<LearningJournalView> {
         'author': 'Teacher Grace',
         'date': '2 days ago',
         'subject': 'Science Lab',
-        'caption': 'Demonstrating working solar circuit during Science experiment.',
+        'caption':
+            'Demonstrating working solar circuit during Science experiment.',
         'image_url': 'https://picsum.photos/400/300?random=2',
         'feedback': 'Excellent problem solving skills displayed today!',
-        'fee_gated': false,
       },
       {
         'type': 'voice',
@@ -70,7 +74,6 @@ class _LearningJournalViewState extends State<LearningJournalView> {
         'caption': 'Recorded reading sample: "The Adventures of Mufaro"',
         'duration': '1 min 24 sec',
         'feedback': 'Fluent expression and clear pronunciation!',
-        'fee_gated': false,
       },
       {
         'type': 'text',
@@ -79,7 +82,6 @@ class _LearningJournalViewState extends State<LearningJournalView> {
         'subject': 'Mathematics',
         'caption': 'Achieved 100% score on mental arithmetic speed challenge!',
         'feedback': 'Superb progress this week.',
-        'fee_gated': false,
       },
     ];
   }
@@ -99,7 +101,11 @@ class _LearningJournalViewState extends State<LearningJournalView> {
           children: [
             const Text(
               'Learning Journal',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
             ),
             Text(
               '${widget.child?['name'] ?? 'Student'} • Running Work Record',
@@ -112,18 +118,22 @@ class _LearningJournalViewState extends State<LearningJournalView> {
       ),
       body: Column(
         children: [
-          // Reassurance & Fee-Ungated Info Banner
+          // Learning journal introduction
           Container(
             width: double.infinity,
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
             color: AppColors.softBlue,
             child: const Row(
               children: [
-                Icon(Icons.verified_rounded, color: AppColors.primary, size: 18),
+                Icon(
+                  Icons.verified_rounded,
+                  color: AppColors.primary,
+                  size: 18,
+                ),
                 SizedBox(width: 8),
                 Expanded(
                   child: Text(
-                    'Day-to-day learning journal & wellbeing logs are NEVER fee-gated. Always visible.',
+                    'Follow classroom learning, teacher feedback and everyday progress.',
                     style: TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.w600,
@@ -155,7 +165,10 @@ class _LearningJournalViewState extends State<LearningJournalView> {
           Expanded(
             child: filteredEntries.isEmpty
                 ? const Center(
-                    child: Text('No journal entries match the selected filter.', style: TextStyle(color: AppColors.textMuted)),
+                    child: Text(
+                      'No journal entries match the selected filter.',
+                      style: TextStyle(color: AppColors.textMuted),
+                    ),
                   )
                 : ListView.builder(
                     padding: const EdgeInsets.all(16),
@@ -188,7 +201,9 @@ class _LearningJournalViewState extends State<LearningJournalView> {
           fontSize: 12,
         ),
         backgroundColor: AppColors.softBlue,
-        side: BorderSide(color: isSelected ? AppColors.primary : AppColors.blueBorder),
+        side: BorderSide(
+          color: isSelected ? AppColors.primary : AppColors.blueBorder,
+        ),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       ),
     );
@@ -245,17 +260,27 @@ class _LearningJournalViewState extends State<LearningJournalView> {
                     children: [
                       Text(
                         entry['author'] ?? 'Teacher',
-                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AppColors.textPrimary),
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 13,
+                          color: AppColors.textPrimary,
+                        ),
                       ),
                       Text(
                         entry['date'] ?? '',
-                        style: const TextStyle(fontSize: 11, color: AppColors.textMuted),
+                        style: const TextStyle(
+                          fontSize: 11,
+                          color: AppColors.textMuted,
+                        ),
                       ),
                     ],
                   ),
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 3,
+                  ),
                   decoration: BoxDecoration(
                     color: AppColors.surface,
                     borderRadius: BorderRadius.circular(4),
@@ -264,7 +289,8 @@ class _LearningJournalViewState extends State<LearningJournalView> {
                   child: Text(
                     isWellbeing
                         ? 'PREPARATORY LOG'
-                        : (entry['subject'] ?? entry['type'].toString().toUpperCase()),
+                        : (entry['subject'] ??
+                              entry['type'].toString().toUpperCase()),
                     style: const TextStyle(
                       fontSize: 10,
                       fontWeight: FontWeight.bold,
@@ -285,7 +311,11 @@ class _LearningJournalViewState extends State<LearningJournalView> {
                 if (entry['caption'] != null)
                   Text(
                     entry['caption'],
-                    style: const TextStyle(fontSize: 14, height: 1.4, color: AppColors.textPrimary),
+                    style: const TextStyle(
+                      fontSize: 14,
+                      height: 1.4,
+                      color: AppColors.textPrimary,
+                    ),
                   ),
 
                 // Preparatory Wellbeing Details Box
@@ -304,13 +334,34 @@ class _LearningJournalViewState extends State<LearningJournalView> {
                       children: [
                         const Text(
                           'DAILY WELLBEING SNAPSHOT',
-                          style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: AppColors.primaryDark, letterSpacing: 0.5),
+                          style: TextStyle(
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.primaryDark,
+                            letterSpacing: 0.5,
+                          ),
                         ),
                         const SizedBox(height: 6),
-                        _buildWellbeingRow(Icons.restaurant_rounded, 'Meals', entry['wellbeing']['meals']),
-                        _buildWellbeingRow(Icons.bed_rounded, 'Nap / Rest', entry['wellbeing']['nap']),
-                        _buildWellbeingRow(Icons.clean_hands_rounded, 'Hygiene', entry['wellbeing']['hygiene']),
-                        _buildWellbeingRow(Icons.sentiment_satisfied_alt_rounded, 'Mood', entry['wellbeing']['mood']),
+                        _buildWellbeingRow(
+                          Icons.restaurant_rounded,
+                          'Meals',
+                          entry['wellbeing']['meals'],
+                        ),
+                        _buildWellbeingRow(
+                          Icons.bed_rounded,
+                          'Nap / Rest',
+                          entry['wellbeing']['nap'],
+                        ),
+                        _buildWellbeingRow(
+                          Icons.clean_hands_rounded,
+                          'Hygiene',
+                          entry['wellbeing']['hygiene'],
+                        ),
+                        _buildWellbeingRow(
+                          Icons.sentiment_satisfied_alt_rounded,
+                          'Mood',
+                          entry['wellbeing']['mood'],
+                        ),
                       ],
                     ),
                   ),
@@ -331,7 +382,11 @@ class _LearningJournalViewState extends State<LearningJournalView> {
                         errorBuilder: (context, error, stackTrace) => Container(
                           color: AppColors.softBlue,
                           child: const Center(
-                            child: Icon(Icons.image, size: 48, color: AppColors.primaryLight),
+                            child: Icon(
+                              Icons.image,
+                              size: 48,
+                              color: AppColors.primaryLight,
+                            ),
                           ),
                         ),
                       ),
@@ -354,21 +409,42 @@ class _LearningJournalViewState extends State<LearningJournalView> {
                         const CircleAvatar(
                           radius: 16,
                           backgroundColor: AppColors.primary,
-                          child: Icon(Icons.play_arrow_rounded, color: Colors.white, size: 20),
+                          child: Icon(
+                            Icons.play_arrow_rounded,
+                            color: Colors.white,
+                            size: 20,
+                          ),
                         ),
                         const SizedBox(width: 12),
                         const Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text('Voice Recording', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppColors.textPrimary)),
-                              Text('Audio sample • Click to play', style: TextStyle(fontSize: 10, color: AppColors.textMuted)),
+                              Text(
+                                'Voice Recording',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                  color: AppColors.textPrimary,
+                                ),
+                              ),
+                              Text(
+                                'Audio sample • Click to play',
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  color: AppColors.textMuted,
+                                ),
+                              ),
                             ],
                           ),
                         ),
                         Text(
                           entry['duration'] ?? '',
-                          style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppColors.primary),
+                          style: const TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.primary,
+                          ),
                         ),
                       ],
                     ),
@@ -383,17 +459,27 @@ class _LearningJournalViewState extends State<LearningJournalView> {
                     decoration: BoxDecoration(
                       color: AppColors.softBlue,
                       borderRadius: BorderRadius.circular(8),
-                      border: const Border(left: BorderSide(color: AppColors.primary, width: 3)),
+                      border: const Border(
+                        left: BorderSide(color: AppColors.primary, width: 3),
+                      ),
                     ),
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Icon(Icons.chat_bubble_outline_rounded, size: 16, color: AppColors.primary),
+                        const Icon(
+                          Icons.chat_bubble_outline_rounded,
+                          size: 16,
+                          color: AppColors.primary,
+                        ),
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
                             'Teacher Feedback: ${entry['feedback']}',
-                            style: const TextStyle(fontSize: 12, fontStyle: FontStyle.italic, color: AppColors.primaryDark),
+                            style: const TextStyle(
+                              fontSize: 12,
+                              fontStyle: FontStyle.italic,
+                              color: AppColors.primaryDark,
+                            ),
                           ),
                         ),
                       ],
@@ -420,11 +506,22 @@ class _LearningJournalViewState extends State<LearningJournalView> {
             child: Icon(icon, size: 14, color: AppColors.primary),
           ),
           const SizedBox(width: 6),
-          Text('$label: ', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppColors.textPrimary)),
+          Text(
+            '$label: ',
+            style: const TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.bold,
+              color: AppColors.textPrimary,
+            ),
+          ),
           Expanded(
             child: Text(
               value,
-              style: const TextStyle(fontSize: 12, height: 1.3, color: AppColors.textSecondary),
+              style: const TextStyle(
+                fontSize: 12,
+                height: 1.3,
+                color: AppColors.textSecondary,
+              ),
             ),
           ),
         ],

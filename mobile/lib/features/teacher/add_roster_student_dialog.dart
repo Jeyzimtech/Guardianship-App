@@ -16,7 +16,6 @@ class _AddRosterStudentDialogState extends State<AddRosterStudentDialog> {
   final _guardianPhoneController = TextEditingController();
 
   String _selectedGender = 'Female';
-  String _feeStatus = 'Paid';
 
   @override
   void dispose() {
@@ -30,13 +29,16 @@ class _AddRosterStudentDialogState extends State<AddRosterStudentDialog> {
   void _submitForm() {
     if (_formKey.currentState!.validate()) {
       final newStudent = {
-        'id': 'STU${(100 + (DateTime.now().millisecondsSinceEpoch % 899)).toString()}',
+        'id':
+            'STU${(100 + (DateTime.now().millisecondsSinceEpoch % 899)).toString()}',
         'name': _nameController.text.trim(),
-        'roll': _rollController.text.trim().isEmpty ? '06' : _rollController.text.trim(),
-        'guardian': '${_guardianNameController.text.trim()} (${_guardianPhoneController.text.trim()})',
+        'roll': _rollController.text.trim().isEmpty
+            ? '06'
+            : _rollController.text.trim(),
+        'guardian':
+            '${_guardianNameController.text.trim()} (${_guardianPhoneController.text.trim()})',
         'guardian_phone': _guardianPhoneController.text.trim(),
         'status': 'Present',
-        'fees': _feeStatus,
         'merits': 0,
         'gender': _selectedGender,
       };
@@ -48,7 +50,11 @@ class _AddRosterStudentDialogState extends State<AddRosterStudentDialog> {
   InputDecoration _buildInputDecoration(String labelText, IconData icon) {
     return InputDecoration(
       labelText: labelText,
-      labelStyle: const TextStyle(color: AppColors.textMuted, fontSize: 13, fontWeight: FontWeight.w500),
+      labelStyle: const TextStyle(
+        color: AppColors.textMuted,
+        fontSize: 13,
+        fontWeight: FontWeight.w500,
+      ),
       prefixIcon: Icon(icon, color: AppColors.primaryLight, size: 20),
       filled: true,
       fillColor: AppColors.surface,
@@ -94,7 +100,11 @@ class _AddRosterStudentDialogState extends State<AddRosterStudentDialog> {
                   children: [
                     const Row(
                       children: [
-                        Icon(Icons.person_add_alt_1_outlined, color: AppColors.primary, size: 22),
+                        Icon(
+                          Icons.person_add_alt_1_outlined,
+                          color: AppColors.primary,
+                          size: 22,
+                        ),
                         SizedBox(width: 10),
                         Text(
                           'Add Student to Class Roster',
@@ -107,7 +117,11 @@ class _AddRosterStudentDialogState extends State<AddRosterStudentDialog> {
                       ],
                     ),
                     IconButton(
-                      icon: const Icon(Icons.close, color: AppColors.textMuted, size: 20),
+                      icon: const Icon(
+                        Icons.close,
+                        color: AppColors.textMuted,
+                        size: 20,
+                      ),
                       onPressed: () => Navigator.of(context).pop(),
                       padding: EdgeInsets.zero,
                       constraints: const BoxConstraints(),
@@ -119,7 +133,10 @@ class _AddRosterStudentDialogState extends State<AddRosterStudentDialog> {
                 // Form Fields
                 TextFormField(
                   controller: _nameController,
-                  decoration: _buildInputDecoration('Student Full Name *', Icons.badge_outlined),
+                  decoration: _buildInputDecoration(
+                    'Student Full Name *',
+                    Icons.badge_outlined,
+                  ),
                   validator: (value) {
                     if (value == null || value.trim().isEmpty) {
                       return 'Please enter student name';
@@ -135,20 +152,30 @@ class _AddRosterStudentDialogState extends State<AddRosterStudentDialog> {
                       child: TextFormField(
                         controller: _rollController,
                         keyboardType: TextInputType.number,
-                        decoration: _buildInputDecoration('Roll Number', Icons.numbers_outlined),
+                        decoration: _buildInputDecoration(
+                          'Roll Number',
+                          Icons.numbers_outlined,
+                        ),
                       ),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
                       child: DropdownButtonFormField<String>(
                         initialValue: _selectedGender,
-                        decoration: _buildInputDecoration('Gender', Icons.wc_outlined),
+                        decoration: _buildInputDecoration(
+                          'Gender',
+                          Icons.wc_outlined,
+                        ),
                         items: const [
-                          DropdownMenuItem(value: 'Female', child: Text('Female')),
+                          DropdownMenuItem(
+                            value: 'Female',
+                            child: Text('Female'),
+                          ),
                           DropdownMenuItem(value: 'Male', child: Text('Male')),
                         ],
                         onChanged: (val) {
-                          if (val != null) setState(() => _selectedGender = val);
+                          if (val != null)
+                            setState(() => _selectedGender = val);
                         },
                       ),
                     ),
@@ -158,7 +185,10 @@ class _AddRosterStudentDialogState extends State<AddRosterStudentDialog> {
 
                 TextFormField(
                   controller: _guardianNameController,
-                  decoration: _buildInputDecoration('Guardian / Parent Name *', Icons.family_restroom_outlined),
+                  decoration: _buildInputDecoration(
+                    'Guardian / Parent Name *',
+                    Icons.family_restroom_outlined,
+                  ),
                   validator: (value) {
                     if (value == null || value.trim().isEmpty) {
                       return 'Please enter guardian name';
@@ -171,7 +201,10 @@ class _AddRosterStudentDialogState extends State<AddRosterStudentDialog> {
                 TextFormField(
                   controller: _guardianPhoneController,
                   keyboardType: TextInputType.phone,
-                  decoration: _buildInputDecoration('Guardian Contact Phone *', Icons.phone_outlined),
+                  decoration: _buildInputDecoration(
+                    'Guardian Contact Phone *',
+                    Icons.phone_outlined,
+                  ),
                   validator: (value) {
                     if (value == null || value.trim().isEmpty) {
                       return 'Please enter phone number';
@@ -180,19 +213,6 @@ class _AddRosterStudentDialogState extends State<AddRosterStudentDialog> {
                   },
                 ),
                 const SizedBox(height: 14),
-
-                DropdownButtonFormField<String>(
-                  initialValue: _feeStatus,
-                  decoration: _buildInputDecoration('Fee Status', Icons.payments_outlined),
-                  items: const [
-                    DropdownMenuItem(value: 'Paid', child: Text('Paid')),
-                    DropdownMenuItem(value: 'USD \$120.00 Pending', child: Text('USD \$120.00 Pending')),
-                    DropdownMenuItem(value: 'USD \$250.00 Pending', child: Text('USD \$250.00 Pending')),
-                  ],
-                  onChanged: (val) {
-                    if (val != null) setState(() => _feeStatus = val);
-                  },
-                ),
 
                 const SizedBox(height: 20),
 
@@ -205,22 +225,44 @@ class _AddRosterStudentDialogState extends State<AddRosterStudentDialog> {
                       style: OutlinedButton.styleFrom(
                         foregroundColor: AppColors.textSecondary,
                         side: const BorderSide(color: AppColors.cardBorder),
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 12,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
                       ),
-                      child: const Text('CANCEL', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+                      child: const Text(
+                        'CANCEL',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 12,
+                        ),
+                      ),
                     ),
                     const SizedBox(width: 10),
                     ElevatedButton.icon(
                       onPressed: _submitForm,
                       icon: const Icon(Icons.check, size: 16),
-                      label: const Text('ADD TO ROSTER', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+                      label: const Text(
+                        'ADD TO ROSTER',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 12,
+                        ),
+                      ),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.primary,
                         foregroundColor: Colors.white,
                         elevation: 0,
-                        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 18,
+                          vertical: 12,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
                       ),
                     ),
                   ],

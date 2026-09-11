@@ -19,10 +19,8 @@ class _CreateStudentDialogState extends State<CreateStudentDialog> {
   final _formKey = GlobalKey<FormState>();
   late TextEditingController _nameController;
   late TextEditingController _guardianController;
-  late TextEditingController _feeController;
 
   String _selectedClass = 'Grade 7 (Alpha)';
-  String _selectedStatus = 'paid';
   bool _isSubmitting = false;
 
   final List<String> _classList = [
@@ -36,15 +34,17 @@ class _CreateStudentDialogState extends State<CreateStudentDialog> {
   @override
   void initState() {
     super.initState();
-    _nameController = TextEditingController(text: widget.initialStudent?['name'] ?? '');
-    _guardianController = TextEditingController(text: widget.initialStudent?['guardian'] ?? '');
-    _feeController = TextEditingController(text: widget.initialStudent?['fee']?.toString() ?? '0.00');
+    _nameController = TextEditingController(
+      text: widget.initialStudent?['name'] ?? '',
+    );
+    _guardianController = TextEditingController(
+      text: widget.initialStudent?['guardian'] ?? '',
+    );
 
     if (widget.initialStudent != null) {
       if (_classList.contains(widget.initialStudent!['class_name'])) {
         _selectedClass = widget.initialStudent!['class_name'];
       }
-      _selectedStatus = widget.initialStudent!['status'] ?? 'paid';
     }
   }
 
@@ -52,7 +52,6 @@ class _CreateStudentDialogState extends State<CreateStudentDialog> {
   void dispose() {
     _nameController.dispose();
     _guardianController.dispose();
-    _feeController.dispose();
     super.dispose();
   }
 
@@ -61,18 +60,13 @@ class _CreateStudentDialogState extends State<CreateStudentDialog> {
 
     setState(() => _isSubmitting = true);
 
-    final feeVal = double.tryParse(_feeController.text.trim()) ?? 0.0;
-    final String autoStatus = feeVal > 0 ? (_selectedStatus == 'paid' ? 'outstanding' : _selectedStatus) : 'paid';
-
     final studentData = {
-      'id': widget.initialStudent?['id'] ?? DateTime.now().millisecondsSinceEpoch,
+      'id':
+          widget.initialStudent?['id'] ?? DateTime.now().millisecondsSinceEpoch,
       'name': _nameController.text.trim(),
       'guardian': _guardianController.text.trim(),
       'class_name': _selectedClass,
       'attendance': widget.initialStudent?['attendance'] ?? '98%',
-      'fee': 'USD ${feeVal.toStringAsFixed(2)}',
-      'fee_amount': feeVal,
-      'status': autoStatus,
     };
 
     widget.onSaved(studentData);
@@ -80,7 +74,11 @@ class _CreateStudentDialogState extends State<CreateStudentDialog> {
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(widget.initialStudent != null ? 'Student record updated.' : 'New student record added.'),
+          content: Text(
+            widget.initialStudent != null
+                ? 'Student record updated.'
+                : 'New student record added.',
+          ),
           backgroundColor: AppColors.primary,
         ),
       );
@@ -104,7 +102,9 @@ class _CreateStudentDialogState extends State<CreateStudentDialog> {
         decoration: BoxDecoration(
           color: AppColors.surface,
           borderRadius: BorderRadius.circular(16),
-          border: const Border(top: BorderSide(color: AppColors.primary, width: 4.0)),
+          border: const Border(
+            top: BorderSide(color: AppColors.primary, width: 4.0),
+          ),
         ),
         child: SingleChildScrollView(
           child: Form(
@@ -115,11 +115,21 @@ class _CreateStudentDialogState extends State<CreateStudentDialog> {
               children: [
                 Row(
                   children: [
-                    const Icon(Icons.person_add_rounded, color: AppColors.primary, size: 24),
+                    const Icon(
+                      Icons.person_add_rounded,
+                      color: AppColors.primary,
+                      size: 24,
+                    ),
                     const SizedBox(width: 10),
                     Text(
-                      widget.initialStudent != null ? 'Edit Student Record' : 'Add New Student',
-                      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.primaryDark),
+                      widget.initialStudent != null
+                          ? 'Edit Student Record'
+                          : 'Add New Student',
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.primaryDark,
+                      ),
                     ),
                   ],
                 ),
@@ -131,9 +141,15 @@ class _CreateStudentDialogState extends State<CreateStudentDialog> {
                   decoration: const InputDecoration(
                     labelText: 'Student Full Name',
                     hintText: 'e.g. Alice Chewe',
-                    prefixIcon: Icon(Icons.person_outline, color: AppColors.primary, size: 20),
+                    prefixIcon: Icon(
+                      Icons.person_outline,
+                      color: AppColors.primary,
+                      size: 20,
+                    ),
                   ),
-                  validator: (val) => val == null || val.trim().isEmpty ? 'Student name is required' : null,
+                  validator: (val) => val == null || val.trim().isEmpty
+                      ? 'Student name is required'
+                      : null,
                 ),
                 const SizedBox(height: 12),
 
@@ -143,9 +159,15 @@ class _CreateStudentDialogState extends State<CreateStudentDialog> {
                   decoration: const InputDecoration(
                     labelText: 'Guardian Name & Phone Number',
                     hintText: 'e.g. John Chewe (+26377...)',
-                    prefixIcon: Icon(Icons.phone_outlined, color: AppColors.primary, size: 20),
+                    prefixIcon: Icon(
+                      Icons.phone_outlined,
+                      color: AppColors.primary,
+                      size: 20,
+                    ),
                   ),
-                  validator: (val) => val == null || val.trim().isEmpty ? 'Guardian contact details required' : null,
+                  validator: (val) => val == null || val.trim().isEmpty
+                      ? 'Guardian contact details required'
+                      : null,
                 ),
                 const SizedBox(height: 12),
 
@@ -154,53 +176,22 @@ class _CreateStudentDialogState extends State<CreateStudentDialog> {
                   initialValue: _selectedClass,
                   decoration: const InputDecoration(
                     labelText: 'Class Stream',
-                    prefixIcon: Icon(Icons.meeting_room_outlined, color: AppColors.primary, size: 20),
+                    prefixIcon: Icon(
+                      Icons.meeting_room_outlined,
+                      color: AppColors.primary,
+                      size: 20,
+                    ),
                   ),
-                  items: _classList.map((cls) => DropdownMenuItem(value: cls, child: Text(cls))).toList(),
+                  items: _classList
+                      .map(
+                        (cls) => DropdownMenuItem(value: cls, child: Text(cls)),
+                      )
+                      .toList(),
                   onChanged: (val) {
                     if (val != null) setState(() => _selectedClass = val);
                   },
                 ),
                 const SizedBox(height: 12),
-
-                // Fee Balance USD
-                TextFormField(
-                  controller: _feeController,
-                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                  decoration: const InputDecoration(
-                    labelText: 'Outstanding Fees (USD)',
-                    hintText: 'e.g. 150.00',
-                    prefixIcon: Icon(Icons.attach_money_rounded, color: AppColors.primary, size: 20),
-                  ),
-                  validator: (val) {
-                    if (val != null && val.trim().isNotEmpty) {
-                      final parsed = double.tryParse(val.trim());
-                      if (parsed == null || parsed < 0) {
-                        return 'Enter a valid non-negative amount';
-                      }
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 12),
-
-                // Status
-                DropdownButtonFormField<String>(
-                  initialValue: _selectedStatus,
-                  decoration: const InputDecoration(
-                    labelText: 'Payment Status',
-                    prefixIcon: Icon(Icons.verified_outlined, color: AppColors.primary, size: 20),
-                  ),
-                  items: const [
-                    DropdownMenuItem(value: 'paid', child: Text('Paid')),
-                    DropdownMenuItem(value: 'pending', child: Text('Pending')),
-                    DropdownMenuItem(value: 'outstanding', child: Text('Outstanding Fees')),
-                  ],
-                  onChanged: (val) {
-                    if (val != null) setState(() => _selectedStatus = val);
-                  },
-                ),
-                const SizedBox(height: 20),
 
                 // Buttons
                 Row(
@@ -214,8 +205,19 @@ class _CreateStudentDialogState extends State<CreateStudentDialog> {
                     ElevatedButton(
                       onPressed: _isSubmitting ? null : _save,
                       child: _isSubmitting
-                          ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                          : Text(widget.initialStudent != null ? 'Save Changes' : 'Add Student'),
+                          ? const SizedBox(
+                              width: 16,
+                              height: 16,
+                              child: CircularProgressIndicator(
+                                color: Colors.white,
+                                strokeWidth: 2,
+                              ),
+                            )
+                          : Text(
+                              widget.initialStudent != null
+                                  ? 'Save Changes'
+                                  : 'Add Student',
+                            ),
                     ),
                   ],
                 ),

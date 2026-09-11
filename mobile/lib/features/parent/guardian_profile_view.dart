@@ -33,8 +33,9 @@ class _GuardianProfileViewState extends State<GuardianProfileView> {
     super.initState();
     _phoneController = TextEditingController(text: '+263773333333');
     _emailController = TextEditingController(text: 'john.chewe@gmail.com');
-    _addressController =
-        TextEditingController(text: '14 Samora Machel Avenue, Harare');
+    _addressController = TextEditingController(
+      text: '14 Samora Machel Avenue, Harare',
+    );
     _emergencyNameController = TextEditingController(text: 'Mary Chewe');
     _emergencyPhoneController = TextEditingController(text: '+263774444444');
   }
@@ -73,8 +74,11 @@ class _GuardianProfileViewState extends State<GuardianProfileView> {
       appBar: AppBar(
         title: const Text(
           'My Profile',
-          style:
-              TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
         ),
         backgroundColor: primaryBlue,
         iconTheme: const IconThemeData(color: Colors.white),
@@ -84,7 +88,10 @@ class _GuardianProfileViewState extends State<GuardianProfileView> {
             child: const Text(
               'Save',
               style: TextStyle(
-                  color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15),
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 15,
+              ),
             ),
           ),
         ],
@@ -99,7 +106,10 @@ class _GuardianProfileViewState extends State<GuardianProfileView> {
               Container(
                 width: double.infinity,
                 color: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 28, horizontal: 16),
+                padding: const EdgeInsets.symmetric(
+                  vertical: 28,
+                  horizontal: 16,
+                ),
                 child: Column(
                   children: [
                     // Initials Avatar
@@ -109,7 +119,10 @@ class _GuardianProfileViewState extends State<GuardianProfileView> {
                       decoration: BoxDecoration(
                         color: const Color(0xFFEFF6FF),
                         borderRadius: BorderRadius.circular(40),
-                        border: Border.all(color: primaryBlue.withValues(alpha: 0.3), width: 2),
+                        border: Border.all(
+                          color: primaryBlue.withValues(alpha: 0.3),
+                          width: 2,
+                        ),
                       ),
                       child: const Center(
                         child: Text(
@@ -126,9 +139,10 @@ class _GuardianProfileViewState extends State<GuardianProfileView> {
                     const Text(
                       'Guardian John Chewe',
                       style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF1F2937)),
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF1F2937),
+                      ),
                     ),
                     const SizedBox(height: 4),
                     const Text(
@@ -147,20 +161,25 @@ class _GuardianProfileViewState extends State<GuardianProfileView> {
                     ),
                     const SizedBox(height: 12),
                     Container(
-                      padding:
-                          const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 14,
+                        vertical: 6,
+                      ),
                       decoration: BoxDecoration(
                         color: const Color(0xFFEFF6FF),
                         borderRadius: BorderRadius.circular(20),
-                        border: Border.all(color: primaryBlue.withValues(alpha: 0.3)),
+                        border: Border.all(
+                          color: primaryBlue.withValues(alpha: 0.3),
+                        ),
                       ),
                       child: const Text(
                         'GUARDIAN ACCOUNT',
                         style: TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.bold,
-                            color: primaryBlue,
-                            letterSpacing: 0.5),
+                          fontSize: 11,
+                          fontWeight: FontWeight.bold,
+                          color: primaryBlue,
+                          letterSpacing: 0.5,
+                        ),
                       ),
                     ),
                   ],
@@ -184,15 +203,20 @@ class _GuardianProfileViewState extends State<GuardianProfileView> {
                   children: [
                     Row(
                       children: [
-                        const Icon(Icons.lock_rounded, size: 14, color: primaryBlue),
+                        const Icon(
+                          Icons.lock_rounded,
+                          size: 14,
+                          color: primaryBlue,
+                        ),
                         const SizedBox(width: 6),
                         const Text(
                           'ADMIN / TEACHER CONTROLLED',
                           style: TextStyle(
-                              fontSize: 10,
-                              fontWeight: FontWeight.bold,
-                              color: primaryBlue,
-                              letterSpacing: 0.5),
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                            color: primaryBlue,
+                            letterSpacing: 0.5,
+                          ),
                         ),
                       ],
                     ),
@@ -206,9 +230,10 @@ class _GuardianProfileViewState extends State<GuardianProfileView> {
                     const Text(
                       'Guardians cannot alter student identity, grade, or school enrolment.',
                       style: TextStyle(
-                          fontSize: 11,
-                          fontStyle: FontStyle.italic,
-                          color: Colors.grey),
+                        fontSize: 11,
+                        fontStyle: FontStyle.italic,
+                        color: Colors.grey,
+                      ),
                     ),
                   ],
                 ),
@@ -226,8 +251,9 @@ class _GuardianProfileViewState extends State<GuardianProfileView> {
                       controller: _phoneController,
                       label: 'Primary Phone Number (SMS Alerts)',
                       keyboardType: TextInputType.phone,
-                      validator: (val) =>
-                          val == null || val.isEmpty ? 'Enter phone number' : null,
+                      validator: (val) => val == null || val.isEmpty
+                          ? 'Enter phone number'
+                          : null,
                     ),
                     const SizedBox(height: 14),
                     _buildField(
@@ -285,13 +311,17 @@ class _GuardianProfileViewState extends State<GuardianProfileView> {
                       title: const Text(
                         'Push Notifications',
                         style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                            color: Color(0xFF1F2937)),
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xFF1F2937),
+                        ),
                       ),
                       subtitle: const Text(
-                        'Fee alerts, attendance & announcements',
-                        style: TextStyle(fontSize: 12, color: Color(0xFF6B7280)),
+                        'Attendance & school announcements',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Color(0xFF6B7280),
+                        ),
                       ),
                       trailing: Switch(
                         value: _notificationsEnabled,
@@ -307,24 +337,36 @@ class _GuardianProfileViewState extends State<GuardianProfileView> {
                       title: const Text(
                         'Preferred Language',
                         style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                            color: Color(0xFF1F2937)),
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xFF1F2937),
+                        ),
                       ),
                       trailing: DropdownButton<String>(
                         value: _preferredLanguage,
                         underline: const SizedBox(),
                         style: const TextStyle(
-                            color: primaryBlue,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 14),
+                          color: primaryBlue,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                        ),
                         items: const [
-                          DropdownMenuItem(value: 'English', child: Text('English')),
-                          DropdownMenuItem(value: 'Shona', child: Text('ChiShona')),
-                          DropdownMenuItem(value: 'Ndebele', child: Text('isiNdebele')),
+                          DropdownMenuItem(
+                            value: 'English',
+                            child: Text('English'),
+                          ),
+                          DropdownMenuItem(
+                            value: 'Shona',
+                            child: Text('ChiShona'),
+                          ),
+                          DropdownMenuItem(
+                            value: 'Ndebele',
+                            child: Text('isiNdebele'),
+                          ),
                         ],
                         onChanged: (val) {
-                          if (val != null) setState(() => _preferredLanguage = val);
+                          if (val != null)
+                            setState(() => _preferredLanguage = val);
                         },
                       ),
                     ),
@@ -346,7 +388,8 @@ class _GuardianProfileViewState extends State<GuardianProfileView> {
                       backgroundColor: primaryBlue,
                       foregroundColor: Colors.white,
                       shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8)),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
                       elevation: 0,
                     ),
                     child: _isSaving
@@ -354,12 +397,16 @@ class _GuardianProfileViewState extends State<GuardianProfileView> {
                             width: 20,
                             height: 20,
                             child: CircularProgressIndicator(
-                                strokeWidth: 2, color: Colors.white),
+                              strokeWidth: 2,
+                              color: Colors.white,
+                            ),
                           )
                         : const Text(
                             'Save Profile Changes',
                             style: TextStyle(
-                                fontWeight: FontWeight.bold, fontSize: 15),
+                              fontWeight: FontWeight.bold,
+                              fontSize: 15,
+                            ),
                           ),
                   ),
                 ),
@@ -377,16 +424,21 @@ class _GuardianProfileViewState extends State<GuardianProfileView> {
                       _showLogoutDialog(context);
                     },
                     style: OutlinedButton.styleFrom(
-                      side: const BorderSide(color: Color(0xFFCBD5E1), width: 1.5),
+                      side: const BorderSide(
+                        color: Color(0xFFCBD5E1),
+                        width: 1.5,
+                      ),
                       shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8)),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
                     ),
                     child: const Text(
                       'Log Out',
                       style: TextStyle(
-                          color: Color(0xFF374151),
-                          fontWeight: FontWeight.bold,
-                          fontSize: 15),
+                        color: Color(0xFF374151),
+                        fontWeight: FontWeight.bold,
+                        fontSize: 15,
+                      ),
                     ),
                   ),
                 ),
@@ -404,14 +456,16 @@ class _GuardianProfileViewState extends State<GuardianProfileView> {
                     style: OutlinedButton.styleFrom(
                       side: const BorderSide(color: Colors.red, width: 1.5),
                       shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8)),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
                     ),
                     child: const Text(
                       'Delete Account',
                       style: TextStyle(
-                          color: Colors.red,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 15),
+                        color: Colors.red,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 15,
+                      ),
                     ),
                   ),
                 ),
@@ -429,30 +483,42 @@ class _GuardianProfileViewState extends State<GuardianProfileView> {
       context: context,
       builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        title: const Text('Log Out',
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+        title: const Text(
+          'Log Out',
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+        ),
         content: const Text(
-            'Are you sure you want to log out of Edu+Conect?',
-            style: TextStyle(fontSize: 14, color: Color(0xFF475569))),
+          'Are you sure you want to log out of Edu+Conect?',
+          style: TextStyle(fontSize: 14, color: Color(0xFF475569)),
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('Cancel',
-                style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold)),
+            child: const Text(
+              'Cancel',
+              style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold),
+            ),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
               backgroundColor: primaryBlue,
               foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
             ),
             onPressed: () async {
               Navigator.pop(ctx);
-              final authProvider =
-                  Provider.of<AuthProvider>(context, listen: false);
+              final authProvider = Provider.of<AuthProvider>(
+                context,
+                listen: false,
+              );
               await authProvider.logout();
             },
-            child: const Text('Log Out', style: TextStyle(fontWeight: FontWeight.bold)),
+            child: const Text(
+              'Log Out',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
           ),
         ],
       ),
@@ -464,9 +530,14 @@ class _GuardianProfileViewState extends State<GuardianProfileView> {
       context: context,
       builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        title: const Text('Delete Account',
-            style: TextStyle(
-                fontWeight: FontWeight.bold, fontSize: 18, color: Colors.red)),
+        title: const Text(
+          'Delete Account',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 18,
+            color: Colors.red,
+          ),
+        ),
         content: const Text(
           'Are you sure you want to permanently delete your account? This action cannot be undone.',
           style: TextStyle(fontSize: 14, color: Color(0xFF475569)),
@@ -474,19 +545,25 @@ class _GuardianProfileViewState extends State<GuardianProfileView> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('Cancel',
-                style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold)),
+            child: const Text(
+              'Cancel',
+              style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold),
+            ),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.red,
               foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
             ),
             onPressed: () async {
               Navigator.pop(ctx);
-              final authProvider =
-                  Provider.of<AuthProvider>(context, listen: false);
+              final authProvider = Provider.of<AuthProvider>(
+                context,
+                listen: false,
+              );
               final success = await authProvider.deleteAccount();
               if (success && context.mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
@@ -498,8 +575,10 @@ class _GuardianProfileViewState extends State<GuardianProfileView> {
                 Navigator.of(context).popUntil((route) => route.isFirst);
               }
             },
-            child: const Text('Delete Account',
-                style: TextStyle(fontWeight: FontWeight.bold)),
+            child: const Text(
+              'Delete Account',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
           ),
         ],
       ),
@@ -530,19 +609,21 @@ class _GuardianProfileViewState extends State<GuardianProfileView> {
           child: Text(
             label,
             style: const TextStyle(
-                fontSize: 10,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF9CA3AF),
-                letterSpacing: 0.5),
+              fontSize: 10,
+              fontWeight: FontWeight.bold,
+              color: Color(0xFF9CA3AF),
+              letterSpacing: 0.5,
+            ),
           ),
         ),
         Expanded(
           child: Text(
             value,
             style: const TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w600,
-                color: Color(0xFF1F2937)),
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              color: Color(0xFF1F2937),
+            ),
           ),
         ),
       ],
@@ -564,12 +645,13 @@ class _GuardianProfileViewState extends State<GuardianProfileView> {
       style: const TextStyle(fontSize: 14, color: Color(0xFF1F2937)),
       decoration: InputDecoration(
         labelText: label,
-        labelStyle:
-            const TextStyle(fontSize: 13, color: Color(0xFF6B7280)),
+        labelStyle: const TextStyle(fontSize: 13, color: Color(0xFF6B7280)),
         filled: true,
         fillColor: Colors.white,
-        contentPadding:
-            const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 14,
+        ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
           borderSide: const BorderSide(color: Color(0xFFE2E8F0)),

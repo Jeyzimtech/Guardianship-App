@@ -23,19 +23,22 @@ class _SmsAlertsLogViewState extends State<SmsAlertsLogView> {
       'date': 'July 25, 2026 • 08:30 AM',
       'channel': 'Africa\'s Talking (SMS Delivered)',
       'sender': 'Hillside Primary',
-      'message': 'Edu-Connect Alert: Bob Chewe attendance marked PRESENT for Grade 4 Gold.',
+      'message':
+          'Edu-Connect Alert: Bob Chewe attendance marked PRESENT for Grade 4 Gold.',
     },
     {
       'date': 'July 22, 2026 • 02:15 PM',
       'channel': 'Econet Wireless SMS',
       'sender': 'Hillside Admin',
-      'message': 'Fee Alert: Term 2 fee balance outstanding for Alice Chewe (\$150 USD). Please pay via EcoCash or Card in app.',
+      'message':
+          'School update: Term 2 reports are available from your school.',
     },
     {
       'date': 'July 18, 2026 • 09:00 AM',
       'channel': 'Telecel SMS',
       'sender': 'Hillside Prep',
-      'message': 'Notice: Early Childhood Sports Day postponed to Friday July 24th due to weather.',
+      'message':
+          'Notice: Early Childhood Sports Day postponed to Friday July 24th due to weather.',
     },
   ];
 
@@ -54,7 +57,11 @@ class _SmsAlertsLogViewState extends State<SmsAlertsLogView> {
       appBar: AppBar(
         title: const Text(
           'Guardian SMS Alerts Log',
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
         ),
         backgroundColor: AppColors.primary,
         iconTheme: const IconThemeData(color: Colors.white),
@@ -72,7 +79,11 @@ class _SmsAlertsLogViewState extends State<SmsAlertsLogView> {
                 Expanded(
                   child: Text(
                     'SMS guarantees delivery for low-connectivity guardians. Search complete alert history below.',
-                    style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppColors.primaryDark),
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.primaryDark,
+                    ),
                   ),
                 ),
               ],
@@ -87,11 +98,21 @@ class _SmsAlertsLogViewState extends State<SmsAlertsLogView> {
               onChanged: (val) => setState(() => _searchQuery = val.trim()),
               decoration: InputDecoration(
                 hintText: 'Search SMS alerts by keyword or date...',
-                hintStyle: const TextStyle(color: AppColors.textLight, fontSize: 13),
-                prefixIcon: const Icon(Icons.search, color: AppColors.primaryLight),
+                hintStyle: const TextStyle(
+                  color: AppColors.textLight,
+                  fontSize: 13,
+                ),
+                prefixIcon: const Icon(
+                  Icons.search,
+                  color: AppColors.primaryLight,
+                ),
                 suffixIcon: _searchQuery.isNotEmpty
                     ? IconButton(
-                        icon: const Icon(Icons.clear, color: AppColors.textMuted, size: 18),
+                        icon: const Icon(
+                          Icons.clear,
+                          color: AppColors.textMuted,
+                          size: 18,
+                        ),
                         onPressed: () {
                           _searchController.clear();
                           setState(() => _searchQuery = '');
@@ -100,10 +121,25 @@ class _SmsAlertsLogViewState extends State<SmsAlertsLogView> {
                     : null,
                 filled: true,
                 fillColor: AppColors.surface,
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: AppColors.cardBorder)),
-                enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: AppColors.cardBorder)),
-                focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: AppColors.primaryLight, width: 1.5)),
-                contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: const BorderSide(color: AppColors.cardBorder),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: const BorderSide(color: AppColors.cardBorder),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: const BorderSide(
+                    color: AppColors.primaryLight,
+                    width: 1.5,
+                  ),
+                ),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 10,
+                ),
               ),
             ),
           ),
@@ -115,11 +151,27 @@ class _SmsAlertsLogViewState extends State<SmsAlertsLogView> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.sms_failed_outlined, size: 48, color: AppColors.primaryLight.withValues(alpha: 0.4)),
+                        Icon(
+                          Icons.sms_failed_outlined,
+                          size: 48,
+                          color: AppColors.primaryLight.withValues(alpha: 0.4),
+                        ),
                         const SizedBox(height: 12),
-                        const Text('No SMS alerts match your search.', style: TextStyle(color: AppColors.textMuted, fontWeight: FontWeight.bold)),
+                        const Text(
+                          'No SMS alerts match your search.',
+                          style: TextStyle(
+                            color: AppColors.textMuted,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                         const SizedBox(height: 4),
-                        const Text('Try searching by school name, keyword or date.', style: TextStyle(color: AppColors.textLight, fontSize: 12)),
+                        const Text(
+                          'Try searching by school name, keyword or date.',
+                          style: TextStyle(
+                            color: AppColors.textLight,
+                            fontSize: 12,
+                          ),
+                        ),
                       ],
                     ),
                   )
@@ -144,27 +196,46 @@ class _SmsAlertsLogViewState extends State<SmsAlertsLogView> {
                               children: [
                                 Text(
                                   item['sender'] ?? '',
-                                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AppColors.primaryDark),
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 13,
+                                    color: AppColors.primaryDark,
+                                  ),
                                 ),
                                 Text(
                                   item['date'] ?? '',
-                                  style: const TextStyle(fontSize: 11, color: AppColors.textMuted),
+                                  style: const TextStyle(
+                                    fontSize: 11,
+                                    color: AppColors.textMuted,
+                                  ),
                                 ),
                               ],
                             ),
                             const SizedBox(height: 6),
                             Text(
                               item['message'] ?? '',
-                              style: const TextStyle(fontSize: 13, height: 1.3, color: AppColors.textPrimary),
+                              style: const TextStyle(
+                                fontSize: 13,
+                                height: 1.3,
+                                color: AppColors.textPrimary,
+                              ),
                             ),
                             const SizedBox(height: 6),
                             Row(
                               children: [
-                                const Icon(Icons.check_circle_outline, size: 14, color: AppColors.primaryLight),
+                                const Icon(
+                                  Icons.check_circle_outline,
+                                  size: 14,
+                                  color: AppColors.primaryLight,
+                                ),
                                 const SizedBox(width: 4),
                                 Text(
                                   item['channel'] ?? '',
-                                  style: const TextStyle(fontSize: 10, color: AppColors.primary, fontWeight: FontWeight.w600),
+                                  style: const TextStyle(
+                                    fontSize: 10,
+                                    color: AppColors.primary,
+                                    fontWeight: FontWeight.w600,
+                                  ),
                                 ),
                               ],
                             ),

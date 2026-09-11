@@ -161,23 +161,23 @@ class GuardianshipApiTest extends TestCase
     }
 
     /**
-     * Test fee-gating business logic.
+     * Reports remain accessible regardless of legacy account balances.
      */
-    public function test_fee_gating_blocks_downloads_for_outstanding_balances()
+    public function test_reports_allow_downloads_with_outstanding_balances()
     {
         $this->actingAs($this->guardian);
 
-        // 1. Get reports list - verify Alice's path is masked as LOCKED_DUE_TO_FEES
+        // Legacy outstanding balances do not hide reports.
         $responseList = $this->getJson('/api/reports/' . $this->student1->id);
         $responseList->assertStatus(200)
-            ->assertJsonPath('reports.0.file_path', 'LOCKED_DUE_TO_FEES')
-            ->assertJsonPath('reports.0.is_locked', true);
+            ->assertJsonPath('reports.0.file_path', 'reports/alice.pdf')
+            ->assertJsonPath('reports.0.is_locked', false);
 
-        // 2. Try to download Alice's report - expect 403 Forbidden
+        // The linked guardian can download the report.
         $aliceReport = ReportDocument::where('student_id', $this->student1->id)->first();
         $responseDownload = $this->getJson('/api/reports/download/' . $aliceReport->id);
-        $responseDownload->assertStatus(403)
-            ->assertJsonPath('message', 'Outstanding fees: Access to report card is locked until balance is cleared.');
+        $responseDownload->assertStatus(200)
+            ->assertJsonPath('status', 'success');
 
         // 3. Get reports list for Bob (no fees) - verify file path is readable
         $responseListBob = $this->getJson('/api/reports/' . $this->student2->id);
@@ -190,6 +190,15 @@ class GuardianshipApiTest extends TestCase
         $responseDownloadBob = $this->getJson('/api/reports/download/' . $bobReport->id);
         $responseDownloadBob->assertStatus(200)
             ->assertJsonPath('status', 'success');
+    }
+
+    public function test_unlinked_guardian_cannot_access_reports()
+    {
+        $this->guardian->students()->detach($this->student1->id);
+        $this->actingAs($this->guardian);
+        $report = ReportDocument::where('student_id', $this->student1->id)->first();
+        $this->getJson('/api/reports/' . $this->student1->id)->assertForbidden();
+        $this->getJson('/api/reports/download/' . $report->id)->assertForbidden();
     }
 
     /**

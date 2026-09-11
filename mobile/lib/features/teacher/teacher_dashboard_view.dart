@@ -32,14 +32,16 @@ class _TeacherDashboardViewState extends State<TeacherDashboardView> {
   static const infoText = AppColors.blueBadgeText;
 
   String _selectedClass = 'Grade 4 Gold (Homeroom)';
-  int _activeTabIndex = 0; // 0: Class Roster, 1: Daily Attendance, 2: Gradebook, 3: Activities, 4: Class Notices
+  int _activeTabIndex =
+      0; // 0: Class Roster, 1: Daily Attendance, 2: Gradebook, 3: Activities, 4: Class Notices
 
   // Roster Filters & Search
   String _rosterSearchQuery = '';
-  String _rosterStatusFilter = 'All'; // All, Present, Absent, Late, Pending Fees
+  String _rosterStatusFilter = 'All'; // All, Present, Absent, Late
 
   final TextEditingController _searchController = TextEditingController();
-  final TextEditingController _noticeSubjectController = TextEditingController();
+  final TextEditingController _noticeSubjectController =
+      TextEditingController();
   final TextEditingController _noticeBodyController = TextEditingController();
 
   // Class Roster Initial State
@@ -52,7 +54,6 @@ class _TeacherDashboardViewState extends State<TeacherDashboardView> {
       'guardian': 'John Chewe',
       'guardian_phone': '+263773333333',
       'status': 'Present',
-      'fees': 'Paid',
       'merits': 12,
       'math_mark': 88,
       'science_mark': 92,
@@ -65,7 +66,6 @@ class _TeacherDashboardViewState extends State<TeacherDashboardView> {
       'guardian': 'Tariro Moyo',
       'guardian_phone': '+263778888888',
       'status': 'Present',
-      'fees': 'Paid',
       'merits': 8,
       'math_mark': 74,
       'science_mark': 81,
@@ -78,7 +78,6 @@ class _TeacherDashboardViewState extends State<TeacherDashboardView> {
       'guardian': 'Sipho Ndlovu',
       'guardian_phone': '+263779999999',
       'status': 'Absent',
-      'fees': 'USD \$120.00 Pending',
       'merits': 5,
       'math_mark': 62,
       'science_mark': 70,
@@ -91,7 +90,6 @@ class _TeacherDashboardViewState extends State<TeacherDashboardView> {
       'guardian': 'Grace Sibanda',
       'guardian_phone': '+263772222222',
       'status': 'Present',
-      'fees': 'Paid',
       'merits': 15,
       'math_mark': 95,
       'science_mark': 98,
@@ -104,7 +102,6 @@ class _TeacherDashboardViewState extends State<TeacherDashboardView> {
       'guardian': 'Blessed Mutasa',
       'guardian_phone': '+263775555555',
       'status': 'Late',
-      'fees': 'Paid',
       'merits': 10,
       'math_mark': 83,
       'science_mark': 86,
@@ -113,22 +110,42 @@ class _TeacherDashboardViewState extends State<TeacherDashboardView> {
 
   // Activities Roster State
   final List<Map<String, dynamic>> _activities = [
-    {'name': 'Junior Chess Club', 'time': '01:30 PM', 'assigned_students': 18, 'location': 'Library Hall', 'attendance_done': true},
-    {'name': 'Grade 4 Athletics Team', 'time': '03:00 PM', 'assigned_students': 24, 'location': 'Sports Field', 'attendance_done': false},
-    {'name': 'Music & Drama Ensemble', 'time': '04:00 PM', 'assigned_students': 12, 'location': 'Auditorium', 'attendance_done': false},
+    {
+      'name': 'Junior Chess Club',
+      'time': '01:30 PM',
+      'assigned_students': 18,
+      'location': 'Library Hall',
+      'attendance_done': true,
+    },
+    {
+      'name': 'Grade 4 Athletics Team',
+      'time': '03:00 PM',
+      'assigned_students': 24,
+      'location': 'Sports Field',
+      'attendance_done': false,
+    },
+    {
+      'name': 'Music & Drama Ensemble',
+      'time': '04:00 PM',
+      'assigned_students': 12,
+      'location': 'Auditorium',
+      'attendance_done': false,
+    },
   ];
 
   // Class Notices State
   final List<Map<String, dynamic>> _notices = [
     {
       'subject': 'Grade 4 Gold Science Project Submission Date',
-      'body': 'Please ensure model solar system projects are brought to school by Friday morning.',
+      'body':
+          'Please ensure model solar system projects are brought to school by Friday morning.',
       'date': 'Today, 08:30 AM',
       'reads': '28 of 32 Parents Read',
     },
     {
       'subject': 'Upcoming Parent-Teacher Consultations',
-      'body': 'Slot bookings for Term 2 progress meetings will open this Thursday via the portal.',
+      'body':
+          'Slot bookings for Term 2 progress meetings will open this Thursday via the portal.',
       'date': 'Yesterday, 02:15 PM',
       'reads': '32 of 32 Parents Read',
     },
@@ -146,7 +163,8 @@ class _TeacherDashboardViewState extends State<TeacherDashboardView> {
   List<Map<String, dynamic>> get _filteredRoster {
     return _roster.where((student) {
       final q = _rosterSearchQuery.toLowerCase();
-      final matchesSearch = q.isEmpty ||
+      final matchesSearch =
+          q.isEmpty ||
           student['name'].toString().toLowerCase().contains(q) ||
           student['id'].toString().toLowerCase().contains(q) ||
           student['guardian'].toString().toLowerCase().contains(q);
@@ -158,8 +176,6 @@ class _TeacherDashboardViewState extends State<TeacherDashboardView> {
         matchesStatus = student['status'] == 'Absent';
       } else if (_rosterStatusFilter == 'Late') {
         matchesStatus = student['status'] == 'Late';
-      } else if (_rosterStatusFilter == 'Pending Fees') {
-        matchesStatus = student['fees'].toString().contains('Pending');
       }
 
       return matchesSearch && matchesStatus;
@@ -172,7 +188,9 @@ class _TeacherDashboardViewState extends State<TeacherDashboardView> {
     });
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('Attendance updated: ${_roster[index]['name']} -> $status'),
+        content: Text(
+          'Attendance updated: ${_roster[index]['name']} -> $status',
+        ),
         duration: const Duration(seconds: 1),
         backgroundColor: primaryBlue,
       ),
@@ -185,7 +203,9 @@ class _TeacherDashboardViewState extends State<TeacherDashboardView> {
     });
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('Merit point awarded to ${_roster[index]['name']}! Total: ${_roster[index]['merits']}'),
+        content: Text(
+          'Merit point awarded to ${_roster[index]['name']}! Total: ${_roster[index]['merits']}',
+        ),
         duration: const Duration(seconds: 1),
         backgroundColor: primaryBlue,
       ),
@@ -205,7 +225,9 @@ class _TeacherDashboardViewState extends State<TeacherDashboardView> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('${result['name']} added to Class Roster successfully!'),
+            content: Text(
+              '${result['name']} added to Class Roster successfully!',
+            ),
             backgroundColor: successText,
           ),
         );
@@ -220,7 +242,9 @@ class _TeacherDashboardViewState extends State<TeacherDashboardView> {
     if (subject.isEmpty || body.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Please enter both announcement subject and message body.'),
+          content: Text(
+            'Please enter both announcement subject and message body.',
+          ),
           backgroundColor: dangerText,
         ),
       );
@@ -253,8 +277,13 @@ class _TeacherDashboardViewState extends State<TeacherDashboardView> {
 
     final presentCount = _roster.where((s) => s['status'] == 'Present').length;
     final totalCount = _roster.length;
-    final attendancePct = totalCount > 0 ? ((presentCount / totalCount) * 100).round() : 0;
-    final totalMerits = _roster.fold<int>(0, (sum, item) => sum + (item['merits'] as int));
+    final attendancePct = totalCount > 0
+        ? ((presentCount / totalCount) * 100).round()
+        : 0;
+    final totalMerits = _roster.fold<int>(
+      0,
+      (sum, item) => sum + (item['merits'] as int),
+    );
 
     return Scaffold(
       backgroundColor: bgLight,
@@ -286,7 +315,11 @@ class _TeacherDashboardViewState extends State<TeacherDashboardView> {
                     alignment: Alignment.center,
                     child: const Text(
                       'TG',
-                      style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15),
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 15,
+                      ),
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -296,7 +329,11 @@ class _TeacherDashboardViewState extends State<TeacherDashboardView> {
                       children: [
                         Text(
                           teacherName,
-                          style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: textPrimary),
+                          style: const TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold,
+                            color: textPrimary,
+                          ),
                           overflow: TextOverflow.ellipsis,
                         ),
                         const SizedBox(height: 2),
@@ -307,14 +344,22 @@ class _TeacherDashboardViewState extends State<TeacherDashboardView> {
                         ),
                         const SizedBox(height: 4),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 7,
+                            vertical: 2,
+                          ),
                           decoration: BoxDecoration(
                             color: infoBg,
                             borderRadius: BorderRadius.circular(3),
                           ),
                           child: const Text(
                             'CLASS SCOPED',
-                            style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: infoText, letterSpacing: 0.5),
+                            style: TextStyle(
+                              fontSize: 9,
+                              fontWeight: FontWeight.bold,
+                              color: infoText,
+                              letterSpacing: 0.5,
+                            ),
                           ),
                         ),
                       ],
@@ -322,7 +367,10 @@ class _TeacherDashboardViewState extends State<TeacherDashboardView> {
                   ),
                   const SizedBox(width: 8),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
                     decoration: BoxDecoration(
                       color: bgLight,
                       borderRadius: BorderRadius.circular(4),
@@ -332,12 +380,29 @@ class _TeacherDashboardViewState extends State<TeacherDashboardView> {
                       value: _selectedClass,
                       underline: const SizedBox(),
                       isDense: true,
-                      icon: const Icon(Icons.keyboard_arrow_down, color: primaryBlue, size: 16),
-                      style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: primaryBlue),
+                      icon: const Icon(
+                        Icons.keyboard_arrow_down,
+                        color: primaryBlue,
+                        size: 16,
+                      ),
+                      style: const TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.bold,
+                        color: primaryBlue,
+                      ),
                       items: const [
-                        DropdownMenuItem(value: 'Grade 4 Gold (Homeroom)', child: Text('Gr 4 Gold')),
-                        DropdownMenuItem(value: 'Grade 5 Blue (Maths)', child: Text('Gr 5 Blue')),
-                        DropdownMenuItem(value: 'Grade 6 Red (Science)', child: Text('Gr 6 Red')),
+                        DropdownMenuItem(
+                          value: 'Grade 4 Gold (Homeroom)',
+                          child: Text('Gr 4 Gold'),
+                        ),
+                        DropdownMenuItem(
+                          value: 'Grade 5 Blue (Maths)',
+                          child: Text('Gr 5 Blue'),
+                        ),
+                        DropdownMenuItem(
+                          value: 'Grade 6 Red (Science)',
+                          child: Text('Gr 6 Red'),
+                        ),
                       ],
                       onChanged: (val) {
                         if (val != null) setState(() => _selectedClass = val);
@@ -353,11 +418,21 @@ class _TeacherDashboardViewState extends State<TeacherDashboardView> {
             Row(
               children: [
                 Expanded(
-                  child: _buildWebKpiCard('CLASS ROSTER', '$totalCount Students', Icons.school_outlined, primaryBlue),
+                  child: _buildWebKpiCard(
+                    'CLASS ROSTER',
+                    '$totalCount Students',
+                    Icons.school_outlined,
+                    primaryBlue,
+                  ),
                 ),
                 const SizedBox(width: 8),
                 Expanded(
-                  child: _buildWebKpiCard('ATTENDANCE', '$attendancePct% Today', Icons.fact_check_outlined, successText),
+                  child: _buildWebKpiCard(
+                    'ATTENDANCE',
+                    '$attendancePct% Today',
+                    Icons.fact_check_outlined,
+                    successText,
+                  ),
                 ),
               ],
             ),
@@ -365,11 +440,21 @@ class _TeacherDashboardViewState extends State<TeacherDashboardView> {
             Row(
               children: [
                 Expanded(
-                  child: _buildWebKpiCard('GRADES PENDING', '2 Tasks Due', Icons.assignment_outlined, warningText),
+                  child: _buildWebKpiCard(
+                    'GRADES PENDING',
+                    '2 Tasks Due',
+                    Icons.assignment_outlined,
+                    warningText,
+                  ),
                 ),
                 const SizedBox(width: 8),
                 Expanded(
-                  child: _buildWebKpiCard('TOTAL MERITS', '$totalMerits Stars', Icons.star_outline_rounded, secondaryBlue),
+                  child: _buildWebKpiCard(
+                    'TOTAL MERITS',
+                    '$totalMerits Stars',
+                    Icons.star_outline_rounded,
+                    secondaryBlue,
+                  ),
                 ),
               ],
             ),
@@ -387,11 +472,31 @@ class _TeacherDashboardViewState extends State<TeacherDashboardView> {
                 scrollDirection: Axis.horizontal,
                 child: Row(
                   children: [
-                    _buildTabButton(0, 'Class Roster', Icons.people_alt_outlined),
-                    _buildTabButton(1, 'Daily Attendance', Icons.fact_check_outlined),
-                    _buildTabButton(2, 'Gradebook & Marks', Icons.assignment_outlined),
-                    _buildTabButton(3, 'Clubs & Activities', Icons.sports_soccer_outlined),
-                    _buildTabButton(4, 'Class Notices', Icons.campaign_outlined),
+                    _buildTabButton(
+                      0,
+                      'Class Roster',
+                      Icons.people_alt_outlined,
+                    ),
+                    _buildTabButton(
+                      1,
+                      'Daily Attendance',
+                      Icons.fact_check_outlined,
+                    ),
+                    _buildTabButton(
+                      2,
+                      'Gradebook & Marks',
+                      Icons.assignment_outlined,
+                    ),
+                    _buildTabButton(
+                      3,
+                      'Clubs & Activities',
+                      Icons.sports_soccer_outlined,
+                    ),
+                    _buildTabButton(
+                      4,
+                      'Class Notices',
+                      Icons.campaign_outlined,
+                    ),
                   ],
                 ),
               ),
@@ -416,7 +521,12 @@ class _TeacherDashboardViewState extends State<TeacherDashboardView> {
   }
 
   // Admin Web KPI Card Helper — with top color accent
-  Widget _buildWebKpiCard(String label, String value, IconData icon, Color color) {
+  Widget _buildWebKpiCard(
+    String label,
+    String value,
+    IconData icon,
+    Color color,
+  ) {
     return Container(
       padding: const EdgeInsets.all(12),
       constraints: const BoxConstraints(minHeight: 68),
@@ -479,7 +589,9 @@ class _TeacherDashboardViewState extends State<TeacherDashboardView> {
               width: 3.0,
             ),
           ),
-          color: isActive ? primaryBlue.withValues(alpha: 0.06) : Colors.transparent,
+          color: isActive
+              ? primaryBlue.withValues(alpha: 0.06)
+              : Colors.transparent,
         ),
         child: Row(
           children: [
@@ -534,11 +646,19 @@ class _TeacherDashboardViewState extends State<TeacherDashboardView> {
                     children: [
                       const Row(
                         children: [
-                          Icon(Icons.people_alt_outlined, color: primaryBlue, size: 18),
+                          Icon(
+                            Icons.people_alt_outlined,
+                            color: primaryBlue,
+                            size: 18,
+                          ),
                           SizedBox(width: 6),
                           Text(
                             'Class Roster & Student Register',
-                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: primaryBlue),
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14,
+                              color: primaryBlue,
+                            ),
                           ),
                         ],
                       ),
@@ -547,11 +667,16 @@ class _TeacherDashboardViewState extends State<TeacherDashboardView> {
                           GestureDetector(
                             onTap: () {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text('Exporting Class Roster...')),
+                                const SnackBar(
+                                  content: Text('Exporting Class Roster...'),
+                                ),
                               );
                             },
                             child: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 7,
+                              ),
                               decoration: BoxDecoration(
                                 border: Border.all(color: borderColor),
                                 borderRadius: BorderRadius.circular(4),
@@ -559,9 +684,20 @@ class _TeacherDashboardViewState extends State<TeacherDashboardView> {
                               ),
                               child: const Row(
                                 children: [
-                                  Icon(Icons.download_outlined, size: 14, color: textPrimary),
+                                  Icon(
+                                    Icons.download_outlined,
+                                    size: 14,
+                                    color: textPrimary,
+                                  ),
                                   SizedBox(width: 4),
-                                  Text('EXPORT', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: textPrimary)),
+                                  Text(
+                                    'EXPORT',
+                                    style: TextStyle(
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.bold,
+                                      color: textPrimary,
+                                    ),
+                                  ),
                                 ],
                               ),
                             ),
@@ -570,7 +706,10 @@ class _TeacherDashboardViewState extends State<TeacherDashboardView> {
                           GestureDetector(
                             onTap: _openAddStudentDialog,
                             child: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 7,
+                              ),
                               decoration: BoxDecoration(
                                 border: Border.all(color: primaryBlue),
                                 borderRadius: BorderRadius.circular(4),
@@ -578,9 +717,20 @@ class _TeacherDashboardViewState extends State<TeacherDashboardView> {
                               ),
                               child: const Row(
                                 children: [
-                                  Icon(Icons.add, size: 14, color: Colors.white),
+                                  Icon(
+                                    Icons.add,
+                                    size: 14,
+                                    color: Colors.white,
+                                  ),
                                   SizedBox(width: 4),
-                                  Text('ADD', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.white)),
+                                  Text(
+                                    'ADD',
+                                    style: TextStyle(
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                    ),
+                                  ),
                                 ],
                               ),
                             ),
@@ -615,9 +765,17 @@ class _TeacherDashboardViewState extends State<TeacherDashboardView> {
                           controller: _searchController,
                           style: const TextStyle(fontSize: 13),
                           decoration: InputDecoration(
-                            hintText: 'Search by student name, ID, or guardian...',
-                            hintStyle: const TextStyle(fontSize: 12, color: textSecondary),
-                            prefixIcon: const Icon(Icons.search, size: 18, color: textSecondary),
+                            hintText:
+                                'Search by student name, ID, or guardian...',
+                            hintStyle: const TextStyle(
+                              fontSize: 12,
+                              color: textSecondary,
+                            ),
+                            prefixIcon: const Icon(
+                              Icons.search,
+                              size: 18,
+                              color: textSecondary,
+                            ),
                             suffixIcon: _rosterSearchQuery.isNotEmpty
                                 ? IconButton(
                                     icon: const Icon(Icons.clear, size: 16),
@@ -629,17 +787,26 @@ class _TeacherDashboardViewState extends State<TeacherDashboardView> {
                                 : null,
                             filled: true,
                             fillColor: surfaceWhite,
-                            contentPadding: const EdgeInsets.symmetric(vertical: 0, horizontal: 10),
+                            contentPadding: const EdgeInsets.symmetric(
+                              vertical: 0,
+                              horizontal: 10,
+                            ),
                             border: const OutlineInputBorder(
-                              borderRadius: BorderRadius.all(Radius.circular(4)),
+                              borderRadius: BorderRadius.all(
+                                Radius.circular(4),
+                              ),
                               borderSide: BorderSide(color: borderColor),
                             ),
                             enabledBorder: const OutlineInputBorder(
-                              borderRadius: BorderRadius.all(Radius.circular(4)),
+                              borderRadius: BorderRadius.all(
+                                Radius.circular(4),
+                              ),
                               borderSide: BorderSide(color: borderColor),
                             ),
                             focusedBorder: const OutlineInputBorder(
-                              borderRadius: BorderRadius.all(Radius.circular(4)),
+                              borderRadius: BorderRadius.all(
+                                Radius.circular(4),
+                              ),
                               borderSide: BorderSide(color: primaryBlue),
                             ),
                           ),
@@ -659,14 +826,26 @@ class _TeacherDashboardViewState extends State<TeacherDashboardView> {
                     children: [
                       const Text(
                         'Filter:',
-                        style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: textSecondary),
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                          color: textSecondary,
+                        ),
                       ),
                       const SizedBox(width: 8),
                       _buildFilterChip('All', _roster.length),
-                      _buildFilterChip('Present', _roster.where((s) => s['status'] == 'Present').length),
-                      _buildFilterChip('Absent', _roster.where((s) => s['status'] == 'Absent').length),
-                      _buildFilterChip('Late', _roster.where((s) => s['status'] == 'Late').length),
-                      _buildFilterChip('Pending Fees', _roster.where((s) => s['fees'].toString().contains('Pending')).length),
+                      _buildFilterChip(
+                        'Present',
+                        _roster.where((s) => s['status'] == 'Present').length,
+                      ),
+                      _buildFilterChip(
+                        'Absent',
+                        _roster.where((s) => s['status'] == 'Absent').length,
+                      ),
+                      _buildFilterChip(
+                        'Late',
+                        _roster.where((s) => s['status'] == 'Late').length,
+                      ),
                     ],
                   ),
                 ),
@@ -681,9 +860,16 @@ class _TeacherDashboardViewState extends State<TeacherDashboardView> {
                   alignment: Alignment.center,
                   child: const Column(
                     children: [
-                      Icon(Icons.search_off_outlined, size: 40, color: textSecondary),
+                      Icon(
+                        Icons.search_off_outlined,
+                        size: 40,
+                        color: textSecondary,
+                      ),
                       SizedBox(height: 8),
-                      Text('No matching students found in class roster', style: TextStyle(color: textSecondary, fontSize: 13)),
+                      Text(
+                        'No matching students found in class roster',
+                        style: TextStyle(color: textSecondary, fontSize: 13),
+                      ),
                     ],
                   ),
                 )
@@ -691,12 +877,14 @@ class _TeacherDashboardViewState extends State<TeacherDashboardView> {
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
                   itemCount: filtered.length,
-                  separatorBuilder: (context, index) => const Divider(height: 1, color: borderColor),
+                  separatorBuilder: (context, index) =>
+                      const Divider(height: 1, color: borderColor),
                   itemBuilder: (context, index) {
                     final student = filtered[index];
-                    final originalIndex = _roster.indexWhere((s) => s['id'] == student['id']);
+                    final originalIndex = _roster.indexWhere(
+                      (s) => s['id'] == student['id'],
+                    );
                     final status = student['status'];
-                    final fees = student['fees'].toString();
 
                     Color statusBg = successBg;
                     Color statusText = successText;
@@ -708,15 +896,11 @@ class _TeacherDashboardViewState extends State<TeacherDashboardView> {
                       statusText = warningText;
                     }
 
-                    Color feeBg = successBg;
-                    Color feeText = successText;
-                    if (fees.contains('Pending')) {
-                      feeBg = dangerBg;
-                      feeText = dangerText;
-                    }
-
                     return Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 6,
+                      ),
                       child: Container(
                         decoration: BoxDecoration(
                           color: surfaceWhite,
@@ -744,54 +928,73 @@ class _TeacherDashboardViewState extends State<TeacherDashboardView> {
                                     alignment: Alignment.center,
                                     child: Text(
                                       student['roll'],
-                                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: primaryBlue),
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 12,
+                                        color: primaryBlue,
+                                      ),
                                     ),
                                   ),
                                   const SizedBox(width: 10),
                                   // Name + gender + guardian
                                   Expanded(
                                     child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
                                         Text(
                                           student['name'],
-                                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: textPrimary),
+                                          style: const TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 14,
+                                            color: textPrimary,
+                                          ),
                                           overflow: TextOverflow.ellipsis,
                                         ),
                                         const SizedBox(height: 2),
                                         Text(
                                           '${student['gender']} • ID: ${student['id']}',
-                                          style: const TextStyle(fontSize: 11, color: textSecondary),
+                                          style: const TextStyle(
+                                            fontSize: 11,
+                                            color: textSecondary,
+                                          ),
                                         ),
                                         const SizedBox(height: 1),
                                         Text(
                                           'Guardian: ${student['guardian']} ${student['guardian_phone']}',
-                                          style: const TextStyle(fontSize: 10, color: textSecondary),
+                                          style: const TextStyle(
+                                            fontSize: 10,
+                                            color: textSecondary,
+                                          ),
                                           overflow: TextOverflow.ellipsis,
                                         ),
                                       ],
                                     ),
                                   ),
                                   const SizedBox(width: 8),
-                                  // Status & fee badges stacked vertically on right
+                                  // Attendance status
                                   Column(
                                     crossAxisAlignment: CrossAxisAlignment.end,
                                     children: [
                                       Container(
-                                        padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
-                                        decoration: BoxDecoration(color: statusBg, borderRadius: BorderRadius.circular(3)),
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 7,
+                                          vertical: 3,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: statusBg,
+                                          borderRadius: BorderRadius.circular(
+                                            3,
+                                          ),
+                                        ),
                                         child: Text(
                                           status.toUpperCase(),
-                                          style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: statusText, letterSpacing: 0.3),
-                                        ),
-                                      ),
-                                      const SizedBox(height: 4),
-                                      Container(
-                                        padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
-                                        decoration: BoxDecoration(color: feeBg, borderRadius: BorderRadius.circular(3)),
-                                        child: Text(
-                                          fees.contains('Pending') ? 'FEE PENDING' : 'FEES PAID',
-                                          style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: feeText, letterSpacing: 0.3),
+                                          style: TextStyle(
+                                            fontSize: 9,
+                                            fontWeight: FontWeight.bold,
+                                            color: statusText,
+                                            letterSpacing: 0.3,
+                                          ),
                                         ),
                                       ),
                                     ],
@@ -804,7 +1007,10 @@ class _TeacherDashboardViewState extends State<TeacherDashboardView> {
                             Padding(
                               padding: const EdgeInsets.fromLTRB(12, 6, 12, 0),
                               child: Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 4,
+                                ),
                                 decoration: BoxDecoration(
                                   color: bgLight,
                                   borderRadius: BorderRadius.circular(3),
@@ -812,7 +1018,11 @@ class _TeacherDashboardViewState extends State<TeacherDashboardView> {
                                 ),
                                 child: Text(
                                   '\u2605  ${student['merits']} Merit Points Awarded',
-                                  style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: textSecondary),
+                                  style: const TextStyle(
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.bold,
+                                    color: textSecondary,
+                                  ),
                                 ),
                               ),
                             ),
@@ -827,21 +1037,47 @@ class _TeacherDashboardViewState extends State<TeacherDashboardView> {
                             Padding(
                               padding: const EdgeInsets.fromLTRB(12, 0, 12, 10),
                               child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   // Attendance P/A/L buttons
                                   Row(
                                     children: [
                                       const Text(
                                         'Mark:',
-                                        style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: textSecondary),
+                                        style: TextStyle(
+                                          fontSize: 10,
+                                          fontWeight: FontWeight.bold,
+                                          color: textSecondary,
+                                        ),
                                       ),
                                       const SizedBox(width: 6),
-                                      _buildAttendanceButton(originalIndex, 'Present', 'P', successBg, successText, status == 'Present'),
+                                      _buildAttendanceButton(
+                                        originalIndex,
+                                        'Present',
+                                        'P',
+                                        successBg,
+                                        successText,
+                                        status == 'Present',
+                                      ),
                                       const SizedBox(width: 4),
-                                      _buildAttendanceButton(originalIndex, 'Absent', 'A', dangerBg, dangerText, status == 'Absent'),
+                                      _buildAttendanceButton(
+                                        originalIndex,
+                                        'Absent',
+                                        'A',
+                                        dangerBg,
+                                        dangerText,
+                                        status == 'Absent',
+                                      ),
                                       const SizedBox(width: 4),
-                                      _buildAttendanceButton(originalIndex, 'Late', 'L', warningBg, warningText, status == 'Late'),
+                                      _buildAttendanceButton(
+                                        originalIndex,
+                                        'Late',
+                                        'L',
+                                        warningBg,
+                                        warningText,
+                                        status == 'Late',
+                                      ),
                                     ],
                                   ),
                                   // +Merit and Contact buttons
@@ -850,17 +1086,35 @@ class _TeacherDashboardViewState extends State<TeacherDashboardView> {
                                       GestureDetector(
                                         onTap: () => _awardMerit(originalIndex),
                                         child: Container(
-                                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 10,
+                                            vertical: 6,
+                                          ),
                                           decoration: BoxDecoration(
-                                            border: Border.all(color: borderColor),
-                                            borderRadius: BorderRadius.circular(4),
+                                            border: Border.all(
+                                              color: borderColor,
+                                            ),
+                                            borderRadius: BorderRadius.circular(
+                                              4,
+                                            ),
                                             color: surfaceWhite,
                                           ),
                                           child: Row(
                                             children: const [
-                                              Icon(Icons.star_outline_rounded, size: 13, color: warningText),
+                                              Icon(
+                                                Icons.star_outline_rounded,
+                                                size: 13,
+                                                color: warningText,
+                                              ),
                                               SizedBox(width: 4),
-                                              Text('+MERIT', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: textPrimary)),
+                                              Text(
+                                                '+MERIT',
+                                                style: TextStyle(
+                                                  fontSize: 10,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: textPrimary,
+                                                ),
+                                              ),
                                             ],
                                           ),
                                         ),
@@ -868,22 +1122,46 @@ class _TeacherDashboardViewState extends State<TeacherDashboardView> {
                                       const SizedBox(width: 6),
                                       GestureDetector(
                                         onTap: () {
-                                          ScaffoldMessenger.of(context).showSnackBar(
-                                            SnackBar(content: Text('Contacting ${student['guardian']}...')),
+                                          ScaffoldMessenger.of(
+                                            context,
+                                          ).showSnackBar(
+                                            SnackBar(
+                                              content: Text(
+                                                'Contacting ${student['guardian']}...',
+                                              ),
+                                            ),
                                           );
                                         },
                                         child: Container(
-                                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 10,
+                                            vertical: 6,
+                                          ),
                                           decoration: BoxDecoration(
-                                            border: Border.all(color: borderColor),
-                                            borderRadius: BorderRadius.circular(4),
+                                            border: Border.all(
+                                              color: borderColor,
+                                            ),
+                                            borderRadius: BorderRadius.circular(
+                                              4,
+                                            ),
                                             color: surfaceWhite,
                                           ),
                                           child: Row(
                                             children: const [
-                                              Icon(Icons.phone_outlined, size: 13, color: primaryBlue),
+                                              Icon(
+                                                Icons.phone_outlined,
+                                                size: 13,
+                                                color: primaryBlue,
+                                              ),
                                               SizedBox(width: 4),
-                                              Text('CONTACT', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: primaryBlue)),
+                                              Text(
+                                                'CONTACT',
+                                                style: TextStyle(
+                                                  fontSize: 10,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: primaryBlue,
+                                                ),
+                                              ),
                                             ],
                                           ),
                                         ),
@@ -930,7 +1208,14 @@ class _TeacherDashboardViewState extends State<TeacherDashboardView> {
     );
   }
 
-  Widget _buildAttendanceButton(int index, String fullStatus, String code, Color bg, Color text, bool isCurrent) {
+  Widget _buildAttendanceButton(
+    int index,
+    String fullStatus,
+    String code,
+    Color bg,
+    Color text,
+    bool isCurrent,
+  ) {
     return GestureDetector(
       onTap: () => _toggleAttendance(index, fullStatus),
       child: Container(
@@ -979,9 +1264,19 @@ class _TeacherDashboardViewState extends State<TeacherDashboardView> {
               const Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Daily Roll Call Register', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: primaryBlue)),
+                  Text(
+                    'Daily Roll Call Register',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                      color: primaryBlue,
+                    ),
+                  ),
                   SizedBox(height: 2),
-                  Text('Quick daily present / absent marking session for homeroom.', style: TextStyle(fontSize: 12, color: textSecondary)),
+                  Text(
+                    'Quick daily present / absent marking session for homeroom.',
+                    style: TextStyle(fontSize: 12, color: textSecondary),
+                  ),
                 ],
               ),
               ElevatedButton.icon(
@@ -992,15 +1287,23 @@ class _TeacherDashboardViewState extends State<TeacherDashboardView> {
                     }
                   });
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('All class students marked Present!'), backgroundColor: successText),
+                    const SnackBar(
+                      content: Text('All class students marked Present!'),
+                      backgroundColor: successText,
+                    ),
                   );
                 },
                 icon: const Icon(Icons.check_circle_outline, size: 16),
-                label: const Text('MARK ALL PRESENT', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
+                label: const Text(
+                  'MARK ALL PRESENT',
+                  style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
+                ),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: primaryBlue,
                   foregroundColor: Colors.white,
-                  shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(4))),
+                  shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(4)),
+                  ),
                 ),
               ),
             ],
@@ -1010,11 +1313,26 @@ class _TeacherDashboardViewState extends State<TeacherDashboardView> {
           // Attendance Summary Bar
           Row(
             children: [
-              _buildSummaryPill('Present Today', '$presentCount Students', successBg, successText),
+              _buildSummaryPill(
+                'Present Today',
+                '$presentCount Students',
+                successBg,
+                successText,
+              ),
               const SizedBox(width: 8),
-              _buildSummaryPill('Absent Today', '$absentCount Students', dangerBg, dangerText),
+              _buildSummaryPill(
+                'Absent Today',
+                '$absentCount Students',
+                dangerBg,
+                dangerText,
+              ),
               const SizedBox(width: 8),
-              _buildSummaryPill('Late Arrivals', '$lateCount Students', warningBg, warningText),
+              _buildSummaryPill(
+                'Late Arrivals',
+                '$lateCount Students',
+                warningBg,
+                warningText,
+              ),
             ],
           ),
           const Divider(height: 24, color: borderColor),
@@ -1024,7 +1342,8 @@ class _TeacherDashboardViewState extends State<TeacherDashboardView> {
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             itemCount: _roster.length,
-            separatorBuilder: (context, index) => const Divider(height: 1, color: bgLight),
+            separatorBuilder: (context, index) =>
+                const Divider(height: 1, color: bgLight),
             itemBuilder: (context, index) {
               final student = _roster[index];
               final status = student['status'];
@@ -1038,22 +1357,51 @@ class _TeacherDashboardViewState extends State<TeacherDashboardView> {
                       children: [
                         Text(
                           '${student['roll']}.',
-                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: textSecondary),
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 13,
+                            color: textSecondary,
+                          ),
                         ),
                         const SizedBox(width: 12),
                         Text(
                           student['name'],
-                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: textPrimary),
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 13,
+                            color: textPrimary,
+                          ),
                         ),
                       ],
                     ),
                     Row(
                       children: [
-                        _buildAttendanceButton(index, 'Present', 'P', successBg, successText, status == 'Present'),
+                        _buildAttendanceButton(
+                          index,
+                          'Present',
+                          'P',
+                          successBg,
+                          successText,
+                          status == 'Present',
+                        ),
                         const SizedBox(width: 6),
-                        _buildAttendanceButton(index, 'Absent', 'A', dangerBg, dangerText, status == 'Absent'),
+                        _buildAttendanceButton(
+                          index,
+                          'Absent',
+                          'A',
+                          dangerBg,
+                          dangerText,
+                          status == 'Absent',
+                        ),
                         const SizedBox(width: 6),
-                        _buildAttendanceButton(index, 'Late', 'L', warningBg, warningText, status == 'Late'),
+                        _buildAttendanceButton(
+                          index,
+                          'Late',
+                          'L',
+                          warningBg,
+                          warningText,
+                          status == 'Late',
+                        ),
                       ],
                     ),
                   ],
@@ -1068,16 +1416,26 @@ class _TeacherDashboardViewState extends State<TeacherDashboardView> {
             child: ElevatedButton.icon(
               onPressed: () {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Attendance Register saved & submitted to Admin Server!'), backgroundColor: primaryBlue),
+                  const SnackBar(
+                    content: Text(
+                      'Attendance Register saved & submitted to Admin Server!',
+                    ),
+                    backgroundColor: primaryBlue,
+                  ),
                 );
               },
               icon: const Icon(Icons.save_outlined, size: 18),
-              label: const Text('SAVE ATTENDANCE REGISTER', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+              label: const Text(
+                'SAVE ATTENDANCE REGISTER',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+              ),
               style: ElevatedButton.styleFrom(
                 backgroundColor: primaryBlue,
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(vertical: 12),
-                shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(4))),
+                shape: const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(4)),
+                ),
               ),
             ),
           ),
@@ -1086,17 +1444,39 @@ class _TeacherDashboardViewState extends State<TeacherDashboardView> {
     );
   }
 
-  Widget _buildSummaryPill(String title, String countStr, Color bg, Color text) {
+  Widget _buildSummaryPill(
+    String title,
+    String countStr,
+    Color bg,
+    Color text,
+  ) {
     return Expanded(
       child: Container(
         padding: const EdgeInsets.all(10),
-        decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(4)),
+        decoration: BoxDecoration(
+          color: bg,
+          borderRadius: BorderRadius.circular(4),
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(title, style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: text)),
+            Text(
+              title,
+              style: TextStyle(
+                fontSize: 10,
+                fontWeight: FontWeight.bold,
+                color: text,
+              ),
+            ),
             const SizedBox(height: 2),
-            Text(countStr, style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: text)),
+            Text(
+              countStr,
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.bold,
+                color: text,
+              ),
+            ),
           ],
         ),
       ),
@@ -1105,14 +1485,25 @@ class _TeacherDashboardViewState extends State<TeacherDashboardView> {
 
   void _showEditMarksDialog(int index) {
     final student = _roster[index];
-    final mathController = TextEditingController(text: student['math_mark']?.toString() ?? '75');
-    final scienceController = TextEditingController(text: student['science_mark']?.toString() ?? '80');
+    final mathController = TextEditingController(
+      text: student['math_mark']?.toString() ?? '75',
+    );
+    final scienceController = TextEditingController(
+      text: student['science_mark']?.toString() ?? '80',
+    );
     final formKey = GlobalKey<FormState>();
 
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text('Edit Marks: ${student['name']}', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: primaryBlue)),
+        title: Text(
+          'Edit Marks: ${student['name']}',
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 16,
+            color: primaryBlue,
+          ),
+        ),
         content: Form(
           key: formKey,
           child: Column(
@@ -1124,11 +1515,15 @@ class _TeacherDashboardViewState extends State<TeacherDashboardView> {
                 decoration: const InputDecoration(
                   labelText: 'Mathematics Mark (%)',
                   border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.calculate_outlined, color: primaryBlue),
+                  prefixIcon: Icon(
+                    Icons.calculate_outlined,
+                    color: primaryBlue,
+                  ),
                 ),
                 validator: (v) {
                   final val = int.tryParse(v ?? '');
-                  if (val == null || val < 0 || val > 100) return 'Enter mark between 0 and 100';
+                  if (val == null || val < 0 || val > 100)
+                    return 'Enter mark between 0 and 100';
                   return null;
                 },
               ),
@@ -1143,7 +1538,8 @@ class _TeacherDashboardViewState extends State<TeacherDashboardView> {
                 ),
                 validator: (v) {
                   final val = int.tryParse(v ?? '');
-                  if (val == null || val < 0 || val > 100) return 'Enter mark between 0 and 100';
+                  if (val == null || val < 0 || val > 100)
+                    return 'Enter mark between 0 and 100';
                   return null;
                 },
               ),
@@ -1151,19 +1547,31 @@ class _TeacherDashboardViewState extends State<TeacherDashboardView> {
           ),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Cancel'),
+          ),
           ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: primaryBlue, foregroundColor: Colors.white),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: primaryBlue,
+              foregroundColor: Colors.white,
+            ),
             onPressed: () {
               if (!formKey.currentState!.validate()) return;
               setState(() {
-                _roster[index]['math_mark'] = int.parse(mathController.text.trim());
-                _roster[index]['science_mark'] = int.parse(scienceController.text.trim());
+                _roster[index]['math_mark'] = int.parse(
+                  mathController.text.trim(),
+                );
+                _roster[index]['science_mark'] = int.parse(
+                  scienceController.text.trim(),
+                );
               });
               Navigator.pop(ctx);
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content: Text('Updated assessment marks for ${student['name']}!'),
+                  content: Text(
+                    'Updated assessment marks for ${student['name']}!',
+                  ),
                   backgroundColor: primaryBlue,
                 ),
               );
@@ -1194,18 +1602,29 @@ class _TeacherDashboardViewState extends State<TeacherDashboardView> {
             children: [
               Icon(Icons.assignment_outlined, color: primaryBlue, size: 20),
               SizedBox(width: 8),
-              Text('Academic Gradebook & Assessment Marks', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: primaryBlue)),
+              Text(
+                'Academic Gradebook & Assessment Marks',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                  color: primaryBlue,
+                ),
+              ),
             ],
           ),
           const SizedBox(height: 4),
-          const Text('Record student test marks, term grades, and subject evaluation summaries.', style: TextStyle(fontSize: 12, color: textSecondary)),
+          const Text(
+            'Record student test marks, term grades, and subject evaluation summaries.',
+            style: TextStyle(fontSize: 12, color: textSecondary),
+          ),
           const Divider(height: 24, color: borderColor),
 
           ListView.separated(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             itemCount: _roster.length,
-            separatorBuilder: (context, index) => const Divider(height: 1, color: borderColor),
+            separatorBuilder: (context, index) =>
+                const Divider(height: 1, color: borderColor),
             itemBuilder: (context, index) {
               final student = _roster[index];
               final math = student['math_mark'] as int;
@@ -1220,17 +1639,35 @@ class _TeacherDashboardViewState extends State<TeacherDashboardView> {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(student['name'], style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: textPrimary)),
+                        Text(
+                          student['name'],
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 13,
+                            color: textPrimary,
+                          ),
+                        ),
                         const SizedBox(height: 2),
-                        Text('Math: $math% • Science: $science%', style: const TextStyle(fontSize: 11, color: textSecondary)),
+                        Text(
+                          'Math: $math% • Science: $science%',
+                          style: const TextStyle(
+                            fontSize: 11,
+                            color: textSecondary,
+                          ),
+                        ),
                       ],
                     ),
                     Row(
                       children: [
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 4,
+                          ),
                           decoration: BoxDecoration(
-                            color: avg >= 80 ? successBg : (avg >= 60 ? warningBg : dangerBg),
+                            color: avg >= 80
+                                ? successBg
+                                : (avg >= 60 ? warningBg : dangerBg),
                             borderRadius: BorderRadius.circular(4),
                           ),
                           child: Text(
@@ -1238,7 +1675,9 @@ class _TeacherDashboardViewState extends State<TeacherDashboardView> {
                             style: TextStyle(
                               fontSize: 11,
                               fontWeight: FontWeight.bold,
-                              color: avg >= 80 ? successText : (avg >= 60 ? warningText : dangerText),
+                              color: avg >= 80
+                                  ? successText
+                                  : (avg >= 60 ? warningText : dangerText),
                             ),
                           ),
                         ),
@@ -1247,10 +1686,24 @@ class _TeacherDashboardViewState extends State<TeacherDashboardView> {
                           onPressed: () => _showEditMarksDialog(index),
                           style: OutlinedButton.styleFrom(
                             side: const BorderSide(color: borderColor),
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                            shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(4))),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 6,
+                            ),
+                            shape: const RoundedRectangleBorder(
+                              borderRadius: BorderRadius.all(
+                                Radius.circular(4),
+                              ),
+                            ),
                           ),
-                          child: const Text('EDIT MARKS', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: primaryBlue)),
+                          child: const Text(
+                            'EDIT MARKS',
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                              color: primaryBlue,
+                            ),
+                          ),
                         ),
                       ],
                     ),
@@ -1283,11 +1736,21 @@ class _TeacherDashboardViewState extends State<TeacherDashboardView> {
             children: [
               Icon(Icons.sports_soccer_outlined, color: primaryBlue, size: 20),
               SizedBox(width: 8),
-              Text('Clubs & Extracurricular Activity Rosters', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: primaryBlue)),
+              Text(
+                'Clubs & Extracurricular Activity Rosters',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                  color: primaryBlue,
+                ),
+              ),
             ],
           ),
           const SizedBox(height: 4),
-          const Text('Track student participation in sports teams and club activities today.', style: TextStyle(fontSize: 12, color: textSecondary)),
+          const Text(
+            'Track student participation in sports teams and club activities today.',
+            style: TextStyle(fontSize: 12, color: textSecondary),
+          ),
           const SizedBox(height: 14),
 
           ListView.builder(
@@ -1310,26 +1773,50 @@ class _TeacherDashboardViewState extends State<TeacherDashboardView> {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(act['name'], style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: textPrimary)),
+                        Text(
+                          act['name'],
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                            color: textPrimary,
+                          ),
+                        ),
                         const SizedBox(height: 3),
-                        Text('${act['time']} • ${act['location']} • ${act['assigned_students']} Students', style: const TextStyle(fontSize: 12, color: textSecondary)),
+                        Text(
+                          '${act['time']} • ${act['location']} • ${act['assigned_students']} Students',
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: textSecondary,
+                          ),
+                        ),
                       ],
                     ),
                     ElevatedButton(
                       onPressed: () {
                         setState(() => act['attendance_done'] = true);
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Activity attendance saved for ${act['name']}')),
+                          SnackBar(
+                            content: Text(
+                              'Activity attendance saved for ${act['name']}',
+                            ),
+                          ),
                         );
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: act['attendance_done'] ? successText : primaryBlue,
+                        backgroundColor: act['attendance_done']
+                            ? successText
+                            : primaryBlue,
                         foregroundColor: Colors.white,
-                        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(4))),
+                        shape: const RoundedRectangleBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(4)),
+                        ),
                       ),
                       child: Text(
                         act['attendance_done'] ? 'COMPLETED' : 'MARK ROLL',
-                        style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
+                        style: const TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
                   ],
@@ -1361,11 +1848,21 @@ class _TeacherDashboardViewState extends State<TeacherDashboardView> {
             children: [
               Icon(Icons.campaign_outlined, color: primaryBlue, size: 20),
               SizedBox(width: 8),
-              Text('Class Announcements & Parent Notices', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: primaryBlue)),
+              Text(
+                'Class Announcements & Parent Notices',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                  color: primaryBlue,
+                ),
+              ),
             ],
           ),
           const SizedBox(height: 4),
-          const Text('Publish official circulars and notices directly to parents in your assigned class.', style: TextStyle(fontSize: 12, color: textSecondary)),
+          const Text(
+            'Publish official circulars and notices directly to parents in your assigned class.',
+            style: TextStyle(fontSize: 12, color: textSecondary),
+          ),
           const Divider(height: 24, color: borderColor),
 
           // Post Announcement Form
@@ -1376,9 +1873,18 @@ class _TeacherDashboardViewState extends State<TeacherDashboardView> {
               hintText: 'e.g. Field Trip Permission Slip Reminder',
               filled: true,
               fillColor: surfaceWhite,
-              border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(4)), borderSide: BorderSide(color: borderColor)),
-              enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(4)), borderSide: BorderSide(color: borderColor)),
-              focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(4)), borderSide: BorderSide(color: primaryBlue)),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(4)),
+                borderSide: BorderSide(color: borderColor),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(4)),
+                borderSide: BorderSide(color: borderColor),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(4)),
+                borderSide: BorderSide(color: primaryBlue),
+              ),
             ),
           ),
           const SizedBox(height: 12),
@@ -1390,9 +1896,18 @@ class _TeacherDashboardViewState extends State<TeacherDashboardView> {
               hintText: 'Enter announcement body content for parents...',
               filled: true,
               fillColor: surfaceWhite,
-              border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(4)), borderSide: BorderSide(color: borderColor)),
-              enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(4)), borderSide: BorderSide(color: borderColor)),
-              focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(4)), borderSide: BorderSide(color: primaryBlue)),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(4)),
+                borderSide: BorderSide(color: borderColor),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(4)),
+                borderSide: BorderSide(color: borderColor),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(4)),
+                borderSide: BorderSide(color: primaryBlue),
+              ),
             ),
           ),
           const SizedBox(height: 12),
@@ -1402,19 +1917,34 @@ class _TeacherDashboardViewState extends State<TeacherDashboardView> {
             child: ElevatedButton.icon(
               onPressed: _publishNotice,
               icon: const Icon(Icons.send_outlined, size: 16),
-              label: const Text('POST CLASS NOTICE', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+              label: const Text(
+                'POST CLASS NOTICE',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+              ),
               style: ElevatedButton.styleFrom(
                 backgroundColor: primaryBlue,
                 foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
-                shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(4))),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 18,
+                  vertical: 12,
+                ),
+                shape: const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(4)),
+                ),
               ),
             ),
           ),
           const Divider(height: 28, color: borderColor),
 
           // Announcement Feed History
-          const Text('Published Class Announcements', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: textPrimary)),
+          const Text(
+            'Published Class Announcements',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 14,
+              color: textPrimary,
+            ),
+          ),
           const SizedBox(height: 10),
 
           ListView.builder(
@@ -1438,15 +1968,38 @@ class _TeacherDashboardViewState extends State<TeacherDashboardView> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Expanded(
-                          child: Text(item['subject'], style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: primaryBlue)),
+                          child: Text(
+                            item['subject'],
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 13,
+                              color: primaryBlue,
+                            ),
+                          ),
                         ),
-                        Text(item['date'], style: const TextStyle(fontSize: 11, color: textSecondary)),
+                        Text(
+                          item['date'],
+                          style: const TextStyle(
+                            fontSize: 11,
+                            color: textSecondary,
+                          ),
+                        ),
                       ],
                     ),
                     const SizedBox(height: 4),
-                    Text(item['body'], style: const TextStyle(fontSize: 12, color: textPrimary)),
+                    Text(
+                      item['body'],
+                      style: const TextStyle(fontSize: 12, color: textPrimary),
+                    ),
                     const SizedBox(height: 6),
-                    Text(item['reads'], style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: successText)),
+                    Text(
+                      item['reads'],
+                      style: const TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                        color: successText,
+                      ),
+                    ),
                   ],
                 ),
               );
