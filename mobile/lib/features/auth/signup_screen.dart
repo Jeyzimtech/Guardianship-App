@@ -89,6 +89,123 @@ class _SignupScreenState extends State<SignupScreen> {
     }
   }
 
+  Widget _buildRoleRadioCard({
+    required String role,
+    required String title,
+    required String subtitle,
+    required IconData icon,
+  }) {
+    final bool isSelected = _selectedRole == role;
+
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () => setState(() => _selectedRole = role),
+        borderRadius: BorderRadius.circular(14),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 220),
+          curve: Curves.easeInOut,
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: isSelected ? AppColors.softBlue : AppColors.surface,
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(
+              color: isSelected ? AppColors.primary : AppColors.cardBorder,
+              width: isSelected ? 1.8 : 1.0,
+            ),
+            boxShadow: isSelected
+                ? [
+                    BoxShadow(
+                      color: AppColors.primary.withValues(alpha: 0.12),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ]
+                : [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.02),
+                      blurRadius: 4,
+                      offset: const Offset(0, 1),
+                    ),
+                  ],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  // Smart Radio Button Indicator
+                  AnimatedContainer(
+                    duration: const Duration(milliseconds: 200),
+                    width: 20,
+                    height: 20,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: isSelected ? AppColors.primary : AppColors.cardBorderDarker,
+                        width: 2.0,
+                      ),
+                      color: isSelected ? AppColors.surface : Colors.transparent,
+                    ),
+                    child: Center(
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 200),
+                        curve: Curves.easeOutBack,
+                        width: isSelected ? 10 : 0,
+                        height: isSelected ? 10 : 0,
+                        decoration: const BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: AppColors.primary,
+                        ),
+                      ),
+                    ),
+                  ),
+                  // Role Icon Badge
+                  Container(
+                    padding: const EdgeInsets.all(6),
+                    decoration: BoxDecoration(
+                      color: isSelected ? AppColors.primary.withValues(alpha: 0.12) : AppColors.background,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      icon,
+                      size: 17,
+                      color: isSelected ? AppColors.primary : AppColors.textLight,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 10),
+              Text(
+                title,
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 13,
+                  color: isSelected ? AppColors.primaryDark : AppColors.textPrimary,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+              const SizedBox(height: 2),
+              Text(
+                subtitle,
+                style: TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w500,
+                  color: isSelected ? AppColors.primaryLight : AppColors.textMuted,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -288,44 +405,46 @@ class _SignupScreenState extends State<SignupScreen> {
                     ),
                     const SizedBox(height: 16),
 
-                    // Account Type Select Dropdown
-                    DropdownButtonFormField<String>(
-                      initialValue: _selectedRole,
-                      dropdownColor: AppColors.surface,
-                      style: const TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w500),
-                      decoration: InputDecoration(
-                        hintText: 'Account Type',
-                        hintStyle: const TextStyle(color: AppColors.textLight, fontSize: 14),
-                        prefixIcon: const Icon(Icons.group_outlined, color: AppColors.primaryLight),
-                        filled: true,
-                        fillColor: AppColors.surface,
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(color: AppColors.cardBorder, width: 1.0),
+                    // Smart Radio Role Selector
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(left: 2, bottom: 8),
+                          child: Text(
+                            'ACCOUNT TYPE',
+                            style: TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 0.8,
+                              color: AppColors.textMuted,
+                            ),
+                          ),
                         ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(color: AppColors.cardBorder, width: 1.0),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: _buildRoleRadioCard(
+                                role: 'Parent / Student',
+                                title: 'Parent / Student',
+                                subtitle: 'Family Portal',
+                                icon: Icons.family_restroom_rounded,
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: _buildRoleRadioCard(
+                                role: 'Teacher',
+                                title: 'Teacher',
+                                subtitle: 'Faculty Portal',
+                                icon: Icons.school_rounded,
+                              ),
+                            ),
+                          ],
                         ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(color: AppColors.primaryLight, width: 1.8),
-                        ),
-                      ),
-                      items: ['Parent / Student', 'Teacher'].map((role) {
-                        return DropdownMenuItem<String>(
-                          value: role,
-                          child: Text(role, style: const TextStyle(color: AppColors.textPrimary)),
-                        );
-                      }).toList(),
-                      onChanged: (val) {
-                        if (val != null) {
-                          setState(() => _selectedRole = val);
-                        }
-                      },
+                      ],
                     ),
-                    const SizedBox(height: 28),
+                    const SizedBox(height: 24),
 
                     // Sign Up Button
                     ElevatedButton(

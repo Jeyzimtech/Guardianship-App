@@ -71,6 +71,123 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
+  Widget _buildRoleRadioCard({
+    required String role,
+    required String title,
+    required String subtitle,
+    required IconData icon,
+  }) {
+    final bool isSelected = _selectedRole == role;
+
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () => _onRoleChanged(role),
+        borderRadius: BorderRadius.circular(14),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 220),
+          curve: Curves.easeInOut,
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: isSelected ? AppColors.softBlue : AppColors.surface,
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(
+              color: isSelected ? AppColors.primary : AppColors.cardBorder,
+              width: isSelected ? 1.8 : 1.0,
+            ),
+            boxShadow: isSelected
+                ? [
+                    BoxShadow(
+                      color: AppColors.primary.withValues(alpha: 0.12),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ]
+                : [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.02),
+                      blurRadius: 4,
+                      offset: const Offset(0, 1),
+                    ),
+                  ],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  // Smart Radio Button Indicator
+                  AnimatedContainer(
+                    duration: const Duration(milliseconds: 200),
+                    width: 20,
+                    height: 20,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: isSelected ? AppColors.primary : AppColors.cardBorderDarker,
+                        width: 2.0,
+                      ),
+                      color: isSelected ? AppColors.surface : Colors.transparent,
+                    ),
+                    child: Center(
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 200),
+                        curve: Curves.easeOutBack,
+                        width: isSelected ? 10 : 0,
+                        height: isSelected ? 10 : 0,
+                        decoration: const BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: AppColors.primary,
+                        ),
+                      ),
+                    ),
+                  ),
+                  // Role Icon Badge
+                  Container(
+                    padding: const EdgeInsets.all(6),
+                    decoration: BoxDecoration(
+                      color: isSelected ? AppColors.primary.withValues(alpha: 0.12) : AppColors.background,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      icon,
+                      size: 17,
+                      color: isSelected ? AppColors.primary : AppColors.textLight,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 10),
+              Text(
+                title,
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 13,
+                  color: isSelected ? AppColors.primaryDark : AppColors.textPrimary,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+              const SizedBox(height: 2),
+              Text(
+                subtitle,
+                style: TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w500,
+                  color: isSelected ? AppColors.primaryLight : AppColors.textMuted,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -125,105 +242,48 @@ class _LoginScreenState extends State<LoginScreen> {
                     fontWeight: FontWeight.w500,
                   ),
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: 20),
 
-                // Role Selection Toggle
-                Container(
-                  margin: const EdgeInsets.only(bottom: 20),
-                  padding: const EdgeInsets.all(4),
-                  decoration: BoxDecoration(
-                    color: AppColors.softBlue,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: AppColors.blueBorder),
-                  ),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: GestureDetector(
-                          onTap: () => _onRoleChanged('Parent / Student'),
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(vertical: 12),
-                            decoration: BoxDecoration(
-                              color: _selectedRole == 'Parent / Student' ? AppColors.primary : Colors.transparent,
-                              borderRadius: BorderRadius.circular(9),
-                              boxShadow: _selectedRole == 'Parent / Student'
-                                  ? [
-                                      BoxShadow(
-                                        color: AppColors.primary.withValues(alpha: 0.25),
-                                        blurRadius: 6,
-                                        offset: const Offset(0, 2),
-                                      )
-                                    ]
-                                  : null,
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  Icons.family_restroom_rounded,
-                                  size: 18,
-                                  color: _selectedRole == 'Parent / Student' ? Colors.white : AppColors.primaryLight,
-                                ),
-                                const SizedBox(width: 8),
-                                Flexible(
-                                  child: Text(
-                                    'Parent / Student',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 13,
-                                      color: _selectedRole == 'Parent / Student' ? Colors.white : AppColors.primaryDark,
-                                    ),
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
+                // Smart Radio Role Selector
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(left: 2, bottom: 8),
+                      child: Text(
+                        'LOGIN AS',
+                        style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 0.8,
+                          color: AppColors.textMuted,
                         ),
                       ),
-                      Expanded(
-                        child: GestureDetector(
-                          onTap: () => _onRoleChanged('Teacher'),
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(vertical: 12),
-                            decoration: BoxDecoration(
-                              color: _selectedRole == 'Teacher' ? AppColors.primary : Colors.transparent,
-                              borderRadius: BorderRadius.circular(9),
-                              boxShadow: _selectedRole == 'Teacher'
-                                  ? [
-                                      BoxShadow(
-                                        color: AppColors.primary.withValues(alpha: 0.25),
-                                        blurRadius: 6,
-                                        offset: const Offset(0, 2),
-                                      )
-                                    ]
-                                  : null,
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  Icons.badge_rounded,
-                                  size: 18,
-                                  color: _selectedRole == 'Teacher' ? Colors.white : AppColors.primaryLight,
-                                ),
-                                const SizedBox(width: 8),
-                                Text(
-                                  'Teacher',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 13,
-                                    color: _selectedRole == 'Teacher' ? Colors.white : AppColors.primaryDark,
-                                  ),
-                                ),
-                              ],
-                            ),
+                    ),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _buildRoleRadioCard(
+                            role: 'Parent / Student',
+                            title: 'Parent / Student',
+                            subtitle: 'Family Portal',
+                            icon: Icons.family_restroom_rounded,
                           ),
                         ),
-                      ),
-                    ],
-                  ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: _buildRoleRadioCard(
+                            role: 'Teacher',
+                            title: 'Teacher',
+                            subtitle: 'Faculty Portal',
+                            icon: Icons.school_rounded,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
+                const SizedBox(height: 18),
                 
                 const SizedBox(height: 8),
 
