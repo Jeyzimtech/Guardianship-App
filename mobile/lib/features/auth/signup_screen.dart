@@ -59,8 +59,6 @@ class _SignupScreenState extends State<SignupScreen> {
       _isAuthenticating = true;
     });
 
-    await Future.delayed(const Duration(milliseconds: 800));
-
     if (!mounted) return;
 
     final authProvider = Provider.of<AuthProvider>(context, listen: false);

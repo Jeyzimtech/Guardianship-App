@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'api_client.dart';
 
@@ -63,9 +64,14 @@ class AuthProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final response = await apiClient.dio.post('/auth/firebase-login', data: {
-        'id_token': firebaseIdToken,
-      });
+      final response = await apiClient.dio.post(
+        '/auth/firebase-login',
+        data: {'id_token': firebaseIdToken},
+        options: Options(
+          sendTimeout: const Duration(milliseconds: 1500),
+          receiveTimeout: const Duration(milliseconds: 1500),
+        ),
+      );
 
       if (response.statusCode == 200 && response.data['status'] == 'success') {
         final userRole = response.data['user']?['role'];
@@ -92,7 +98,7 @@ class AuthProvider extends ChangeNotifier {
         return true;
       }
     } catch (e) {
-      // Offline fallback: simulate successful login for prototype (Teacher or Guardian)
+      // Fast fallback: simulate successful login for prototype (Teacher or Guardian)
       final isTeacherRole = firebaseIdToken.contains('teacher') || firebaseIdToken.contains('+263772222222');
       final role = isTeacherRole ? 'teacher' : 'guardian';
       final name = isTeacherRole ? 'Teacher Grace' : 'Guardian John Chewe';
@@ -122,19 +128,31 @@ class AuthProvider extends ChangeNotifier {
   }
 
   Future<void> logout() async {
-    try {
-      await apiClient.dio.post('/auth/logout');
-    } catch (_) {
-      // Ignore network errors on logout
-    }
+    final tokenToRevoke = _token;
 
+    // 1. Immediately reset memory state and notify listeners for instantaneous UI response
     _token = null;
     _user = null;
     _errorMessage = null;
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.clear();
-    
     notifyListeners();
+
+    // 2. Clear storage asynchronously
+    SharedPreferences.getInstance().then((prefs) => prefs.clear());
+
+    // 3. Fire-and-forget server logout in background without blocking the UI
+    if (tokenToRevoke != null && !tokenToRevoke.startsWith('mock-')) {
+      try {
+        apiClient.dio.post(
+          '/auth/logout',
+          options: Options(
+            sendTimeout: const Duration(seconds: 2),
+            receiveTimeout: const Duration(seconds: 2),
+          ),
+        ).catchError((_) => Response(requestOptions: RequestOptions(path: '')));
+      } catch (_) {
+        // Ignored
+      }
+    }
   }
 
   Future<bool> updateProfile({
