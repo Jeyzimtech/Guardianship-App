@@ -4,7 +4,6 @@ import '../../core/auth_provider.dart';
 import '../../core/student_provider.dart';
 import '../../core/app_colors.dart';
 import '../../core/app_icon.dart';
-import '../profile/profile_view.dart';
 import '../parent/uniform_marketplace_view.dart';
 import '../parent/learning_journal_view.dart';
 import '../parent/behaviour_view.dart';
@@ -130,15 +129,6 @@ class AppDrawer extends StatelessWidget {
 
                       onTap: () =>
                           Navigator.popUntil(context, (r) => r.isFirst),
-                    ),
-                    _buildDrawerItem(
-                      context,
-                      title: 'My Profile',
-
-                      onTap: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (_) => const ProfileView()),
-                      ),
                     ),
                     if (!isTeacher) ...[
                       _buildDrawerItem(
