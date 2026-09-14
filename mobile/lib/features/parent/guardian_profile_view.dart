@@ -188,59 +188,6 @@ class _GuardianProfileViewState extends State<GuardianProfileView> {
 
               const SizedBox(height: 8),
 
-              // ── STUDENT IDENTITY (READ ONLY) ──
-              _buildSectionHeader('Student Linked Record'),
-              Container(
-                margin: const EdgeInsets.symmetric(horizontal: 16),
-                padding: const EdgeInsets.all(14),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFF8FAFC),
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: const Color(0xFFCBD5E1)),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        const Icon(
-                          Icons.lock_rounded,
-                          size: 14,
-                          color: primaryBlue,
-                        ),
-                        const SizedBox(width: 6),
-                        const Text(
-                          'ADMIN / TEACHER CONTROLLED',
-                          style: TextStyle(
-                            fontSize: 10,
-                            fontWeight: FontWeight.bold,
-                            color: primaryBlue,
-                            letterSpacing: 0.5,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
-                    _buildInfoRow('STUDENT NAME', widget.child['name'] ?? '—'),
-                    const SizedBox(height: 4),
-                    _buildInfoRow('CLASS', widget.child['class'] ?? '—'),
-                    const SizedBox(height: 4),
-                    _buildInfoRow('SCHOOL', widget.child['school'] ?? '—'),
-                    const SizedBox(height: 8),
-                    const Text(
-                      'Guardians cannot alter student identity, grade, or school enrolment.',
-                      style: TextStyle(
-                        fontSize: 11,
-                        fontStyle: FontStyle.italic,
-                        color: Colors.grey,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              const SizedBox(height: 8),
-
               // ── PERSONAL DETAILS ──
               _buildSectionHeader('Personal Details'),
               Padding(
@@ -365,8 +312,9 @@ class _GuardianProfileViewState extends State<GuardianProfileView> {
                           ),
                         ],
                         onChanged: (val) {
-                          if (val != null)
+                          if (val != null) {
                             setState(() => _preferredLanguage = val);
+                          }
                         },
                       ),
                     ),
@@ -600,35 +548,6 @@ class _GuardianProfileViewState extends State<GuardianProfileView> {
     );
   }
 
-  Widget _buildInfoRow(String label, String value) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        SizedBox(
-          width: 90,
-          child: Text(
-            label,
-            style: const TextStyle(
-              fontSize: 10,
-              fontWeight: FontWeight.bold,
-              color: Color(0xFF9CA3AF),
-              letterSpacing: 0.5,
-            ),
-          ),
-        ),
-        Expanded(
-          child: Text(
-            value,
-            style: const TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.w600,
-              color: Color(0xFF1F2937),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
 
   Widget _buildField({
     required TextEditingController controller,
