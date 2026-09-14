@@ -11,6 +11,7 @@ import '../parent/behaviour_view.dart';
 import '../parent/assignments_view.dart';
 import '../dashboard/announcements_view.dart';
 import '../dashboard/attendance_view.dart';
+import '../auth/login_screen.dart';
 
 class AppDrawer extends StatelessWidget {
   final String currentRoute;
@@ -252,10 +253,12 @@ class AppDrawer extends StatelessWidget {
                       listen: false,
                     );
                     studentProvider.clearData();
-                    Navigator.pop(context); // Close drawer
                     await auth.logout();
-                    if (context.mounted && Navigator.canPop(context)) {
-                      Navigator.of(context).popUntil((route) => route.isFirst);
+                    if (context.mounted) {
+                      Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
+                        MaterialPageRoute(builder: (_) => const LoginScreen()),
+                        (route) => false,
+                      );
                     }
                   },
                   icon: const Icon(

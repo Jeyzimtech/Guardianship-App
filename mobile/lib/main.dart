@@ -148,13 +148,6 @@ class AuthGate extends StatelessWidget {
     if (authProvider.isAuthenticated) {
       return const MobileRoleGuard(child: DashboardHome());
     } else {
-      // Clear any pushed routes when logged out
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (navigatorKey.currentState != null &&
-            navigatorKey.currentState!.canPop()) {
-          navigatorKey.currentState!.popUntil((route) => route.isFirst);
-        }
-      });
       return const LoginScreen();
     }
   }

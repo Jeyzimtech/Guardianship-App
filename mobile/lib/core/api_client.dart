@@ -15,17 +15,20 @@ class ApiClient {
       if (Platform.isAndroid) {
         return 'http://10.0.2.2:8000/api';
       }
+      if (Platform.isWindows || Platform.isMacOS || Platform.isLinux) {
+        return 'http://127.0.0.1:8000/api';
+      }
     } catch (_) {
       // Non-mobile platforms or fallback
     }
-    return 'http://10.0.2.2:8000/api'; // Default fallback
+    return 'http://127.0.0.1:8000/api'; // Default fallback
   }
 
   ApiClient({String? baseUrl}) {
     _dio = Dio(BaseOptions(
       baseUrl: baseUrl ?? defaultBaseUrl,
-      connectTimeout: const Duration(seconds: 3),
-      receiveTimeout: const Duration(seconds: 3),
+      connectTimeout: const Duration(milliseconds: 1500),
+      receiveTimeout: const Duration(milliseconds: 1500),
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json',

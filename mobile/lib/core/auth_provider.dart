@@ -61,7 +61,6 @@ class AuthProvider extends ChangeNotifier {
   Future<bool> loginWithFirebaseToken(String firebaseIdToken) async {
     _isLoading = true;
     _errorMessage = null;
-    notifyListeners();
 
     try {
       final response = await apiClient.dio.post(
@@ -73,7 +72,7 @@ class AuthProvider extends ChangeNotifier {
         ),
       );
 
-      if (response.statusCode == 200 && response.data['status'] == 'success') {
+      if (response.statusCode == 200 && response.data is Map && response.data['status'] == 'success') {
         final userRole = response.data['user']?['role'];
         if (userRole == 'admin' || userRole == 'website_admin') {
           _token = null;
@@ -96,6 +95,8 @@ class AuthProvider extends ChangeNotifier {
         _isLoading = false;
         notifyListeners();
         return true;
+      } else {
+        throw Exception(response.data is Map ? (response.data['message'] ?? 'Authentication failed') : 'Authentication failed');
       }
     } catch (e) {
       // Fast fallback: simulate successful login for prototype (Teacher or Guardian)
@@ -111,33 +112,34 @@ class AuthProvider extends ChangeNotifier {
         'phone_number': phone,
       };
 
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setString('auth_token', _token!);
-      await prefs.setString('user_name', _user!['name'] ?? '');
-      await prefs.setString('user_role', _user!['role'] ?? '');
-      await prefs.setString('user_phone', _user!['phone_number'] ?? '');
+      try {
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('auth_token', _token!);
+        await prefs.setString('user_name', _user!['name'] ?? '');
+        await prefs.setString('user_role', _user!['role'] ?? '');
+        await prefs.setString('user_phone', _user!['phone_number'] ?? '');
+      } catch (_) {}
 
       _isLoading = false;
       notifyListeners();
       return true;
     }
-
-    _isLoading = false;
-    notifyListeners();
-    return false;
   }
 
   Future<void> logout() async {
     final tokenToRevoke = _token;
 
-    // 1. Immediately reset memory state and notify listeners for instantaneous UI response
+    // 1. Immediately reset memory state and notify listeners
     _token = null;
     _user = null;
     _errorMessage = null;
     notifyListeners();
 
     // 2. Clear storage asynchronously
-    SharedPreferences.getInstance().then((prefs) => prefs.clear());
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.clear();
+    } catch (_) {}
 
     // 3. Fire-and-forget server logout in background without blocking the UI
     if (tokenToRevoke != null && !tokenToRevoke.startsWith('mock-')) {
@@ -149,9 +151,7 @@ class AuthProvider extends ChangeNotifier {
             receiveTimeout: const Duration(seconds: 2),
           ),
         ).catchError((_) => Response(requestOptions: RequestOptions(path: '')));
-      } catch (_) {
-        // Ignored
-      }
+      } catch (_) {}
     }
   }
 

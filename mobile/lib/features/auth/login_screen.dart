@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../core/auth_provider.dart';
 import '../../core/app_colors.dart';
+import '../dashboard/dashboard_home.dart';
 import 'signup_screen.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -60,14 +61,21 @@ class _LoginScreenState extends State<LoginScreen> {
     
     final success = await authProvider.loginWithFirebaseToken(mockToken);
     
-    setState(() {
-      _isAuthenticating = false;
-    });
+    if (mounted) {
+      setState(() {
+        _isAuthenticating = false;
+      });
 
-    if (!success && mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(authProvider.errorMessage ?? 'Authentication failed.')),
-      );
+      if (success) {
+        Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (_) => const DashboardHome()),
+          (route) => false,
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(authProvider.errorMessage ?? 'Authentication failed.')),
+        );
+      }
     }
   }
 
@@ -406,7 +414,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     TextButton(
                       onPressed: () {
-                        Navigator.of(context).pushReplacement(
+                        Navigator.of(context).push(
                           MaterialPageRoute(builder: (_) => const SignupScreen()),
                         );
                       },

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../core/auth_provider.dart';
 import '../../core/app_colors.dart';
+import '../dashboard/dashboard_home.dart';
 import 'login_screen.dart';
 
 class SignupScreen extends StatefulWidget {
@@ -76,9 +77,12 @@ class _SignupScreenState extends State<SignupScreen> {
 
       if (success) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Welcome, $name! Account created successfully (Dummy mode).')),
+          SnackBar(content: Text('Welcome, $name! Account created successfully.')),
         );
-        Navigator.of(context).popUntil((route) => route.isFirst);
+        Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (_) => const DashboardHome()),
+          (route) => false,
+        );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(authProvider.errorMessage ?? 'Signup simulation failed.')),
@@ -218,9 +222,13 @@ class _SignupScreenState extends State<SignupScreen> {
               child: IconButton(
                 icon: const Icon(Icons.arrow_back_ios_new_rounded, color: AppColors.primary),
                 onPressed: () {
-                  Navigator.of(context).pushReplacement(
-                    MaterialPageRoute(builder: (_) => const LoginScreen()),
-                  );
+                  if (Navigator.canPop(context)) {
+                    Navigator.of(context).pop();
+                  } else {
+                    Navigator.of(context).pushReplacement(
+                      MaterialPageRoute(builder: (_) => const LoginScreen()),
+                    );
+                  }
                 },
               ),
             ),
@@ -477,9 +485,13 @@ class _SignupScreenState extends State<SignupScreen> {
                         ),
                         TextButton(
                           onPressed: () {
-                            Navigator.of(context).pushReplacement(
-                              MaterialPageRoute(builder: (_) => const LoginScreen()),
-                            );
+                            if (Navigator.canPop(context)) {
+                              Navigator.of(context).pop();
+                            } else {
+                              Navigator.of(context).pushReplacement(
+                                MaterialPageRoute(builder: (_) => const LoginScreen()),
+                              );
+                            }
                           },
                           child: const Text(
                             'Log In',

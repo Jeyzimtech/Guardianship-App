@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'auth_provider.dart';
 import 'student_provider.dart';
+import '../features/auth/login_screen.dart';
 
 class MobileRoleGuard extends StatelessWidget {
   final Widget child;
@@ -67,8 +68,11 @@ class MobileRoleGuard extends StatelessWidget {
                       final studentProvider = Provider.of<StudentProvider>(context, listen: false);
                       studentProvider.clearData();
                       await authProvider.logout();
-                      if (context.mounted && Navigator.canPop(context)) {
-                        Navigator.of(context).popUntil((route) => route.isFirst);
+                      if (context.mounted) {
+                        Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
+                          MaterialPageRoute(builder: (_) => const LoginScreen()),
+                          (route) => false,
+                        );
                       }
                     },
                     icon: const Icon(Icons.logout_rounded),
