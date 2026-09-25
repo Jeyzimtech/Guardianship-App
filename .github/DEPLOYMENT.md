@@ -1,6 +1,6 @@
-﻿# Guardianship App — CI/CD Guide
+# Guardianship App — Backend CI/CD Guide
 
-This project uses **GitHub Actions** for continuous integration and deployment.
+This project uses **GitHub Actions** to automate continuous integration and continuous deployment for the **Laravel backend**.
 
 ---
 
@@ -8,83 +8,45 @@ This project uses **GitHub Actions** for continuous integration and deployment.
 
 | Workflow | Trigger | What it does |
 |---|---|---|
-| `ci.yml` | Every push / PR to `master` or `production` | Flutter analyze + tests, Laravel lint + migrations + tests |
-| `cd.yml` | Push to `production` branch only | Deploys Laravel backend to production server via SSH |
-| `build-apk.yml` | Every push to `master` or `production` | Builds a Flutter debug APK and uploads it as an artifact |
+| `ci.yml` | Push & PR to `master` or `production` affecting `backend/**` | Runs composer install, SQLite migrations, and PHPUnit test suite |
+| `cd.yml` | Push to `production` affecting `backend/**` or manual dispatch | Deploys backend via rsync over SSH to server, caches routes/config, and runs database migrations |
 
 ---
 
 ## Branch Strategy
 
 ```
-master      → development / integration branch (CI runs)
-production  → triggers both CI and CD (deploys to server)
+master      → development / staging branch (Backend CI runs)
+production  → deployment branch (Backend CI runs, then deploys to 109.199.99.156)
 ```
 
-**To deploy to production:**
+**To deploy latest changes to production:**
 ```bash
 git checkout production
 git merge master
 git push origin production
 ```
 
+Or trigger manually anytime from **GitHub → Actions → Deploy Backend to Production → Run workflow**.
+
 ---
 
-## Required GitHub Secrets
+## Configured GitHub Secrets
 
-Go to: **GitHub repo → Settings → Secrets and variables → Actions → New repository secret**
+All secrets are pre-configured in GitHub Repository Settings:
 
-| Secret Name | Value |
+| Secret Name | Purpose |
 |---|---|
-| `DEPLOY_HOST` | `109.199.99.156` |
-| `DEPLOY_USER` | `root` |
-| `DEPLOY_PASSWORD` | *(your server root password)* |
-| `DEPLOY_SSH_KEY` | *(private SSH key — see below)* |
-
-### Generating an SSH Key for Deployment
-
-Run this on your **local machine**:
-```bash
-ssh-keygen -t ed25519 -C "github-actions-deploy" -f deploy_key -N ""
-```
-
-This creates two files:
-- `deploy_key` — private key → paste this into `DEPLOY_SSH_KEY` secret
-- `deploy_key.pub` — public key → add to server with:
-
-```bash
-ssh root@109.199.99.156 "mkdir -p ~/.ssh && echo '$(cat deploy_key.pub)' >> ~/.ssh/authorized_keys"
-```
+| `DEPLOY_HOST` | Production server IP (`109.199.99.156`) |
+| `DEPLOY_USER` | Server user (`root`) |
+| `DEPLOY_PASSWORD` | Server root password (fallback) |
+| `DEPLOY_SSH_KEY` | Dedicated Ed25519 private key for automated passwordless deployment |
 
 ---
 
-## First-Time Server Setup
+## Production Server Paths
 
-SSH into the server and run the setup script once:
-```bash
-ssh root@109.199.99.156
-bash -c "$(curl -fsSL https://raw.githubusercontent.com/Jeyzimtech/Guardianship-App/master/.github/scripts/server-setup.sh)"
-```
-
-Or copy and run the script manually from `.github/scripts/server-setup.sh`.
-
-After first deploy, generate the app key on the server:
-```bash
-ssh root@109.199.99.156 "cd /var/www/guardianship/backend && php artisan key:generate"
-```
-
----
-
-## APK Artifacts
-
-After every push to `master` or `production`, the Flutter debug APK is built and available to download from:
-
-**GitHub repo → Actions → Build — Flutter Debug APK → (select run) → Artifacts**
-
-The APK is retained for **14 days**.
-
----
-
-## Viewing CI/CD Status
-
-Check the status at: `https://github.com/Jeyzimtech/Guardianship-App/actions`
+- Application root: `/var/www/guardianship/backend`
+- Nginx root: `/var/www/guardianship/backend/public`
+- Environment config: `/var/www/guardianship/backend/.env`
+- SQLite Database: `/var/www/guardianship/backend/database/database.sqlite`

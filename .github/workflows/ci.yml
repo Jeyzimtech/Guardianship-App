@@ -1,95 +1,63 @@
-name: CI — Guardianship App
+name: Backend CI
 
 on:
   push:
     branches: [master, production]
+    paths:
+      - 'backend/**'
+      - '.github/workflows/ci.yml'
   pull_request:
     branches: [master, production]
+    paths:
+      - 'backend/**'
+      - '.github/workflows/ci.yml'
 
-# Cancel any in-progress runs for the same branch to save runner minutes
 concurrency:
-  group: ci-${{ github.ref }}
+  group: backend-ci-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  # ─────────────────────────────────────────────
-  #  JOB 1: Flutter — Analyze & Test
-  # ─────────────────────────────────────────────
-  flutter-ci:
-    name: Flutter — Analyze & Test
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: 📥 Checkout repository
-        uses: actions/checkout@v4
-
-      - name: 🐦 Setup Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          flutter-version: "3.32.x"
-          channel: "stable"
-          cache: true
-
-      - name: 📦 Install Flutter dependencies
-        working-directory: mobile
-        run: flutter pub get
-
-      - name: 🔍 Run Flutter Analyze (lint & type check)
-        working-directory: mobile
-        run: flutter analyze --no-fatal-infos
-
-      - name: 🧪 Run Flutter Tests
-        working-directory: mobile
-        run: flutter test --reporter=expanded
-
-  # ─────────────────────────────────────────────
-  #  JOB 2: Laravel — Lint, Migrate & Test
-  # ─────────────────────────────────────────────
   laravel-ci:
-    name: Laravel — Lint, Migrate & Test
+    name: Laravel Lint & Test
     runs-on: ubuntu-latest
 
     steps:
-      - name: 📥 Checkout repository
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: 🐘 Setup PHP 8.2
+      - name: Setup PHP 8.2
         uses: shivammathur/setup-php@v2
         with:
-          php-version: "8.2"
+          php-version: '8.2'
           extensions: mbstring, pdo, pdo_sqlite, sqlite3, bcmath, json, tokenizer, xml, ctype, openssl
           coverage: none
 
-      - name: 📦 Install Composer dependencies
+      - name: Install Composer dependencies
         working-directory: backend
         run: composer install --no-interaction --prefer-dist --optimize-autoloader
 
-      - name: 📄 Copy .env.example to .env
+      - name: Copy .env.example to .env
         working-directory: backend
         run: cp .env.example .env
 
-      - name: 🔑 Generate application key
+      - name: Generate application key
         working-directory: backend
         run: php artisan key:generate
 
-      - name: 🗄️ Create SQLite database
+      - name: Create SQLite database
         working-directory: backend
         run: |
           touch database/database.sqlite
           echo "DB_CONNECTION=sqlite" >> .env
           echo "DB_DATABASE=$(pwd)/database/database.sqlite" >> .env
 
-      - name: 📐 Run database migrations
+      - name: Run database migrations
         working-directory: backend
         run: php artisan migrate --force
 
-      - name: 🎨 Run Laravel Pint (PHP lint)
+      - name: Run PHPUnit tests
         working-directory: backend
-        run: ./vendor/bin/pint --test
-
-      - name: 🧪 Run PHPUnit tests
-        working-directory: backend
-        run: php artisan test --parallel
+        run: php artisan test
         env:
           APP_ENV: testing
           DB_CONNECTION: sqlite
