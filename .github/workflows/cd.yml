@@ -1,17 +1,20 @@
-name: CD — Deploy to Production
+name: Deploy Backend to Production
 
 on:
   push:
     branches: [production]
+    paths:
+      - 'backend/**'
+      - '.github/workflows/cd.yml'
+  workflow_dispatch:
 
-# Only one deployment at a time
 concurrency:
   group: cd-production
   cancel-in-progress: false
 
 jobs:
   deploy-backend:
-    name: 🚀 Deploy Laravel Backend to Server
+    name: Deploy Laravel Backend to Server
     runs-on: ubuntu-latest
 
     environment:
@@ -19,21 +22,21 @@ jobs:
       url: http://109.199.99.156
 
     steps:
-      - name: 📥 Checkout repository
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: 🐘 Setup PHP 8.2
+      - name: Setup PHP 8.2
         uses: shivammathur/setup-php@v2
         with:
-          php-version: "8.2"
+          php-version: '8.2'
           extensions: mbstring, pdo, pdo_sqlite, sqlite3, bcmath, json, tokenizer, xml, ctype, openssl
           coverage: none
 
-      - name: 📦 Install Composer dependencies (production)
+      - name: Install Composer dependencies (production)
         working-directory: backend
         run: composer install --no-interaction --prefer-dist --optimize-autoloader --no-dev
 
-      - name: 📂 Deploy via rsync to server
+      - name: Deploy via rsync to server
         uses: easingthemes/ssh-deploy@v5.1.0
         with:
           SSH_PRIVATE_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
@@ -43,12 +46,12 @@ jobs:
           TARGET: "/var/www/guardianship/backend"
           ARGS: "-avz --delete --exclude='.env' --exclude='storage/logs/' --exclude='storage/framework/cache/' --exclude='storage/framework/sessions/' --exclude='storage/framework/views/' --exclude='database/database.sqlite'"
 
-      - name: ⚙️ Run post-deploy artisan commands on server
+      - name: Run post-deploy artisan commands on server
         uses: appleboy/ssh-action@v1.2.0
         with:
           host: ${{ secrets.DEPLOY_HOST }}
           username: ${{ secrets.DEPLOY_USER }}
-          password: ${{ secrets.DEPLOY_PASSWORD }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
           script: |
             set -e
             cd /var/www/guardianship/backend
@@ -65,4 +68,4 @@ jobs:
             php artisan migrate --force
             php artisan queue:restart
 
-            echo "--- Deployment complete ✅ ---"
+            echo "--- Deployment complete ---"
