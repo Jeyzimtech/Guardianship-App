@@ -209,7 +209,6 @@ class _LearningJournalViewState extends State<LearningJournalView> {
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
         color: AppColors.surface,
-        borderRadius: BorderRadius.circular(10),
         border: Border.all(color: AppColors.cardBorder),
         boxShadow: [
           BoxShadow(
@@ -228,10 +227,6 @@ class _LearningJournalViewState extends State<LearningJournalView> {
             decoration: const BoxDecoration(
               color: AppColors.softBlue,
               border: Border(bottom: BorderSide(color: AppColors.blueBorder)),
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(10),
-                topRight: Radius.circular(10),
-              ),
             ),
             child: Row(
               children: [
@@ -274,7 +269,6 @@ class _LearningJournalViewState extends State<LearningJournalView> {
                   ),
                   decoration: BoxDecoration(
                     color: AppColors.surface,
-                    borderRadius: BorderRadius.circular(4),
                     border: Border.all(color: AppColors.blueBorder),
                   ),
                   child: Text(
@@ -317,7 +311,6 @@ class _LearningJournalViewState extends State<LearningJournalView> {
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
                       color: AppColors.softBlue,
-                      borderRadius: BorderRadius.circular(8),
                       border: Border.all(color: AppColors.blueBorder),
                     ),
                     child: Column(
@@ -361,23 +354,23 @@ class _LearningJournalViewState extends State<LearningJournalView> {
                 // Image Work Sample
                 if (hasImage) ...[
                   const SizedBox(height: 12),
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(8),
-                    child: Container(
-                      height: 180,
-                      width: double.infinity,
+                  Container(
+                    height: 180,
+                    width: double.infinity,
+                    decoration: BoxDecoration(
                       color: AppColors.softBlue,
-                      child: Image.network(
-                        entry['image_url'],
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) => Container(
-                          color: AppColors.softBlue,
-                          child: const Center(
-                            child: Icon(
-                              Icons.image,
-                              size: 48,
-                              color: AppColors.primaryLight,
-                            ),
+                      border: Border.all(color: AppColors.blueBorder),
+                    ),
+                    child: Image.network(
+                      entry['image_url'],
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) => Container(
+                        color: AppColors.softBlue,
+                        child: const Center(
+                          child: Icon(
+                            Icons.image,
+                            size: 48,
+                            color: AppColors.primaryLight,
                           ),
                         ),
                       ),
@@ -392,7 +385,6 @@ class _LearningJournalViewState extends State<LearningJournalView> {
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
                       color: AppColors.softBlue,
-                      borderRadius: BorderRadius.circular(8),
                       border: Border.all(color: AppColors.blueBorder),
                     ),
                     child: Row(
@@ -449,10 +441,7 @@ class _LearningJournalViewState extends State<LearningJournalView> {
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
                       color: AppColors.softBlue,
-                      borderRadius: BorderRadius.circular(8),
-                      border: const Border(
-                        left: BorderSide(color: AppColors.primary, width: 3),
-                      ),
+                      border: Border.all(color: AppColors.blueBorder),
                     ),
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
