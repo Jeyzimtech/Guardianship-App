@@ -12,7 +12,6 @@ class UniformMarketplaceView extends StatefulWidget {
 
 class _UniformMarketplaceViewState extends State<UniformMarketplaceView> with SingleTickerProviderStateMixin {
   static const primaryBlue = AppColors.primary;
-  static const secondaryBlue = AppColors.primaryLight;
   static const accentGreen = AppColors.primaryLight;
   static const borderColor = AppColors.cardBorder;
 
@@ -498,9 +497,6 @@ class _UniformMarketplaceViewState extends State<UniformMarketplaceView> with Si
 
   @override
   Widget build(BuildContext context) {
-    final childName = widget.child?['name'] ?? 'Alice Chewe';
-    final childSchool = widget.child?['school'] ?? 'Hillside Primary School';
-
     final filteredCatalog = _catalog.where((item) {
       final matchesCat = _selectedCategory == 'All' || item['category'] == _selectedCategory;
       final matchesSearch = _searchQuery.isEmpty ||
@@ -563,57 +559,6 @@ class _UniformMarketplaceViewState extends State<UniformMarketplaceView> with Si
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Student Context Banner
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: borderColor),
-                  ),
-                  child: Row(
-                    children: [
-                      const CircleAvatar(
-                        radius: 16,
-                        backgroundColor: secondaryBlue,
-                        child: Icon(Icons.school_rounded, color: Colors.white, size: 18),
-                      ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Shopping for: $childName',
-                              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Color(0xFF1F2937)),
-                            ),
-                            Text(
-                              childSchool,
-                              style: const TextStyle(fontSize: 11, color: Color(0xFF6B7280)),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFECFDF5),
-                          borderRadius: BorderRadius.circular(6),
-                          border: Border.all(color: const Color(0xFFA7F3D0)),
-                        ),
-                        child: const Row(
-                          children: [
-                            Icon(Icons.verified_rounded, size: 12, color: accentGreen),
-                            SizedBox(width: 4),
-                            Text('Verified Uniforms', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: accentGreen)),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 14),
-
                 // Search Bar
                 TextField(
                   onChanged: (val) => setState(() => _searchQuery = val.trim()),

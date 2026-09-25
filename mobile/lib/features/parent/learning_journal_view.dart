@@ -96,22 +96,13 @@ class _LearningJournalViewState extends State<LearningJournalView> {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Learning Journal',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-              ),
-            ),
-            Text(
-              '${widget.child?['name'] ?? 'Student'} • Running Work Record',
-              style: const TextStyle(fontSize: 12, color: Colors.white70),
-            ),
-          ],
+        title: const Text(
+          'Learning Journal',
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
         ),
         backgroundColor: AppColors.primary,
         iconTheme: const IconThemeData(color: Colors.white),
