@@ -1,4 +1,4 @@
-﻿name: CI — Guardianship App
+name: CI — Guardianship App
 
 on:
   push:
