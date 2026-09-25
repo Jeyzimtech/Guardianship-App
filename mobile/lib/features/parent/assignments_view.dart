@@ -1,5 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../../core/auth_provider.dart';
+import '../../core/student_provider.dart';
+import '../teacher/create_assignment_page.dart';
 import '../../core/app_colors.dart';
+import '../../core/app_icon.dart';
+import '../common/page_components.dart';
 
 class AssignmentsView extends StatefulWidget {
   final Map<String, dynamic>? child;
@@ -12,6 +18,86 @@ class AssignmentsView extends StatefulWidget {
 
 class _AssignmentsViewState extends State<AssignmentsView> {
   String _selectedFilter = 'All';
+  List<dynamic> _classes = [];
+  bool _loading = false;
+  String? _error;
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _load();
+    });
+  }
+
+  Future<void> _load() async {
+    final auth = context.read<AuthProvider>();
+    final student =
+        widget.child?['id'] ??
+        context.read<StudentProvider?>()?.selectedStudent?['id'];
+    if (!auth.isTeacher && student == null) return;
+    setState(() {
+      _loading = true;
+      _error = null;
+      _mockAssignments.clear();
+    });
+    try {
+      final response = await auth.apiClient.dio.get(
+        auth.isTeacher ? '/teacher/assignments' : '/assignments/$student',
+      );
+      if (response.data['status'] != 'success') throw StateError('Load failed');
+      final List<dynamic> items = auth.isTeacher
+          ? response.data['data']
+          : response.data['data']['all'];
+      if (!mounted) return;
+      setState(() {
+        _classes = response.data['classes'] ?? [];
+        _mockAssignments.addAll(
+          items.map(
+            (a) => <String, dynamic>{
+              'title': a['title'],
+              'subject': a['subject_name'] ?? 'Assignment',
+              'description': a['description'] ?? '',
+              'due_date': 'Due ${a['due_date']}',
+              'status': auth.isTeacher
+                  ? 'PUBLISHED'
+                  : (DateTime.tryParse(
+                              a['due_date'] ?? '',
+                            )?.isBefore(DateUtils.dateOnly(DateTime.now())) ==
+                            true
+                        ? 'OVERDUE'
+                        : 'PENDING'),
+            },
+          ),
+        );
+      });
+    } catch (_) {
+      if (mounted) {
+        setState(
+          () => _error = 'Could not load assignments. Please try again.',
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _loading = false);
+    }
+  }
+
+  Future<void> _create() async {
+    final saved = await Navigator.push<bool>(
+      context,
+      MaterialPageRoute(
+        builder: (_) => CreateAssignmentPage(
+          api: context.read<AuthProvider>().apiClient,
+          classes: _classes,
+        ),
+      ),
+    );
+    if (saved == true && mounted) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Assignment created.')));
+      await _load();
+    }
+  }
 
   final List<Map<String, dynamic>> _mockAssignments = [
     {
@@ -27,7 +113,8 @@ class _AssignmentsViewState extends State<AssignmentsView> {
       'title': 'Photosynthesis Observation Journal',
       'subject': 'SCIENCE',
       'subject_color': AppColors.primaryLight,
-      'description': 'Document daily plant growth progress in project notebook.',
+      'description':
+          'Document daily plant growth progress in project notebook.',
       'due_date': 'Overdue — 26 Jul 2026',
       'status': 'OVERDUE',
       'score': null,
@@ -59,252 +146,169 @@ class _AssignmentsViewState extends State<AssignmentsView> {
         .toList();
   }
 
-  Color _statusColor(String status) {
-    switch (status) {
-      case 'PENDING':
-        return AppColors.warning;
-      case 'OVERDUE':
-        return AppColors.error;
-      case 'SUBMITTED':
-        return AppColors.primary;
-      case 'GRADED':
-        return AppColors.primaryLight;
-      default:
-        return AppColors.textMuted;
-    }
-  }
-
-  Color _statusBg(String status) {
-    switch (status) {
-      case 'PENDING':
-        return AppColors.warningLight;
-      case 'OVERDUE':
-        return AppColors.errorLight;
-      case 'SUBMITTED':
-        return AppColors.softBlue;
-      case 'GRADED':
-        return AppColors.softBlue;
-      default:
-        return AppColors.softBlue;
-    }
-  }
+  Color _statusColor(String status) => switch (status) {
+    'OVERDUE' => const Color(0xFFB91C1C),
+    'PENDING' => const Color(0xFF92400E),
+    'GRADED' => const Color(0xFF047857),
+    _ => AppColors.primary,
+  };
 
   @override
   Widget build(BuildContext context) {
-    final filters = ['All', 'Pending', 'Submitted', 'Graded'];
-
+    final teacher = context.watch<AuthProvider>().isTeacher;
+    final remaining = _mockAssignments
+        .where((a) => a['status'] == 'PENDING' || a['status'] == 'OVERDUE')
+        .length;
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        backgroundColor: AppColors.primary,
-        iconTheme: const IconThemeData(color: Colors.white),
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+      appBar: supportingAppBar(context, 'Homework'),
+      body: SafeArea(
+        child: ListView(
+          padding: const EdgeInsets.all(20),
           children: [
-            const Text(
-              'Homework Tasks',
-              style: TextStyle(
-                  fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
+            PageHeading(
+              title: 'Homework',
+              subtitle: widget.child == null
+                  ? 'A clear view of assignments and progress.'
+                  : '${widget.child!['name']} · ${widget.child!['class'] ?? 'Assignments'}',
+              symbol: AppSymbol.report,
             ),
-            Text(
-              '${widget.child?['name'] ?? 'Student'} — ${widget.child?['class'] ?? 'Class'}',
-              style: const TextStyle(fontSize: 12, color: Colors.white70),
-            ),
-          ],
-        ),
-      ),
-      body: Column(
-        children: [
-          // Filter Chips
-          Container(
-            color: AppColors.surface,
-            padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: filters.map((f) {
-                  final isSel = _selectedFilter == f;
-                  return Padding(
-                    padding: const EdgeInsets.only(right: 8),
-                    child: GestureDetector(
-                      onTap: () => setState(() => _selectedFilter = f),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 14, vertical: 7),
-                        decoration: BoxDecoration(
-                          color: isSel ? AppColors.primary : AppColors.softBlue,
-                          borderRadius: BorderRadius.circular(20),
-                          border: Border.all(
-                            color:
-                                isSel ? AppColors.primary : AppColors.blueBorder,
-                          ),
-                        ),
-                        child: Text(
-                          f,
-                          style: TextStyle(
-                            color: isSel ? Colors.white : AppColors.primaryDark,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 12,
-                          ),
-                        ),
-                      ),
+            if (teacher) ...[
+              FilledButton.icon(
+                onPressed: _loading || _error != null ? null : _create,
+                icon: const Icon(Icons.add),
+                label: const Text('Create assignment'),
+              ),
+              const SizedBox(height: 20),
+            ],
+            if (_loading) const LinearProgressIndicator(),
+            if (_error != null)
+              PageCard(
+                child: Column(
+                  children: [
+                    Text(_error!),
+                    TextButton(onPressed: _load, child: const Text('Retry')),
+                  ],
+                ),
+              ),
+            PageCard(
+              color: AppColors.softBlue,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    teacher ? 'CLASS ASSIGNMENTS' : 'YOUR NEXT STEPS',
+                    style: TextStyle(
+                      fontSize: 11,
+                      letterSpacing: 1.3,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.primary,
                     ),
-                  );
-                }).toList(),
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    teacher
+                        ? '${_mockAssignments.length} published assignments'
+                        : '$remaining tasks to complete',
+                    style: const TextStyle(
+                      fontSize: 23,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.primaryDark,
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    teacher
+                        ? 'Create clear instructions and keep your class on track.'
+                        : 'Check due dates and make time for a little progress each day.',
+                    style: TextStyle(
+                      color: AppColors.textSecondary,
+                      height: 1.5,
+                    ),
+                  ),
+                ],
               ),
             ),
-          ),
-          const Divider(height: 1, color: AppColors.divider),
-
-          // Assignment List
-          Expanded(
-            child: _filtered.isEmpty
-                ? Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Container(
-                          width: 64,
-                          height: 64,
-                          decoration: BoxDecoration(
-                            color: AppColors.softBlue,
-                            borderRadius: BorderRadius.circular(32),
+            const SizedBox(height: 24),
+            PageFilters(
+              labels: teacher
+                  ? const ['All', 'Published']
+                  : const ['All', 'Pending', 'Overdue', 'Submitted', 'Graded'],
+              selected: _selectedFilter,
+              onSelected: (value) => setState(() => _selectedFilter = value),
+            ),
+            const SizedBox(height: 20),
+            if (!_loading && _error == null && _filtered.isEmpty)
+              const PageEmpty(
+                title: 'All clear here',
+                message:
+                    'No assignments match this status. Choose another filter to see more.',
+              ),
+            for (final item in _filtered)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 16),
+                child: PageCard(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: [
+                          PageBadge(item['subject']),
+                          PageBadge(
+                            item['status'],
+                            color: _statusColor(item['status']),
                           ),
-                          child: const Icon(Icons.assignment_outlined,
-                              color: AppColors.primary, size: 32),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        item['title'],
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                          height: 1.35,
                         ),
-                        const SizedBox(height: 16),
-                        const Text(
-                          'No assignments in this category.',
-                          style: TextStyle(
-                              color: AppColors.textMuted,
-                              fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 10),
+                      Text(
+                        item['description'],
+                        style: const TextStyle(
+                          color: AppColors.textSecondary,
+                          fontSize: 14,
+                          height: 1.6,
                         ),
-                      ],
-                    ),
-                  )
-                : ListView.builder(
-                    padding: const EdgeInsets.all(16),
-                    itemCount: _filtered.length,
-                    itemBuilder: (context, index) {
-                      final item = _filtered[index];
-                      final status = item['status'] as String;
-                      final subjectColor = item['subject_color'] as Color;
-
-                      return Container(
-                        margin: const EdgeInsets.only(bottom: 12),
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: AppColors.surface,
-                          borderRadius: BorderRadius.circular(10),
-                          border: Border.all(color: AppColors.cardBorder),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                // Subject badge
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 8, vertical: 3),
-                                  decoration: BoxDecoration(
-                                    color: subjectColor.withValues(alpha: 0.1),
-                                    borderRadius: BorderRadius.circular(4),
-                                  ),
-                                  child: Text(
-                                    item['subject'] as String,
-                                    style: TextStyle(
-                                      fontSize: 10,
-                                      fontWeight: FontWeight.bold,
-                                      color: subjectColor,
-                                      letterSpacing: 0.5,
-                                    ),
-                                  ),
-                                ),
-                                const Spacer(),
-                                // Status chip
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 10, vertical: 4),
-                                  decoration: BoxDecoration(
-                                    color: _statusBg(status),
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  child: Text(
-                                    status,
-                                    style: TextStyle(
-                                      fontSize: 10,
-                                      fontWeight: FontWeight.bold,
-                                      color: _statusColor(status),
-                                    ),
-                                  ),
-                                ),
-                              ],
+                      ),
+                      const SizedBox(height: 20),
+                      const Divider(height: 1),
+                      const SizedBox(height: 16),
+                      Wrap(
+                        spacing: 12,
+                        runSpacing: 8,
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        children: [
+                          Text(
+                            item['due_date'],
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: _statusColor(item['status']),
+                              fontWeight: FontWeight.w600,
                             ),
-                            const SizedBox(height: 10),
-                            Text(
-                              item['title'] as String,
-                              style: const TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.bold,
-                                  color: AppColors.textPrimary),
+                          ),
+                          if (item['score'] != null)
+                            PageBadge(
+                              'Score ${item['score']}',
+                              color: const Color(0xFF047857),
                             ),
-                            const SizedBox(height: 4),
-                            Text(
-                              item['description'] as String,
-                              style: const TextStyle(
-                                  fontSize: 13,
-                                  color: AppColors.textSecondary,
-                                  height: 1.3),
-                            ),
-                            const SizedBox(height: 12),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Row(
-                                  children: [
-                                    Icon(Icons.calendar_today_outlined,
-                                        size: 13,
-                                        color: _statusColor(status)),
-                                    const SizedBox(width: 5),
-                                    Text(
-                                      item['due_date'] as String,
-                                      style: TextStyle(
-                                        fontSize: 11,
-                                        fontWeight: FontWeight.w600,
-                                        color: _statusColor(status),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                if (item['score'] != null)
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 8, vertical: 3),
-                                    decoration: BoxDecoration(
-                                      color: AppColors.softBlue,
-                                      borderRadius: BorderRadius.circular(4),
-                                      border: Border.all(color: AppColors.blueBorder),
-                                    ),
-                                    child: Text(
-                                      'Score: ${item['score']}',
-                                      style: const TextStyle(
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.bold,
-                                        color: AppColors.primaryDark,
-                                      ),
-                                    ),
-                                  ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      );
-                    },
+                        ],
+                      ),
+                    ],
                   ),
-          ),
-        ],
+                ),
+              ),
+          ],
+        ),
       ),
     );
   }

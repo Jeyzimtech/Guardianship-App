@@ -217,7 +217,8 @@ class AppDrawer extends StatelessWidget {
                       onTap: () => Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (_) => const AnnouncementsView(),
+                          builder: (_) =>
+                              const AnnouncementsView(notifications: true),
                         ),
                       ),
                     ),
@@ -245,7 +246,10 @@ class AppDrawer extends StatelessWidget {
                     studentProvider.clearData();
                     await auth.logout();
                     if (context.mounted) {
-                      Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
+                      Navigator.of(
+                        context,
+                        rootNavigator: true,
+                      ).pushAndRemoveUntil(
                         MaterialPageRoute(builder: (_) => const LoginScreen()),
                         (route) => false,
                       );

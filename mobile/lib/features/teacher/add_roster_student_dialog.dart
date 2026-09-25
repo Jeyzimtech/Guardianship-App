@@ -29,14 +29,12 @@ class _AddRosterStudentDialogState extends State<AddRosterStudentDialog> {
   void _submitForm() {
     if (_formKey.currentState!.validate()) {
       final newStudent = {
-        'id':
-            'STU${(100 + (DateTime.now().millisecondsSinceEpoch % 899)).toString()}',
+        'id': 'STU-${(100 + (DateTime.now().millisecondsSinceEpoch % 899)).toString()}',
         'name': _nameController.text.trim(),
         'roll': _rollController.text.trim().isEmpty
-            ? '06'
+            ? '07'
             : _rollController.text.trim(),
-        'guardian':
-            '${_guardianNameController.text.trim()} (${_guardianPhoneController.text.trim()})',
+        'guardian': _guardianNameController.text.trim(),
         'guardian_phone': _guardianPhoneController.text.trim(),
         'status': 'Present',
         'merits': 0,
@@ -55,21 +53,21 @@ class _AddRosterStudentDialogState extends State<AddRosterStudentDialog> {
         fontSize: 13,
         fontWeight: FontWeight.w500,
       ),
-      prefixIcon: Icon(icon, color: AppColors.primaryLight, size: 20),
+      prefixIcon: Icon(icon, color: AppColors.primary, size: 20),
       filled: true,
-      fillColor: AppColors.surface,
+      fillColor: AppColors.background,
       contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(10),
-        borderSide: const BorderSide(color: AppColors.cardBorder),
+      border: const OutlineInputBorder(
+        borderRadius: BorderRadius.zero,
+        borderSide: BorderSide(color: AppColors.cardBorder),
       ),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(10),
-        borderSide: const BorderSide(color: AppColors.cardBorder),
+      enabledBorder: const OutlineInputBorder(
+        borderRadius: BorderRadius.zero,
+        borderSide: BorderSide(color: AppColors.cardBorder),
       ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(10),
-        borderSide: const BorderSide(color: AppColors.primaryLight, width: 1.8),
+      focusedBorder: const OutlineInputBorder(
+        borderRadius: BorderRadius.zero,
+        borderSide: BorderSide(color: AppColors.primary, width: 1.5),
       ),
     );
   }
@@ -77,14 +75,13 @@ class _AddRosterStudentDialogState extends State<AddRosterStudentDialog> {
   @override
   Widget build(BuildContext context) {
     return Dialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      shape: const RoundedRectangleBorder(),
       elevation: 4,
       child: Container(
         width: 480,
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
           color: AppColors.surface,
-          borderRadius: BorderRadius.circular(12),
           border: Border.all(color: AppColors.cardBorder),
         ),
         child: SingleChildScrollView(
@@ -107,7 +104,7 @@ class _AddRosterStudentDialogState extends State<AddRosterStudentDialog> {
                         ),
                         SizedBox(width: 10),
                         Text(
-                          'Add Student to Class Roster',
+                          'Add Student to Roster',
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
@@ -174,8 +171,9 @@ class _AddRosterStudentDialogState extends State<AddRosterStudentDialog> {
                           DropdownMenuItem(value: 'Male', child: Text('Male')),
                         ],
                         onChanged: (val) {
-                          if (val != null)
+                          if (val != null) {
                             setState(() => _selectedGender = val);
+                          }
                         },
                       ),
                     ),
@@ -212,8 +210,6 @@ class _AddRosterStudentDialogState extends State<AddRosterStudentDialog> {
                     return null;
                   },
                 ),
-                const SizedBox(height: 14),
-
                 const SizedBox(height: 20),
 
                 // Action Buttons
@@ -229,9 +225,7 @@ class _AddRosterStudentDialogState extends State<AddRosterStudentDialog> {
                           horizontal: 16,
                           vertical: 12,
                         ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
+                        shape: const RoundedRectangleBorder(),
                       ),
                       child: const Text(
                         'CANCEL',
@@ -260,9 +254,7 @@ class _AddRosterStudentDialogState extends State<AddRosterStudentDialog> {
                           horizontal: 18,
                           vertical: 12,
                         ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
+                        shape: const RoundedRectangleBorder(),
                       ),
                     ),
                   ],

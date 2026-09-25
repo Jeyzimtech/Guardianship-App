@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../core/api_client.dart';
 import '../../core/app_colors.dart';
+import '../../core/auth_provider.dart';
+import '../../core/app_icon.dart';
+import '../common/page_components.dart';
 import 'create_academic_year_dialog.dart';
 import 'create_class_dialog.dart';
 import 'create_school_dialog.dart';
@@ -13,11 +16,11 @@ class SchoolManagementScreen extends StatefulWidget {
   State<SchoolManagementScreen> createState() => _SchoolManagementScreenState();
 }
 
-class _SchoolManagementScreenState extends State<SchoolManagementScreen> with SingleTickerProviderStateMixin {
-  static const darkTeal = AppColors.primary;
-  static const mintGreen = AppColors.primaryLight;
-
-  late TabController _tabController;
+class _SchoolManagementScreenState extends State<SchoolManagementScreen> {
+  String _tab = 'Campuses';
+  String _query = '';
+  bool _demo = false;
+  final _search = TextEditingController();
   bool _isLoading = true;
 
   List<Map<String, dynamic>> _schools = [];
@@ -26,32 +29,85 @@ class _SchoolManagementScreenState extends State<SchoolManagementScreen> with Si
 
   // Mock data fallbacks for offline/demo mode
   final List<Map<String, dynamic>> _mockSchools = [
-    {'id': 1, 'name': 'Hillside Preparatory School', 'type': 'prep', 'students_count': 45, 'teachers_count': 4, 'school_classes_count': 3},
-    {'id': 2, 'name': 'Hillside Primary School', 'type': 'primary', 'students_count': 230, 'teachers_count': 12, 'school_classes_count': 14},
-    {'id': 3, 'name': 'Hillside Secondary School', 'type': 'secondary', 'students_count': 310, 'teachers_count': 18, 'school_classes_count': 18},
+    {
+      'id': 1,
+      'name': 'Hillside Preparatory School',
+      'type': 'prep',
+      'students_count': 45,
+      'teachers_count': 4,
+      'school_classes_count': 3,
+    },
+    {
+      'id': 2,
+      'name': 'Hillside Primary School',
+      'type': 'primary',
+      'students_count': 230,
+      'teachers_count': 12,
+      'school_classes_count': 14,
+    },
+    {
+      'id': 3,
+      'name': 'Hillside Secondary School',
+      'type': 'secondary',
+      'students_count': 310,
+      'teachers_count': 18,
+      'school_classes_count': 18,
+    },
   ];
 
   final List<Map<String, dynamic>> _mockAcademicYears = [
-    {'id': 1, 'name': 'Term 1 2026', 'code': 'AY-2026-T1', 'is_current': true, 'school_classes_count': 35},
-    {'id': 2, 'name': 'Term 3 2025', 'code': 'AY-2025-T3', 'is_current': false, 'school_classes_count': 35},
+    {
+      'id': 1,
+      'name': 'Term 1 2026',
+      'code': 'AY-2026-T1',
+      'is_current': true,
+      'school_classes_count': 35,
+    },
+    {
+      'id': 2,
+      'name': 'Term 3 2025',
+      'code': 'AY-2025-T3',
+      'is_current': false,
+      'school_classes_count': 35,
+    },
   ];
 
   final List<Map<String, dynamic>> _mockClasses = [
-    {'id': 1, 'school_id': 1, 'grade': 'ECD B', 'class_name': 'Butterflies', 'capacity': 25, 'school': {'name': 'Hillside Preparatory School'}},
-    {'id': 2, 'school_id': 2, 'grade': 'Grade 1', 'class_name': 'Green', 'capacity': 30, 'school': {'name': 'Hillside Primary School'}},
-    {'id': 3, 'school_id': 2, 'grade': 'Grade 4', 'class_name': 'Gold', 'capacity': 35, 'school': {'name': 'Hillside Primary School'}},
+    {
+      'id': 1,
+      'school_id': 1,
+      'grade': 'ECD B',
+      'class_name': 'Butterflies',
+      'capacity': 25,
+      'school': {'name': 'Hillside Preparatory School'},
+    },
+    {
+      'id': 2,
+      'school_id': 2,
+      'grade': 'Grade 1',
+      'class_name': 'Green',
+      'capacity': 30,
+      'school': {'name': 'Hillside Primary School'},
+    },
+    {
+      'id': 3,
+      'school_id': 2,
+      'grade': 'Grade 4',
+      'class_name': 'Gold',
+      'capacity': 35,
+      'school': {'name': 'Hillside Primary School'},
+    },
   ];
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
     _fetchAllData();
   }
 
   @override
   void dispose() {
-    _tabController.dispose();
+    _search.dispose();
     super.dispose();
   }
 
@@ -67,14 +123,21 @@ class _SchoolManagementScreenState extends State<SchoolManagementScreen> with Si
       if (mounted) {
         setState(() {
           if (sResp.statusCode == 200 && sResp.data['status'] == 'success') {
-            _schools = List<Map<String, dynamic>>.from(sResp.data['schools'] ?? []);
+            _schools = List<Map<String, dynamic>>.from(
+              sResp.data['schools'] ?? [],
+            );
           }
           if (ayResp.statusCode == 200 && ayResp.data['status'] == 'success') {
-            _academicYears = List<Map<String, dynamic>>.from(ayResp.data['academic_years'] ?? []);
+            _academicYears = List<Map<String, dynamic>>.from(
+              ayResp.data['academic_years'] ?? [],
+            );
           }
           if (cResp.statusCode == 200 && cResp.data['status'] == 'success') {
-            _classes = List<Map<String, dynamic>>.from(cResp.data['classes'] ?? []);
+            _classes = List<Map<String, dynamic>>.from(
+              cResp.data['classes'] ?? [],
+            );
           }
+          _demo = false;
           _isLoading = false;
         });
         return;
@@ -85,6 +148,7 @@ class _SchoolManagementScreenState extends State<SchoolManagementScreen> with Si
 
     if (mounted) {
       setState(() {
+        _demo = true;
         _schools = _mockSchools;
         _academicYears = _mockAcademicYears;
         _classes = _mockClasses;
@@ -101,9 +165,15 @@ class _SchoolManagementScreenState extends State<SchoolManagementScreen> with Si
         title: Text('Delete $type'),
         content: Text('Are you sure you want to delete "$name"?'),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Cancel'),
+          ),
           ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.red, foregroundColor: Colors.white),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+              foregroundColor: Colors.white,
+            ),
             onPressed: () => Navigator.pop(ctx, true),
             child: const Text('Delete'),
           ),
@@ -115,12 +185,25 @@ class _SchoolManagementScreenState extends State<SchoolManagementScreen> with Si
 
     try {
       if (type == 'School') await apiClient.dio.delete('/schools/$id');
-      if (type == 'Academic Term') await apiClient.dio.delete('/academic-years/$id');
+      if (type == 'Academic Term') {
+        await apiClient.dio.delete('/academic-years/$id');
+      }
       if (type == 'Class') await apiClient.dio.delete('/school-classes/$id');
-    } catch (_) {}
+    } catch (_) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Could not save this change. Please try again.'),
+          ),
+        );
+      }
+      return;
+    }
 
     if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('$type "$name" deleted.')));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('$type "$name" deleted.')));
       _fetchAllData();
     }
   }
@@ -129,314 +212,384 @@ class _SchoolManagementScreenState extends State<SchoolManagementScreen> with Si
     final apiClient = Provider.of<ApiClient>(context, listen: false);
     try {
       await apiClient.dio.post('/academic-years/$id/set-current');
-    } catch (_) {}
+    } catch (_) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Could not save this change. Please try again.'),
+          ),
+        );
+      }
+      return;
+    }
 
     if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Active term set to "$name"')));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Active term set to "$name"')));
       _fetchAllData();
     }
   }
 
-  Widget _buildSchoolTypeBadge(String type) {
-    Color bg;
-    Color fg;
-    String label;
+  bool get _canManage {
+    final role = context.read<AuthProvider?>()?.user?['role'];
+    return !_demo && (role == 'admin' || role == 'website_admin');
+  }
 
-    switch (type.toLowerCase()) {
-      case 'prep':
-        bg = const Color(0xFFFEF3C7);
-        fg = const Color(0xFFD97706);
-        label = 'Prep / ECD';
-        break;
-      case 'primary':
-        bg = const Color(0xFFE6F9F5);
-        fg = const Color(0xFF05D099);
-        label = 'Primary School';
-        break;
-      case 'secondary':
-      default:
-        bg = const Color(0xFFE0F2FE);
-        fg = const Color(0xFF0284C7);
-        label = 'Secondary High';
-        break;
-    }
+  void _edit([Map<String, dynamic>? item]) {
+    showDialog(
+      context: context,
+      builder: (_) => _tab == 'Campuses'
+          ? CreateSchoolDialog(initialSchool: item, onSaved: _fetchAllData)
+          : _tab == 'Terms'
+          ? CreateAcademicYearDialog(initialYear: item, onSaved: _fetchAllData)
+          : CreateClassDialog(
+              schools: _schools,
+              academicYears: _academicYears,
+              initialClass: item,
+              onSaved: _fetchAllData,
+            ),
+    );
+  }
 
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-      decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(20)),
-      child: Text(label, style: TextStyle(color: fg, fontWeight: FontWeight.bold, fontSize: 12)),
+  String _name(Map<String, dynamic> item) => _tab == 'Classes'
+      ? '${item['grade']} ${item['class_name']}'
+      : '${item['name'] ?? 'Not provided'}';
+  String _type(Map<String, dynamic> item) => switch (item['type']) {
+    'prep' => 'Preparatory',
+    'primary' => 'Primary',
+    'secondary' => 'Secondary',
+    _ => 'School',
+  };
+  bool _active(Map<String, dynamic> item) =>
+      item['is_current'] == true || item['is_current'] == 1;
+  Widget _details(Map<String, dynamic> item) => Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      if (_tab == 'Campuses')
+        Wrap(
+          spacing: 24,
+          runSpacing: 16,
+          children: [
+            _metric('${item['students_count'] ?? '—'}', 'Students'),
+            _metric('${item['teachers_count'] ?? '—'}', 'Teachers'),
+            _metric('${item['school_classes_count'] ?? '—'}', 'Classes'),
+          ],
+        ),
+      if (_tab == 'Terms') ...[
+        Text(
+          'Term code · ${item['code'] ?? 'Not provided'}',
+          style: const TextStyle(color: AppColors.textSecondary, height: 1.5),
+        ),
+        if (item['start_date'] != null)
+          Text(
+            'Starts ${item['start_date']}',
+            style: const TextStyle(height: 1.5),
+          ),
+        if (item['end_date'] != null)
+          Text('Ends ${item['end_date']}', style: const TextStyle(height: 1.5)),
+      ],
+      if (_tab == 'Classes') ...[
+        Text(
+          '${item['school']?['name'] ?? 'School not provided'}',
+          style: const TextStyle(color: AppColors.textSecondary, height: 1.5),
+        ),
+        const SizedBox(height: 12),
+        PageBadge('Capacity · ${item['capacity'] ?? 'Not provided'} students'),
+        if (item['academic_year']?['name'] != null)
+          Padding(
+            padding: const EdgeInsets.only(top: 12),
+            child: Text('${item['academic_year']['name']}'),
+          ),
+      ],
+    ],
+  );
+  Widget _metric(String value, String label) => Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Text(
+        value,
+        style: const TextStyle(
+          fontSize: 24,
+          fontWeight: FontWeight.w600,
+          color: AppColors.primaryDark,
+        ),
+      ),
+      const SizedBox(height: 4),
+      Text(
+        label,
+        style: const TextStyle(fontSize: 12, color: AppColors.textMuted),
+      ),
+    ],
+  );
+  void _open(Map<String, dynamic> item) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      showDragHandle: true,
+      builder: (ctx) => SafeArea(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            maxHeight: MediaQuery.sizeOf(ctx).height * .8,
+          ),
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.fromLTRB(24, 0, 24, 32),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const AppIcon(
+                  AppSymbol.school,
+                  color: AppColors.primary,
+                  size: 32,
+                ),
+                const SizedBox(height: 18),
+                Text(
+                  _name(item),
+                  style: const TextStyle(
+                    fontSize: 25,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 24),
+                _details(item),
+                const SizedBox(height: 24),
+                TextButton(
+                  onPressed: () => Navigator.pop(ctx),
+                  child: const Text('Close'),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    final items = _tab == 'Campuses'
+        ? _schools
+        : _tab == 'Terms'
+        ? _academicYears
+        : _classes;
+    final filtered = items
+        .where(
+          (i) => '${_name(i)} ${i['school']?['name'] ?? ''} ${i['code'] ?? ''}'
+              .toLowerCase()
+              .contains(_query),
+        )
+        .toList();
+    final current = _academicYears.where(_active).toList();
     return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: darkTeal),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: const Text(
-          'School Management',
-          style: TextStyle(color: darkTeal, fontSize: 20, fontWeight: FontWeight.bold),
-        ),
-        bottom: TabBar(
-          controller: _tabController,
-          labelColor: darkTeal,
-          unselectedLabelColor: Colors.grey,
-          indicatorColor: mintGreen,
-          indicatorWeight: 3,
-          labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
-          tabs: const [
-            Tab(text: 'Campuses'),
-            Tab(text: 'Academic Terms'),
-            Tab(text: 'Grades & Classes'),
-          ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        backgroundColor: mintGreen,
-        foregroundColor: Colors.white,
-        icon: const Icon(Icons.add_rounded),
-        label: Text(
-          _tabController.index == 0
-              ? 'Add Campus'
-              : (_tabController.index == 1 ? 'Add Term' : 'Add Class'),
-          style: const TextStyle(fontWeight: FontWeight.bold),
-        ),
-        onPressed: () {
-          if (_tabController.index == 0) {
-            showDialog(context: context, builder: (_) => CreateSchoolDialog(onSaved: _fetchAllData));
-          } else if (_tabController.index == 1) {
-            showDialog(context: context, builder: (_) => CreateAcademicYearDialog(onSaved: _fetchAllData));
-          } else {
-            showDialog(
-              context: context,
-              builder: (_) => CreateClassDialog(
-                schools: _schools,
-                academicYears: _academicYears,
-                onSaved: _fetchAllData,
+      backgroundColor: AppColors.background,
+      appBar: supportingAppBar(context, 'School management'),
+      body: SafeArea(
+        child: RefreshIndicator(
+          onRefresh: _fetchAllData,
+          child: ListView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            padding: const EdgeInsets.all(20),
+            children: [
+              const PageHeading(
+                title: 'School management',
+                subtitle: 'Your school community, clearly organised.',
+                symbol: AppSymbol.school,
               ),
-            );
-          }
-        },
-      ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator(color: darkTeal))
-          : TabBarView(
-              controller: _tabController,
-              children: [
-                // 1. Schools List Tab
-                _buildSchoolsTab(),
-
-                // 2. Academic Years List Tab
-                _buildAcademicYearsTab(),
-
-                // 3. Grades & Classes List Tab
-                _buildClassesTab(),
-              ],
-            ),
-    );
-  }
-
-  Widget _buildSchoolsTab() {
-    if (_schools.isEmpty) {
-      return const Center(child: Text('No schools configured yet.'));
-    }
-
-    return ListView.separated(
-      padding: const EdgeInsets.all(16),
-      itemCount: _schools.length,
-      separatorBuilder: (_, _) => const SizedBox(height: 12),
-      itemBuilder: (context, index) {
-        final school = _schools[index];
-        final id = school['id'] ?? 0;
-        final name = school['name'] ?? 'School';
-        final type = school['type'] ?? 'primary';
-        final sCount = school['students_count'] ?? 0;
-        final tCount = school['teachers_count'] ?? 0;
-
-        return Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: const Color(0xFFE5E7EB)),
-          ),
-          child: ListTile(
-            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            leading: Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: darkTeal.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: const Icon(Icons.school_rounded, color: darkTeal, size: 28),
-            ),
-            title: Row(
-              children: [
-                Expanded(
-                  child: Text(name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: darkTeal)),
-                ),
-                const SizedBox(width: 8),
-                _buildSchoolTypeBadge(type),
-              ],
-            ),
-            subtitle: Padding(
-              padding: const EdgeInsets.only(top: 8.0),
-              child: Row(
-                children: [
-                  Icon(Icons.people_outline, size: 16, color: Colors.grey.shade600),
-                  const SizedBox(width: 4),
-                  Text('$sCount Students', style: TextStyle(fontSize: 13, color: Colors.grey.shade700)),
-                  const SizedBox(width: 16),
-                  Icon(Icons.badge_outlined, size: 16, color: Colors.grey.shade600),
-                  const SizedBox(width: 4),
-                  Text('$tCount Teachers', style: TextStyle(fontSize: 13, color: Colors.grey.shade700)),
-                ],
-              ),
-            ),
-            trailing: PopupMenuButton<String>(
-              onSelected: (val) {
-                if (val == 'edit') {
-                  showDialog(context: context, builder: (_) => CreateSchoolDialog(initialSchool: school, onSaved: _fetchAllData));
-                } else if (val == 'delete') {
-                  _deleteItem('School', id, name);
-                }
-              },
-              itemBuilder: (ctx) => [
-                const PopupMenuItem(value: 'edit', child: Row(children: [Icon(Icons.edit_outlined, color: darkTeal), SizedBox(width: 8), Text('Edit School')])),
-                const PopupMenuItem(value: 'delete', child: Row(children: [Icon(Icons.delete_outline, color: Colors.red), SizedBox(width: 8), Text('Delete School', style: TextStyle(color: Colors.red))])),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _buildAcademicYearsTab() {
-    if (_academicYears.isEmpty) {
-      return const Center(child: Text('No academic terms configured yet.'));
-    }
-
-    return ListView.separated(
-      padding: const EdgeInsets.all(16),
-      itemCount: _academicYears.length,
-      separatorBuilder: (_, _) => const SizedBox(height: 12),
-      itemBuilder: (context, index) {
-        final year = _academicYears[index];
-        final id = year['id'] ?? 0;
-        final name = year['name'] ?? 'Academic Term';
-        final code = year['code'] ?? '';
-        final isCurrent = year['is_current'] == true;
-
-        return Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: isCurrent ? mintGreen : const Color(0xFFE5E7EB), width: isCurrent ? 2 : 1),
-          ),
-          child: ListTile(
-            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-            leading: Icon(Icons.date_range_rounded, color: isCurrent ? mintGreen : darkTeal, size: 32),
-            title: Row(
-              children: [
-                Expanded(
-                  child: Text(name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: darkTeal)),
-                ),
-                if (isCurrent) ...[
-                  const SizedBox(width: 8),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                    decoration: BoxDecoration(color: const Color(0xFFE6F9F5), borderRadius: BorderRadius.circular(20)),
-                    child: const Text('Active Term', style: TextStyle(color: mintGreen, fontWeight: FontWeight.bold, fontSize: 12)),
-                  ),
-                ],
-              ],
-            ),
-            subtitle: Text('Code: $code', style: TextStyle(fontSize: 13, color: Colors.grey.shade600)),
-            trailing: PopupMenuButton<String>(
-              onSelected: (val) {
-                if (val == 'active') {
-                  _setActiveAcademicYear(id, name);
-                } else if (val == 'edit') {
-                  showDialog(context: context, builder: (_) => CreateAcademicYearDialog(initialYear: year, onSaved: _fetchAllData));
-                } else if (val == 'delete') {
-                  _deleteItem('Academic Term', id, name);
-                }
-              },
-              itemBuilder: (ctx) => [
-                if (!isCurrent)
-                  const PopupMenuItem(value: 'active', child: Row(children: [Icon(Icons.check_circle_outline, color: mintGreen), SizedBox(width: 8), Text('Set Active Term')])),
-                const PopupMenuItem(value: 'edit', child: Row(children: [Icon(Icons.edit_outlined, color: darkTeal), SizedBox(width: 8), Text('Edit Term')])),
-                const PopupMenuItem(value: 'delete', child: Row(children: [Icon(Icons.delete_outline, color: Colors.red), SizedBox(width: 8), Text('Delete Term', style: TextStyle(color: Colors.red))])),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _buildClassesTab() {
-    if (_classes.isEmpty) {
-      return const Center(child: Text('No grade classes configured yet.'));
-    }
-
-    return ListView.separated(
-      padding: const EdgeInsets.all(16),
-      itemCount: _classes.length,
-      separatorBuilder: (_, _) => const SizedBox(height: 12),
-      itemBuilder: (context, index) {
-        final item = _classes[index];
-        final id = item['id'] ?? 0;
-        final grade = item['grade'] ?? 'Grade';
-        final className = item['class_name'] ?? 'Class';
-        final schoolName = item['school']?['name'] ?? 'School';
-        final capacity = item['capacity'] ?? 30;
-
-        return Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: const Color(0xFFE5E7EB)),
-          ),
-          child: ListTile(
-            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-            leading: CircleAvatar(
-              radius: 22,
-              backgroundColor: const Color(0xFFF3F4F6),
-              child: Text(grade.isNotEmpty ? grade[0] : 'G', style: const TextStyle(fontWeight: FontWeight.bold, color: darkTeal)),
-            ),
-            title: Text('$grade - $className', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: darkTeal)),
-            subtitle: Text('$schoolName • Max Capacity: $capacity students', style: TextStyle(fontSize: 13, color: Colors.grey.shade600)),
-            trailing: PopupMenuButton<String>(
-              onSelected: (val) {
-                if (val == 'edit') {
-                  showDialog(
-                    context: context,
-                    builder: (_) => CreateClassDialog(
-                      schools: _schools,
-                      academicYears: _academicYears,
-                      initialClass: item,
-                      onSaved: _fetchAllData,
+              PageCard(
+                color: AppColors.primaryDark,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'ACADEMIC OVERVIEW',
+                      style: TextStyle(
+                        color: Colors.white70,
+                        fontSize: 12,
+                        letterSpacing: 1.3,
+                      ),
                     ),
-                  );
-                } else if (val == 'delete') {
-                  _deleteItem('Class', id, '$grade $className');
-                }
-              },
-              itemBuilder: (ctx) => [
-                const PopupMenuItem(value: 'edit', child: Row(children: [Icon(Icons.edit_outlined, color: darkTeal), SizedBox(width: 8), Text('Edit Class')])),
-                const PopupMenuItem(value: 'delete', child: Row(children: [Icon(Icons.delete_outline, color: Colors.red), SizedBox(width: 8), Text('Delete Class', style: TextStyle(color: Colors.red))])),
+                    const SizedBox(height: 16),
+                    Text(
+                      _isLoading
+                          ? 'Loading school details…'
+                          : current.isEmpty
+                          ? 'No active term'
+                          : '${current.first['name']}',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 26,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    Text(
+                      '${_schools.length} campuses · ${_classes.length} classes',
+                      style: const TextStyle(
+                        color: Colors.white70,
+                        height: 1.5,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              if (_demo)
+                Padding(
+                  padding: const EdgeInsets.only(top: 16),
+                  child: PageCard(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const PageBadge('Sample data'),
+                        const SizedBox(height: 10),
+                        const Text(
+                          'Could not connect to your school. These are example records.',
+                          style: TextStyle(height: 1.5),
+                        ),
+                        TextButton(
+                          onPressed: _fetchAllData,
+                          child: const Text('Retry connection'),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              const SizedBox(height: 24),
+              PageFilters(
+                labels: const ['Campuses', 'Terms', 'Classes'],
+                selected: _tab,
+                onSelected: (v) => setState(() {
+                  _tab = v;
+                  _query = '';
+                  _search.clear();
+                }),
+              ),
+              const SizedBox(height: 18),
+              TextField(
+                controller: _search,
+                onChanged: (v) =>
+                    setState(() => _query = v.trim().toLowerCase()),
+                decoration: InputDecoration(
+                  hintText: 'Search ${_tab.toLowerCase()}',
+                  prefixIcon: const Icon(Icons.search),
+                  suffixIcon: _search.text.isEmpty
+                      ? null
+                      : IconButton(
+                          tooltip: 'Clear search',
+                          icon: const Icon(Icons.close),
+                          onPressed: () => setState(() {
+                            _search.clear();
+                            _query = '';
+                          }),
+                        ),
+                ),
+              ),
+              const SizedBox(height: 20),
+              if (_canManage) ...[
+                FilledButton.icon(
+                  onPressed: () => _edit(),
+                  icon: const Icon(Icons.add),
+                  label: Text(
+                    _tab == 'Campuses'
+                        ? 'Add campus'
+                        : _tab == 'Terms'
+                        ? 'Add term'
+                        : 'Add class',
+                  ),
+                ),
+                const SizedBox(height: 16),
               ],
-            ),
+              if (_isLoading)
+                const Center(child: CircularProgressIndicator())
+              else if (filtered.isEmpty)
+                const PageEmpty(
+                  title: 'No matching records',
+                  message: 'Try another search or pull down to refresh.',
+                )
+              else ...[
+                Text(
+                  '${filtered.length} ${_tab.toLowerCase()}',
+                  style: const TextStyle(
+                    color: AppColors.textMuted,
+                    fontSize: 13,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                for (final item in filtered)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 16),
+                    child: PageCard(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          PageBadge(
+                            _tab == 'Campuses'
+                                ? _type(item)
+                                : _tab == 'Terms'
+                                ? (_active(item)
+                                      ? 'Active term'
+                                      : 'Academic term')
+                                : '${item['grade']}',
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            _name(item),
+                            style: const TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.w600,
+                              height: 1.4,
+                            ),
+                          ),
+                          const SizedBox(height: 18),
+                          _details(item),
+                          const SizedBox(height: 18),
+                          const Divider(height: 1),
+                          Wrap(
+                            spacing: 12,
+                            children: [
+                              TextButton(
+                                onPressed: () => _open(item),
+                                child: const Text('View details'),
+                              ),
+                              if (_canManage) ...[
+                                TextButton(
+                                  onPressed: () => _edit(item),
+                                  child: const Text('Edit'),
+                                ),
+                                if (_tab == 'Terms' && !_active(item))
+                                  TextButton(
+                                    onPressed: () => _setActiveAcademicYear(
+                                      item['id'],
+                                      _name(item),
+                                    ),
+                                    child: const Text('Set active'),
+                                  ),
+                                TextButton(
+                                  onPressed: () => _deleteItem(
+                                    _tab == 'Campuses'
+                                        ? 'School'
+                                        : _tab == 'Terms'
+                                        ? 'Academic Term'
+                                        : 'Class',
+                                    item['id'],
+                                    _name(item),
+                                  ),
+                                  child: const Text(
+                                    'Delete',
+                                    style: TextStyle(color: AppColors.error),
+                                  ),
+                                ),
+                              ],
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+              ],
+            ],
           ),
-        );
-      },
+        ),
+      ),
     );
   }
 }

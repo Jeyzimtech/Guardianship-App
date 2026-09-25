@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../core/app_colors.dart';
+import '../../core/app_icon.dart';
+import '../common/page_components.dart';
 
 class UniformMarketplaceView extends StatefulWidget {
   final Map<String, dynamic>? child;
@@ -10,12 +12,11 @@ class UniformMarketplaceView extends StatefulWidget {
   State<UniformMarketplaceView> createState() => _UniformMarketplaceViewState();
 }
 
-class _UniformMarketplaceViewState extends State<UniformMarketplaceView> with SingleTickerProviderStateMixin {
-  static const primaryBlue = AppColors.primary;
+class _UniformMarketplaceViewState extends State<UniformMarketplaceView> {
   static const accentGreen = AppColors.primaryLight;
-  static const borderColor = AppColors.cardBorder;
 
-  late TabController _tabController;
+  int _section = 0;
+  final _searchController = TextEditingController();
   String _selectedCategory = 'All';
   String _searchQuery = '';
 
@@ -30,7 +31,8 @@ class _UniformMarketplaceViewState extends State<UniformMarketplaceView> with Si
       'sizes': ['Size 28', 'Size 30', 'Size 32', 'Size 34', 'Size 36'],
       'in_stock': true,
       'icon': Icons.checkroom_rounded,
-      'description': 'High-density navy blue wool-blend blazer with official school chest emblem badge.',
+      'description':
+          'High-density navy blue wool-blend blazer with official school chest emblem badge.',
     },
     {
       'id': 'U-102',
@@ -41,7 +43,8 @@ class _UniformMarketplaceViewState extends State<UniformMarketplaceView> with Si
       'sizes': ['Size 26', 'Size 28', 'Size 30', 'Size 32', 'Size 34'],
       'in_stock': true,
       'icon': Icons.dry_cleaning_rounded,
-      'description': 'Breathable 100% white cotton school shirts with reinforced collar and buttons.',
+      'description':
+          'Breathable 100% white cotton school shirts with reinforced collar and buttons.',
     },
     {
       'id': 'U-103',
@@ -52,7 +55,8 @@ class _UniformMarketplaceViewState extends State<UniformMarketplaceView> with Si
       'sizes': ['Size 28', 'Size 30', 'Size 32', 'Size 34'],
       'in_stock': true,
       'icon': Icons.strikethrough_s_rounded,
-      'description': 'Tailored charcoal grey wool-polyester trousers / box-pleated skirt.',
+      'description':
+          'Tailored charcoal grey wool-polyester trousers / box-pleated skirt.',
     },
     {
       'id': 'U-104',
@@ -63,7 +67,8 @@ class _UniformMarketplaceViewState extends State<UniformMarketplaceView> with Si
       'sizes': ['S', 'M', 'L', 'XL'],
       'in_stock': true,
       'icon': Icons.directions_run_rounded,
-      'description': 'Water-resistant zip jacket and track pants with fleece lining for sports days.',
+      'description':
+          'Water-resistant zip jacket and track pants with fleece lining for sports days.',
     },
     {
       'id': 'U-105',
@@ -74,7 +79,8 @@ class _UniformMarketplaceViewState extends State<UniformMarketplaceView> with Si
       'sizes': ['S', 'M', 'L', 'XL'],
       'in_stock': true,
       'icon': Icons.sports_tennis_rounded,
-      'description': 'Moisture-wicking polo shirt in official house colors (Red, Blue, Green, Yellow).',
+      'description':
+          'Moisture-wicking polo shirt in official house colors (Red, Blue, Green, Yellow).',
     },
     {
       'id': 'U-106',
@@ -96,7 +102,8 @@ class _UniformMarketplaceViewState extends State<UniformMarketplaceView> with Si
       'sizes': ['Size 1', 'Size 2', 'Size 3', 'Size 4', 'Size 5', 'Size 6'],
       'in_stock': true,
       'icon': Icons.roller_skating_rounded,
-      'description': 'Durable black leather shoes with orthotic support and non-slip rubber soles.',
+      'description':
+          'Durable black leather shoes with orthotic support and non-slip rubber soles.',
     },
     {
       'id': 'U-108',
@@ -107,7 +114,8 @@ class _UniformMarketplaceViewState extends State<UniformMarketplaceView> with Si
       'sizes': ['Small (9-12)', 'Medium (12-3)', 'Large (4-7)'],
       'in_stock': true,
       'icon': Icons.style_rounded,
-      'description': 'Padded heel and toe turn-down school socks with turnover band.',
+      'description':
+          'Padded heel and toe turn-down school socks with turnover band.',
     },
   ];
 
@@ -139,23 +147,23 @@ class _UniformMarketplaceViewState extends State<UniformMarketplaceView> with Si
   ];
 
   @override
-  void initState() {
-    super.initState();
-    _tabController = TabController(length: 2, vsync: this);
-  }
-
-  @override
   void dispose() {
-    _tabController.dispose();
+    _searchController.dispose();
     super.dispose();
   }
 
   double get _cartTotalUsd {
-    return _cartItems.fold(0.0, (sum, item) => sum + (item['price_usd'] * item['qty']));
+    return _cartItems.fold(
+      0.0,
+      (sum, item) => sum + (item['price_usd'] * item['qty']),
+    );
   }
 
   double get _cartTotalZig {
-    return _cartItems.fold(0.0, (sum, item) => sum + (item['price_zig'] * item['qty']));
+    return _cartItems.fold(
+      0.0,
+      (sum, item) => sum + (item['price_zig'] * item['qty']),
+    );
   }
 
   void _addToCart(Map<String, dynamic> item, String selectedSize, int qty) {
@@ -186,742 +194,682 @@ class _UniformMarketplaceViewState extends State<UniformMarketplaceView> with Si
         action: SnackBarAction(
           label: 'VIEW CART',
           textColor: Colors.white,
-          onPressed: () => _tabController.animateTo(1),
+          onPressed: () => setState(() => _section = 1),
         ),
       ),
     );
   }
 
-  void _openItemDetailModal(Map<String, dynamic> item) {
-    String selectedSize = item['sizes'][0];
-    int quantity = 1;
+  Widget _productVisual(Map<String, dynamic> item, {double height = 100}) =>
+      Container(
+        height: height,
+        width: double.infinity,
+        decoration: BoxDecoration(
+          color: AppColors.softBlue,
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Center(
+          child: Icon(
+            item['category'] == 'Sports & Physical Ed'
+                ? Icons.directions_run_outlined
+                : item['category'] == 'Formal Wear'
+                ? Icons.checkroom_outlined
+                : Icons.shopping_bag_outlined,
+            size: 42,
+            color: AppColors.primary,
+          ),
+        ),
+      );
 
+  void _openItemDetailModal(Map<String, dynamic> item) {
+    String size = item['sizes'][0];
+    int qty = 1;
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
+      showDragHandle: true,
+      backgroundColor: AppColors.surface,
       builder: (ctx) => StatefulBuilder(
-        builder: (context, setModalState) {
-          final priceUsd = (item['price_usd'] as double) * quantity;
-          final priceZig = (item['price_zig'] as double) * quantity;
-
-          return Padding(
-            padding: EdgeInsets.only(
-              bottom: MediaQuery.of(ctx).viewInsets.bottom + 20,
-              top: 20,
-              left: 20,
-              right: 20,
+        builder: (ctx, update) => SafeArea(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              maxHeight: MediaQuery.sizeOf(ctx).height * .8,
             ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: primaryBlue.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Icon(item['icon'] as IconData, color: primaryBlue, size: 32),
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _productVisual(item, height: 120),
+                  const SizedBox(height: 20),
+                  Text(
+                    item['name'],
+                    style: const TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.w600,
+                      height: 1.3,
                     ),
-                    const SizedBox(width: 14),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            item['name'],
-                            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Color(0xFF1F2937)),
-                          ),
-                          const SizedBox(height: 2),
-                          Text(
-                            item['category'],
-                            style: const TextStyle(fontSize: 12, color: Color(0xFF6B7280)),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  item['description'],
-                  style: const TextStyle(fontSize: 13, color: Color(0xFF475569), height: 1.3),
-                ),
-                const SizedBox(height: 16),
-                const Text(
-                  'SELECT SIZE:',
-                  style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFF6B7280), letterSpacing: 0.5),
-                ),
-                const SizedBox(height: 8),
-                Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  children: (item['sizes'] as List<String>).map((size) {
-                    final isSelected = size == selectedSize;
-                    return ChoiceChip(
-                      label: Text(size),
-                      selected: isSelected,
-                      selectedColor: primaryBlue,
-                      labelStyle: TextStyle(
-                        color: isSelected ? Colors.white : const Color(0xFF334155),
-                        fontWeight: FontWeight.bold,
-                        fontSize: 12,
-                      ),
-                      onSelected: (val) {
-                        if (val) setModalState(() => selectedSize = size);
-                      },
-                    );
-                  }).toList(),
-                ),
-                const SizedBox(height: 16),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text(
-                      'QUANTITY:',
-                      style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFF6B7280), letterSpacing: 0.5),
-                    ),
-                    Container(
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFF1F5F9),
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: borderColor),
-                      ),
-                      child: Row(
-                        children: [
-                          IconButton(
-                            icon: const Icon(Icons.remove_rounded, size: 18),
-                            onPressed: quantity > 1 ? () => setModalState(() => quantity--) : null,
-                          ),
-                          Text(
-                            '$quantity',
-                            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
-                          ),
-                          IconButton(
-                            icon: const Icon(Icons.add_rounded, size: 18),
-                            onPressed: () => setModalState(() => quantity++),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 20),
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFF8FAFC),
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(color: borderColor),
                   ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  const SizedBox(height: 10),
+                  Text(
+                    item['description'],
+                    style: const TextStyle(
+                      color: AppColors.textSecondary,
+                      height: 1.6,
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  const Text(
+                    'Choose your size',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                  ),
+                  const SizedBox(height: 10),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: (item['sizes'] as List)
+                        .map(
+                          (value) => ChoiceChip(
+                            label: Text(value),
+                            selected: size == value,
+                            onSelected: (_) => update(() => size = value),
+                          ),
+                        )
+                        .toList(),
+                  ),
+                  const SizedBox(height: 20),
+                  Wrap(
+                    spacing: 16,
+                    crossAxisAlignment: WrapCrossAlignment.center,
                     children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                      const Text(
+                        'Quantity',
+                        style: TextStyle(fontWeight: FontWeight.w600),
+                      ),
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
                         children: [
-                          Text(
-                            'USD \$${priceUsd.toStringAsFixed(2)}',
-                            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: primaryBlue),
+                          IconButton(
+                            tooltip: 'Decrease quantity',
+                            onPressed: qty > 1
+                                ? () => update(() => qty--)
+                                : null,
+                            icon: const Icon(Icons.remove),
                           ),
                           Text(
-                            'ZiG ${priceZig.toStringAsFixed(2)}',
-                            style: const TextStyle(fontSize: 12, color: Color(0xFF64748B), fontWeight: FontWeight.w600),
+                            '$qty',
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          IconButton(
+                            tooltip: 'Increase quantity',
+                            onPressed: () => update(() => qty++),
+                            icon: const Icon(Icons.add),
                           ),
                         ],
-                      ),
-                      ElevatedButton.icon(
-                        onPressed: () {
-                          Navigator.pop(ctx);
-                          _addToCart(item, selectedSize, quantity);
-                        },
-                        icon: const Icon(Icons.add_shopping_cart_rounded, size: 18),
-                        label: const Text('Add to Cart', style: TextStyle(fontWeight: FontWeight.bold)),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: primaryBlue,
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                        ),
                       ),
                     ],
                   ),
-                ),
-              ],
+                  const SizedBox(height: 16),
+                  Text(
+                    'USD \$${(item['price_usd'] * qty).toStringAsFixed(2)}',
+                    style: const TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.primaryDark,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    'ZiG ${(item['price_zig'] * qty).toStringAsFixed(2)}',
+                    style: const TextStyle(color: AppColors.textMuted),
+                  ),
+                  const SizedBox(height: 20),
+                  SizedBox(
+                    width: double.infinity,
+                    child: FilledButton(
+                      onPressed: item['in_stock'] == true
+                          ? () {
+                              Navigator.pop(ctx);
+                              _addToCart(item, size, qty);
+                            }
+                          : null,
+                      child: Text(
+                        item['in_stock'] == true
+                            ? 'Add to bag'
+                            : 'Out of stock',
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
-          );
-        },
+          ),
+        ),
       ),
     );
   }
 
   void _checkoutOrder() {
     if (_cartItems.isEmpty) return;
-
-    String selectedPayment = 'EcoCash USD';
-    String collectionPoint = 'School Store (Main Campus)';
-
-    showDialog(
+    String payment = 'EcoCash USD';
+    String collection = 'School Store (Main Campus)';
+    showModalBottomSheet(
       context: context,
+      isScrollControlled: true,
+      showDragHandle: true,
       builder: (ctx) => StatefulBuilder(
-        builder: (context, setDialogState) {
-          return AlertDialog(
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-            title: const Row(
-              children: [
-                Icon(Icons.shopping_bag_rounded, color: primaryBlue, size: 28),
-                SizedBox(width: 10),
-                Text('Uniform Checkout', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-              ],
+        builder: (ctx, update) => SafeArea(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              maxHeight: MediaQuery.sizeOf(ctx).height * .8,
             ),
-            content: SingleChildScrollView(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
               child: Column(
-                mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('ORDER SUMMARY', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFF6B7280))),
-                  const SizedBox(height: 8),
-                  ..._cartItems.map((item) {
-                    return Padding(
-                      padding: const EdgeInsets.only(bottom: 6),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  const Text(
+                    'Review your order',
+                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.w700),
+                  ),
+                  const SizedBox(height: 20),
+                  for (final item in _cartItems)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Expanded(
-                            child: Text(
-                              '${item['name']} (${item['selected_size']}) x${item['qty']}',
-                              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
                           Text(
-                            '\$${(item['price_usd'] * item['qty']).toStringAsFixed(2)}',
-                            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                            item['name'],
+                            style: const TextStyle(fontWeight: FontWeight.w600),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            '${item['selected_size']} · Qty ${item['qty']}',
+                            style: const TextStyle(color: AppColors.textMuted),
                           ),
                         ],
                       ),
-                    );
-                  }),
-                  const Divider(height: 20),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text('Total Amount:', style: TextStyle(fontWeight: FontWeight.bold)),
-                      Text(
-                        'USD \$${_cartTotalUsd.toStringAsFixed(2)} / ZiG ${_cartTotalZig.toStringAsFixed(2)}',
-                        style: const TextStyle(fontWeight: FontWeight.bold, color: primaryBlue, fontSize: 13),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                  const Text('PAYMENT METHOD:', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFF6B7280))),
-                  const SizedBox(height: 6),
-                  DropdownButtonFormField<String>(
-                    initialValue: selectedPayment,
-                    decoration: const InputDecoration(border: OutlineInputBorder(), contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8)),
-                    items: const [
-                      DropdownMenuItem(value: 'EcoCash USD', child: Text('EcoCash USD')),
-                      DropdownMenuItem(value: 'ZiG Mobile Transfer', child: Text('ZiG Mobile Transfer')),
-                      DropdownMenuItem(value: 'Visa / Mastercard', child: Text('Visa / Mastercard')),
-                      DropdownMenuItem(value: 'School Ledger Wallet', child: Text('School Pre-paid Wallet')),
-                    ],
-                    onChanged: (val) {
-                      if (val != null) setDialogState(() => selectedPayment = val);
-                    },
-                  ),
+                    ),
+                  const Divider(),
                   const SizedBox(height: 12),
-                  const Text('COLLECTION POINT:', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFF6B7280))),
-                  const SizedBox(height: 6),
+                  Text(
+                    'USD \$${_cartTotalUsd.toStringAsFixed(2)}',
+                    style: const TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.primary,
+                    ),
+                  ),
+                  Text(
+                    'ZiG ${_cartTotalZig.toStringAsFixed(2)}',
+                    style: const TextStyle(color: AppColors.textMuted),
+                  ),
+                  const SizedBox(height: 24),
                   DropdownButtonFormField<String>(
-                    initialValue: collectionPoint,
-                    decoration: const InputDecoration(border: OutlineInputBorder(), contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8)),
-                    items: const [
-                      DropdownMenuItem(value: 'School Store (Main Campus)', child: Text('School Store (Main Campus)')),
-                      DropdownMenuItem(value: 'Deliver to Homeroom Teacher', child: Text('Deliver to Homeroom Teacher')),
-                    ],
-                    onChanged: (val) {
-                      if (val != null) setDialogState(() => collectionPoint = val);
+                    initialValue: payment,
+                    isExpanded: true,
+                    decoration: const InputDecoration(
+                      labelText: 'Payment method',
+                    ),
+                    items:
+                        [
+                              'EcoCash USD',
+                              'ZiG Mobile Transfer',
+                              'Visa / Mastercard',
+                            ]
+                            .map(
+                              (value) => DropdownMenuItem(
+                                value: value,
+                                child: Text(
+                                  value,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            )
+                            .toList(),
+                    onChanged: (value) {
+                      if (value != null) update(() => payment = value);
                     },
+                  ),
+                  const SizedBox(height: 20),
+                  DropdownButtonFormField<String>(
+                    initialValue: collection,
+                    isExpanded: true,
+                    decoration: const InputDecoration(
+                      labelText: 'Collection point',
+                    ),
+                    items:
+                        [
+                              'School Store (Main Campus)',
+                              'Deliver to Homeroom Teacher',
+                            ]
+                            .map(
+                              (value) => DropdownMenuItem(
+                                value: value,
+                                child: Text(
+                                  value,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            )
+                            .toList(),
+                    onChanged: (value) {
+                      if (value != null) update(() => collection = value);
+                    },
+                  ),
+                  const SizedBox(height: 24),
+                  SizedBox(
+                    width: double.infinity,
+                    child: FilledButton(
+                      onPressed: () {
+                        final now = DateTime.now();
+                        final id = 'ORD-${now.millisecondsSinceEpoch}';
+                        setState(() {
+                          _ordersHistory.insert(0, {
+                            'order_id': id,
+                            'date': '${now.day}/${now.month}/${now.year}',
+                            'items_summary': _cartItems
+                                .map(
+                                  (i) =>
+                                      '${i['name']} (${i['selected_size']}) ×${i['qty']}',
+                                )
+                                .join(', '),
+                            'total_usd': _cartTotalUsd,
+                            'currency': 'USD',
+                            'payment_method': payment,
+                            'status': 'Processing · $collection',
+                            'status_color': AppColors.primary,
+                          });
+                          _cartItems.clear();
+                          _section = 2;
+                        });
+                        Navigator.pop(ctx);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Order saved for this session.'),
+                          ),
+                        );
+                      },
+                      child: const Text('Place order'),
+                    ),
                   ),
                 ],
               ),
             ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(ctx),
-                child: const Text('Cancel', style: TextStyle(color: Colors.grey)),
-              ),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(backgroundColor: accentGreen, foregroundColor: Colors.white),
-                onPressed: () {
-                  final newOrderId = 'ORD-2026-${(1000 + _ordersHistory.length * 111)}';
-                  final summaryText = _cartItems.map((i) => '${i['name']} (${i['selected_size']}) x${i['qty']}').join(', ');
-
-                  setState(() {
-                    _ordersHistory.insert(0, {
-                      'order_id': newOrderId,
-                      'date': 'August 03, 2026',
-                      'items_summary': summaryText,
-                      'total_usd': _cartTotalUsd,
-                      'currency': 'USD',
-                      'payment_method': selectedPayment,
-                      'status': 'Processing — $collectionPoint',
-                      'status_color': const Color(0xFFF59E0B),
-                    });
-                    _cartItems.clear();
-                  });
-
-                  Navigator.pop(ctx);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('Order #$newOrderId placed successfully! Receipt sent via SMS.'),
-                      backgroundColor: accentGreen,
-                      duration: const Duration(seconds: 4),
-                    ),
-                  );
-                  _tabController.animateTo(1); // Switch to Orders tab
-                },
-                child: const Text('Confirm & Pay', style: TextStyle(fontWeight: FontWeight.bold)),
-              ),
-            ],
-          );
-        },
+          ),
+        ),
       ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    final filteredCatalog = _catalog.where((item) {
-      final matchesCat = _selectedCategory == 'All' || item['category'] == _selectedCategory;
-      final matchesSearch = _searchQuery.isEmpty ||
-          (item['name'] as String).toLowerCase().contains(_searchQuery.toLowerCase()) ||
-          (item['description'] as String).toLowerCase().contains(_searchQuery.toLowerCase());
-      return matchesCat && matchesSearch;
-    }).toList();
-
+    final catalog = _catalog
+        .where(
+          (item) =>
+              (_selectedCategory == 'All' ||
+                  item['category'] == _selectedCategory) &&
+              '${item['name']} ${item['description']} ${item['sizes']}'
+                  .toLowerCase()
+                  .contains(_searchQuery.toLowerCase()),
+        )
+        .toList();
+    final count = _cartItems.fold<int>(
+      0,
+      (sum, item) => sum + (item['qty'] as int),
+    );
+    final tabs = ['Shop', 'Bag ($count)', 'Orders'];
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
-      appBar: AppBar(
-        backgroundColor: primaryBlue,
-        title: const Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+      backgroundColor: AppColors.background,
+      appBar: supportingAppBar(context, 'Uniform store'),
+      body: SafeArea(
+        child: ListView(
+          padding: const EdgeInsets.all(20),
           children: [
-            Text('Uniform Marketplace', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Colors.white)),
-            Text('Official School Wear & Online Store', style: TextStyle(fontSize: 11, color: Colors.white70)),
-          ],
-        ),
-        iconTheme: const IconThemeData(color: Colors.white),
-        bottom: TabBar(
-          controller: _tabController,
-          indicatorColor: Colors.white,
-          labelColor: Colors.white,
-          unselectedLabelColor: Colors.white70,
-          labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
-          tabs: [
-            const Tab(text: 'Catalog & Store'),
-            Tab(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Text('Cart & Orders'),
-                  if (_cartItems.isNotEmpty) ...[
-                    const SizedBox(width: 6),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                      decoration: const BoxDecoration(
-                        color: accentGreen,
-                        shape: BoxShape.circle,
+            PageHeading(
+              title: 'Uniform store',
+              subtitle: 'School essentials, ready for every day.',
+              symbol: AppSymbol.store,
+              icon: Icons.shopping_bag_outlined,
+            ),
+            PageFilters(
+              labels: tabs,
+              selected: tabs[_section],
+              onSelected: (value) =>
+                  setState(() => _section = tabs.indexOf(value)),
+            ),
+            const SizedBox(height: 24),
+            if (_section == 0) ...[
+              Container(
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  color: AppColors.primaryDark,
+                  borderRadius: BorderRadius.circular(22),
+                ),
+                child: const Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'THE SCHOOL COLLECTION',
+                      style: TextStyle(
+                        fontSize: 11,
+                        letterSpacing: 1.2,
+                        color: Colors.white70,
                       ),
-                      child: Text(
-                        '${_cartItems.length}',
-                        style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
+                    ),
+                    SizedBox(height: 12),
+                    Text(
+                      'A fresh start.\nThe right fit.',
+                      style: TextStyle(
+                        fontSize: 28,
+                        fontWeight: FontWeight.w600,
+                        height: 1.2,
+                        color: Colors.white,
                       ),
+                    ),
+                    SizedBox(height: 12),
+                    Text(
+                      'Uniforms, sportswear and everyday essentials.',
+                      style: TextStyle(color: Colors.white70, height: 1.5),
                     ),
                   ],
-                ],
+                ),
               ),
-            ),
-          ],
-        ),
-      ),
-      body: TabBarView(
-        controller: _tabController,
-        children: [
-          // TAB 1: Catalog & Store
-          SingleChildScrollView(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Search Bar
-                TextField(
-                  onChanged: (val) => setState(() => _searchQuery = val.trim()),
-                  decoration: InputDecoration(
-                    hintText: 'Search uniforms, sizes, or items...',
-                    hintStyle: const TextStyle(fontSize: 13, color: Color(0xFF94A3B8)),
-                    prefixIcon: const Icon(Icons.search_rounded, color: primaryBlue, size: 20),
-                    suffixIcon: _searchQuery.isNotEmpty
-                        ? IconButton(
-                            icon: const Icon(Icons.clear_rounded, size: 18),
-                            onPressed: () => setState(() => _searchQuery = ''),
-                          )
-                        : null,
-                    filled: true,
-                    fillColor: Colors.white,
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: const BorderSide(color: borderColor),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: const BorderSide(color: borderColor),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 12),
-
-                // Category Filter Pills
-                SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    children: ['All', 'Formal Wear', 'Sports & Physical Ed', 'Accessories & Footwear'].map((cat) {
-                      final isSelected = _selectedCategory == cat;
-                      return GestureDetector(
-                        onTap: () => setState(() => _selectedCategory = cat),
-                        child: Container(
-                          margin: const EdgeInsets.only(right: 8),
-                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                          decoration: BoxDecoration(
-                            color: isSelected ? primaryBlue : Colors.white,
-                            borderRadius: BorderRadius.circular(20),
-                            border: Border.all(color: isSelected ? primaryBlue : borderColor),
-                          ),
-                          child: Text(
-                            cat,
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
-                              color: isSelected ? Colors.white : const Color(0xFF475569),
-                            ),
-                          ),
+              const SizedBox(height: 24),
+              TextField(
+                controller: _searchController,
+                onChanged: (value) =>
+                    setState(() => _searchQuery = value.trim()),
+                decoration: InputDecoration(
+                  hintText: 'Search items or sizes',
+                  prefixIcon: const Icon(Icons.search),
+                  suffixIcon: _searchQuery.isEmpty
+                      ? null
+                      : IconButton(
+                          tooltip: 'Clear search',
+                          icon: const Icon(Icons.close),
+                          onPressed: () {
+                            _searchController.clear();
+                            setState(() => _searchQuery = '');
+                          },
                         ),
-                      );
-                    }).toList(),
-                  ),
                 ),
-                const SizedBox(height: 16),
-
-                // Uniform Items Grid
-                GridView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: MediaQuery.of(context).size.width > 600 ? 3 : 2,
-                    crossAxisSpacing: 12,
-                    mainAxisSpacing: 12,
-                    childAspectRatio: 0.78,
-                  ),
-                  itemCount: filteredCatalog.length,
-                  itemBuilder: (context, index) {
-                    final item = filteredCatalog[index];
-                    return GestureDetector(
+              ),
+              const SizedBox(height: 16),
+              PageFilters(
+                labels: const [
+                  'All',
+                  'Formal Wear',
+                  'Sports & Physical Ed',
+                  'Accessories & Footwear',
+                ],
+                selected: _selectedCategory,
+                onSelected: (value) =>
+                    setState(() => _selectedCategory = value),
+              ),
+              const SizedBox(height: 20),
+              Text(
+                '${catalog.length} essentials',
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(height: 16),
+              if (catalog.isEmpty)
+                const PageEmpty(
+                  title: 'No matching items',
+                  message: 'Try another category, item name or size.',
+                ),
+              for (final item in catalog)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 16),
+                  child: Material(
+                    color: AppColors.surface,
+                    borderRadius: BorderRadius.circular(20),
+                    clipBehavior: Clip.antiAlias,
+                    child: InkWell(
                       onTap: () => _openItemDetailModal(item),
-                      child: Container(
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(10),
-                          border: Border.all(color: borderColor),
-                          boxShadow: const [
-                            BoxShadow(color: Color(0x06000000), blurRadius: 6, offset: Offset(0, 2)),
-                          ],
-                        ),
+                      child: PageCard(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Center(
-                              child: Container(
-                                height: 74,
-                                width: double.infinity,
-                                decoration: BoxDecoration(
-                                  color: const Color(0xFFF1F5F9),
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: Icon(item['icon'] as IconData, size: 40, color: primaryBlue),
-                              ),
+                            _productVisual(item),
+                            const SizedBox(height: 16),
+                            Wrap(
+                              spacing: 8,
+                              runSpacing: 8,
+                              children: [
+                                PageBadge(item['category']),
+                                if (item['in_stock'] != true)
+                                  const PageBadge(
+                                    'Out of stock',
+                                    color: AppColors.error,
+                                  ),
+                              ],
                             ),
-                            const SizedBox(height: 10),
+                            const SizedBox(height: 12),
                             Text(
                               item['name'],
-                              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Color(0xFF1F2937)),
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w600,
+                                height: 1.3,
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                            Text(
+                              'USD \$${(item['price_usd'] as num).toStringAsFixed(2)}',
+                              style: const TextStyle(
+                                fontSize: 22,
+                                fontWeight: FontWeight.w700,
+                                color: AppColors.primaryDark,
+                              ),
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              item['category'],
-                              style: const TextStyle(fontSize: 10, color: Color(0xFF6B7280)),
+                              'ZiG ${(item['price_zig'] as num).toStringAsFixed(2)} · ${item['sizes'].length} sizes',
+                              style: const TextStyle(
+                                color: AppColors.textMuted,
+                                fontSize: 13,
+                              ),
                             ),
-                            const Spacer(),
+                            const SizedBox(height: 14),
+                            const Row(
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    'Choose size',
+                                    style: TextStyle(
+                                      color: AppColors.primary,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ),
+                                Icon(
+                                  Icons.arrow_forward,
+                                  size: 18,
+                                  color: AppColors.primary,
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+            ],
+            if (_section == 1) ...[
+              if (_cartItems.isEmpty) ...[
+                const PageEmpty(
+                  title: 'Your bag is waiting',
+                  message:
+                      'Choose your school essentials and select a size to get started.',
+                ),
+                const SizedBox(height: 16),
+                FilledButton(
+                  onPressed: () => setState(() => _section = 0),
+                  child: const Text('Browse uniforms'),
+                ),
+              ],
+              for (final item in _cartItems)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 16),
+                  child: PageCard(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          item['name'],
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        PageBadge(item['selected_size']),
+                        const SizedBox(height: 12),
+                        Text(
+                          'USD \$${(item['price_usd'] * item['qty']).toStringAsFixed(2)}',
+                          style: const TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.primaryDark,
+                          ),
+                        ),
+                        Wrap(
+                          spacing: 16,
+                          crossAxisAlignment: WrapCrossAlignment.center,
+                          children: [
                             Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              mainAxisSize: MainAxisSize.min,
                               children: [
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      'USD \$${(item['price_usd'] as double).toStringAsFixed(2)}',
-                                      style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: primaryBlue),
-                                    ),
-                                    Text(
-                                      'ZiG ${(item['price_zig'] as double).toStringAsFixed(2)}',
-                                      style: const TextStyle(fontSize: 9, color: Color(0xFF64748B)),
-                                    ),
-                                  ],
-                                ),
-                                Container(
-                                  padding: const EdgeInsets.all(6),
-                                  decoration: BoxDecoration(
-                                    color: primaryBlue.withValues(alpha: 0.1),
-                                    borderRadius: BorderRadius.circular(6),
-                                  ),
-                                  child: const Icon(Icons.add_shopping_cart_rounded, size: 16, color: primaryBlue),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              ],
-            ),
-          ),
-
-          // TAB 2: Cart & Orders History
-          SingleChildScrollView(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Active Shopping Cart
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Row(
-                      children: [
-                        Icon(Icons.shopping_cart_rounded, color: primaryBlue, size: 20),
-                        SizedBox(width: 8),
-                        Text('Shopping Cart', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: primaryBlue)),
-                      ],
-                    ),
-                    if (_cartItems.isNotEmpty)
-                      TextButton(
-                        onPressed: () => setState(() => _cartItems.clear()),
-                        child: const Text('Clear Cart', style: TextStyle(color: Colors.red, fontSize: 12)),
-                      ),
-                  ],
-                ),
-                const SizedBox(height: 8),
-                if (_cartItems.isEmpty)
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(24),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: borderColor),
-                    ),
-                    child: Column(
-                      children: [
-                        Icon(Icons.remove_shopping_cart_rounded, size: 48, color: Colors.grey.shade400),
-                        const SizedBox(height: 10),
-                        const Text(
-                          'Your cart is currently empty',
-                          style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF64748B)),
-                        ),
-                        const SizedBox(height: 4),
-                        const Text(
-                          'Browse the Uniform Catalog tab to add items.',
-                          style: TextStyle(fontSize: 12, color: Colors.grey),
-                        ),
-                      ],
-                    ),
-                  )
-                else ...[
-                  Column(
-                    children: List.generate(_cartItems.length, (index) {
-                      final item = _cartItems[index];
-                      return Container(
-                        margin: const EdgeInsets.only(bottom: 8),
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(color: borderColor),
-                        ),
-                        child: Row(
-                          children: [
-                            Icon(item['icon'] as IconData, color: primaryBlue, size: 24),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(item['name'], style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
-                                  Text(
-                                    'Size: ${item['selected_size']} • Qty: ${item['qty']}',
-                                    style: const TextStyle(fontSize: 11, color: Color(0xFF6B7280)),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              children: [
-                                Text(
-                                  'USD \$${(item['price_usd'] * item['qty']).toStringAsFixed(2)}',
-                                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: primaryBlue),
-                                ),
                                 IconButton(
-                                  icon: const Icon(Icons.delete_outline_rounded, color: Colors.red, size: 18),
-                                  onPressed: () {
-                                    setState(() => _cartItems.removeAt(index));
-                                  },
+                                  tooltip: 'Decrease quantity',
+                                  onPressed: item['qty'] > 1
+                                      ? () => setState(() => item['qty']--)
+                                      : null,
+                                  icon: const Icon(Icons.remove),
+                                ),
+                                Text('${item['qty']}'),
+                                IconButton(
+                                  tooltip: 'Increase quantity',
+                                  onPressed: () =>
+                                      setState(() => item['qty']++),
+                                  icon: const Icon(Icons.add),
                                 ),
                               ],
                             ),
-                          ],
-                        ),
-                      );
-                    }),
-                  ),
-                  const SizedBox(height: 12),
-                  Container(
-                    padding: const EdgeInsets.all(14),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: borderColor),
-                    ),
-                    child: Column(
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Text('Total USD:', style: TextStyle(fontWeight: FontWeight.bold)),
-                            Text('USD \$${_cartTotalUsd.toStringAsFixed(2)}', style: const TextStyle(fontWeight: FontWeight.bold, color: primaryBlue, fontSize: 16)),
-                          ],
-                        ),
-                        const SizedBox(height: 4),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Text('Total ZiG Equivalent:', style: TextStyle(fontSize: 12, color: Colors.grey)),
-                            Text('ZiG ${_cartTotalZig.toStringAsFixed(2)}', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Color(0xFF475569))),
-                          ],
-                        ),
-                        const SizedBox(height: 14),
-                        SizedBox(
-                          width: double.infinity,
-                          height: 46,
-                          child: ElevatedButton.icon(
-                            onPressed: _checkoutOrder,
-                            icon: const Icon(Icons.payment_rounded, size: 18),
-                            label: const Text('Proceed to Checkout & Pay', style: TextStyle(fontWeight: FontWeight.bold)),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: accentGreen,
-                              foregroundColor: Colors.white,
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                            TextButton(
+                              onPressed: () =>
+                                  setState(() => _cartItems.remove(item)),
+                              child: const Text('Remove'),
                             ),
-                          ),
+                          ],
                         ),
                       ],
                     ),
                   ),
-                ],
-
-                const SizedBox(height: 24),
-
-                // Order History List
-                const Row(
-                  children: [
-                    Icon(Icons.history_rounded, color: primaryBlue, size: 20),
-                    SizedBox(width: 8),
-                    Text('Order History & Status', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: primaryBlue)),
-                  ],
                 ),
-                const SizedBox(height: 10),
-                Column(
-                  children: _ordersHistory.map((order) {
-                    final Color statusColor = order['status_color'] as Color;
-                    return Container(
-                      margin: const EdgeInsets.only(bottom: 10),
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: borderColor),
+              if (_cartItems.isNotEmpty)
+                PageCard(
+                  color: AppColors.softBlue,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Order total',
+                        style: TextStyle(fontWeight: FontWeight.w600),
                       ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                order['order_id'],
-                                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: primaryBlue),
-                              ),
-                              Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                                decoration: BoxDecoration(
-                                  color: statusColor.withValues(alpha: 0.12),
-                                  borderRadius: BorderRadius.circular(4),
-                                ),
-                                child: Text(
-                                  order['status'],
-                                  style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: statusColor),
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 6),
-                          Text(
-                            order['items_summary'],
-                            style: const TextStyle(fontSize: 12, color: Color(0xFF334155), fontWeight: FontWeight.w500),
-                          ),
-                          const SizedBox(height: 6),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                '${order['date']} • ${order['payment_method']}',
-                                style: const TextStyle(fontSize: 11, color: Color(0xFF64748B)),
-                              ),
-                              Text(
-                                'USD \$${(order['total_usd'] as double).toStringAsFixed(2)}',
-                                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Color(0xFF1F2937)),
-                              ),
-                            ],
-                          ),
-                        ],
+                      const SizedBox(height: 10),
+                      Text(
+                        'USD \$${_cartTotalUsd.toStringAsFixed(2)}',
+                        style: const TextStyle(
+                          fontSize: 26,
+                          color: AppColors.primaryDark,
+                          fontWeight: FontWeight.w700,
+                        ),
                       ),
-                    );
-                  }).toList(),
+                      Text(
+                        'ZiG ${_cartTotalZig.toStringAsFixed(2)}',
+                        style: const TextStyle(color: AppColors.textMuted),
+                      ),
+                      const SizedBox(height: 20),
+                      SizedBox(
+                        width: double.infinity,
+                        child: FilledButton(
+                          onPressed: _checkoutOrder,
+                          child: const Text('Review order'),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ],
-            ),
-          ),
-        ],
+            ],
+            if (_section == 2) ...[
+              const Text(
+                'Your orders',
+                style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600),
+              ),
+              const SizedBox(height: 16),
+              for (final order in _ordersHistory)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 16),
+                  child: PageCard(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        PageBadge(order['status']),
+                        const SizedBox(height: 16),
+                        Text(
+                          order['order_id'],
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 16,
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        Text(
+                          order['date'],
+                          style: const TextStyle(
+                            color: AppColors.textMuted,
+                            fontSize: 13,
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        Text(
+                          order['items_summary'],
+                          style: const TextStyle(
+                            color: AppColors.textSecondary,
+                            height: 1.6,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          'USD \$${(order['total_usd'] as num).toStringAsFixed(2)}',
+                          style: const TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.primaryDark,
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        Text(
+                          order['payment_method'],
+                          style: const TextStyle(color: AppColors.textMuted),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+            ],
+          ],
+        ),
       ),
     );
   }

@@ -116,6 +116,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/reports/download/{report_id}', [ReportController::class, 'downloadReport']);
     });
 
+    Route::get('/teacher/assignments', [AssignmentController::class, 'teacherIndex'])->middleware('role:teacher');
+
     // Authoring Endpoints (Teachers & Admin)
     Route::post('/attendance/mark', [AttendanceController::class, 'markAttendance'])->middleware('role:admin,teacher,website_admin');
     Route::post('/fees/pay', [FeeController::class, 'processPayment']);

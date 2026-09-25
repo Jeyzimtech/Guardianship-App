@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../core/app_colors.dart';
+import '../../core/app_icon.dart';
+import '../common/page_components.dart';
 
 class MessagingView extends StatefulWidget {
   const MessagingView({super.key});
@@ -14,15 +16,15 @@ class _MessagingViewState extends State<MessagingView> {
 
   final List<Map<String, dynamic>> _conversations = [
     {
-      'name': 'Mrs. Grace Mupfu...',
+      'name': 'Mrs. Grace Mupfu',
       'initials': 'GM',
       'color': AppColors.primary,
-      'preview': 'Thank you for the update, Mr. Che...',
+      'preview': 'Thank you for the update, Mr. Chewe.',
       'time': 'Mon 10:32',
       'unread': 2,
     },
     {
-      'name': 'Mr. Sithole — School Accoun...',
+      'name': 'Mr. Sithole · School office',
       'initials': 'MS',
       'color': AppColors.primaryDark,
       'preview': 'Thank you for the school update.',
@@ -30,10 +32,10 @@ class _MessagingViewState extends State<MessagingView> {
       'unread': 0,
     },
     {
-      'name': 'Mrs. Dube — Deput...',
+      'name': 'Mrs. Dube · Deputy head',
       'initials': 'AD',
       'color': AppColors.primaryLight,
-      'preview': 'Please confirm your attendance f...',
+      'preview': 'Please confirm your attendance.',
       'time': 'Thu 09:00',
       'unread': 1,
     },
@@ -41,7 +43,7 @@ class _MessagingViewState extends State<MessagingView> {
       'name': 'Edu+Conect Support',
       'initials': 'ES',
       'color': AppColors.primaryAccent,
-      'preview': 'Welcome to the platform! Let us know if you ...',
+      'preview': 'Welcome! Let us know how we can help.',
       'time': '22 Oct',
       'unread': 0,
     },
@@ -70,208 +72,143 @@ class _MessagingViewState extends State<MessagingView> {
 
   @override
   Widget build(BuildContext context) {
+    final unread = _conversations.fold<int>(
+      0,
+      (sum, conversation) => sum + (conversation['unread'] as int),
+    );
     return Scaffold(
       backgroundColor: AppColors.background,
-      body: Column(
-        children: [
-          // ── SEARCH BAR ──
-          Container(
-            color: AppColors.surface,
-            padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
-            child: TextField(
+      appBar: supportingAppBar(context, 'Messages'),
+      body: SafeArea(
+        child: ListView(
+          padding: const EdgeInsets.fromLTRB(20, 24, 20, 100),
+          children: [
+            PageHeading(
+              title: 'Conversations',
+              subtitle: 'A closer connection between school and home.',
+              symbol: AppSymbol.message,
+            ),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                PageBadge('${_conversations.length} conversations'),
+                if (unread > 0) PageBadge('$unread unread'),
+              ],
+            ),
+            const SizedBox(height: 20),
+            TextField(
               controller: _searchController,
-              onChanged: (val) => setState(() => _searchQuery = val.trim()),
+              onChanged: (value) => setState(() => _searchQuery = value.trim()),
               decoration: InputDecoration(
-                hintText: 'Search conversations...',
-                hintStyle: const TextStyle(
-                  fontSize: 13,
-                  color: AppColors.textLight,
-                ),
-                prefixIcon: const Icon(
-                  Icons.search_rounded,
-                  color: AppColors.primaryLight,
-                  size: 20,
-                ),
-                suffixIcon: _searchQuery.isNotEmpty
-                    ? IconButton(
-                        icon: const Icon(Icons.clear_rounded, size: 18),
+                hintText: 'Search conversations',
+                prefixIcon: const Icon(Icons.search),
+                suffixIcon: _searchQuery.isEmpty
+                    ? null
+                    : IconButton(
+                        tooltip: 'Clear search',
+                        icon: const Icon(Icons.close),
                         onPressed: () {
                           _searchController.clear();
                           setState(() => _searchQuery = '');
                         },
-                      )
-                    : null,
-                filled: true,
-                fillColor: AppColors.softBlue,
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 12,
-                ),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                  borderSide: const BorderSide(color: AppColors.blueBorder),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                  borderSide: const BorderSide(color: AppColors.blueBorder),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                  borderSide: const BorderSide(
-                    color: AppColors.primaryLight,
-                    width: 1.5,
-                  ),
-                ),
+                      ),
               ),
             ),
-          ),
-          const Divider(height: 1, color: AppColors.divider),
-
-          // ── CONVERSATION LIST ──
-          Expanded(
-            child: _filtered.isEmpty
-                ? const Center(
-                    child: Text(
-                      'No conversations found.',
-                      style: TextStyle(
-                        color: AppColors.textMuted,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  )
-                : ListView.separated(
-                    itemCount: _filtered.length,
-                    separatorBuilder: (ctx, i) =>
-                        const Divider(height: 1, color: AppColors.divider),
-                    itemBuilder: (ctx, i) {
-                      final c = _filtered[i];
-                      final hasUnread = (c['unread'] as int) > 0;
-
-                      return InkWell(
-                        onTap: () => _openConversation(context, c),
-                        child: Container(
-                          color: AppColors.surface,
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 14,
-                          ),
-                          child: Row(
+            const SizedBox(height: 24),
+            const Text(
+              'Inbox',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+            ),
+            const SizedBox(height: 14),
+            if (_filtered.isEmpty)
+              const PageEmpty(
+                title: 'No conversations found',
+                message: 'Try a different name or clear your search.',
+              ),
+            for (final conversation in _filtered)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: Material(
+                  color: AppColors.surface,
+                  borderRadius: BorderRadius.circular(20),
+                  clipBehavior: Clip.antiAlias,
+                  child: InkWell(
+                    onTap: () => _openConversation(context, conversation),
+                    child: PageCard(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              // Avatar
-                              Container(
-                                width: 46,
-                                height: 46,
-                                decoration: BoxDecoration(
-                                  color: c['color'] as Color,
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                child: Center(
-                                  child: Text(
-                                    c['initials'],
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 15,
-                                    ),
+                              CircleAvatar(
+                                radius: 22,
+                                backgroundColor: AppColors.softBlue,
+                                foregroundColor: AppColors.primary,
+                                child: Text(
+                                  conversation['initials'],
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.w600,
                                   ),
                                 ),
                               ),
                               const SizedBox(width: 12),
-
-                              // Name + Preview
                               Expanded(
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      c['name'],
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: hasUnread
-                                            ? FontWeight.bold
-                                            : FontWeight.w600,
-                                        color: AppColors.textPrimary,
+                                      conversation['name'],
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w600,
                                       ),
-                                      overflow: TextOverflow.ellipsis,
                                     ),
-                                    const SizedBox(height: 3),
+                                    const SizedBox(height: 5),
                                     Text(
-                                      c['preview'],
-                                      style: TextStyle(
-                                        fontSize: 13,
-                                        color: hasUnread
-                                            ? AppColors.textPrimary
-                                            : AppColors.textMuted,
-                                        fontWeight: hasUnread
-                                            ? FontWeight.w500
-                                            : FontWeight.normal,
+                                      conversation['time'],
+                                      style: const TextStyle(
+                                        color: AppColors.textMuted,
+                                        fontSize: 12,
                                       ),
-                                      overflow: TextOverflow.ellipsis,
                                     ),
                                   ],
                                 ),
                               ),
-
-                              // Time + Badge
-                              const SizedBox(width: 8),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.end,
-                                children: [
-                                  Text(
-                                    c['time'],
-                                    style: TextStyle(
-                                      fontSize: 11,
-                                      color: hasUnread
-                                          ? AppColors.primary
-                                          : AppColors.textMuted,
-                                      fontWeight: hasUnread
-                                          ? FontWeight.bold
-                                          : FontWeight.normal,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 6),
-                                  if (hasUnread)
-                                    Container(
-                                      width: 20,
-                                      height: 20,
-                                      decoration: const BoxDecoration(
-                                        color: AppColors.primary,
-                                        shape: BoxShape.circle,
-                                      ),
-                                      child: Center(
-                                        child: Text(
-                                          '${c['unread']}',
-                                          style: const TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 10,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ),
-                                    )
-                                  else
-                                    const SizedBox(width: 20, height: 20),
-                                ],
-                              ),
+                              if ((conversation['unread'] as int) > 0)
+                                Padding(
+                                  padding: const EdgeInsets.only(left: 8),
+                                  child: PageBadge('${conversation['unread']}'),
+                                ),
                             ],
                           ),
-                        ),
-                      );
-                    },
+                          const SizedBox(height: 14),
+                          Text(
+                            conversation['preview'],
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              color: AppColors.textSecondary,
+                              height: 1.5,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
-          ),
-        ],
+                ),
+              ),
+          ],
+        ),
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _showNewMessageSheet(context),
         backgroundColor: AppColors.primary,
         foregroundColor: Colors.white,
-        icon: const Icon(Icons.edit_rounded, size: 18),
-        label: const Text(
-          'New Message',
-          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
-        ),
-        elevation: 2,
+        elevation: 0,
+        icon: const AppIcon(AppSymbol.message, color: Colors.white, size: 20),
+        label: const Text('New message'),
       ),
     );
   }
@@ -411,7 +348,7 @@ class _ConversationPageState extends State<_ConversationPage> {
     },
     {
       'isMe': true,
-      'text': 'Thank you for the update, Mr. Che...',
+      'text': 'Thank you for the update, Mr. Chewe.',
       'time': '10:32',
     },
   ];

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../core/app_colors.dart';
+import '../../core/app_icon.dart';
+import '../common/page_components.dart';
 
 class LearningJournalView extends StatefulWidget {
   final Map<String, dynamic>? child;
@@ -86,426 +88,223 @@ class _LearningJournalViewState extends State<LearningJournalView> {
     ];
   }
 
+  static const _filters = {
+    'All entries': 'all',
+    'Wellbeing': 'wellbeing',
+    'Photos': 'photo',
+    'Drawings': 'drawing',
+    'Voice notes': 'voice',
+    'Notes': 'text',
+  };
+
   @override
   Widget build(BuildContext context) {
-    final filteredEntries = _mockEntries.where((e) {
-      if (_selectedFilter == 'all') return true;
-      return e['type'] == _selectedFilter;
-    }).toList();
-
+    final entries = _mockEntries
+        .where(
+          (entry) =>
+              _selectedFilter == 'all' || entry['type'] == _selectedFilter,
+        )
+        .toList();
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        title: const Text(
-          'Learning Journal',
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
-          ),
+      appBar: supportingAppBar(context, 'Learning journal'),
+      body: SafeArea(
+        child: ListView(
+          padding: const EdgeInsets.all(20),
+          children: [
+            PageHeading(
+              title: 'Little moments.\nMeaningful progress.',
+              subtitle: widget.child == null
+                  ? 'Learning, wellbeing and classroom stories.'
+                  : '${widget.child!['name']} · Learning journal',
+              symbol: AppSymbol.report,
+            ),
+            PageFilters(
+              labels: _filters.keys.toList(),
+              selected: _filters.entries
+                  .firstWhere((entry) => entry.value == _selectedFilter)
+                  .key,
+              onSelected: (label) =>
+                  setState(() => _selectedFilter = _filters[label]!),
+            ),
+            const SizedBox(height: 24),
+            if (entries.isEmpty)
+              const PageEmpty(
+                title: 'No entries yet',
+                message:
+                    'Choose another category to explore classroom updates.',
+              ),
+            for (final entry in entries)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 20),
+                child: _journalEntry(entry),
+              ),
+          ],
         ),
-        backgroundColor: AppColors.primary,
-        iconTheme: const IconThemeData(color: Colors.white),
-      ),
-      body: Column(
-        children: [
-          // Learning journal introduction
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-            color: AppColors.softBlue,
-            child: const Row(
-              children: [
-                Icon(
-                  Icons.verified_rounded,
-                  color: AppColors.primary,
-                  size: 18,
-                ),
-                SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    'Follow classroom learning, teacher feedback and everyday progress.',
-                    style: TextStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.primaryDark,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          // Filter Chips
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-            child: Row(
-              children: [
-                _buildFilterChip('all', 'All Entries'),
-                _buildFilterChip('wellbeing', 'Wellbeing Logs'),
-                _buildFilterChip('photo', 'Photos'),
-                _buildFilterChip('drawing', 'Drawings'),
-                _buildFilterChip('voice', 'Voice Notes'),
-                _buildFilterChip('text', 'Notes'),
-              ],
-            ),
-          ),
-
-          // Journal Stream
-          Expanded(
-            child: filteredEntries.isEmpty
-                ? const Center(
-                    child: Text(
-                      'No journal entries match the selected filter.',
-                      style: TextStyle(color: AppColors.textMuted),
-                    ),
-                  )
-                : ListView.builder(
-                    padding: const EdgeInsets.all(16),
-                    itemCount: filteredEntries.length,
-                    itemBuilder: (context, index) {
-                      final entry = filteredEntries[index];
-                      return _buildJournalCard(entry);
-                    },
-                  ),
-          ),
-        ],
       ),
     );
   }
 
-  Widget _buildFilterChip(String key, String label) {
-    final isSelected = _selectedFilter == key;
-    return Padding(
-      padding: const EdgeInsets.only(right: 8.0),
-      child: ChoiceChip(
-        label: Text(label),
-        selected: isSelected,
-        onSelected: (val) {
-          if (val) setState(() => _selectedFilter = key);
-        },
-        selectedColor: AppColors.primary,
-        labelStyle: TextStyle(
-          color: isSelected ? Colors.white : AppColors.primaryDark,
-          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-          fontSize: 12,
-        ),
-        backgroundColor: AppColors.softBlue,
-        side: BorderSide(
-          color: isSelected ? AppColors.primary : AppColors.blueBorder,
-        ),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-      ),
-    );
-  }
-
-  Widget _buildJournalCard(Map<String, dynamic> entry) {
-    final isWellbeing = entry['type'] == 'wellbeing';
-    final hasImage = entry.containsKey('image_url');
-    final hasVoice = entry['type'] == 'voice';
-
-    return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        border: Border.all(color: AppColors.cardBorder),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.02),
-            blurRadius: 6,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Header
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: const BoxDecoration(
-              color: AppColors.softBlue,
-              border: Border(bottom: BorderSide(color: AppColors.blueBorder)),
+  Widget _journalEntry(Map<String, dynamic> entry) => PageCard(
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: AppColors.softBlue,
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: const AppIcon(
+                AppSymbol.teacher,
+                color: AppColors.primary,
+                size: 22,
+              ),
             ),
-            child: Row(
-              children: [
-                CircleAvatar(
-                  radius: 16,
-                  backgroundColor: AppColors.primary,
-                  child: Icon(
-                    isWellbeing ? Icons.child_care : Icons.face,
-                    color: Colors.white,
-                    size: 18,
-                  ),
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        entry['author'] ?? 'Teacher',
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 13,
-                          color: AppColors.textPrimary,
-                        ),
-                      ),
-                      Text(
-                        entry['date'] ?? '',
-                        style: const TextStyle(
-                          fontSize: 11,
-                          color: AppColors.textMuted,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 3,
-                  ),
-                  decoration: BoxDecoration(
-                    color: AppColors.surface,
-                    border: Border.all(color: AppColors.blueBorder),
-                  ),
-                  child: Text(
-                    isWellbeing
-                        ? 'PREPARATORY LOG'
-                        : (entry['subject'] ??
-                              entry['type'].toString().toUpperCase()),
-                    style: const TextStyle(
-                      fontSize: 10,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.primaryDark,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          // Content Body
-          Padding(
-            padding: const EdgeInsets.all(14),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                if (entry['caption'] != null)
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
                   Text(
-                    entry['caption'],
+                    entry['author'],
                     style: const TextStyle(
-                      fontSize: 14,
-                      height: 1.4,
-                      color: AppColors.textPrimary,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
-
-                // Preparatory Wellbeing Details Box
-                if (isWellbeing && entry['wellbeing'] != null) ...[
-                  const SizedBox(height: 12),
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: AppColors.softBlue,
-                      border: Border.all(color: AppColors.blueBorder),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          'DAILY WELLBEING SNAPSHOT',
-                          style: TextStyle(
-                            fontSize: 10,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.primaryDark,
-                            letterSpacing: 0.5,
-                          ),
-                        ),
-                        const SizedBox(height: 6),
-                        _buildWellbeingRow(
-                          Icons.restaurant_rounded,
-                          'Meals',
-                          entry['wellbeing']['meals'],
-                        ),
-                        _buildWellbeingRow(
-                          Icons.bed_rounded,
-                          'Nap / Rest',
-                          entry['wellbeing']['nap'],
-                        ),
-                        _buildWellbeingRow(
-                          Icons.clean_hands_rounded,
-                          'Hygiene',
-                          entry['wellbeing']['hygiene'],
-                        ),
-                        _buildWellbeingRow(
-                          Icons.sentiment_satisfied_alt_rounded,
-                          'Mood',
-                          entry['wellbeing']['mood'],
-                        ),
-                      ],
+                  const SizedBox(height: 4),
+                  Text(
+                    entry['date'],
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: AppColors.textMuted,
                     ),
                   ),
                 ],
-
-                // Image Work Sample
-                if (hasImage) ...[
-                  const SizedBox(height: 12),
-                  Container(
-                    height: 180,
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      color: AppColors.softBlue,
-                      border: Border.all(color: AppColors.blueBorder),
-                    ),
-                    child: Image.network(
-                      entry['image_url'],
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) => Container(
-                        color: AppColors.softBlue,
-                        child: const Center(
-                          child: Icon(
-                            Icons.image,
-                            size: 48,
-                            color: AppColors.primaryLight,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-
-                // Voice Note Sample
-                if (hasVoice) ...[
-                  const SizedBox(height: 12),
-                  Container(
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      color: AppColors.softBlue,
-                      border: Border.all(color: AppColors.blueBorder),
-                    ),
-                    child: Row(
-                      children: [
-                        const CircleAvatar(
-                          radius: 16,
-                          backgroundColor: AppColors.primary,
-                          child: Icon(
-                            Icons.play_arrow_rounded,
-                            color: Colors.white,
-                            size: 20,
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        const Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Voice Recording',
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.bold,
-                                  color: AppColors.textPrimary,
-                                ),
-                              ),
-                              Text(
-                                'Audio sample • Click to play',
-                                style: TextStyle(
-                                  fontSize: 10,
-                                  color: AppColors.textMuted,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Text(
-                          entry['duration'] ?? '',
-                          style: const TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.primary,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-
-                // Teacher Feedback Note
-                if (entry['feedback'] != null) ...[
-                  const SizedBox(height: 12),
-                  Container(
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      color: AppColors.softBlue,
-                      border: Border.all(color: AppColors.blueBorder),
-                    ),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Icon(
-                          Icons.chat_bubble_outline_rounded,
-                          size: 16,
-                          color: AppColors.primary,
-                        ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            'Teacher Feedback: ${entry['feedback']}',
-                            style: const TextStyle(
-                              fontSize: 12,
-                              fontStyle: FontStyle.italic,
-                              color: AppColors.primaryDark,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ],
+              ),
             ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildWellbeingRow(IconData icon, String label, String? value) {
-    if (value == null) return const SizedBox.shrink();
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 4.0),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(top: 2.0),
-            child: Icon(icon, size: 14, color: AppColors.primary),
-          ),
-          const SizedBox(width: 6),
+          ],
+        ),
+        const SizedBox(height: 18),
+        PageBadge(
+          entry['subject'] ??
+              _filters.entries
+                  .firstWhere((filter) => filter.value == entry['type'])
+                  .key,
+        ),
+        const SizedBox(height: 14),
+        if (entry['caption'] != null)
           Text(
-            '$label: ',
+            entry['caption'],
             style: const TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.bold,
+              fontSize: 16,
+              height: 1.6,
               color: AppColors.textPrimary,
             ),
           ),
-          Expanded(
-            child: Text(
-              value,
-              style: const TextStyle(
-                fontSize: 12,
-                height: 1.3,
-                color: AppColors.textSecondary,
+        if (entry['wellbeing'] != null) ...[
+          const SizedBox(height: 20),
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: AppColors.softBlue,
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'TODAY’S WELLBEING',
+                  style: TextStyle(
+                    fontSize: 11,
+                    letterSpacing: 1.1,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.primary,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                for (final item in {
+                  'Meals': 'meals',
+                  'Rest': 'nap',
+                  'Hygiene': 'hygiene',
+                  'Mood': 'mood',
+                }.entries)
+                  if (entry['wellbeing'][item.value] != null)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 12),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            item.key,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.primaryDark,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            entry['wellbeing'][item.value],
+                            style: const TextStyle(
+                              color: AppColors.textSecondary,
+                              height: 1.5,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+              ],
+            ),
+          ),
+        ],
+        if (entry['image_url'] != null) ...[
+          const SizedBox(height: 18),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(16),
+            child: AspectRatio(
+              aspectRatio: 4 / 3,
+              child: Image.network(
+                entry['image_url'],
+                fit: BoxFit.cover,
+                errorBuilder: (_, error, stack) => Container(
+                  color: AppColors.softBlue,
+                  alignment: Alignment.center,
+                  child: const Text(
+                    'Photo unavailable',
+                    style: TextStyle(color: AppColors.textMuted),
+                  ),
+                ),
               ),
             ),
           ),
         ],
-      ),
-    );
-  }
+        if (entry['type'] == 'voice') ...[
+          const SizedBox(height: 18),
+          PageBadge('Voice note · ${entry['duration']}'),
+        ],
+        if (entry['feedback'] != null) ...[
+          const SizedBox(height: 20),
+          const Divider(height: 1),
+          const SizedBox(height: 16),
+          const Text(
+            'Teacher’s note',
+            style: TextStyle(
+              fontWeight: FontWeight.w600,
+              color: AppColors.primary,
+            ),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            entry['feedback'],
+            style: const TextStyle(color: AppColors.textSecondary, height: 1.6),
+          ),
+        ],
+      ],
+    ),
+  );
 }
