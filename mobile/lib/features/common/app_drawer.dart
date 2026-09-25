@@ -80,7 +80,7 @@ class AppDrawer extends StatelessWidget {
             child: Row(
               children: [
                 Image.asset(
-                  'assets/logo.png',
+                  'assets/e.png',
                   height: 32,
                   width: 32,
                   fit: BoxFit.contain,
@@ -96,7 +96,7 @@ class AppDrawer extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Edu+Conect',
+                        'Edu Connect',
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 18,

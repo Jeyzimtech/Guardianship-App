@@ -210,24 +210,15 @@ class _LoginScreenState extends State<LoginScreen> {
               children: [
                 const SizedBox(height: 40),
                 
-                // Logo Graphic Embedded directly on Background
+                // Logo Graphic - E mark for Edu Connect
                 Center(
-                  child: Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: AppColors.softBlue,
-                      shape: BoxShape.circle,
-                      border: Border.all(color: AppColors.blueBorder, width: 1.5),
-                    ),
-                    child: Image.asset(
-                      'assets/logo.png',
-                      height: 70,
-                      width: 70,
-                      fit: BoxFit.contain,
-                    ),
+                  child: Image.asset(
+                    'assets/e.png',
+                    height: 100,
+                    fit: BoxFit.contain,
                   ),
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: 20),
                 
                 Text(
                   'Welcome Back',

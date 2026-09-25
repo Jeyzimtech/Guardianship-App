@@ -242,24 +242,15 @@ class _SignupScreenState extends State<SignupScreen> {
                   children: [
                     const SizedBox(height: 40),
                     
-                    // Logo Graphic
+                    // Logo Graphic - E mark for Edu Connect
                     Center(
-                      child: Container(
-                        padding: const EdgeInsets.all(14),
-                        decoration: BoxDecoration(
-                          color: AppColors.softBlue,
-                          shape: BoxShape.circle,
-                          border: Border.all(color: AppColors.blueBorder, width: 1.5),
-                        ),
-                        child: Image.asset(
-                          'assets/logo.png',
-                          height: 60,
-                          width: 60,
-                          fit: BoxFit.contain,
-                        ),
+                      child: Image.asset(
+                        'assets/e.png',
+                        height: 90,
+                        fit: BoxFit.contain,
                       ),
                     ),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 16),
                     
                     // Header
                     const Text(
