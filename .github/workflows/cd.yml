@@ -17,10 +17,6 @@ jobs:
     name: Deploy Laravel Backend to Server
     runs-on: ubuntu-latest
 
-    environment:
-      name: production
-      url: http://109.199.99.156
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
