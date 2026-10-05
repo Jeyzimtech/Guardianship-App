@@ -7,28 +7,19 @@ class ApiClient {
   late final Dio _dio;
   
   // Use 10.0.2.2 for Android Emulator, localhost for iOS/Web/Desktop
+  // Production server URL (Port 80)
+  static const String serverBaseUrl = 'http://109.199.99.156/api';
+
   static String get defaultBaseUrl {
-    if (kIsWeb) {
-      return 'http://localhost:8000/api';
-    }
-    try {
-      if (Platform.isAndroid) {
-        return 'http://10.0.2.2:8000/api';
-      }
-      if (Platform.isWindows || Platform.isMacOS || Platform.isLinux) {
-        return 'http://127.0.0.1:8000/api';
-      }
-    } catch (_) {
-      // Non-mobile platforms or fallback
-    }
-    return 'http://127.0.0.1:8000/api'; // Default fallback
+    // Points directly to the deployed backend server
+    return serverBaseUrl;
   }
 
   ApiClient({String? baseUrl}) {
     _dio = Dio(BaseOptions(
       baseUrl: baseUrl ?? defaultBaseUrl,
-      connectTimeout: const Duration(milliseconds: 1500),
-      receiveTimeout: const Duration(milliseconds: 1500),
+      connectTimeout: const Duration(seconds: 20),
+      receiveTimeout: const Duration(seconds: 20),
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
