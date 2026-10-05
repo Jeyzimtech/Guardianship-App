@@ -20,6 +20,15 @@ use App\Http\Controllers\WebsiteAdminController;
 use App\Http\Middleware\CheckChildSubscription;
 use Illuminate\Support\Facades\Route;
 
+// Public health check endpoint
+Route::get('/health', function () {
+    return response()->json([
+        'status' => 'ok',
+        'message' => 'Guardianship API is running',
+        'timestamp' => now()->toIso8601String(),
+    ]);
+});
+
 // Public auth endpoints
 Route::post('/auth/firebase-login', [AuthController::class, 'firebaseLogin']);
 
