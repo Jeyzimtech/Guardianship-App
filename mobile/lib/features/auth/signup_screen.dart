@@ -13,14 +13,23 @@ class SignupScreen extends StatefulWidget {
 }
 
 class _SignupScreenState extends State<SignupScreen> {
-  final _nameController = TextEditingController(text: 'John Chewe');
-  final _emailController = TextEditingController(text: 'parent@chewe.tech');
-  final _passwordController = TextEditingController(text: 'password123');
-  final _confirmPasswordController = TextEditingController(text: 'password123');
+  final _nameController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+  final _confirmPasswordController = TextEditingController();
   String _selectedRole = 'Parent / Student'; // Parent / Student or Teacher
   bool _isObscuredPassword = true;
   bool _isObscuredConfirm = true;
   bool _isAuthenticating = false;
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
+    _confirmPasswordController.dispose();
+    super.dispose();
+  }
 
   void _signup() async {
     final name = _nameController.text.trim();
@@ -63,12 +72,14 @@ class _SignupScreenState extends State<SignupScreen> {
     if (!mounted) return;
 
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    
-    final String mockPhone = _selectedRole == 'Teacher' ? '+263772222222' : '+263773333333';
-    final String roleLower = _selectedRole == 'Teacher' ? 'teacher' : 'guardian';
-    final mockToken = 'mock-firebase-token-$mockPhone-uid_${roleLower}_123';
+    final String role = _selectedRole == 'Teacher' ? 'teacher' : 'guardian';
 
-    final success = await authProvider.loginWithFirebaseToken(mockToken);
+    final success = await authProvider.register(
+      name: name,
+      email: email,
+      password: password,
+      role: role,
+    );
     
     if (mounted) {
       setState(() {
@@ -77,7 +88,10 @@ class _SignupScreenState extends State<SignupScreen> {
 
       if (success) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Welcome, $name! Account created successfully.')),
+          SnackBar(
+            backgroundColor: Colors.green.shade700,
+            content: Text('Welcome, $name! Account created successfully.'),
+          ),
         );
         Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
           MaterialPageRoute(builder: (_) => const DashboardHome()),
@@ -85,7 +99,10 @@ class _SignupScreenState extends State<SignupScreen> {
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(authProvider.errorMessage ?? 'Signup simulation failed.')),
+          SnackBar(
+            backgroundColor: Colors.red.shade700,
+            content: Text(authProvider.errorMessage ?? 'Registration failed. Please try again.'),
+          ),
         );
       }
     }

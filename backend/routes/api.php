@@ -30,6 +30,8 @@ Route::get('/health', function () {
 });
 
 // Public auth endpoints
+Route::post('/auth/login', [AuthController::class, 'login']);
+Route::post('/auth/register', [AuthController::class, 'register']);
 Route::post('/auth/firebase-login', [AuthController::class, 'firebaseLogin']);
 
 // Authenticated routes

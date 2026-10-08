@@ -56,7 +56,7 @@ def sftp_mkdirs(sftp, remote_dir):
                 pass
 
 def deploy(password):
-    local_backend_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "backend"))
+    local_backend_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "backend"))
     if not os.path.exists(local_backend_dir):
         print(f"Error: Backend directory not found at {local_backend_dir}")
         sys.exit(1)
@@ -113,6 +113,7 @@ def deploy(password):
     php artisan route:cache
     php artisan view:cache
     php artisan migrate --force
+    php artisan db:seed --force
     php artisan queue:restart
     chown -R www-data:www-data storage bootstrap/cache
     """

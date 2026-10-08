@@ -52,14 +52,7 @@ class _LoginScreenState extends State<LoginScreen> {
     });
 
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
-
-    final bool isTeacher =
-        _selectedRole == 'Teacher' || email.toLowerCase().contains('teacher');
-    final String mockPhone = isTeacher ? '+263772222222' : '+263773333333';
-    final String roleLower = isTeacher ? 'teacher' : 'guardian';
-    final mockToken = 'mock-firebase-token-$mockPhone-uid_${roleLower}_123';
-
-    final success = await authProvider.loginWithFirebaseToken(mockToken);
+    final success = await authProvider.loginWithEmailPassword(email, password);
 
     if (mounted) {
       setState(() {
@@ -74,8 +67,9 @@ class _LoginScreenState extends State<LoginScreen> {
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
+            backgroundColor: Colors.red.shade700,
             content: Text(
-              authProvider.errorMessage ?? 'Authentication failed.',
+              authProvider.errorMessage ?? 'Authentication failed. Please check credentials.',
             ),
           ),
         );

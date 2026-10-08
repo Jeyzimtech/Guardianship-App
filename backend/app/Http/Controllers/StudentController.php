@@ -44,7 +44,7 @@ class StudentController extends Controller
             ]);
         }
 
-        if ($user->role === 'admin') {
+        if (in_array($user->role, ['admin', 'website_admin'])) {
             // Admin gets all students
             $students = Student::with('school')->get();
             return response()->json([
@@ -65,11 +65,18 @@ class StudentController extends Controller
     public function store(Request $request)
     {
         $user = $request->user();
-        if ($user->role !== 'admin') {
+        if (!in_array($user->role, ['admin', 'website_admin'])) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'Unauthorized. Admin access only.'
             ], 403);
+        }
+
+        if (!$request->has('school_id')) {
+            $defaultSchool = \App\Models\School::first();
+            if ($defaultSchool) {
+                $request->merge(['school_id' => $defaultSchool->id]);
+            }
         }
 
         $request->validate([
@@ -100,7 +107,7 @@ class StudentController extends Controller
     public function linkGuardian(Request $request)
     {
         $user = $request->user();
-        if ($user->role !== 'admin') {
+        if (!in_array($user->role, ['admin', 'website_admin'])) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'Unauthorized. Admin access only.'

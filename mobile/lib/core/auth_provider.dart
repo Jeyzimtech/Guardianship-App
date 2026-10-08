@@ -58,6 +58,151 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
+  Future<bool> loginWithEmailPassword(String email, String password) async {
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      final response = await apiClient.dio.post(
+        '/auth/login',
+        data: {
+          'email': email.trim(),
+          'password': password,
+        },
+      );
+
+      if (response.statusCode == 200 && response.data is Map && response.data['status'] == 'success') {
+        final userData = response.data['user'];
+        final userRole = userData?['role'];
+
+        if (userRole == 'admin' || userRole == 'website_admin') {
+          _token = null;
+          _user = null;
+          _errorMessage = 'Mobile application access is restricted to Teachers and Parents/Students. Please log in via the Web Admin Portal.';
+          _isLoading = false;
+          notifyListeners();
+          return false;
+        }
+
+        _token = response.data['token'];
+        _user = userData;
+
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('auth_token', _token!);
+        await prefs.setString('user_name', _user!['name'] ?? '');
+        await prefs.setString('user_role', _user!['role'] ?? '');
+        if (_user!['phone_number'] != null) {
+          await prefs.setString('user_phone', _user!['phone_number']);
+        }
+        if (_user!['email'] != null) {
+          await prefs.setString('user_email', _user!['email']);
+        }
+
+        _isLoading = false;
+        notifyListeners();
+        return true;
+      } else {
+        final msg = response.data is Map ? (response.data['message'] ?? 'Authentication failed') : 'Authentication failed';
+        _errorMessage = msg.toString();
+        _isLoading = false;
+        notifyListeners();
+        return false;
+      }
+    } on DioException catch (dioErr) {
+      String msg = 'Authentication failed. Please check your network and credentials.';
+      if (dioErr.response?.data is Map && dioErr.response?.data['message'] != null) {
+        msg = dioErr.response!.data['message'].toString();
+      } else if (dioErr.type == DioExceptionType.connectionTimeout || dioErr.type == DioExceptionType.receiveTimeout) {
+        msg = 'Connection timed out. Please check your internet connection.';
+      }
+      _errorMessage = msg;
+      _isLoading = false;
+      notifyListeners();
+      return false;
+    } catch (e) {
+      _errorMessage = e.toString();
+      _isLoading = false;
+      notifyListeners();
+      return false;
+    }
+  }
+
+  Future<bool> register({
+    required String name,
+    required String email,
+    required String password,
+    required String role,
+    String? phone,
+  }) async {
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      final response = await apiClient.dio.post(
+        '/auth/register',
+        data: {
+          'name': name.trim(),
+          'email': email.trim(),
+          'password': password,
+          'role': role,
+          if (phone != null && phone.isNotEmpty) 'phone_number': phone.trim(),
+        },
+      );
+
+      if ((response.statusCode == 200 || response.statusCode == 201) &&
+          response.data is Map &&
+          response.data['status'] == 'success') {
+        final userData = response.data['user'];
+
+        _token = response.data['token'];
+        _user = userData;
+
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('auth_token', _token!);
+        await prefs.setString('user_name', _user!['name'] ?? '');
+        await prefs.setString('user_role', _user!['role'] ?? '');
+        if (_user!['phone_number'] != null) {
+          await prefs.setString('user_phone', _user!['phone_number']);
+        }
+        if (_user!['email'] != null) {
+          await prefs.setString('user_email', _user!['email']);
+        }
+
+        _isLoading = false;
+        notifyListeners();
+        return true;
+      } else {
+        final msg = response.data is Map ? (response.data['message'] ?? 'Registration failed') : 'Registration failed';
+        _errorMessage = msg.toString();
+        _isLoading = false;
+        notifyListeners();
+        return false;
+      }
+    } on DioException catch (dioErr) {
+      String msg = 'Registration failed.';
+      if (dioErr.response?.data is Map) {
+        final data = dioErr.response!.data;
+        if (data['message'] != null) {
+          msg = data['message'].toString();
+        } else if (data['errors'] != null && data['errors'] is Map) {
+          final errors = data['errors'] as Map;
+          msg = errors.values.map((v) => (v is List ? v.join(', ') : v.toString())).join('\n');
+        }
+      }
+      _errorMessage = msg;
+      _isLoading = false;
+      notifyListeners();
+      return false;
+    } catch (e) {
+      _errorMessage = e.toString();
+      _isLoading = false;
+      notifyListeners();
+      return false;
+    }
+  }
+
   Future<bool> loginWithFirebaseToken(String firebaseIdToken) async {
     _isLoading = true;
     _errorMessage = null;

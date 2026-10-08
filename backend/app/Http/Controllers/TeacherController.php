@@ -41,6 +41,25 @@ class TeacherController extends Controller
      */
     public function store(Request $request)
     {
+        if (!$request->has('user_id') && $request->filled('name')) {
+            $user = User::create([
+                'name' => $request->name,
+                'email' => $request->email,
+                'phone_number' => $request->phone ?? ('+2637' . rand(10000000, 99999999)),
+                'role' => 'teacher',
+                'password' => \Illuminate\Support\Facades\Hash::make('password123'),
+                'firebase_uid' => 'uid_teacher_' . time(),
+            ]);
+            $request->merge(['user_id' => $user->id]);
+        }
+
+        if (!$request->has('school_id')) {
+            $defaultSchool = \App\Models\School::first();
+            if ($defaultSchool) {
+                $request->merge(['school_id' => $defaultSchool->id]);
+            }
+        }
+
         $request->validate([
             'user_id' => 'required|exists:users,id',
             'school_id' => 'required|exists:schools,id',

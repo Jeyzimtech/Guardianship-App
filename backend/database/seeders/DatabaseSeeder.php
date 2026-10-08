@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\AcademicYear;
 use App\Models\Announcement;
 use App\Models\Assignment;
 use App\Models\AttendanceRecord;
@@ -11,6 +12,7 @@ use App\Models\FeeTransaction;
 use App\Models\JournalEntry;
 use App\Models\ReportDocument;
 use App\Models\School;
+use App\Models\SchoolClass;
 use App\Models\Student;
 use App\Models\Subscription;
 use App\Models\Teacher;
@@ -53,14 +55,47 @@ class DatabaseSeeder extends Seeder
             'branding_color' => '#6366F1',
         ]);
 
-        // 2. Create Users (Website Admin, Admin, Teacher, Guardian)
+        // 2. Create Academic Years & School Classes
+        $academicYear = AcademicYear::create([
+            'name' => '2026 Academic Year',
+            'code' => 'AY-2026',
+            'start_date' => '2026-01-12',
+            'end_date' => '2026-12-04',
+            'is_current' => true,
+        ]);
+
+        $classPrep = SchoolClass::create([
+            'school_id' => $prepSchool->id,
+            'academic_year_id' => $academicYear->id,
+            'grade' => 'ECD B',
+            'class_name' => 'Butterflies',
+            'capacity' => 25,
+        ]);
+
+        $classPrimary1 = SchoolClass::create([
+            'school_id' => $primarySchool->id,
+            'academic_year_id' => $academicYear->id,
+            'grade' => 'Grade 1',
+            'class_name' => 'Grade 1A',
+            'capacity' => 30,
+        ]);
+
+        $classPrimary4 = SchoolClass::create([
+            'school_id' => $primarySchool->id,
+            'academic_year_id' => $academicYear->id,
+            'grade' => 'Grade 4',
+            'class_name' => 'Gold',
+            'capacity' => 32,
+        ]);
+
+        // 3. Create Users (Website Admin, Admin, Teacher, Guardian)
         $websiteAdmin = User::create([
             'name' => 'CT Pulse Platform Owner',
             'email' => 'platform@ctpulse.co.zw',
             'phone_number' => '+263770000000',
             'firebase_uid' => 'mock_uid_webadmin_000',
             'role' => 'website_admin',
-            'password' => Hash::make('password'),
+            'password' => Hash::make('password123'),
         ]);
 
         $admin = User::create([
@@ -69,7 +104,7 @@ class DatabaseSeeder extends Seeder
             'phone_number' => '+263771111111',
             'firebase_uid' => 'mock_uid_admin_123',
             'role' => 'admin',
-            'password' => Hash::make('password'),
+            'password' => Hash::make('password123'),
         ]);
 
         $teacher = User::create([
@@ -78,7 +113,7 @@ class DatabaseSeeder extends Seeder
             'phone_number' => '+263772222222',
             'firebase_uid' => 'mock_uid_teacher_123',
             'role' => 'teacher',
-            'password' => Hash::make('password'),
+            'password' => Hash::make('password123'),
         ]);
 
         $guardian = User::create([
@@ -87,7 +122,20 @@ class DatabaseSeeder extends Seeder
             'phone_number' => '+263773333333',
             'firebase_uid' => 'mock_uid_guardian_123',
             'role' => 'guardian',
-            'password' => Hash::make('password'),
+            'password' => Hash::make('password123'),
+            'address' => '14 Samora Machel Avenue, Harare',
+            'preferred_language' => 'English',
+            'emergency_contact_name' => 'Mary Chewe',
+            'emergency_contact_phone' => '+263774444444',
+        ]);
+
+        $guardian2 = User::create([
+            'name' => 'John Chewe',
+            'email' => 'parent@chewe.tech',
+            'phone_number' => '+263775555555',
+            'firebase_uid' => 'mock_uid_parent_chewe',
+            'role' => 'guardian',
+            'password' => Hash::make('password123'),
             'address' => '14 Samora Machel Avenue, Harare',
             'preferred_language' => 'English',
             'emergency_contact_name' => 'Mary Chewe',
@@ -120,6 +168,7 @@ class DatabaseSeeder extends Seeder
 
         // 5. Link Guardian to Students
         $guardian->students()->attach([$student1->id, $student2->id]);
+        $guardian2->students()->attach([$student1->id, $student2->id]);
 
         // 6. Subscriptions (Platform Owner Active Subscriptions)
         Subscription::create([

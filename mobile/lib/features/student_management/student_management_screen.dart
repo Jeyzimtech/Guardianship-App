@@ -453,8 +453,9 @@ class _StudentManagementScreenState extends State<StudentManagementScreen> {
                             ),
                           ],
                           onChanged: (val) {
-                            if (val != null)
+                            if (val != null) {
                               setState(() => _selectedClassFilter = val);
+                            }
                           },
                         ),
                       ),
@@ -499,8 +500,9 @@ class _StudentManagementScreenState extends State<StudentManagementScreen> {
                             ),
                           ],
                           onChanged: (val) {
-                            if (val != null)
+                            if (val != null) {
                               setState(() => _selectedStatusFilter = val);
+                            }
                           },
                         ),
                       ),
@@ -689,8 +691,9 @@ class _StudentManagementScreenState extends State<StudentManagementScreen> {
                                             final idx = _students.indexWhere(
                                               (item) => item['id'] == s['id'],
                                             );
-                                            if (idx != -1)
+                                            if (idx != -1) {
                                               _students[idx] = updated;
+                                            }
                                           });
                                         },
                                       ),
