@@ -31,27 +31,11 @@ class _SchoolManagementScreenState extends State<SchoolManagementScreen> {
   final List<Map<String, dynamic>> _mockSchools = [
     {
       'id': 1,
-      'name': 'Hillside Preparatory School',
-      'type': 'prep',
-      'students_count': 45,
-      'teachers_count': 4,
-      'school_classes_count': 3,
-    },
-    {
-      'id': 2,
       'name': 'Hillside Primary School',
       'type': 'primary',
-      'students_count': 230,
-      'teachers_count': 12,
-      'school_classes_count': 14,
-    },
-    {
-      'id': 3,
-      'name': 'Hillside Secondary School',
-      'type': 'secondary',
-      'students_count': 310,
-      'teachers_count': 18,
-      'school_classes_count': 18,
+      'students_count': 0,
+      'teachers_count': 0,
+      'school_classes_count': 3,
     },
   ];
 

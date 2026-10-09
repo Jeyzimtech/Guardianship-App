@@ -38,41 +38,20 @@ class DatabaseSeeder extends Seeder
             // Tables might be empty or migrations already fresh
         }
 
-        // 2. Create / Ensure Schools
-        $prepSchool = School::firstOrCreate(
-            ['name' => 'Hillside Preparatory School'],
-            [
-                'type' => 'prep',
-                'primary_admin_name' => 'Sarah Jenkins',
-                'primary_admin_email' => 'sjenkins@prep.hillside.ac.zw',
-                'primary_admin_phone' => '+263771000111',
-                'branding_color' => '#10B981',
-            ]
-        );
+        // 2. Create / Ensure Schools (Only Hillside Primary School)
+        DB::table('school_classes')->delete();
+        DB::table('schools')->delete();
 
-        $primarySchool = School::firstOrCreate(
-            ['name' => 'Hillside Primary School'],
-            [
-                'type' => 'primary',
-                'primary_admin_name' => 'Admin Tinotenda',
-                'primary_admin_email' => 'admin@hillside.ac.zw',
-                'primary_admin_phone' => '+263771111111',
-                'branding_color' => '#3B5998',
-            ]
-        );
+        $primarySchool = School::create([
+            'name' => 'Hillside Primary School',
+            'type' => 'primary',
+            'primary_admin_name' => 'chewetinotenda',
+            'primary_admin_email' => 'chewetinotenda@hillside.ac.zw',
+            'primary_admin_phone' => '+263771000001',
+            'branding_color' => '#3B5998',
+        ]);
 
-        $secondarySchool = School::firstOrCreate(
-            ['name' => 'Hillside Secondary School'],
-            [
-                'type' => 'secondary',
-                'primary_admin_name' => 'Dr. Michael Moyo',
-                'primary_admin_email' => 'mmoyo@sec.hillside.ac.zw',
-                'primary_admin_phone' => '+263771999888',
-                'branding_color' => '#6366F1',
-            ]
-        );
-
-        // 3. Create / Ensure Academic Years & School Classes
+        // 3. Create / Ensure Academic Years & School Classes (Primary School)
         $academicYear = AcademicYear::firstOrCreate(
             ['code' => 'AY-2026'],
             [
@@ -80,15 +59,6 @@ class DatabaseSeeder extends Seeder
                 'start_date' => '2026-01-12',
                 'end_date' => '2026-12-04',
                 'is_current' => true,
-            ]
-        );
-
-        SchoolClass::firstOrCreate(
-            ['school_id' => $prepSchool->id, 'class_name' => 'Butterflies'],
-            [
-                'academic_year_id' => $academicYear->id,
-                'grade' => 'ECD B',
-                'capacity' => 25,
             ]
         );
 
@@ -102,11 +72,20 @@ class DatabaseSeeder extends Seeder
         );
 
         SchoolClass::firstOrCreate(
-            ['school_id' => $primarySchool->id, 'class_name' => 'Gold'],
+            ['school_id' => $primarySchool->id, 'class_name' => 'Grade 2A'],
             [
                 'academic_year_id' => $academicYear->id,
-                'grade' => 'Grade 4',
-                'capacity' => 32,
+                'grade' => 'Grade 2',
+                'capacity' => 30,
+            ]
+        );
+
+        SchoolClass::firstOrCreate(
+            ['school_id' => $primarySchool->id, 'class_name' => 'Grade 3A'],
+            [
+                'academic_year_id' => $academicYear->id,
+                'grade' => 'Grade 3',
+                'capacity' => 30,
             ]
         );
 

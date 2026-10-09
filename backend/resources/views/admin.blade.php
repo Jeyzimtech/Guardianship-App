@@ -988,8 +988,6 @@
                         <label>Assigned School</label>
                         <select id="signupSchool" required>
                             <option value="Hillside Primary School">Hillside Primary School</option>
-                            <option value="Hillside Preparatory">Hillside Preparatory</option>
-                            <option value="Hillside Secondary">Hillside Secondary</option>
                         </select>
                     </div>
 
@@ -1312,26 +1310,10 @@
                             </thead>
                             <tbody id="platformDirectoryBody">
                                 <tr>
-                                    <td><strong>Hillside Preparatory School</strong></td>
-                                    <td><span class="badge" style="background:#DCFCE7; color:#15803D;">Preparatory (ECD)</span></td>
-                                    <td>Sarah Jenkins (sjenkins@prep.hillside.ac.zw)</td>
-                                    <td><span style="display:inline-block; width:14px; height:14px; background:#10B981; border-radius:50%; vertical-align:middle; margin-right:4px;"></span> #10B981</td>
-                                    <td>1 Child</td>
-                                    <td><button class="btn-sm">Configure</button></td>
-                                </tr>
-                                <tr>
                                     <td><strong>Hillside Primary School</strong></td>
                                     <td><span class="badge" style="background:#DBEAFE; color:#1E40AF;">Primary</span></td>
-                                    <td>Admin Tinotenda (admin@hillside.ac.zw)</td>
+                                    <td>chewetinotenda (chewetinotenda@hillside.ac.zw)</td>
                                     <td><span style="display:inline-block; width:14px; height:14px; background:#3B5998; border-radius:50%; vertical-align:middle; margin-right:4px;"></span> #3B5998</td>
-                                    <td>1 Child</td>
-                                    <td><button class="btn-sm">Configure</button></td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Hillside Secondary School</strong></td>
-                                    <td><span class="badge" style="background:#E0E7FF; color:#3730A3;">Secondary</span></td>
-                                    <td>Dr. Michael Moyo (mmoyo@sec.hillside.ac.zw)</td>
-                                    <td><span style="display:inline-block; width:14px; height:14px; background:#6366F1; border-radius:50%; vertical-align:middle; margin-right:4px;"></span> #6366F1</td>
                                     <td>0 Children</td>
                                     <td><button class="btn-sm">Configure</button></td>
                                 </tr>
@@ -2153,6 +2135,20 @@
                 const countEl = document.getElementById('platformSchoolCount');
                 if (countEl) countEl.innerText = schoolsList.length.toString();
                 if (schoolsList.length > 0) updateSchool(schoolsList[0].name);
+
+                const dirBody = document.getElementById('platformDirectoryBody');
+                if (dirBody) {
+                    dirBody.innerHTML = schoolsList.map(s => `
+                        <tr>
+                            <td><strong>${s.name}</strong></td>
+                            <td><span class="badge" style="background:#DBEAFE; color:#1E40AF;">${(s.type || 'primary').toUpperCase()}</span></td>
+                            <td>${s.primary_admin_name || 'chewetinotenda'} (${s.primary_admin_email || 'chewetinotenda@hillside.ac.zw'})</td>
+                            <td><span style="display:inline-block; width:14px; height:14px; background:${s.branding_color || '#3B5998'}; border-radius:50%; vertical-align:middle; margin-right:4px;"></span> ${s.branding_color || '#3B5998'}</td>
+                            <td>${studentsList ? studentsList.filter(st => st.school_id == s.id).length : 0} Children</td>
+                            <td><button class="btn-sm">Configure</button></td>
+                        </tr>
+                    `).join('');
+                }
             }
         }
 
@@ -2166,6 +2162,19 @@
                 }
                 const countEl = document.getElementById('kpiClasses');
                 if (countEl) countEl.innerText = classesList.length.toString();
+
+                const classesTbody = document.getElementById('classesTableBody');
+                if (classesTbody) {
+                    classesTbody.innerHTML = classesList.map(c => `
+                        <tr>
+                            <td><strong>${c.class_name}</strong></td>
+                            <td>${c.grade || 'Primary'}</td>
+                            <td>Unassigned</td>
+                            <td>${studentsList ? studentsList.filter(s => s.class_name === c.class_name).length : 0} Students</td>
+                            <td><button class="btn-sm" onclick="alert('Class: ${c.class_name}')">View</button></td>
+                        </tr>
+                    `).join('');
+                }
             }
         }
 

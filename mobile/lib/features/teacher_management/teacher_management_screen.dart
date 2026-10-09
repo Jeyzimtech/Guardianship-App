@@ -127,9 +127,7 @@ class _TeacherManagementScreenState extends State<TeacherManagementScreen> {
         _demo = true;
         _teachers = _mockTeachers;
         _schools = [
-          {'id': 1, 'name': 'Hillside Preparatory School'},
-          {'id': 2, 'name': 'Hillside Primary School'},
-          {'id': 3, 'name': 'Hillside Secondary School'},
+          {'id': 1, 'name': 'Hillside Primary School'},
         ];
         _classes = [
           {'id': 1, 'grade': 'ECD B', 'class_name': 'Butterflies'},
