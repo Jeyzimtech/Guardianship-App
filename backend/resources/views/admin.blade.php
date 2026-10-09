@@ -193,7 +193,7 @@
         /* Right Side: Logo & Branding Panel */
         .auth-logo-side {
             flex: 0.9;
-            background: linear-gradient(135deg, rgba(59, 89, 152, 0.82) 0%, rgba(30, 48, 88, 0.92) 100%), url('/assets/control.gif') center/cover no-repeat;
+            background: linear-gradient(135deg, #1E3A8A 0%, #2E5198 50%, #152750 100%);
             color: white;
             padding: 44px;
             display: flex;
@@ -945,13 +945,13 @@
                     <p class="auth-subtitle">Sign in to your Edu+Conect Web Admin Portal</p>
 
                     <div class="form-group">
-                        <label>Admin Email</label>
-                        <input type="email" id="loginEmail" value="admin@hillside.ac.zw" placeholder="admin@hillside.ac.zw" required>
+                        <label>Admin Username or Email</label>
+                        <input type="text" id="loginEmail" value="chewetinotenda" placeholder="chewetinotenda" required>
                     </div>
 
                     <div class="form-group">
                         <label>Password</label>
-                        <input type="password" id="loginPassword" value="password123" placeholder="••••••••" required>
+                        <input type="password" id="loginPassword" value="chewetech4321#$" placeholder="••••••••" required>
                     </div>
 
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; font-size: 13px;">
@@ -1004,8 +1004,12 @@
 
             <!-- Right Side: Brand Logo Panel -->
             <div class="auth-logo-side">
-                <img src="/assets/logo.png" alt="Edu+Conect Logo" style="height: 90px; width: auto; object-fit: contain; margin-bottom: 20px; filter: drop-shadow(0 4px 12px rgba(0,0,0,0.3));">
-                <h1 class="brand-heading">Edu+Conect</h1>
+                <div style="background: white; padding: 20px 24px; border-radius: 14px; box-shadow: 0 16px 36px rgba(0,0,0,0.22); margin-bottom: 24px; display: inline-flex; align-items: center; justify-content: center;">
+                    <img src="/assets/logo.png" alt="Edu+Connect Logo" style="height: 120px; width: auto; object-fit: contain;">
+                </div>
+                <h1 class="brand-heading" style="color: white; font-size: 26px; font-weight: 700; margin-bottom: 6px;">Edu+Connect</h1>
+                <p class="brand-subtext" style="color: rgba(255,255,255,0.9); font-size: 14px;">A Good Day To Learn • Unified Institutional Platform</p>
+                <div class="brand-tag">PORTAL ADMINISTRATOR</div>
             </div>
 
         </div>
@@ -1017,9 +1021,11 @@
         
         <!-- Sidebar Navigation -->
         <aside class="sidebar">
-            <div class="brand-header">
-                <img src="/assets/logo.png" alt="Edu+Conect Logo" style="height: 36px; width: 36px; object-fit: contain;">
-                <span>Edu+Conect</span>
+            <div class="brand-header" style="gap: 12px;">
+                <div style="background: white; border-radius: 6px; padding: 4px; display: flex; align-items: center; justify-content: center; width: 36px; height: 36px;">
+                    <img src="/assets/logo.png" alt="Edu+Connect Logo" style="height: 28px; width: 28px; object-fit: contain;">
+                </div>
+                <span style="font-weight: 700; font-size: 16px; letter-spacing: -0.2px;">Edu+Connect</span>
             </div>
             <ul class="nav-list">
                 <li class="nav-item">
@@ -1987,7 +1993,7 @@
 
         async function handleLoginSubmit(e) {
             e.preventDefault();
-            const email = document.getElementById('loginEmail').value.trim();
+            const usernameOrEmail = document.getElementById('loginEmail').value.trim();
             const password = document.getElementById('loginPassword').value;
             const btn = e.target.querySelector('button[type="submit"]');
             const originalText = btn.innerText;
@@ -1997,7 +2003,7 @@
             try {
                 const res = await apiFetch('/api/auth/login', {
                     method: 'POST',
-                    body: JSON.stringify({ email, password })
+                    body: JSON.stringify({ email: usernameOrEmail, username: usernameOrEmail, password })
                 });
 
                 if (res.ok && res.data.status === 'success') {
@@ -2402,13 +2408,17 @@
                 body: JSON.stringify({
                     name,
                     class_name: className,
-                    grade: className.split(' ')[0] || 'Grade 1'
+                    grade: className.split(' ')[0] || 'Grade 1',
+                    guardian_name: guardian
                 })
             });
 
             if (res.ok) {
                 closeModal('studentModal');
                 await loadStudents();
+                await loadPlatformDirectory();
+                await loadUsers();
+                recalculateStatistics();
                 alert('Student "' + name + '" enrolled in database!');
             } else {
                 alert(res.data.message || 'Failed to enroll student.');
@@ -2491,7 +2501,7 @@
         }
 
         function recalculateStatistics() {
-            const totalStudents = studentsList.length || 1250;
+            const totalStudents = studentsList.length;
             const kpiEl = document.getElementById('kpiStudents');
             if (kpiEl) kpiEl.innerText = totalStudents.toLocaleString();
 

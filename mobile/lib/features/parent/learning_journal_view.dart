@@ -23,25 +23,24 @@ class _LearningJournalViewState extends State<LearningJournalView> {
     final activeChild =
         widget.child ??
         {
-          'name': 'Alice Chewe',
-          'class': 'Grade 4 Gold',
+          'name': 'Enrolled Learner',
+          'class': 'Primary Class',
           'tier': 'primary',
           'school': 'Hillside Primary School',
         };
-    final childName = activeChild['name'] ?? 'Child';
+    final childName = activeChild['name'] ?? 'Learner';
     final isPrep =
         (activeChild['tier'] == 'preparatory') ||
-        childName.contains('Alice') ||
-        childName.contains('Timothy');
+        (activeChild['class']?.toString().toLowerCase().contains('ecd') ?? false);
 
     _mockEntries = [
       if (isPrep) ...[
         {
           'type': 'wellbeing',
-          'author': 'Caregiver Amai Tendai',
+          'author': 'Caregiver Tendai',
           'date': 'Today, 11:30 AM',
           'caption':
-              'Alice had a wonderful morning during circle time and outdoor play!',
+              '$childName had a wonderful morning during circle time and outdoor play!',
           'wellbeing': {
             'meals': 'Ate all of lunch (chicken & rice)',
             'nap': 'Rested 45 mins quietly',

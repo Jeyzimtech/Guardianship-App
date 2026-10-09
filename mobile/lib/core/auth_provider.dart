@@ -68,6 +68,7 @@ class AuthProvider extends ChangeNotifier {
         '/auth/login',
         data: {
           'email': email.trim(),
+          'username': email.trim(),
           'password': password,
         },
       );
@@ -190,6 +191,58 @@ class AuthProvider extends ChangeNotifier {
           final errors = data['errors'] as Map;
           msg = errors.values.map((v) => (v is List ? v.join(', ') : v.toString())).join('\n');
         }
+      }
+      _errorMessage = msg;
+      _isLoading = false;
+      notifyListeners();
+      return false;
+    } catch (e) {
+      _errorMessage = e.toString();
+      _isLoading = false;
+      notifyListeners();
+      return false;
+    }
+  }
+
+  Future<bool> changePassword({
+    required String email,
+    required String currentPassword,
+    required String newPassword,
+  }) async {
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      final response = await apiClient.dio.post(
+        '/auth/change-password',
+        data: {
+          'email': email.trim(),
+          'current_password': currentPassword,
+          'new_password': newPassword,
+        },
+      );
+
+      if (response.statusCode == 200 &&
+          response.data is Map &&
+          response.data['status'] == 'success') {
+        _isLoading = false;
+        notifyListeners();
+        return true;
+      } else {
+        final msg = response.data is Map
+            ? (response.data['message'] ?? 'Failed to change password.')
+            : 'Failed to change password.';
+        _errorMessage = msg.toString();
+        _isLoading = false;
+        notifyListeners();
+        return false;
+      }
+    } on DioException catch (dioErr) {
+      String msg = 'Failed to change password.';
+      if (dioErr.response?.data is Map &&
+          dioErr.response?.data['message'] != null) {
+        msg = dioErr.response!.data['message'].toString();
       }
       _errorMessage = msg;
       _isLoading = false;

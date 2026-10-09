@@ -45,11 +45,30 @@ class WebsiteAdminController extends Controller
     public function listDirectory(Request $request)
     {
         $schools = School::with(['students' => function ($query) {
-            $query->with('activeSubscription');
+            $query->with(['activeSubscription', 'guardians']);
         }])->get();
+
+        $directory = [];
+        foreach ($schools as $school) {
+            foreach ($school->students as $student) {
+                $guardian = $student->guardians->first();
+                $sub = $student->activeSubscription;
+                $directory[] = [
+                    'student_id' => $student->id,
+                    'student_name' => $student->name,
+                    'grade' => $student->grade,
+                    'class_name' => $student->class_name,
+                    'school_name' => $school->name,
+                    'guardian_name' => $guardian ? $guardian->name : 'N/A',
+                    'guardian_phone' => $guardian ? ($guardian->phone_number ?? 'N/A') : 'N/A',
+                    'subscription_status' => ($sub && $sub->status === 'inactive') ? 'inactive' : 'active',
+                ];
+            }
+        }
 
         return response()->json([
             'status' => 'success',
+            'directory' => $directory,
             'data' => $schools
         ]);
     }

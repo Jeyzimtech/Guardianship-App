@@ -140,7 +140,7 @@ class _CreateStudentDialogState extends State<CreateStudentDialog> {
                   controller: _nameController,
                   decoration: const InputDecoration(
                     labelText: 'Student Full Name',
-                    hintText: 'e.g. Alice Chewe',
+                    hintText: 'e.g. Tendai Mukuru',
                     prefixIcon: Icon(
                       Icons.person_outline,
                       color: AppColors.primary,

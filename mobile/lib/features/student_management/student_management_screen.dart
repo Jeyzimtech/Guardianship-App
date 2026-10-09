@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../core/app_colors.dart';
+import '../../core/auth_provider.dart';
 import '../common/app_drawer.dart';
 import 'create_student_dialog.dart';
 
@@ -20,40 +22,47 @@ class _StudentManagementScreenState extends State<StudentManagementScreen> {
   String _selectedStatusFilter = 'all';
   String _searchQuery = '';
 
-  final List<Map<String, dynamic>> _students = [
-    {
-      'id': 1,
-      'name': 'Alice Chewe',
-      'guardian': 'John Chewe (+263773333333)',
-      'class_name': 'ECD B (Butterflies)',
-      'attendance': '92%',
-      'status': 'inactive',
-    },
-    {
-      'id': 2,
-      'name': 'Bob Chewe',
-      'guardian': 'John Chewe (+263773333333)',
-      'class_name': 'Grade 4 (Gold)',
-      'attendance': '100%',
-      'status': 'active',
-    },
-    {
-      'id': 3,
-      'name': 'Chipo Moyo',
-      'guardian': 'Tariro Moyo (+263778888888)',
-      'class_name': 'Grade 7 (Alpha)',
-      'attendance': '96%',
-      'status': 'pending',
-    },
-    {
-      'id': 4,
-      'name': 'David Mpofu',
-      'guardian': 'Sipho Mpofu (+263779999999)',
-      'class_name': 'Form 1 (Green)',
-      'attendance': '98%',
-      'status': 'active',
-    },
-  ];
+  List<Map<String, dynamic>> _students = [];
+  bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadStudents();
+  }
+
+  Future<void> _loadStudents() async {
+    setState(() => _isLoading = true);
+    try {
+      final auth = Provider.of<AuthProvider>(context, listen: false);
+      final response = await auth.apiClient.dio.get('/students');
+      if (response.statusCode == 200 && response.data['status'] == 'success') {
+        final list = (response.data['students'] as List? ?? []);
+        if (mounted) {
+          setState(() {
+            _students = list.map((item) {
+              final m = item as Map<String, dynamic>;
+              final guardians = (m['guardians'] as List? ?? []);
+              final guardianStr = guardians.isNotEmpty
+                  ? '${guardians[0]['name']} (${guardians[0]['phone_number'] ?? ''})'
+                  : 'Guardian Pending';
+              return {
+                'id': m['id'],
+                'name': m['name'] ?? '',
+                'guardian': guardianStr,
+                'class_name': '${m['grade'] ?? ''} (${m['class_name'] ?? ''})'.trim(),
+                'attendance': '100%',
+                'status': 'active',
+              };
+            }).toList();
+          });
+        }
+      }
+    } catch (_) {
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
 
   @override
   void dispose() {
@@ -314,8 +323,23 @@ class _StudentManagementScreenState extends State<StudentManagementScreen> {
                     showDialog(
                       context: context,
                       builder: (_) => CreateStudentDialog(
-                        onSaved: (newStudent) {
-                          setState(() => _students.insert(0, newStudent));
+                        onSaved: (newStudent) async {
+                          final auth = Provider.of<AuthProvider>(context, listen: false);
+                          try {
+                            await auth.apiClient.dio.post('/students', data: {
+                              'name': newStudent['name'],
+                              'grade': (newStudent['class_name'] as String).split(' ').first,
+                              'class_name': newStudent['class_name'],
+                              'guardian_name': newStudent['guardian'],
+                            });
+                            await _loadStudents();
+                          } catch (e) {
+                            if (context.mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text('Failed to save student: $e')),
+                              );
+                            }
+                          }
                         },
                       ),
                     );
@@ -558,7 +582,12 @@ class _StudentManagementScreenState extends State<StudentManagementScreen> {
             ),
             const SizedBox(height: 8),
 
-            if (filteredList.isEmpty)
+            if (_isLoading)
+              const Padding(
+                padding: EdgeInsets.symmetric(vertical: 32.0),
+                child: Center(child: CircularProgressIndicator()),
+              )
+            else if (filteredList.isEmpty)
               const Padding(
                 padding: EdgeInsets.symmetric(vertical: 32.0),
                 child: Center(

@@ -50,7 +50,7 @@ class AnnouncementController extends Controller
             ]);
         }
 
-        if ($user->role === 'admin') {
+        if (in_array($user->role, ['admin', 'website_admin'])) {
             $announcements = Announcement::orderBy('created_at', 'desc')->get();
             return response()->json([
                 'status' => 'success',
@@ -65,12 +65,12 @@ class AnnouncementController extends Controller
     }
 
     /**
-     * Create an announcement (Admin and Teachers).
+     * Create an announcement (Admin, Teachers, and Website Admin).
      */
     public function store(Request $request)
     {
         $user = $request->user();
-        if (!in_array($user->role, ['teacher', 'admin'])) {
+        if (!in_array($user->role, ['teacher', 'admin', 'website_admin'])) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'Unauthorized. Only teachers and admins can create announcements.'

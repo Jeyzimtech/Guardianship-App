@@ -22,36 +22,35 @@ class ParentShell extends StatefulWidget {
 class _ParentShellState extends State<ParentShell> {
   int _currentIndex = 0;
 
-  static final Map<String, dynamic> _defaultChild = {
-    'name': 'Alice Chewe',
-    'class': 'Grade 4 Gold',
-    'school': 'Hillside Primary School',
-  };
-
-  late final List<Widget> _pages;
-
   @override
   void initState() {
     super.initState();
-    final studentProvider = Provider.of<StudentProvider>(
-      context,
-      listen: false,
-    );
-    final child = (studentProvider.selectedStudent != null
-        ? studentProvider.selectedStudent as Map<String, dynamic>
-        : _defaultChild);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<StudentProvider>(context, listen: false).fetchStudents();
+    });
+  }
 
-    _pages = [
+  @override
+  Widget build(BuildContext context) {
+    final studentProvider = Provider.of<StudentProvider>(context);
+    final child = (studentProvider.selectedStudent != null
+        ? studentProvider.selectedStudent!
+        : (studentProvider.students.isNotEmpty
+            ? studentProvider.students[0] as Map<String, dynamic>
+            : <String, dynamic>{
+                'name': 'Enrolled Learner',
+                'class': 'General Class',
+                'school': 'Hillside School',
+              }));
+
+    final pages = [
       const ParentDashboardView(),
       const AnnouncementsView(),
       LearningJournalView(child: child),
       const MessagingView(),
       GuardianProfileView(child: child),
     ];
-  }
 
-  @override
-  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Editorial.canvas,
       drawer: const AppDrawer(currentRoute: 'Dashboard'),
@@ -69,7 +68,7 @@ class _ParentShellState extends State<ParentShell> {
         ),
         iconTheme: const IconThemeData(color: AppColors.textPrimary),
       ),
-      body: IndexedStack(index: _currentIndex, children: _pages),
+      body: IndexedStack(index: _currentIndex, children: pages),
       bottomNavigationBar: Container(
         decoration: const BoxDecoration(
           color: AppColors.surface,

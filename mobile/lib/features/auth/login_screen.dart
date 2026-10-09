@@ -4,7 +4,6 @@ import '../../core/auth_provider.dart';
 import '../../core/app_colors.dart';
 import '../../core/app_icon.dart';
 import '../dashboard/dashboard_home.dart';
-import 'signup_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -40,9 +39,9 @@ class _LoginScreenState extends State<LoginScreen> {
       return;
     }
 
-    if (!email.contains('@')) {
+    if (email.length < 3) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter a valid email address.')),
+        const SnackBar(content: Text('Please enter a valid email address or username.')),
       );
       return;
     }
@@ -119,21 +118,129 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  void _passwordHelp() => showDialog(
-    context: context,
-    builder: (ctx) => AlertDialog(
-      title: const Text('Need help signing in?'),
-      content: const Text(
-        'Contact your school office to reset your password or confirm your account details.',
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(ctx),
-          child: const Text('Got it'),
+  void _showChangePasswordDialog() {
+    final emailCtrl = TextEditingController(text: _emailController.text.trim());
+    final currentPassCtrl = TextEditingController();
+    final newPassCtrl = TextEditingController();
+    final confirmPassCtrl = TextEditingController();
+    bool isSubmitting = false;
+
+    showDialog(
+      context: context,
+      builder: (dialogCtx) => StatefulBuilder(
+        builder: (ctx, setDialogState) => AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          title: const Text('Change Password', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const Text(
+                  'Accounts are created by your school administrator. Enter your credentials below to update your password.',
+                  style: TextStyle(fontSize: 13, color: AppColors.textMuted),
+                ),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: emailCtrl,
+                  keyboardType: TextInputType.emailAddress,
+                  decoration: const InputDecoration(labelText: 'Email Address', prefixIcon: Icon(Icons.mail_outline)),
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: currentPassCtrl,
+                  obscureText: true,
+                  decoration: const InputDecoration(labelText: 'Current / Temporary Password', prefixIcon: Icon(Icons.lock_clock_outlined)),
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: newPassCtrl,
+                  obscureText: true,
+                  decoration: const InputDecoration(labelText: 'New Password (min 6 chars)', prefixIcon: Icon(Icons.lock_outline)),
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: confirmPassCtrl,
+                  obscureText: true,
+                  decoration: const InputDecoration(labelText: 'Confirm New Password', prefixIcon: Icon(Icons.check_circle_outline)),
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: isSubmitting ? null : () => Navigator.pop(dialogCtx),
+              child: const Text('Cancel'),
+            ),
+            FilledButton(
+              onPressed: isSubmitting ? null : () async {
+                final email = emailCtrl.text.trim();
+                final currentP = currentPassCtrl.text;
+                final newP = newPassCtrl.text;
+                final confirmP = confirmPassCtrl.text;
+
+                if (email.isEmpty || currentP.isEmpty || newP.isEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Please fill all fields.')),
+                  );
+                  return;
+                }
+
+                if (newP.length < 6) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('New password must be at least 6 characters.')),
+                  );
+                  return;
+                }
+
+                if (newP != confirmP) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('New passwords do not match.')),
+                  );
+                  return;
+                }
+
+                final messenger = ScaffoldMessenger.of(context);
+                setDialogState(() => isSubmitting = true);
+                final auth = Provider.of<AuthProvider>(context, listen: false);
+                final ok = await auth.changePassword(
+                  email: email,
+                  currentPassword: currentP,
+                  newPassword: newP,
+                );
+
+                if (!mounted) return;
+
+                if (ok) {
+                  if (dialogCtx.mounted) Navigator.pop(dialogCtx);
+                  messenger.showSnackBar(
+                    const SnackBar(
+                      backgroundColor: Colors.green,
+                      content: Text('Password updated successfully! Please sign in with your new password.'),
+                    ),
+                  );
+                  _passwordController.text = newP;
+                } else {
+                  setDialogState(() => isSubmitting = false);
+                  messenger.showSnackBar(
+                    SnackBar(
+                      backgroundColor: Colors.red.shade700,
+                      content: Text(auth.errorMessage ?? 'Failed to update password.'),
+                    ),
+                  );
+                }
+              },
+              child: isSubmitting
+                  ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                  : const Text('Update Password'),
+            ),
+          ],
         ),
-      ],
-    ),
-  );
+      ),
+    );
+  }
+
+  void _passwordHelp() => _showChangePasswordDialog();
 
   @override
   Widget build(BuildContext context) => Scaffold(
@@ -150,10 +257,10 @@ class _LoginScreenState extends State<LoginScreen> {
                 children: [
                   Row(
                     children: [
-                      Image.asset('assets/e.png', width: 40, height: 40),
+                      Image.asset('assets/logo.png', width: 44, height: 44),
                       const SizedBox(width: 10),
                       const Text(
-                        'Edu+Conect',
+                        'Edu+Connect',
                         style: TextStyle(
                           fontSize: 23,
                           fontWeight: FontWeight.w700,
@@ -251,9 +358,9 @@ class _LoginScreenState extends State<LoginScreen> {
                     autocorrect: false,
                     autofillHints: const [AutofillHints.username],
                     decoration: const InputDecoration(
-                      labelText: 'Email address',
-                      hintText: 'you@example.com',
-                      prefixIcon: Icon(Icons.mail_outline),
+                      labelText: 'Email or Username',
+                      hintText: 'user@example.com or username',
+                      prefixIcon: Icon(Icons.person_outline),
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -325,19 +432,12 @@ class _LoginScreenState extends State<LoginScreen> {
                     crossAxisAlignment: WrapCrossAlignment.center,
                     children: [
                       const Text(
-                        'New to Edu+Conect?',
-                        style: TextStyle(color: AppColors.textMuted),
+                        'Accounts are managed by school administration. ',
+                        style: TextStyle(color: AppColors.textMuted, fontSize: 13),
                       ),
                       TextButton(
-                        onPressed: _isAuthenticating
-                            ? null
-                            : () => Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => const SignupScreen(),
-                                ),
-                              ),
-                        child: const Text('Create account'),
+                        onPressed: _isAuthenticating ? null : _showChangePasswordDialog,
+                        child: const Text('Change password'),
                       ),
                     ],
                   ),

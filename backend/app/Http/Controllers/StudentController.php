@@ -46,7 +46,7 @@ class StudentController extends Controller
 
         if (in_array($user->role, ['admin', 'website_admin'])) {
             // Admin gets all students
-            $students = Student::with('school')->get();
+            $students = Student::with(['school', 'guardians'])->get();
             return response()->json([
                 'status' => 'success',
                 'students' => $students
@@ -85,9 +85,19 @@ class StudentController extends Controller
             'grade' => 'required|string',
             'class_name' => 'required|string',
             'dob' => 'nullable|date',
+            'guardian_name' => 'nullable|string|max:255',
+            'guardian_phone' => 'nullable|string|max:50',
+            'guardian_email' => 'nullable|email|max:255',
+            'guardian_id' => 'nullable|exists:users,id',
         ]);
 
-        $student = Student::create($request->all());
+        $student = Student::create([
+            'school_id' => $request->school_id,
+            'name' => trim($request->name),
+            'grade' => trim($request->grade),
+            'class_name' => trim($request->class_name),
+            'dob' => $request->dob,
+        ]);
 
         // Create an associated fee account for the student
         $student->feeAccount()->create([
@@ -95,9 +105,49 @@ class StudentController extends Controller
             'balance_zig' => 0.00,
         ]);
 
+        // Create active subscription by default
+        \App\Models\Subscription::create([
+            'student_id' => $student->id,
+            'status' => 'active',
+            'start_date' => now()->toDateString(),
+            'set_by_user_id' => $user->id,
+        ]);
+
+        // Link or auto-provision guardian if provided
+        $guardianId = $request->guardian_id;
+        if (!$guardianId && $request->filled('guardian_name')) {
+            $guardianName = trim($request->guardian_name);
+            $guardianEmail = $request->guardian_email ? strtolower(trim($request->guardian_email)) : null;
+            $guardianPhone = $request->guardian_phone ? trim($request->guardian_phone) : null;
+
+            $guardianUser = null;
+            if ($guardianEmail) {
+                $guardianUser = \App\Models\User::where('email', $guardianEmail)->first();
+            }
+            if (!$guardianUser && $guardianPhone) {
+                $guardianUser = \App\Models\User::where('phone_number', $guardianPhone)->first();
+            }
+            if (!$guardianUser) {
+                $cleanName = strtolower(preg_replace('/[^a-zA-Z0-9]/', '', $guardianName));
+                $guardianUser = \App\Models\User::create([
+                    'name' => $guardianName,
+                    'email' => $guardianEmail ?? ($cleanName . rand(100, 999) . '@guardianship.local'),
+                    'phone_number' => $guardianPhone ?? ('+2637' . rand(10000000, 99999999)),
+                    'role' => 'guardian',
+                    'password' => \Illuminate\Support\Facades\Hash::make('password123'),
+                    'firebase_uid' => 'uid_guardian_' . time() . '_' . rand(10, 99),
+                ]);
+            }
+            $guardianId = $guardianUser->id;
+        }
+
+        if ($guardianId) {
+            $student->guardians()->syncWithoutDetaching([$guardianId]);
+        }
+
         return response()->json([
             'status' => 'success',
-            'student' => $student->load('school')
+            'student' => $student->load(['school', 'guardians'])
         ], 201);
     }
 

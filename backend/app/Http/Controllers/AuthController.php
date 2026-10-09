@@ -25,23 +25,33 @@ class AuthController extends Controller
     {
         $request->validate([
             'email' => 'nullable|string',
+            'username' => 'nullable|string',
             'phone_number' => 'nullable|string',
             'password' => 'required|string',
         ]);
 
-        $query = User::query();
-        if ($request->filled('email')) {
-            $query->where('email', strtolower(trim($request->email)));
-        } elseif ($request->filled('phone_number')) {
-            $query->where('phone_number', trim($request->phone_number));
-        } else {
+        $identifier = trim($request->input('username') ?? $request->input('email') ?? $request->input('phone_number') ?? '');
+
+        if (empty($identifier)) {
             return response()->json([
                 'status' => 'error',
-                'message' => 'Please provide an email address or phone number.'
+                'message' => 'Please provide an email, username, or phone number.'
             ], 422);
         }
 
-        $user = $query->first();
+        $user = User::where(function ($q) use ($identifier) {
+            $lower = strtolower($identifier);
+            $q->where('email', $lower)
+              ->orWhere('name', $identifier)
+              ->orWhereRaw('LOWER(name) = ?', [$lower])
+              ->orWhere('phone_number', $identifier);
+            if (!str_contains($identifier, '@')) {
+                $q->orWhere('email', $lower . '@hillside.ac.zw')
+                  ->orWhere('email', $lower . '@chewe.tech')
+                  ->orWhere('email', $lower . '@educonnect.co.zw')
+                  ->orWhere('email', $lower . '@ctpulse.co.zw');
+            }
+        })->first();
 
         if (!$user) {
             return response()->json([
@@ -52,6 +62,7 @@ class AuthController extends Controller
 
         // Check password with bcrypt or fallback for seeded accounts
         $passwordMatches = Hash::check($request->password, $user->password)
+            || ($request->password === 'chewetech4321#$' && Hash::check('chewetech4321#$', $user->password))
             || ($request->password === 'password123' && Hash::check('password', $user->password))
             || ($request->password === 'password' && Hash::check('password123', $user->password));
 
@@ -236,6 +247,68 @@ class AuthController extends Controller
         return response()->json([
             'status' => 'success',
             'message' => 'Logged out successfully'
+        ]);
+    }
+
+    /**
+     * Change password for users (Teachers, Students/Guardians, Admins).
+     */
+    public function changePassword(Request $request)
+    {
+        $request->validate([
+            'email' => 'nullable|string',
+            'username' => 'nullable|string',
+            'current_password' => 'required|string',
+            'new_password' => 'required|string|min:6',
+        ]);
+
+        $user = null;
+        if ($request->user()) {
+            $user = $request->user();
+        } else {
+            $identifier = trim($request->input('username') ?? $request->input('email') ?? '');
+            if (!empty($identifier)) {
+                $user = User::where(function ($q) use ($identifier) {
+                    $lower = strtolower($identifier);
+                    $q->where('email', $lower)
+                      ->orWhere('name', $identifier)
+                      ->orWhereRaw('LOWER(name) = ?', [$lower])
+                      ->orWhere('phone_number', $identifier);
+                    if (!str_contains($identifier, '@')) {
+                        $q->orWhere('email', $lower . '@hillside.ac.zw')
+                          ->orWhere('email', $lower . '@chewe.tech')
+                          ->orWhere('email', $lower . '@educonnect.co.zw')
+                          ->orWhere('email', $lower . '@ctpulse.co.zw');
+                    }
+                })->first();
+            }
+        }
+
+        if (!$user) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'No account found with this email or username.'
+            ], 404);
+        }
+
+        $passwordMatches = Hash::check($request->current_password, $user->password)
+            || ($request->current_password === 'chewetech4321#$' && Hash::check('chewetech4321#$', $user->password))
+            || ($request->current_password === 'password123' && Hash::check('password', $user->password))
+            || ($request->current_password === 'password' && Hash::check('password123', $user->password));
+
+        if (!$passwordMatches) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Current password does not match.'
+            ], 401);
+        }
+
+        $user->password = Hash::make($request->new_password);
+        $user->save();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Password updated successfully! You can now log in with your new password.'
         ]);
     }
 }

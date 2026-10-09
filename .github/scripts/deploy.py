@@ -65,7 +65,7 @@ def deploy(password):
     ssh = paramiko.SSHClient()
     ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     try:
-        ssh.connect(SERVER_HOST, username=SERVER_USER, password=password, timeout=15)
+        ssh.connect(SERVER_HOST, username=SERVER_USER, password=password, timeout=30)
     except Exception as e:
         print(f"Authentication / Connection failed: {e}")
         sys.exit(1)

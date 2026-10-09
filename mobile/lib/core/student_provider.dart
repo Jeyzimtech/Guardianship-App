@@ -30,7 +30,7 @@ class StudentProvider extends ChangeNotifier {
     try {
       final response = await apiClient.dio.get('/students');
       if (response.statusCode == 200 && response.data['status'] == 'success') {
-        _students = response.data['students'];
+        _students = response.data['students'] ?? [];
         if (_students.isNotEmpty) {
           _selectedStudent = _students[0];
           await fetchDashboard(_selectedStudent!['id']);
@@ -40,13 +40,10 @@ class StudentProvider extends ChangeNotifier {
         }
       }
     } catch (e) {
-      // Offline fallback: load mock student list for John Chewe (Guardian)
-      _students = [
-        {'id': 1, 'name': 'Alice Chewe', 'grade': '4', 'class_name': '4A'},
-        {'id': 2, 'name': 'Bob Chewe', 'grade': '2', 'class_name': '2B'},
-      ];
-      _selectedStudent = _students[0];
-      await fetchDashboard(_selectedStudent!['id']);
+      _errorMessage = e.toString();
+      _students = [];
+      _selectedStudent = null;
+      _dashboardData = null;
     }
 
     _isLoadingStudents = false;
@@ -67,35 +64,11 @@ class StudentProvider extends ChangeNotifier {
       final response = await apiClient.dio.get('/dashboard/$studentId');
       if (response.statusCode == 200 && response.data['status'] == 'success') {
         _dashboardData = response.data;
+      } else {
+        _dashboardData = null;
       }
     } catch (e) {
-      // Offline fallback: load mock dashboard data
-      _dashboardData = {
-        'status': 'success',
-        'attendance_snapshot': {
-          'percentage': studentId == 1 ? 92 : 98,
-          'present_days': studentId == 1 ? 46 : 49,
-          'total_days': 50,
-        },
-        'z_score_trend': [
-          {'term': 'Term 1', 'z_score': 1.2},
-          {'term': 'Term 2', 'z_score': 1.5},
-          {'term': 'Term 3', 'z_score': 1.8},
-        ],
-        'velocity_engine_status': studentId == 1 ? 'SLOWING' : 'OPTIMAL',
-        'recent_announcements': [
-          {
-            'title': 'School Consultation Day',
-            'content':
-                'Consultation day will be held this Friday. All parents are requested to attend.',
-          },
-          {
-            'title': 'Term 2 Academic Updates',
-            'content':
-                'Term 2 progress reports are available from your school.',
-          },
-        ],
-      };
+      _dashboardData = null;
     }
 
     _isLoadingDashboard = false;

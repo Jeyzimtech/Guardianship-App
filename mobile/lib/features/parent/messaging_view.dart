@@ -343,12 +343,12 @@ class _ConversationPageState extends State<_ConversationPage> {
     {
       'isMe': false,
       'text':
-          'Good morning! Alice performed excellently in today\'s Mathematics session.',
+          'Good morning! Your child performed excellently in today\'s session.',
       'time': '09:15',
     },
     {
       'isMe': true,
-      'text': 'Thank you for the update, Mr. Chewe.',
+      'text': 'Thank you for the update!',
       'time': '10:32',
     },
   ];

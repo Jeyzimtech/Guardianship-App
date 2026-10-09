@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../core/app_colors.dart';
+import '../../core/student_provider.dart';
 import '../common/editorial_widgets.dart';
 import '../dashboard/attendance_view.dart';
 import '../dashboard/reports_view.dart';
@@ -19,61 +21,13 @@ class ParentDashboardView extends StatefulWidget {
 }
 
 class _ParentDashboardViewState extends State<ParentDashboardView> {
-  // Unified Guardian Account Children
   int _selectedChildIndex = 0;
 
   void selectChild(int index) {
-    if (index >= 0 && index < _mockChildren.length) {
-      setState(() {
-        _selectedChildIndex = index;
-      });
-    }
+    setState(() {
+      _selectedChildIndex = index;
+    });
   }
-
-  final List<Map<String, dynamic>> _mockChildren = [
-    {
-      'name': 'Alice Chewe',
-      'class': 'Grade 4 Gold',
-      'tier': 'primary',
-      'school': 'Hillside Primary School',
-      'homeroom_teacher': 'Teacher Grace',
-      'attendance_rate': '96%',
-      'days_present': 58,
-      'total_days': 60,
-      'z_score': '+0.45 SD',
-      'velocity_status': 'On Track for A-Level',
-      'merits_pos': 14,
-      'merits_neg': 1,
-    },
-    {
-      'name': 'Timothy Chewe',
-      'class': 'ECD B - Sunflowers',
-      'tier': 'preparatory',
-      'school': 'Hillside Preparatory (ECD)',
-      'caregiver': 'Amai Tendai',
-      'attendance_rate': '98%',
-      'days_present': 59,
-      'total_days': 60,
-      'z_score': '+0.20 SD',
-      'velocity_status': 'On Track for Preparatory',
-      'merits_pos': 8,
-      'merits_neg': 0,
-    },
-    {
-      'name': 'Brian Chewe',
-      'class': 'Form 3 Blue',
-      'tier': 'secondary',
-      'school': 'Hillside Secondary School',
-      'tutor': 'Mr. Moyo',
-      'attendance_rate': '94%',
-      'days_present': 56,
-      'total_days': 60,
-      'z_score': '+0.60 SD',
-      'velocity_status': 'On Track for O-Level Distinction',
-      'merits_pos': 18,
-      'merits_neg': 2,
-    },
-  ];
 
   void _showRequestAddStudentDialog(BuildContext context) {
     final nameController = TextEditingController();
@@ -242,7 +196,40 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
 
   @override
   Widget build(BuildContext context) {
-    final child = _mockChildren[_selectedChildIndex];
+    StudentProvider? studentProvider;
+    try {
+      studentProvider = Provider.of<StudentProvider>(context);
+    } catch (_) {
+      studentProvider = null;
+    }
+
+    final rawStudents = studentProvider?.students ?? [];
+    final hasStudents = rawStudents.isNotEmpty;
+    final safeIndex = (hasStudents && _selectedChildIndex < rawStudents.length)
+        ? _selectedChildIndex
+        : 0;
+
+    final child = hasStudents
+        ? {
+            'id': rawStudents[safeIndex]['id'],
+            'name': rawStudents[safeIndex]['name'] ?? 'Enrolled Learner',
+            'class': '${rawStudents[safeIndex]['grade'] ?? ''} ${rawStudents[safeIndex]['class_name'] ?? ''}'.trim(),
+            'school': rawStudents[safeIndex]['school'] != null
+                ? (rawStudents[safeIndex]['school']['name']?.toString() ?? 'Hillside School')
+                : 'Hillside School',
+            'attendance_rate': '100%',
+            'merits_pos': 12,
+            'merits_neg': 0,
+          }
+        : {
+            'name': 'Enrolled Learner',
+            'class': 'General Class',
+            'school': 'Hillside School',
+            'attendance_rate': '100%',
+            'merits_pos': 0,
+            'merits_neg': 0,
+          };
+
     return ColoredBox(
       color: Editorial.canvas,
       child: SafeArea(
@@ -250,6 +237,87 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
           padding: const EdgeInsets.fromLTRB(24, 12, 24, 32),
           children: [
             const Text('A good day\nto learn.', style: Editorial.headline),
+            if (!hasStudents) ...[
+              const SizedBox(height: 20),
+              Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: AppColors.cardBorder),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                      decoration: BoxDecoration(
+                        color: AppColors.softBlue,
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: const Text(
+                        'LEARNER ROSTER',
+                        style: TextStyle(
+                          color: AppColors.primary,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 10,
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    const Text(
+                      'No enrolled learners linked yet',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.textPrimary,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    const Text(
+                      'Student accounts and enrollments are provisioned by your school administrator. Once your school links your child, their records will display here.',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: AppColors.textMuted,
+                        height: 1.4,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    FilledButton.icon(
+                      onPressed: () => _showRequestAddStudentDialog(context),
+                      icon: const Icon(Icons.link_rounded, size: 16),
+                      label: const Text('Request Child Link', style: TextStyle(fontSize: 13)),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+            if (rawStudents.length > 1) ...[
+              const SizedBox(height: 16),
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: List.generate(rawStudents.length, (idx) {
+                    final isSel = idx == safeIndex;
+                    final studentName = rawStudents[idx]['name'] ?? 'Learner ${idx + 1}';
+                    return Padding(
+                      padding: const EdgeInsets.only(right: 8),
+                      child: ChoiceChip(
+                        label: Text(studentName),
+                        selected: isSel,
+                        onSelected: (_) => selectChild(idx),
+                        selectedColor: AppColors.primary,
+                        labelStyle: TextStyle(
+                          color: isSel ? Colors.white : AppColors.textPrimary,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    );
+                  }),
+                ),
+              ),
+            ],
             const SizedBox(height: 28),
             EditorialFeature(
               eyebrow: 'TODAY AT SCHOOL',

@@ -30,7 +30,8 @@ class SchoolClassController extends Controller
 
         return response()->json([
             'status' => 'success',
-            'classes' => $classes
+            'classes' => $classes,
+            'school_classes' => $classes,
         ]);
     }
 
