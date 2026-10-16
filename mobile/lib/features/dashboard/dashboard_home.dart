@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../../core/auth_provider.dart';
 import '../parent/parent_shell.dart';
 import '../teacher/teacher_shell.dart';
+import '../../core/role_guard.dart';
 
 /// Routes to the correct role shell after login.
 /// Each shell owns its own Scaffold (AppBar + Drawer + BottomNav).
@@ -15,6 +16,9 @@ class DashboardHome extends StatelessWidget {
       builder: (context, auth, _) {
         if (auth.isTeacher) {
           return const TeacherShell();
+        }
+        if (auth.user?['role'] == 'admin' || auth.user?['role'] == 'website_admin') {
+          return const MobileRoleGuard(child: SizedBox.shrink());
         }
         return const ParentShell();
       },

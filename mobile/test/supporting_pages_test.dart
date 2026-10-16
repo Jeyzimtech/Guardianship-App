@@ -1,3 +1,5 @@
+import 'package:dio/dio.dart';
+import 'package:guardianship/core/student_provider.dart';
 import 'dart:io';
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
@@ -14,6 +16,30 @@ import 'package:guardianship/features/parent/learning_journal_view.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+class FixtureStudents extends StudentProvider {
+  FixtureStudents(super.apiClient);
+  @override
+  Map<String, dynamic> get selectedStudent => {'id': 1, 'school_id': 1, 'name': 'Alice Chewe'};
+}
+
+ApiClient fixtureApi() {
+  final api = ApiClient();
+  bool ordered = false;
+  api.dio.interceptors.add(InterceptorsWrapper(onRequest: (o, h) {
+    if (o.path == '/uniform-orders' && o.method == 'POST') ordered = true;
+    final data = <String, dynamic>{'status': 'success', 'categories': [], 'activities': [], 'announcements': [], 'reports': [], 'entries': [], 'orders': ordered ? [{'id': 1, 'created_at': '2026-10-16', 'items': [], 'total_amount': 45, 'currency': 'USD', 'payment_status': 'pending'}] : [],
+      'roster': [
+        {'student_id': 1, 'name': 'Alice Chewe', 'class_name': 'Gold', 'status': 'present'},
+        {'student_id': 2, 'name': 'Bob Chewe', 'class_name': 'Gold', 'status': 'absent'},
+      ],
+      'attendance': List.generate(7, (i) => {'date': '2026-10-${10+i}', 'status': i == 0 ? 'absent' : 'present', 'subject_name': 'Math'}),
+      'uniforms': [{'id': 1, 'name': 'Official Embroidered School Blazer', 'category': 'Blazers', 'price': 45.0, 'price_usd': 45.0, 'price_zig': 1200.0, 'sizes': ['Size 30','Size 32'], 'in_stock': true, 'description': 'School blazer'}],
+      'data': {'all': [{'title': 'Photosynthesis Observation Journal', 'subject_name': 'Science', 'description': 'Observe plants', 'due_date': '2020-01-01'}]}};
+    h.resolve(Response(requestOptions: o, statusCode: 200, data: data));
+  }));
+  return api;
+}
+
 Future<void> mount(
   WidgetTester tester,
   Widget page, {
@@ -25,9 +51,13 @@ Future<void> mount(
   tester.view.devicePixelRatio = 1;
   addTearDown(tester.view.resetPhysicalSize);
   addTearDown(tester.view.resetDevicePixelRatio);
+  final api = fixtureApi();
   await tester.pumpWidget(
-    ChangeNotifierProvider(
-      create: (_) => AuthProvider(ApiClient()),
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => AuthProvider(api)),
+        ChangeNotifierProvider<StudentProvider>(create: (_) => FixtureStudents(api)),
+      ],
       child: MaterialApp(
         theme: ThemeData(
           fontFamily: 'Cabin',
@@ -133,21 +163,42 @@ void main() {
     expect(find.text('Alice Chewe'), findsOneWidget);
     expect(find.text('Bob Chewe'), findsNothing);
     await tapVisible(tester, find.text('Award merit'));
-    expect(find.text('13 merits'), findsOneWidget);
+    await tapVisible(tester, find.text('Save'));
+    expect(find.text('Behaviour saved for Alice Chewe.'), findsOneWidget);
+    await tester.pump(const Duration(seconds: 5));
     await tapVisible(tester, find.text('Roll call'));
     await tapVisible(tester, find.widgetWithText(ChoiceChip, 'Absent'));
     await reveal(tester, find.text('2 absent'));
     expect(find.text('2 absent'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
-  testWidgets('Gradebook saves edited marks', (tester) async {
+  testWidgets('Teacher guardian invitation validates details and submits the selected child', (tester) async {
+    final api = fixtureApi();
+    Map<String, dynamic>? invitation;
+    api.dio.interceptors.insert(0, InterceptorsWrapper(onRequest: (options, handler) {
+      if (options.path == '/users') {
+        invitation = Map<String, dynamic>.from(options.data);
+        handler.resolve(Response(requestOptions: options, statusCode: 201, data: {'status':'success','email_sent':true,'message':'Setup link emailed.'}));
+      } else { handler.next(options); }
+    }));
+    await mount(tester, ChangeNotifierProvider(create: (_) => AuthProvider(api), child: const TeacherDashboardView()));
+    await tapVisible(tester, find.text('Invite guardian').first);
+    await tapVisible(tester, find.text('Send invitation'));
+    expect(find.text('Enter a name'), findsOneWidget);
+    await tester.enterText(find.byType(TextFormField).at(0), 'Parent Example');
+    await tester.enterText(find.byType(TextFormField).at(1), 'parent@example.com');
+    await tester.enterText(find.byType(TextFormField).at(2), '+263771234567');
+    await tapVisible(tester, find.text('Send invitation'));
+    expect(invitation?['role'], 'guardian');
+    expect(invitation?['student_ids'], [1]);
+    expect(find.text('Setup link emailed.'), findsOneWidget);
+    await tester.pump(const Duration(milliseconds: 300));
+    expect(tester.takeException(), isNull);
+  });
+  testWidgets('Activities tab loads the empty roster state', (tester) async {
     await mount(tester, const TeacherDashboardView(), width: 320);
-    await tapVisible(tester, find.text('Gradebook'));
-    await tapVisible(tester, find.text('Edit marks'));
-    await tester.enterText(find.byType(TextFormField).first, '93');
-    await tapVisible(tester, find.text('Save Marks'));
-    await reveal(tester, find.text('93%'));
-    expect(find.text('93%'), findsOneWidget);
+    await tapVisible(tester, find.text('Activities').first);
+    expect(find.text('New activity'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
   testWidgets('Notice form validates and adds a notice', (tester) async {
@@ -166,8 +217,7 @@ void main() {
       'Please bring a favourite book.',
     );
     await tapVisible(tester, find.text('Post notice'));
-    await reveal(tester, find.text('Class reading day'));
-    expect(find.text('Class reading day'), findsOneWidget);
+    expect(find.text('Notice sent to parents in your class.'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
   testWidgets('Homework exposes overdue filter', (tester) async {
@@ -176,17 +226,11 @@ void main() {
     expect(find.text('Photosynthesis Observation Journal'), findsOneWidget);
     expect(find.text('Fractions & Decimals Exercise Set 3'), findsNothing);
   });
-  testWidgets('Inbox search displays empty state and opens a conversation', (
-    tester,
-  ) async {
+  testWidgets('Messages show persisted school notices and an empty search state', (tester) async {
     await mount(tester, const MessagingView());
     await tester.enterText(find.byType(TextField).first, 'no match');
     await tester.pumpAndSettle();
-    expect(find.text('No conversations found'), findsOneWidget);
-    await tester.enterText(find.byType(TextField).first, 'Support');
-    await tester.pumpAndSettle();
-    await tapVisible(tester, find.text('Edu+Conect Support'));
-    expect(find.text('Edu+Conect Support'), findsOneWidget);
+    expect(find.text('No updates match this view. Try another filter or pull down to refresh.'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 }

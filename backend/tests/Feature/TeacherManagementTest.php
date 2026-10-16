@@ -40,7 +40,8 @@ class TeacherManagementTest extends TestCase
             'email' => 'admin@hillside.ac.zw',
             'phone_number' => '+263771111111',
             'role' => 'admin',
-            'firebase_uid' => 'uid_admin_123',
+            'school_id' => $this->school->id,
+            'account_uid' => 'uid_admin_123',
         ]);
 
         $this->teacherUser = User::create([
@@ -48,14 +49,14 @@ class TeacherManagementTest extends TestCase
             'email' => 'grace@hillside.ac.zw',
             'phone_number' => '+263772222222',
             'role' => 'teacher',
-            'firebase_uid' => 'uid_teacher_123',
+            'account_uid' => 'uid_teacher_123',
         ]);
 
         $this->guardian = User::create([
             'name' => 'Guardian John',
             'phone_number' => '+263773333333',
             'role' => 'guardian',
-            'firebase_uid' => 'uid_guardian_123',
+            'account_uid' => 'uid_guardian_123',
         ]);
     }
 

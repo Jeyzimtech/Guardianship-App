@@ -9,7 +9,7 @@ class FeeTransaction extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['fee_account_id', 'amount', 'currency', 'payment_method', 'status'];
+    protected $fillable = ['fee_account_id', 'amount', 'currency', 'payment_method', 'status', 'reference', 'verified_by', 'verified_at'];
 
     public function feeAccount()
     {

@@ -51,7 +51,7 @@ class MobileRoleGuard extends StatelessWidget {
                 ),
                 const SizedBox(height: 12),
                 const Text(
-                  'The mobile application is designed exclusively for Teachers and Parents/Students.\n\nAdministrators must log in using the Web Admin Portal on a web browser.',
+                  'The mobile application is designed exclusively for Teachers and Parents/Guardians.\n\nAdministrators must log in using the Web Admin Portal on a web browser.',
                   style: TextStyle(
                     fontSize: 14,
                     color: Color(0xFF6B7280),
@@ -88,6 +88,11 @@ class MobileRoleGuard extends StatelessWidget {
           ),
         ),
       );
+    }
+
+    // Student accounts are out of MVP scope; only teachers and parents use the app.
+    if (user != null && !['teacher', 'guardian'].contains(user['role'])) {
+      return const Scaffold(body: Center(child: Text('Your account does not have access to this app.')));
     }
 
     return child;

@@ -109,13 +109,8 @@ class _CreateClassDialogState extends State<CreateClassDialog> {
     } catch (_) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Saved class stream (Offline/Demo mode success).'),
-            backgroundColor: AppColors.primary,
-          ),
+          const SnackBar(content: Text('Could not save class stream. Check your connection and try again.')),
         );
-        widget.onSaved();
-        Navigator.pop(context);
       }
     } finally {
       if (mounted) setState(() => _isSubmitting = false);

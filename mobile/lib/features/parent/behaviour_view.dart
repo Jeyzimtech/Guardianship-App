@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../../core/student_provider.dart';
 import '../../core/app_colors.dart';
 import '../../core/app_icon.dart';
 import '../common/page_components.dart';
@@ -14,30 +16,33 @@ class _BehaviourViewState extends State<BehaviourView> {
   String _filter = 'All';
   String _query = '';
   final _search = TextEditingController();
-  final _incidents = [
-    {
-      'polarity': 'positive',
-      'category': 'Excellence in Mathematics',
-      'note': 'Scored highest mark in mid-term mental arithmetic speed quiz.',
-      'author': 'Teacher Grace',
-      'date': '2 days ago',
-    },
-    {
-      'polarity': 'positive',
-      'category': 'Helpfulness & Leadership',
-      'note':
-          'Assisted fellow class members in organizing classroom library books.',
-      'author': 'Teacher Grace',
-      'date': '5 days ago',
-    },
-    {
-      'polarity': 'negative',
-      'category': 'Late Homework Submission',
-      'note': 'Science observation journal submitted 1 day past due date.',
-      'author': 'Teacher Grace',
-      'date': '2 weeks ago',
-    },
-  ];
+  List<Map<String, dynamic>> _incidents = [];
+  List<Map<String, dynamic>> _activities = [];
+  bool _loading = true;
+  String? _error;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _load());
+  }
+
+  Future<void> _load() async {
+    final provider = context.read<StudentProvider>();
+    final studentId = widget.child?['id'] ?? provider.selectedStudent?['id'];
+    if (studentId == null) { if (mounted) setState(() => _loading = false); return; }
+    setState(() { _loading = true; _error = null; });
+    try {
+      final response = await provider.apiClient.dio.get('/behaviour/$studentId');
+      final data = Map<String, dynamic>.from(response.data['data'] ?? {});
+      if (mounted) setState(() => _incidents = (data['incidents'] as List? ?? []).map((e) => Map<String, dynamic>.from(e)).toList());
+      try {
+        final activities = await provider.apiClient.dio.get('/activities/student/$studentId');
+        if (mounted) setState(() => _activities = (activities.data['activities'] as List? ?? []).map((e) => Map<String, dynamic>.from(e)).toList());
+      } catch (_) {}
+    } catch (_) { if (mounted) setState(() => _error = 'Could not load behaviour records.'); }
+    finally { if (mounted) setState(() => _loading = false); }
+  }
   @override
   void dispose() {
     _search.dispose();
@@ -48,8 +53,7 @@ class _BehaviourViewState extends State<BehaviourView> {
   Widget build(BuildContext context) {
     final merits = _incidents.where((i) => i['polarity'] == 'positive').length;
     final notes = _incidents.length - merits;
-    // Preserve the existing demonstration house-points tally.
-    final points = merits * 5 + 27;
+    final points = merits;
     final filtered = _incidents
         .where(
           (i) =>
@@ -57,7 +61,7 @@ class _BehaviourViewState extends State<BehaviourView> {
                   (_filter == 'Merits'
                       ? i['polarity'] == 'positive'
                       : i['polarity'] == 'negative')) &&
-              '${i['category']} ${i['note']} ${i['author']}'
+              '${i['category']} ${i['note']} ${i['recorded_by']?['name'] ?? ''}'
                   .toLowerCase()
                   .contains(_query),
         )
@@ -81,7 +85,7 @@ class _BehaviourViewState extends State<BehaviourView> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Text(
-                    'THIS TERM',
+                    'BEHAVIOUR SUMMARY',
                     style: TextStyle(
                       color: Colors.white70,
                       fontSize: 12,
@@ -100,7 +104,7 @@ class _BehaviourViewState extends State<BehaviourView> {
                   ),
                   const SizedBox(height: 6),
                   const Text(
-                    'House points earned',
+                    'Merits recorded',
                     style: TextStyle(fontSize: 17, color: Colors.white),
                   ),
                   const SizedBox(height: 20),
@@ -126,29 +130,47 @@ class _BehaviourViewState extends State<BehaviourView> {
             ),
             const SizedBox(height: 28),
             const Text(
-              'Achievements',
+              'Activities',
               style: TextStyle(fontSize: 21, fontWeight: FontWeight.w600),
             ),
             const SizedBox(height: 6),
             const Text(
-              'Small moments worth celebrating.',
+              'School activities your child took part in.',
               style: TextStyle(color: AppColors.textSecondary, height: 1.5),
             ),
             const SizedBox(height: 16),
-            const PageCard(
-              child: Wrap(
-                spacing: 10,
-                runSpacing: 12,
-                children: [
-                  PageBadge('Star Reader'),
-                  PageBadge('Helpful Peer'),
-                  PageBadge('Math Champion'),
-                  PageBadge('Punctual'),
-                  PageBadge('Clean Desk'),
-                  PageBadge('Team Player'),
-                ],
+            if (_error != null) PageCard(child: Column(children: [Text(_error!), TextButton(onPressed: _load, child: const Text('Retry'))])),
+            if (!_loading && _activities.isEmpty)
+              const PageCard(child: Text('No school activities recorded yet.', style: TextStyle(color: AppColors.textSecondary))),
+            for (final activity in _activities)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: PageCard(
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(activity['title']?.toString() ?? '', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+                            const SizedBox(height: 4),
+                            Text(activity['activity_date']?.toString().split('T').first ?? '', style: const TextStyle(fontSize: 12, color: AppColors.textMuted)),
+                          ],
+                        ),
+                      ),
+                      PageBadge(
+                        switch (activity['status']) {
+                          'present' => 'Took part',
+                          'late' => 'Late',
+                          'absent' => 'Absent',
+                          _ => 'Enrolled',
+                        },
+                        color: activity['status'] == 'absent' ? const Color(0xFFB91C1C) : AppColors.primary,
+                      ),
+                    ],
+                  ),
+                ),
               ),
-            ),
             const SizedBox(height: 28),
             const Text(
               'Activity record',
@@ -190,7 +212,8 @@ class _BehaviourViewState extends State<BehaviourView> {
               style: const TextStyle(color: AppColors.textMuted, fontSize: 13),
             ),
             const SizedBox(height: 12),
-            if (filtered.isEmpty)
+            if (_loading) const Center(child: CircularProgressIndicator()),
+            if (!_loading && filtered.isEmpty)
               PageCard(
                 child: Column(
                   children: [
@@ -244,7 +267,7 @@ class _BehaviourViewState extends State<BehaviourView> {
                                 : const Color(0xFF956100),
                           ),
                           Text(
-                            item['date']!,
+                          item['incident_date']?.toString() ?? '',
                             style: const TextStyle(
                               fontSize: 12,
                               color: AppColors.textMuted,
@@ -254,7 +277,7 @@ class _BehaviourViewState extends State<BehaviourView> {
                       ),
                       const SizedBox(height: 16),
                       Text(
-                        item['category']!,
+                        item['category']?.toString() ?? 'Observation',
                         style: const TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w600,
@@ -263,7 +286,7 @@ class _BehaviourViewState extends State<BehaviourView> {
                       ),
                       const SizedBox(height: 10),
                       Text(
-                        item['note']!,
+                        item['note']?.toString() ?? '',
                         style: const TextStyle(
                           fontSize: 14,
                           height: 1.65,
@@ -283,7 +306,7 @@ class _BehaviourViewState extends State<BehaviourView> {
                           const SizedBox(width: 10),
                           Expanded(
                             child: Text(
-                              'Recorded by ${item['author']}',
+                              'Recorded by ${item['recorded_by']?['name'] ?? 'School staff'}',
                               style: const TextStyle(
                                 fontSize: 13,
                                 color: AppColors.textSecondary,

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../core/app_colors.dart';
 import '../../core/app_icon.dart';
+import '../../core/student_provider.dart';
 import '../common/page_components.dart';
 
 class LearningJournalView extends StatefulWidget {
@@ -14,77 +16,59 @@ class LearningJournalView extends StatefulWidget {
 
 class _LearningJournalViewState extends State<LearningJournalView> {
   String _selectedFilter = 'all';
-
-  late final List<Map<String, dynamic>> _mockEntries;
+  List<Map<String, dynamic>> _entries = [];
+  bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    final activeChild =
-        widget.child ??
-        {
-          'name': 'Enrolled Learner',
-          'class': 'Primary Class',
-          'tier': 'primary',
-          'school': 'Hillside Primary School',
-        };
-    final childName = activeChild['name'] ?? 'Learner';
-    final isPrep =
-        (activeChild['tier'] == 'preparatory') ||
-        (activeChild['class']?.toString().toLowerCase().contains('ecd') ?? false);
+    WidgetsBinding.instance.addPostFrameCallback((_) => _fetchEntries());
+  }
 
-    _mockEntries = [
-      if (isPrep) ...[
-        {
-          'type': 'wellbeing',
-          'author': 'Caregiver Tendai',
-          'date': 'Today, 11:30 AM',
-          'caption':
-              '$childName had a wonderful morning during circle time and outdoor play!',
-          'wellbeing': {
-            'meals': 'Ate all of lunch (chicken & rice)',
-            'nap': 'Rested 45 mins quietly',
-            'hygiene': 'Hands washed before and after meals',
-            'mood': 'Cheerful & Energetic',
-          },
-        },
-        {
-          'type': 'drawing',
-          'author': 'Caregiver Amai Tendai',
-          'date': 'Yesterday, 02:15 PM',
-          'caption': 'Finger painting activity: "My Family at Home"',
-          'image_url': 'https://picsum.photos/400/300?random=1',
-          'feedback': 'Great color choice and hand-eye coordination!',
-        },
-      ],
-      {
-        'type': 'photo',
-        'author': 'Teacher Grace',
-        'date': '2 days ago',
-        'subject': 'Science Lab',
-        'caption':
-            'Demonstrating working solar circuit during Science experiment.',
-        'image_url': 'https://picsum.photos/400/300?random=2',
-        'feedback': 'Excellent problem solving skills displayed today!',
-      },
-      {
-        'type': 'voice',
-        'author': 'Teacher Grace',
-        'date': '3 days ago',
-        'subject': 'Reading & Phonics',
-        'caption': 'Recorded reading sample: "The Adventures of Mufaro"',
-        'duration': '1 min 24 sec',
-        'feedback': 'Fluent expression and clear pronunciation!',
-      },
-      {
-        'type': 'text',
-        'author': 'Teacher Grace',
-        'date': '4 days ago',
-        'subject': 'Mathematics',
-        'caption': 'Achieved 100% score on mental arithmetic speed challenge!',
-        'feedback': 'Superb progress this week.',
-      },
-    ];
+  Future<void> _fetchEntries() async {
+    if (!mounted) return;
+    setState(() => _isLoading = true);
+    final studentId = widget.child?['id'] ??
+        context.read<StudentProvider?>()?.selectedStudent?['id'];
+    try {
+      final dio = context.read<StudentProvider>().apiClient.dio;
+      final endpoint = studentId != null ? '/journal/$studentId' : '/journal';
+      final res = await dio.get(endpoint);
+      final rawEntries = studentId != null ? res.data?['data']?['entries'] : res.data?['entries'];
+      if (res.statusCode == 200 && rawEntries is List) {
+        final list = List<Map<String, dynamic>>.from(
+          rawEntries.map((e) {
+            final map = Map<String, dynamic>.from(e);
+            return {
+              'id': map['id'],
+              'type': map['type'] ?? 'text',
+              'author': map['author_name'] ?? 'Teacher',
+              'date': map['created_at'] ?? map['created_at_date'] ?? '',
+              'subject': map['class_name'] ?? map['grade'] ?? 'Classroom',
+              'caption': map['caption'] ?? '',
+              'image_url': map['media_url'],
+              'feedback': map['feedback'] ?? '',
+              'wellbeing': map['wellbeing_data'],
+            };
+          }),
+        );
+        if (mounted) {
+          setState(() {
+            _entries = list;
+            _isLoading = false;
+          });
+          return;
+        }
+      }
+    } catch (e) {
+      debugPrint('Journal fetch error: $e');
+    }
+    if (mounted) {
+      setState(() {
+        _entries = [];
+        _isLoading = false;
+      });
+    }
   }
 
   static const _filters = {
@@ -98,7 +82,7 @@ class _LearningJournalViewState extends State<LearningJournalView> {
 
   @override
   Widget build(BuildContext context) {
-    final entries = _mockEntries
+    final entries = _entries
         .where(
           (entry) =>
               _selectedFilter == 'all' || entry['type'] == _selectedFilter,
@@ -108,37 +92,46 @@ class _LearningJournalViewState extends State<LearningJournalView> {
       backgroundColor: AppColors.background,
       appBar: supportingAppBar(context, 'Learning journal'),
       body: SafeArea(
-        child: ListView(
-          padding: const EdgeInsets.all(20),
-          children: [
-            PageHeading(
-              title: 'Little moments.\nMeaningful progress.',
-              subtitle: widget.child == null
-                  ? 'Learning, wellbeing and classroom stories.'
-                  : '${widget.child!['name']} · Learning journal',
-              symbol: AppSymbol.report,
-            ),
-            PageFilters(
-              labels: _filters.keys.toList(),
-              selected: _filters.entries
-                  .firstWhere((entry) => entry.value == _selectedFilter)
-                  .key,
-              onSelected: (label) =>
-                  setState(() => _selectedFilter = _filters[label]!),
-            ),
-            const SizedBox(height: 24),
-            if (entries.isEmpty)
-              const PageEmpty(
-                title: 'No entries yet',
-                message:
-                    'Choose another category to explore classroom updates.',
+        child: RefreshIndicator(
+          onRefresh: _fetchEntries,
+          child: ListView(
+            padding: const EdgeInsets.all(20),
+            children: [
+              PageHeading(
+                title: 'Little moments.\nMeaningful progress.',
+                subtitle: widget.child == null
+                    ? 'Learning, wellbeing and classroom stories.'
+                    : '${widget.child!['name']} · Learning journal',
+                symbol: AppSymbol.report,
               ),
-            for (final entry in entries)
-              Padding(
-                padding: const EdgeInsets.only(bottom: 20),
-                child: _journalEntry(entry),
+              PageFilters(
+                labels: _filters.keys.toList(),
+                selected: _filters.entries
+                    .firstWhere((entry) => entry.value == _selectedFilter)
+                    .key,
+                onSelected: (label) =>
+                    setState(() => _selectedFilter = _filters[label]!),
               ),
-          ],
+              const SizedBox(height: 24),
+              if (_isLoading)
+                const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 40),
+                  child: Center(child: CircularProgressIndicator()),
+                )
+              else if (entries.isEmpty)
+                const PageEmpty(
+                  title: 'No journal entries yet',
+                  message:
+                      'Classroom moments and wellbeing logs posted by teachers and administrators will appear here.',
+                )
+              else
+                for (final entry in entries)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 20),
+                    child: _journalEntry(entry),
+                  ),
+            ],
+          ),
         ),
       ),
     );

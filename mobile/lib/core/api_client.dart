@@ -5,11 +5,14 @@ class ApiClient {
   late final Dio _dio;
   
   // Use 10.0.2.2 for Android Emulator, localhost for iOS/Web/Desktop
-  // Production server URL (Port 80)
-  static const String serverBaseUrl = 'http://109.199.99.156/api';
+  // Production secure domain (HTTPS)
+  static const String serverBaseUrl = String.fromEnvironment(
+    'API_BASE_URL',
+    defaultValue: 'https://admin.chewetechnologies.co.zw/api',
+  );
 
   static String get defaultBaseUrl {
-    // Points directly to the deployed backend server
+    // Points to the deployed backend server with SSL
     return serverBaseUrl;
   }
 

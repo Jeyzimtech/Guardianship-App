@@ -68,13 +68,8 @@ class _CreateAcademicYearDialogState extends State<CreateAcademicYearDialog> {
     } catch (_) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Saved academic year (Offline/Demo mode success).'),
-            backgroundColor: AppColors.primary,
-          ),
+          const SnackBar(content: Text('Could not save academic year. Check your connection and try again.')),
         );
-        widget.onSaved();
-        Navigator.pop(context);
       }
     } finally {
       if (mounted) setState(() => _isSubmitting = false);

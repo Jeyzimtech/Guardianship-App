@@ -32,7 +32,8 @@ class UserManagementTest extends TestCase
             'email' => 'admin@hillside.ac.zw',
             'phone_number' => '+263771111111',
             'role' => 'admin',
-            'firebase_uid' => 'uid_admin_123',
+            'school_id' => $this->school->id,
+            'account_uid' => 'uid_admin_123',
         ]);
 
         $this->teacher = User::create([
@@ -40,7 +41,8 @@ class UserManagementTest extends TestCase
             'email' => 'grace@hillside.ac.zw',
             'phone_number' => '+263772222222',
             'role' => 'teacher',
-            'firebase_uid' => 'uid_teacher_123',
+            'school_id' => $this->school->id,
+            'account_uid' => 'uid_teacher_123',
         ]);
 
         $this->guardian = User::create([
@@ -48,7 +50,7 @@ class UserManagementTest extends TestCase
             'email' => 'john@chewe.tech',
             'phone_number' => '+263773333333',
             'role' => 'guardian',
-            'firebase_uid' => 'uid_guardian_123',
+            'account_uid' => 'uid_guardian_123',
         ]);
 
         $this->student = Student::create([
@@ -57,6 +59,7 @@ class UserManagementTest extends TestCase
             'grade' => 'Grade 1',
             'class_name' => 'Green',
         ]);
+        $this->guardian->students()->attach($this->student->id);
     }
 
     /**
@@ -114,7 +117,7 @@ class UserManagementTest extends TestCase
     /**
      * Test admin can create a new Guardian account linked to a student.
      */
-    public function test_admin_can_create_guardian_account_with_student_link()
+    public function test_school_admin_cannot_create_guardian_accounts()
     {
         $this->actingAs($this->admin);
 
@@ -125,12 +128,8 @@ class UserManagementTest extends TestCase
             'student_ids' => [$this->student->id],
         ]);
 
-        $response->assertStatus(201)
-            ->assertJsonPath('user.name', 'New Guardian Mary')
-            ->assertJsonPath('user.role', 'guardian');
-
-        $this->assertDatabaseHas('users', ['phone_number' => '+263776666666', 'role' => 'guardian']);
-        $this->assertDatabaseHas('guardian_student', ['student_id' => $this->student->id]);
+        $response->assertForbidden();
+        $this->assertDatabaseMissing('users', ['phone_number' => '+263776666666']);
     }
 
     /**
@@ -178,6 +177,7 @@ class UserManagementTest extends TestCase
             'name' => 'Unauthorized Admin',
             'phone_number' => '+263779999999',
             'role' => 'admin',
+            'school_id' => $this->school->id,
         ]);
         $responseCreate->assertStatus(403);
     }

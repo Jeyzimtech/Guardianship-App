@@ -38,9 +38,7 @@ class _ParentShellState extends State<ParentShell> {
         : (studentProvider.students.isNotEmpty
             ? studentProvider.students[0] as Map<String, dynamic>
             : <String, dynamic>{
-                'name': 'Enrolled Learner',
-                'class': 'General Class',
-                'school': 'Hillside School',
+                'name': 'No child selected',
               }));
 
     final pages = [

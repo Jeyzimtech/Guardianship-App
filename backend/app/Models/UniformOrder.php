@@ -14,7 +14,7 @@ class UniformOrder extends Model
         'items',
         'total_amount',
         'currency',
-        'payment_status',
+        'payment_status', 'payment_reference', 'payment_method', 'verified_by', 'verified_at',
     ];
 
     protected $casts = [

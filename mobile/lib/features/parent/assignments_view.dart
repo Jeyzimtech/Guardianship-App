@@ -38,7 +38,7 @@ class _AssignmentsViewState extends State<AssignmentsView> {
     setState(() {
       _loading = true;
       _error = null;
-      _mockAssignments.clear();
+      _assignments.clear();
     });
     try {
       final response = await auth.apiClient.dio.get(
@@ -51,7 +51,7 @@ class _AssignmentsViewState extends State<AssignmentsView> {
       if (!mounted) return;
       setState(() {
         _classes = response.data['classes'] ?? [];
-        _mockAssignments.addAll(
+        _assignments.addAll(
           items.map(
             (a) => <String, dynamic>{
               'title': a['title'],
@@ -99,49 +99,11 @@ class _AssignmentsViewState extends State<AssignmentsView> {
     }
   }
 
-  final List<Map<String, dynamic>> _mockAssignments = [
-    {
-      'title': 'Fractions & Decimals Exercise Set 3',
-      'subject': 'MATHEMATICS',
-      'subject_color': AppColors.primary,
-      'description': 'Complete problems 1 to 15 on page 42 of Math workbook.',
-      'due_date': 'Due 22 Aug 2026',
-      'status': 'PENDING',
-      'score': null,
-    },
-    {
-      'title': 'Photosynthesis Observation Journal',
-      'subject': 'SCIENCE',
-      'subject_color': AppColors.primaryLight,
-      'description':
-          'Document daily plant growth progress in project notebook.',
-      'due_date': 'Overdue — 26 Jul 2026',
-      'status': 'OVERDUE',
-      'score': null,
-    },
-    {
-      'title': 'Shona Comprehension & Vocabulary',
-      'subject': 'SHONA',
-      'subject_color': AppColors.primaryDark,
-      'description': 'Read Chapter 4 and answer review questions 1-5.',
-      'due_date': 'Due 2 Aug 2026',
-      'status': 'SUBMITTED',
-      'score': null,
-    },
-    {
-      'title': 'English Essay — My Community',
-      'subject': 'ENGLISH',
-      'subject_color': AppColors.primaryAccent,
-      'description': 'Write a 3-paragraph descriptive essay on your community.',
-      'due_date': 'Graded — 15 Jul 2026',
-      'status': 'GRADED',
-      'score': '18/20',
-    },
-  ];
+  final List<Map<String, dynamic>> _assignments = [];
 
   List<Map<String, dynamic>> get _filtered {
-    if (_selectedFilter == 'All') return _mockAssignments;
-    return _mockAssignments
+    if (_selectedFilter == 'All') return _assignments;
+    return _assignments
         .where((a) => a['status'] == _selectedFilter.toUpperCase())
         .toList();
   }
@@ -156,7 +118,7 @@ class _AssignmentsViewState extends State<AssignmentsView> {
   @override
   Widget build(BuildContext context) {
     final teacher = context.watch<AuthProvider>().isTeacher;
-    final remaining = _mockAssignments
+    final remaining = _assignments
         .where((a) => a['status'] == 'PENDING' || a['status'] == 'OVERDUE')
         .length;
     return Scaffold(
@@ -208,7 +170,7 @@ class _AssignmentsViewState extends State<AssignmentsView> {
                   const SizedBox(height: 10),
                   Text(
                     teacher
-                        ? '${_mockAssignments.length} published assignments'
+                        ? '${_assignments.length} published assignments'
                         : '$remaining tasks to complete',
                     style: const TextStyle(
                       fontSize: 23,

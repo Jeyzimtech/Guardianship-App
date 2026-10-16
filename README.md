@@ -71,7 +71,7 @@ flutter run
 
 | Method | Endpoint | Description |
 |---|---|---|
-| `POST` | `/api/auth/firebase-login` | Authenticate user via Firebase UID |
+| `POST` | `/api/auth/login` | Authenticate with email and password |
 | `GET` | `/api/dashboard/{student_id}` | Fetch student KPIs, fee balance, and attendance |
 | `GET` | `/api/reports/{student_id}` | Retrieve student academic report documents |
 | `POST` | `/api/attendance/mark` | Mark student roll call attendance |

@@ -24,13 +24,14 @@ class User extends Authenticatable
         'name',
         'email',
         'phone_number',
-        'firebase_uid',
+        'account_uid',
         'role',
         'password',
         'address',
         'preferred_language',
         'emergency_contact_name',
         'emergency_contact_phone',
+        'school_id',
     ];
 
     /**

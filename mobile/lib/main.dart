@@ -34,7 +34,7 @@ class EduConectApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       navigatorKey: navigatorKey,
-      title: 'Guardianship App',
+      title: 'Edu Connect',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         brightness: Brightness.light,

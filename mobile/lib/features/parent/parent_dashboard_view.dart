@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../core/auth_provider.dart';
 import '../../core/app_colors.dart';
 import '../../core/student_provider.dart';
 import '../common/editorial_widgets.dart';
@@ -154,7 +155,7 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
               width: double.infinity,
               height: 48,
               child: ElevatedButton.icon(
-                onPressed: () {
+                onPressed: () async {
                   final name = nameController.text.trim();
                   if (name.isEmpty) {
                     ScaffoldMessenger.of(ctx).showSnackBar(
@@ -164,15 +165,20 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
                     );
                     return;
                   }
-                  Navigator.pop(ctx);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        'Link request for "$name" submitted to School Admin! You will be notified once approved.',
-                      ),
-                      backgroundColor: AppColors.primary,
-                    ),
-                  );
+                  try {
+                    final auth = context.read<AuthProvider>();
+                    await auth.apiClient.dio.post('/students/request-link', data: {
+                      'student_name': name,
+                      'school_name': schoolController.text.trim(),
+                      'relationship': 'Parent/Guardian',
+                      'notes': notesController.text.trim(),
+                    });
+                    if (!ctx.mounted) return;
+                    Navigator.pop(ctx);
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Link request submitted for school verification.'), backgroundColor: AppColors.primary));
+                  } catch (_) {
+                    if (ctx.mounted) ScaffoldMessenger.of(ctx).showSnackBar(const SnackBar(content: Text('Link request could not be submitted. Please try again.')));
+                  }
                 },
                 icon: const Icon(Icons.send_rounded, size: 18),
                 label: const Text(
@@ -209,23 +215,24 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
         ? _selectedChildIndex
         : 0;
 
+    final dashboard = studentProvider?.dashboardData;
+    final rawChild = hasStudents ? Map<String, dynamic>.from(rawStudents[safeIndex]) : <String, dynamic>{};
     final child = hasStudents
         ? {
             'id': rawStudents[safeIndex]['id'],
             'name': rawStudents[safeIndex]['name'] ?? 'Enrolled Learner',
             'class': '${rawStudents[safeIndex]['grade'] ?? ''} ${rawStudents[safeIndex]['class_name'] ?? ''}'.trim(),
-            'school': rawStudents[safeIndex]['school'] != null
-                ? (rawStudents[safeIndex]['school']['name']?.toString() ?? 'Hillside School')
-                : 'Hillside School',
-            'attendance_rate': '100%',
-            'merits_pos': 12,
-            'merits_neg': 0,
+            'school_id': rawChild['school_id'],
+            'school': rawChild['school']?['name'] ?? 'School',
+            'attendance_rate': '${dashboard?['attendance_snapshot']?['percentage'] ?? 0}%',
+            'merits_pos': dashboard?['behaviour_snapshot']?['positive_count'] ?? 0,
+            'merits_neg': dashboard?['behaviour_snapshot']?['negative_count'] ?? 0,
           }
         : {
             'name': 'Enrolled Learner',
             'class': 'General Class',
-            'school': 'Hillside School',
-            'attendance_rate': '100%',
+            'school': 'School',
+            'attendance_rate': '—',
             'merits_pos': 0,
             'merits_neg': 0,
           };

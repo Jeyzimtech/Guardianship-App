@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../../core/student_provider.dart';
 import '../../core/app_colors.dart';
 import '../../core/app_icon.dart';
 import '../common/page_components.dart';
@@ -14,51 +16,44 @@ class _AttendanceViewState extends State<AttendanceView> {
   final _searchController = TextEditingController();
   String _query = '';
   String _status = 'All';
-  final List<Map<String, dynamic>> _attendanceRecords = [
-    {
-      'date': '17 Sep 2025',
-      'status': 'PRESENT',
-      'remarks': 'On time - Morning Assembly',
-      'time': '07:45 AM',
-    },
-    {
-      'date': '16 Sep 2025',
-      'status': 'PRESENT',
-      'remarks': 'On time',
-      'time': '07:48 AM',
-    },
-    {
-      'date': '15 Sep 2025',
-      'status': 'PRESENT',
-      'remarks': 'On time',
-      'time': '07:50 AM',
-    },
-    {
-      'date': '12 Sep 2025',
-      'status': 'LATE',
-      'remarks': '15 mins late - Heavy traffic',
-      'time': '08:15 AM',
-    },
-    {
-      'date': '11 Sep 2025',
-      'status': 'PRESENT',
-      'remarks': 'On time',
-      'time': '07:42 AM',
-    },
-    {
-      'date': '10 Sep 2025',
-      'status': 'PRESENT',
-      'remarks': 'On time',
-      'time': '07:46 AM',
-    },
-    {
-      'date': '09 Sep 2025',
-      'status': 'ABSENT',
-      'remarks': 'Excused medical absence',
-      'time': '-',
-    },
-  ];
+  List<Map<String, dynamic>> _attendanceRecords = [];
+  bool _loading = true;
+  String? _loadError;
 
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _load());
+  }
+
+  Future<void> _load() async {
+    final provider = context.read<StudentProvider>();
+    final studentId = provider.selectedStudent?['id'];
+    if (studentId == null) {
+      if (mounted) setState(() { _loading = false; _attendanceRecords = []; });
+      return;
+    }
+    setState(() { _loading = true; _loadError = null; });
+    try {
+      final response = await provider.apiClient.dio.get('/attendance/$studentId');
+      final rows = (response.data['attendance'] as List? ?? []).map((row) {
+        final record = Map<String, dynamic>.from(row);
+        final date = DateTime.tryParse(record['date']?.toString() ?? '');
+        return <String, dynamic>{
+          'date': date == null ? '' : '${date.day} ${_month(date.month)} ${date.year}',
+          'status': record['status'].toString().toUpperCase(),
+          'remarks': record['subject_name'] ?? '',
+        };
+      }).toList();
+      if (mounted) setState(() => _attendanceRecords = rows);
+    } catch (_) {
+      if (mounted) setState(() => _loadError = 'Could not load attendance.');
+    } finally {
+      if (mounted) setState(() => _loading = false);
+    }
+  }
+
+  String _month(int month) => const ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][month - 1];
   @override
   void dispose() {
     _searchController.dispose();
@@ -114,8 +109,8 @@ class _AttendanceViewState extends State<AttendanceView> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'SEPTEMBER 2025',
+                  Text(
+                    _attendanceRecords.isEmpty ? 'ATTENDANCE SUMMARY' : 'LATEST ATTENDANCE',
                     style: TextStyle(
                       color: Colors.white70,
                       fontSize: 12,
@@ -153,6 +148,8 @@ class _AttendanceViewState extends State<AttendanceView> {
                 ],
               ),
             ),
+            if (_loadError != null) Text(_loadError!, style: const TextStyle(color: AppColors.error)),
+            if (_loading) const Center(child: CircularProgressIndicator()),
             const SizedBox(height: 16),
             PageCard(
               child: Wrap(
@@ -187,6 +184,8 @@ class _AttendanceViewState extends State<AttendanceView> {
                 ],
               ),
             ),
+            if (_loadError != null) Text(_loadError!, style: const TextStyle(color: AppColors.error)),
+            if (_loading) const Center(child: CircularProgressIndicator()),
             const SizedBox(height: 28),
             const Text(
               'Daily records',

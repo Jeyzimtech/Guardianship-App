@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../core/student_provider.dart';
 import '../../core/app_colors.dart';
 
@@ -45,21 +46,9 @@ class _ReportsViewState extends State<ReportsView> {
         });
       }
     } catch (e) {
-      // Offline fallback: load mock reports
-
+      debugPrint('Reports load error: $e');
       setState(() {
-        _reports = [
-          {
-            'id': 101,
-            'title': 'Term 1 Academic Report Card',
-            'is_locked': false,
-          },
-          {
-            'id': 102,
-            'title': 'Term 2 Mid-Term Progress Card',
-            'is_locked': false,
-          },
-        ];
+        _reports = [];
       });
     }
 
@@ -86,138 +75,24 @@ class _ReportsViewState extends State<ReportsView> {
       final response = await studentProvider.apiClient.dio.get(
         '/reports/download/${report['id']}',
       );
-      if (mounted) Navigator.pop(context); // Close spinner
+      if (!mounted) return;
+      Navigator.pop(context); // Close spinner
 
       if (response.statusCode == 200 && response.data['status'] == 'success') {
         if (mounted) {
-          showDialog(
-            context: context,
-            builder: (context) => AlertDialog(
-              backgroundColor: AppColors.surface,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-                side: const BorderSide(color: AppColors.cardBorder, width: 1.0),
-              ),
-              title: Text(
-                report['title'],
-                style: const TextStyle(
-                  color: AppColors.primaryDark,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Report download authorized successfully.',
-                    style: TextStyle(color: AppColors.textPrimary),
-                  ),
-                  const SizedBox(height: 12),
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: AppColors.softBlue,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Text(
-                      response.data['file_content_mock'] ?? '',
-                      style: const TextStyle(
-                        color: AppColors.primaryDark,
-                        fontFamily: 'monospace',
-                        fontWeight: FontWeight.bold,
-                        fontSize: 11,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              actions: [
-                TextButton(
-                  child: const Text(
-                    'Close',
-                    style: TextStyle(
-                      color: AppColors.primary,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  onPressed: () => Navigator.pop(context),
-                ),
-              ],
-            ),
-          );
+          final url = Uri.tryParse(response.data['download_url']?.toString() ?? '');
+          final opened = url != null && ['http', 'https'].contains(url.scheme) && await launchUrl(url, mode: LaunchMode.externalApplication);
+          if (!mounted) return;
+          if (!opened) {
+            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('The report file could not be opened.')));
+          }
         }
       }
-    } catch (_) {
+    } catch (e) {
       if (mounted) {
-        Navigator.pop(context); // Close spinner
-        // Offline fallback: display mock report dialog directly
-        showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-            backgroundColor: AppColors.surface,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-              side: const BorderSide(color: AppColors.cardBorder, width: 1.0),
-            ),
-            title: Text(
-              report['title'],
-              style: const TextStyle(
-                color: AppColors.primaryDark,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'Report loaded successfully (Offline Mode).',
-                  style: TextStyle(color: AppColors.textPrimary),
-                ),
-                const SizedBox(height: 12),
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: AppColors.softBlue,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Text(
-                    '===================================\n'
-                    '     OFFICIAL ACADEMIC REPORT      \n'
-                    '===================================\n'
-                    'Student: ${studentProvider.selectedStudent?['name'] ?? 'Student'}\n'
-                    'Term: ${report['title'].toString().contains('Term 1') ? 'Term 1' : 'Term 2'}\n'
-                    '-----------------------------------\n'
-                    'Mathematics: A\n'
-                    'English: B+\n'
-                    'Science: A\n'
-                    'Overall Position: 3rd in Class\n'
-                    '===================================',
-                    style: const TextStyle(
-                      color: AppColors.primaryDark,
-                      fontFamily: 'monospace',
-                      fontWeight: FontWeight.bold,
-                      fontSize: 11,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            actions: [
-              TextButton(
-                child: const Text(
-                  'Close',
-                  style: TextStyle(
-                    color: AppColors.primary,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                onPressed: () => Navigator.pop(context),
-              ),
-            ],
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Unable to download report. Please check your connection or contact school administration.'),
           ),
         );
       }

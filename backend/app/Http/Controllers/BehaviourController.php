@@ -11,9 +11,19 @@ class BehaviourController extends Controller
     /**
      * Get behaviour and merits log snapshot for a student
      */
-    public function getStudentBehaviour($student_id)
+    public function getStudentBehaviour(Request $request, $student_id)
     {
         $student = Student::findOrFail($student_id);
+        $user = $request->user();
+        if ($user?->role === 'guardian' && !$user->students()->where('students.id', $student_id)->exists()) {
+            return response()->json(['status' => 'error', 'message' => 'This student is not linked to your account.'], 403);
+        }
+        if ($user?->role === 'admin' && (!$user->school_id || (int) $user->school_id !== (int) $student->school_id)) {
+            return response()->json(['status' => 'error', 'message' => 'This student is outside your school.'], 403);
+        }
+        if ($user?->role === 'teacher' && (!$user->teacherProfile || (int) $user->teacherProfile->school_id !== (int) $student->school_id || !$user->teacherProfile->assignedClasses()->where('class_name', $student->class_name)->where('grade', $student->grade)->exists())) {
+            return response()->json(['status' => 'error', 'message' => 'You may only view students in your assigned classes.'], 403);
+        }
 
         $incidents = BehaviourIncident::where('student_id', $student_id)
             ->with('recordedBy:id,name,role')
@@ -31,7 +41,10 @@ class BehaviourController extends Controller
                     'negative_count' => $negativeCount,
                     'net_merits' => $positiveCount - $negativeCount,
                 ],
-                'incidents' => $incidents
+                'incidents' => $incidents->map(function ($incident) {
+                    $incident->setAttribute('recorded_by', $incident->recordedBy);
+                    return $incident;
+                })
             ]
         ]);
     }
@@ -48,6 +61,21 @@ class BehaviourController extends Controller
             'note' => 'nullable|string',
             'incident_date' => 'required|date',
         ]);
+
+        $student = Student::findOrFail($validated['student_id']);
+        $user = $request->user();
+        if ($user?->role === 'teacher' && (!$user->teacherProfile || (int) $user->teacherProfile->school_id !== (int) $student->school_id || !$user->teacherProfile->assignedClasses()->where('class_name', $student->class_name)->where('grade', $student->grade)->exists())) {
+            return response()->json(['status' => 'error', 'message' => 'You may only update students in your assigned classes.'], 403);
+        }
+        if ($user?->role === 'admin' && (!$user->school_id || (int) $user->school_id !== (int) $student->school_id)) {
+            return response()->json(['status' => 'error', 'message' => 'This student is outside your school.'], 403);
+        }
+
+        // Once the school admin has configured categories, incidents must use one of them.
+        $configured = \App\Models\BehaviourCategory::where('school_id', $student->school_id)->where('polarity', $validated['polarity']);
+        if ((clone $configured)->exists() && !(clone $configured)->where('name', $validated['category'])->exists()) {
+            return response()->json(['status' => 'error', 'message' => 'Choose one of the behaviour categories set by your school.'], 422);
+        }
 
         $incident = BehaviourIncident::create([
             'student_id' => $validated['student_id'],

@@ -1,8 +1,26 @@
+import 'package:dio/dio.dart';
+import 'package:provider/provider.dart';
+import 'package:guardianship/core/api_client.dart';
+import 'package:guardianship/core/student_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:guardianship/features/parent/behaviour_view.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'supporting_pages_test.dart' show mount, tapVisible;
+
+Widget liveBehaviour({Map<String, dynamic>? child}) {
+  final api = ApiClient();
+  api.dio.interceptors.add(InterceptorsWrapper(onRequest: (options, handler) {
+    handler.resolve(Response(requestOptions: options, statusCode: 200, data:
+      options.path.startsWith('/behaviour/') ? {'data': {'incidents': [
+        {'category': 'Leadership', 'note': 'Helping others', 'polarity': 'positive'},
+        {'category': 'Arithmetic', 'note': 'Excellent arithmetic', 'polarity': 'positive'},
+        {'category': 'Late Homework Submission', 'note': null, 'polarity': 'negative'},
+      ]}} : {'activities': [{'title': 'Athletics', 'activity_date': '2026-10-16', 'status': 'present'}]}));
+  }));
+  return ChangeNotifierProvider(create: (_) => StudentProvider(api),
+    child: BehaviourView(child: {'id': 1, ...?child}));
+}
 
 void main() {
   setUp(() => SharedPreferences.setMockInitialValues({}));
@@ -12,7 +30,7 @@ void main() {
     ) async {
       await mount(
         tester,
-        const BehaviourView(child: {'name': 'Alice Chewe'}),
+        liveBehaviour(child: {'name': 'Alice Chewe'}),
         width: width,
         scale: 1.3,
       );
@@ -26,7 +44,7 @@ void main() {
     });
   }
   testWidgets('Conduct filters combine with search and reset', (tester) async {
-    await mount(tester, const BehaviourView());
+    await mount(tester, liveBehaviour());
     await tester.scrollUntilVisible(
       find.widgetWithText(ChoiceChip, 'Conduct notes'),
       250,

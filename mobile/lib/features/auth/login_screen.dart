@@ -240,7 +240,111 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  void _passwordHelp() => _showChangePasswordDialog();
+  void _showForgotPasswordDialog() {
+    final initialEmail = _emailController.text.trim().contains('@')
+        ? _emailController.text.trim()
+        : '';
+    final emailController = TextEditingController(text: initialEmail);
+    bool isSubmitting = false;
+
+    showDialog<void>(
+      context: context,
+      builder: (dialogCtx) => StatefulBuilder(
+        builder: (context, setDialogState) => AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          title: const Row(
+            children: [
+              Icon(Icons.lock_reset, color: AppColors.primary),
+              SizedBox(width: 8),
+              Text('Reset Password', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            ],
+          ),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Enter your registered email address. We will send you a secure link to create or reset your password for the mobile app.',
+                  style: TextStyle(fontSize: 13, color: AppColors.textMuted),
+                ),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: emailController,
+                  keyboardType: TextInputType.emailAddress,
+                  decoration: const InputDecoration(
+                    labelText: 'Registered Email',
+                    hintText: 'e.g. parent@example.com',
+                    prefixIcon: Icon(Icons.email_outlined),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: isSubmitting ? null : () => Navigator.pop(dialogCtx),
+              child: const Text('Cancel'),
+            ),
+            FilledButton(
+              style: FilledButton.styleFrom(backgroundColor: AppColors.primary),
+              onPressed: isSubmitting
+                  ? null
+                  : () async {
+                      final email = emailController.text.trim();
+                      if (email.isEmpty || !email.contains('@')) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            backgroundColor: Colors.red,
+                            content: Text('Please enter a valid email address.'),
+                          ),
+                        );
+                        return;
+                      }
+
+                      setDialogState(() => isSubmitting = true);
+                      final messenger = ScaffoldMessenger.of(context);
+                      final auth = Provider.of<AuthProvider>(context, listen: false);
+                      final success = await auth.sendForgotPasswordLink(email);
+
+                      if (!mounted) return;
+
+                      if (success) {
+                        if (dialogCtx.mounted) Navigator.pop(dialogCtx);
+                        messenger.showSnackBar(
+                          SnackBar(
+                            backgroundColor: Colors.green.shade700,
+                            duration: const Duration(seconds: 6),
+                            content: Text(
+                              'Password link sent to $email! Please open your email to set your password, then return here to log in.',
+                            ),
+                          ),
+                        );
+                      } else {
+                        setDialogState(() => isSubmitting = false);
+                        messenger.showSnackBar(
+                          SnackBar(
+                            backgroundColor: Colors.red.shade700,
+                            content: Text(auth.errorMessage ?? 'Failed to send reset link.'),
+                          ),
+                        );
+                      }
+                    },
+              child: isSubmitting
+                  ? const SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                    )
+                  : const Text('Send Reset Link'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _passwordHelp() => _showForgotPasswordDialog();
 
   @override
   Widget build(BuildContext context) => Scaffold(

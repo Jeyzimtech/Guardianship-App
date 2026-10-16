@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../../core/student_provider.dart';
 import '../../core/app_colors.dart';
 import '../../core/app_icon.dart';
 import '../common/page_components.dart';
@@ -20,131 +22,75 @@ class _UniformMarketplaceViewState extends State<UniformMarketplaceView> {
   String _selectedCategory = 'All';
   String _searchQuery = '';
 
-  // Uniform Catalog Data
-  final List<Map<String, dynamic>> _catalog = [
-    {
-      'id': 'U-101',
-      'name': 'Official Embroidered School Blazer',
-      'category': 'Formal Wear',
-      'price_usd': 45.00,
-      'price_zig': 585.00,
-      'sizes': ['Size 28', 'Size 30', 'Size 32', 'Size 34', 'Size 36'],
-      'in_stock': true,
-      'icon': Icons.checkroom_rounded,
-      'description':
-          'High-density navy blue wool-blend blazer with official school chest emblem badge.',
-    },
-    {
-      'id': 'U-102',
-      'name': 'Long-Sleeve Cotton Shirt (Pack of 2)',
-      'category': 'Formal Wear',
-      'price_usd': 22.00,
-      'price_zig': 286.00,
-      'sizes': ['Size 26', 'Size 28', 'Size 30', 'Size 32', 'Size 34'],
-      'in_stock': true,
-      'icon': Icons.dry_cleaning_rounded,
-      'description':
-          'Breathable 100% white cotton school shirts with reinforced collar and buttons.',
-    },
-    {
-      'id': 'U-103',
-      'name': 'School Trousers / Pleated Skirt',
-      'category': 'Formal Wear',
-      'price_usd': 25.00,
-      'price_zig': 325.00,
-      'sizes': ['Size 28', 'Size 30', 'Size 32', 'Size 34'],
-      'in_stock': true,
-      'icon': Icons.strikethrough_s_rounded,
-      'description':
-          'Tailored charcoal grey wool-polyester trousers / box-pleated skirt.',
-    },
-    {
-      'id': 'U-104',
-      'name': 'Full Athletics Tracksuit Set',
-      'category': 'Sports & Physical Ed',
-      'price_usd': 38.00,
-      'price_zig': 494.00,
-      'sizes': ['S', 'M', 'L', 'XL'],
-      'in_stock': true,
-      'icon': Icons.directions_run_rounded,
-      'description':
-          'Water-resistant zip jacket and track pants with fleece lining for sports days.',
-    },
-    {
-      'id': 'U-105',
-      'name': 'House Color Sports Polo Shirt',
-      'category': 'Sports & Physical Ed',
-      'price_usd': 14.00,
-      'price_zig': 182.00,
-      'sizes': ['S', 'M', 'L', 'XL'],
-      'in_stock': true,
-      'icon': Icons.sports_tennis_rounded,
-      'description':
-          'Moisture-wicking polo shirt in official house colors (Red, Blue, Green, Yellow).',
-    },
-    {
-      'id': 'U-106',
-      'name': 'Official Striped School Tie',
-      'category': 'Accessories & Footwear',
-      'price_usd': 8.00,
-      'price_zig': 104.00,
-      'sizes': ['Standard Boy', 'Standard Girl', 'Prefect Gold Thread'],
-      'in_stock': true,
-      'icon': Icons.military_tech_rounded,
-      'description': 'Silk-finish woven tie featuring school crest stripes.',
-    },
-    {
-      'id': 'U-107',
-      'name': 'Genuine Leather School Shoes',
-      'category': 'Accessories & Footwear',
-      'price_usd': 32.00,
-      'price_zig': 416.00,
-      'sizes': ['Size 1', 'Size 2', 'Size 3', 'Size 4', 'Size 5', 'Size 6'],
-      'in_stock': true,
-      'icon': Icons.roller_skating_rounded,
-      'description':
-          'Durable black leather shoes with orthotic support and non-slip rubber soles.',
-    },
-    {
-      'id': 'U-108',
-      'name': 'Cotton Heavyweight School Socks (3 Pairs)',
-      'category': 'Accessories & Footwear',
-      'price_usd': 7.50,
-      'price_zig': 97.50,
-      'sizes': ['Small (9-12)', 'Medium (12-3)', 'Large (4-7)'],
-      'in_stock': true,
-      'icon': Icons.style_rounded,
-      'description':
-          'Padded heel and toe turn-down school socks with turnover band.',
-    },
-  ];
+  List<Map<String, dynamic>> _catalog = [];
+  bool _loadingCatalog = true;
+  bool _loadingOrders = false;
+  List<Map<String, dynamic>> _ordersHistory = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchLiveCatalog();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _fetchOrders());
+  }
+
+  Future<void> _fetchOrders() async {
+    final studentId = widget.child?['id'] ?? (mounted ? (context.read<StudentProvider>().selectedStudent?['id']) : null);
+    if (studentId == null) return;
+    setState(() => _loadingOrders = true);
+    try {
+      final response = await context.read<StudentProvider>().apiClient.dio.get('/uniform-orders/$studentId');
+      final values = (response.data['orders'] as List? ?? []).map((order) {
+        final data = Map<String, dynamic>.from(order);
+        return {
+          'order_id': 'ORD-${data['id']}',
+          'date': data['created_at']?.toString().split('T').first ?? '',
+          'items_summary': (data['items'] as List? ?? []).map((line) => '${line['name']} (${line['size']}) ×${line['quantity']}').join(', '),
+          'total_amount': data['total_amount'],
+          'currency': data['currency'],
+          'status': data['payment_status'] == 'pending' ? 'Payment pending' : data['payment_status'],
+          'payment_method': 'Payment is settled with the school.',
+        };
+      }).cast<Map<String, dynamic>>().toList();
+      if (mounted) setState(() => _ordersHistory = values);
+    } catch (_) {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Could not load uniform orders.')));
+    } finally {
+      if (mounted) setState(() => _loadingOrders = false);
+    }
+  }
+
+  Future<void> _fetchLiveCatalog() async {
+    setState(() => _loadingCatalog = true);
+    try {
+      final dio = context.read<StudentProvider>().apiClient.dio;
+      final schoolId = widget.child?['school_id'] ?? (mounted ? (context.read<StudentProvider>().selectedStudent?['school_id']) : null);
+      final res = await dio.get('/uniforms', queryParameters: schoolId == null ? null : {'school_id': schoolId});
+      if (res.statusCode == 200 && res.data != null && res.data['uniforms'] != null) {
+        final list = List<Map<String, dynamic>>.from(
+          (res.data['uniforms'] as List).map((e) => Map<String, dynamic>.from(e)),
+        );
+        if (mounted) {
+          setState(() {
+            _catalog = list;
+            _loadingCatalog = false;
+          });
+          return;
+        }
+      }
+    } catch (e) {
+      debugPrint('Live uniform catalog fetch error: $e');
+    }
+    if (mounted) {
+      setState(() {
+        _catalog = [];
+        _loadingCatalog = false;
+      });
+    }
+  }
 
   // Cart State: Item ID -> Map of details {item, size, qty}
   final List<Map<String, dynamic>> _cartItems = [];
-
-  // Mock Orders History
-  final List<Map<String, dynamic>> _ordersHistory = [
-    {
-      'order_id': 'ORD-2026-9821',
-      'date': 'July 25, 2026',
-      'items_summary': 'Official School Blazer (Size 30) x1, School Tie x1',
-      'total_usd': 53.00,
-      'currency': 'USD',
-      'payment_method': 'EcoCash USD',
-      'status': 'Ready for Pickup at School Store',
-      'status_color': const Color(0xFF10B981),
-    },
-    {
-      'order_id': 'ORD-2026-8710',
-      'date': 'May 12, 2026',
-      'items_summary': 'Sports Polo Shirt (Size M) x2, Tracksuit Set x1',
-      'total_usd': 66.00,
-      'currency': 'USD',
-      'payment_method': 'ZiG Mobile Transfer',
-      'status': 'Delivered / Collected',
-      'status_color': const Color(0xFF3B5998),
-    },
-  ];
 
   @override
   void dispose() {
@@ -200,29 +146,59 @@ class _UniformMarketplaceViewState extends State<UniformMarketplaceView> {
     );
   }
 
-  Widget _productVisual(Map<String, dynamic> item, {double height = 100}) =>
-      Container(
-        height: height,
-        width: double.infinity,
-        decoration: BoxDecoration(
-          color: AppColors.softBlue,
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: Center(
-          child: Icon(
-            item['category'] == 'Sports & Physical Ed'
-                ? Icons.directions_run_outlined
-                : item['category'] == 'Formal Wear'
-                ? Icons.checkroom_outlined
-                : Icons.shopping_bag_outlined,
-            size: 42,
-            color: AppColors.primary,
-          ),
-        ),
-      );
+  Widget _productVisual(Map<String, dynamic> item, {double height = 120}) {
+    final imageUrl = item['image_url'] as String?;
+    final hasImage = imageUrl != null && imageUrl.isNotEmpty;
+
+    return Container(
+      height: height,
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: AppColors.softBlue,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: hasImage
+          ? Image.network(
+              imageUrl,
+              fit: BoxFit.cover,
+              width: double.infinity,
+              height: height,
+              errorBuilder: (context, error, stackTrace) => _fallbackIcon(item),
+              loadingBuilder: (context, child, progress) {
+                if (progress == null) return child;
+                return Center(
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    value: progress.expectedTotalBytes != null
+                        ? progress.cumulativeBytesLoaded /
+                            progress.expectedTotalBytes!
+                        : null,
+                  ),
+                );
+              },
+            )
+          : _fallbackIcon(item),
+    );
+  }
+
+  Widget _fallbackIcon(Map<String, dynamic> item) {
+    return Center(
+      child: Icon(
+        item['category'] == 'Sports & Physical Ed'
+            ? Icons.directions_run_outlined
+            : item['category'] == 'Formal Wear'
+            ? Icons.checkroom_outlined
+            : Icons.shopping_bag_outlined,
+        size: 42,
+        color: AppColors.primary,
+      ),
+    );
+  }
 
   void _openItemDetailModal(Map<String, dynamic> item) {
-    String size = item['sizes'][0];
+    final sizesList = (item['sizes'] as List?) ?? ['Standard'];
+    String size = sizesList.isNotEmpty ? sizesList[0].toString() : 'Standard';
     int qty = 1;
     showModalBottomSheet(
       context: context,
@@ -354,8 +330,12 @@ class _UniformMarketplaceViewState extends State<UniformMarketplaceView> {
 
   void _checkoutOrder() {
     if (_cartItems.isEmpty) return;
-    String payment = 'EcoCash USD';
     String collection = 'School Store (Main Campus)';
+    final addressController = TextEditingController();
+    Map<String, dynamic>? deliveryQuote;
+    bool quoting = false;
+    String? quoteError;
+    double? deliveryFeeUsd;
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -397,44 +377,20 @@ class _UniformMarketplaceViewState extends State<UniformMarketplaceView> {
                   const Divider(),
                   const SizedBox(height: 12),
                   Text(
-                    'USD \$${_cartTotalUsd.toStringAsFixed(2)}',
-                    style: const TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.w700,
-                      color: AppColors.primary,
-                    ),
+                    'Items: USD \$${_cartTotalUsd.toStringAsFixed(2)}',
+                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.primary),
                   ),
+                  if (deliveryFeeUsd != null)
+                    Text('Delivery: USD \$${deliveryFeeUsd!.toStringAsFixed(2)}'),
+                  if (deliveryFeeUsd != null)
+                    Text('Total: USD \$${(_cartTotalUsd + deliveryFeeUsd!).toStringAsFixed(2)}',
+                        style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w700, color: AppColors.primary)),
                   Text(
                     'ZiG ${_cartTotalZig.toStringAsFixed(2)}',
                     style: const TextStyle(color: AppColors.textMuted),
                   ),
                   const SizedBox(height: 24),
-                  DropdownButtonFormField<String>(
-                    initialValue: payment,
-                    isExpanded: true,
-                    decoration: const InputDecoration(
-                      labelText: 'Payment method',
-                    ),
-                    items:
-                        [
-                              'EcoCash USD',
-                              'ZiG Mobile Transfer',
-                              'Visa / Mastercard',
-                            ]
-                            .map(
-                              (value) => DropdownMenuItem(
-                                value: value,
-                                child: Text(
-                                  value,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ),
-                            )
-                            .toList(),
-                    onChanged: (value) {
-                      if (value != null) update(() => payment = value);
-                    },
-                  ),
+                  const Text('Payment is pending and will be arranged with the school. The app does not charge your account.', style: TextStyle(color: AppColors.textMuted)),
                   const SizedBox(height: 20),
                   DropdownButtonFormField<String>(
                     initialValue: collection,
@@ -445,7 +401,7 @@ class _UniformMarketplaceViewState extends State<UniformMarketplaceView> {
                     items:
                         [
                               'School Store (Main Campus)',
-                              'Deliver to Homeroom Teacher',
+                              'Deliver to address',
                             ]
                             .map(
                               (value) => DropdownMenuItem(
@@ -458,41 +414,96 @@ class _UniformMarketplaceViewState extends State<UniformMarketplaceView> {
                             )
                             .toList(),
                     onChanged: (value) {
-                      if (value != null) update(() => collection = value);
+                      if (value != null) { update(() {
+                        collection = value;
+                        deliveryQuote = null;
+                        deliveryFeeUsd = null;
+                        quoteError = null;
+                      }); }
                     },
                   ),
+                  if (collection == 'Deliver to address') ...[
+                    const SizedBox(height: 16),
+                    TextField(
+                      controller: addressController,
+                      decoration: const InputDecoration(labelText: 'Delivery address', hintText: 'Street, suburb, city'),
+                      textCapitalization: TextCapitalization.words,
+                      minLines: 1,
+                      maxLines: 3,
+                    ),
+                    if (quoteError != null)
+                      Padding(padding: const EdgeInsets.only(top: 8), child: Text(quoteError!, style: const TextStyle(color: Colors.red))),
+                    if (deliveryQuote != null)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 8),
+                        child: Text('Roadrunner quote received${deliveryQuote!['distance'] != null ? ' · ${deliveryQuote!['distance']}' : ''}'),
+                      ),
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: TextButton.icon(
+                        onPressed: quoting ? null : () async {
+                          final address = addressController.text.trim();
+                          if (address.length < 8) {
+                            update(() => quoteError = 'Enter a complete delivery address.');
+                            return;
+                          }
+                          update(() { quoting = true; quoteError = null; deliveryQuote = null; deliveryFeeUsd = null; });
+                          try {
+                            final response = await context.read<StudentProvider>().apiClient.dio.post('/delivery/quote', data: {
+                              'destination_address': address,
+                              'items': _cartItems.map((item) => {
+                                'name': item['name'],
+                                'quantity': item['qty'],
+                              }).toList(),
+                            });
+                            final raw = response.data?['quote'];
+                            if (raw is! Map) throw Exception('Unexpected quote response.');
+                            final quote = Map<String, dynamic>.from(raw);
+                            final amount = _quoteAmount(quote);
+                            if (amount == null) throw Exception('Roadrunner quote did not contain a price.');
+                            update(() { deliveryQuote = quote; deliveryFeeUsd = amount; });
+                          } catch (_) {
+                            update(() => quoteError = 'Could not get a delivery quote. Check the address or try again.');
+                          } finally {
+                            update(() => quoting = false);
+                          }
+                        },
+                        icon: quoting
+                            ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2))
+                            : const Icon(Icons.local_shipping_outlined),
+                        label: Text(quoting ? 'Getting quote…' : 'Get delivery quote'),
+                      ),
+                    ),
+                  ],
                   const SizedBox(height: 24),
                   SizedBox(
                     width: double.infinity,
                     child: FilledButton(
-                      onPressed: () {
-                        final now = DateTime.now();
-                        final id = 'ORD-${now.millisecondsSinceEpoch}';
-                        setState(() {
-                          _ordersHistory.insert(0, {
-                            'order_id': id,
-                            'date': '${now.day}/${now.month}/${now.year}',
-                            'items_summary': _cartItems
-                                .map(
-                                  (i) =>
-                                      '${i['name']} (${i['selected_size']}) ×${i['qty']}',
-                                )
-                                .join(', '),
-                            'total_usd': _cartTotalUsd,
+                      onPressed: collection == 'Deliver to address' ? null : () async {
+                        final studentId = widget.child?['id'] ?? context.read<StudentProvider>().selectedStudent?['id'];
+                        if (studentId == null) {
+                          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Link a child to your account before ordering.')));
+                          return;
+                        }
+                        try {
+                          final response = await context.read<StudentProvider>().apiClient.dio.post('/uniform-orders', data: {
+                            'student_id': studentId,
                             'currency': 'USD',
-                            'payment_method': payment,
-                            'status': 'Processing · $collection',
-                            'status_color': AppColors.primary,
+                            'items': _cartItems.map((item) => {
+                              'uniform_id': item['id'],
+                              'size': item['selected_size'],
+                              'quantity': item['qty'],
+                            }).toList(),
                           });
-                          _cartItems.clear();
-                          _section = 2;
-                        });
-                        Navigator.pop(ctx);
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Order saved for this session.'),
-                          ),
-                        );
+                          if (response.data?['status'] != 'success') throw Exception('Order was not accepted.');
+                          if (!mounted || !ctx.mounted) return;
+                          setState(() { _cartItems.clear(); _section = 2; });
+                          Navigator.pop(ctx);
+                          await _fetchOrders();
+                          if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Order request saved. Payment is pending with the school.')));
+                        } catch (error) {
+                          update(() => quoteError = error.toString().replaceFirst('Exception: ', ''));
+                        }
                       },
                       child: const Text('Place order'),
                     ),
@@ -504,6 +515,19 @@ class _UniformMarketplaceViewState extends State<UniformMarketplaceView> {
         ),
       ),
     );
+  }
+
+  double? _quoteAmount(Map<String, dynamic> quote) {
+    final candidates = [
+      quote['amount'], quote['total'], quote['price'], quote['fee'], quote['delivery_fee'],
+      if (quote['quote'] is Map) (quote['quote'] as Map)['amount'],
+      if (quote['quote'] is Map) (quote['quote'] as Map)['total'],
+    ];
+    for (final value in candidates) {
+      final parsed = value is num ? value.toDouble() : double.tryParse('$value');
+      if (parsed != null && parsed >= 0) return parsed;
+    }
+    return null;
   }
 
   @override
@@ -620,10 +644,15 @@ class _UniformMarketplaceViewState extends State<UniformMarketplaceView> {
                 ),
               ),
               const SizedBox(height: 16),
-              if (catalog.isEmpty)
+              if (_loadingCatalog)
+                const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 40),
+                  child: Center(child: CircularProgressIndicator()),
+                )
+              else if (catalog.isEmpty)
                 const PageEmpty(
                   title: 'No matching items',
-                  message: 'Try another category, item name or size.',
+                  message: 'No uniform items found in the school store catalog.',
                 ),
               for (final item in catalog)
                 Padding(
@@ -817,6 +846,9 @@ class _UniformMarketplaceViewState extends State<UniformMarketplaceView> {
                 style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600),
               ),
               const SizedBox(height: 16),
+              if (_loadingOrders) const Center(child: CircularProgressIndicator()),
+              if (!_loadingOrders && _ordersHistory.isEmpty)
+                const PageEmpty(title: 'No orders yet', message: 'Orders placed for your child will appear here.'),
               for (final order in _ordersHistory)
                 Padding(
                   padding: const EdgeInsets.only(bottom: 16),
@@ -851,7 +883,7 @@ class _UniformMarketplaceViewState extends State<UniformMarketplaceView> {
                         ),
                         const SizedBox(height: 16),
                         Text(
-                          'USD \$${(order['total_usd'] as num).toStringAsFixed(2)}',
+                          '${order['currency']} ${order['total_amount']}',
                           style: const TextStyle(
                             fontSize: 22,
                             fontWeight: FontWeight.w700,

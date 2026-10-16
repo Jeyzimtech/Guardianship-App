@@ -2,22 +2,20 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\SystemSetting;
 use App\Models\User;
-use App\Services\FirebaseAuthService;
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 
 class AuthController extends Controller
 {
-    protected $firebaseAuth;
-
-    public function __construct(FirebaseAuthService $firebaseAuth)
-    {
-        $this->firebaseAuth = $firebaseAuth;
-    }
-
     /**
      * Authenticate a user with email/phone and password against the database.
      */
@@ -45,12 +43,6 @@ class AuthController extends Controller
               ->orWhere('name', $identifier)
               ->orWhereRaw('LOWER(name) = ?', [$lower])
               ->orWhere('phone_number', $identifier);
-            if (!str_contains($identifier, '@')) {
-                $q->orWhere('email', $lower . '@hillside.ac.zw')
-                  ->orWhere('email', $lower . '@chewe.tech')
-                  ->orWhere('email', $lower . '@educonnect.co.zw')
-                  ->orWhere('email', $lower . '@ctpulse.co.zw');
-            }
         })->first();
 
         if (!$user) {
@@ -60,17 +52,21 @@ class AuthController extends Controller
             ], 401);
         }
 
-        // Check password with bcrypt or fallback for seeded accounts
-        $passwordMatches = Hash::check($request->password, $user->password)
-            || ($request->password === 'chewetech4321#$' && Hash::check('chewetech4321#$', $user->password))
-            || ($request->password === 'password123' && Hash::check('password', $user->password))
-            || ($request->password === 'password' && Hash::check('password123', $user->password));
+        $passwordMatches = Hash::check($request->password, $user->password);
 
         if (!$passwordMatches) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'Incorrect password. Please try again.'
             ], 401);
+        }
+
+        // Student accounts are out of MVP scope.
+        if (!in_array($user->role, ['website_admin', 'admin', 'teacher', 'guardian'], true)) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'This account role does not have access yet.'
+            ], 403);
         }
 
         // Create Sanctum Token
@@ -100,8 +96,7 @@ class AuthController extends Controller
             'email' => 'required|string|email|max:255|unique:users,email',
             'phone_number' => 'nullable|string|max:50',
             'password' => 'required|string|min:6',
-            'role' => 'nullable|in:admin,teacher,guardian,website_admin',
-            'school_id' => 'nullable|integer',
+            'role' => 'nullable|in:guardian',
         ]);
 
         $email = strtolower(trim($request->email));
@@ -116,7 +111,8 @@ class AuthController extends Controller
             $phoneNumber .= '-' . rand(10, 99);
         }
 
-        $role = $request->role ?? 'guardian';
+        // Public self-registration creates guardian accounts only. Schools invite teachers.
+        $role = 'guardian';
 
         $user = User::create([
             'name' => trim($request->name),
@@ -124,17 +120,8 @@ class AuthController extends Controller
             'phone_number' => $phoneNumber,
             'password' => Hash::make($request->password),
             'role' => $role,
-            'firebase_uid' => 'uid_' . Str::random(20),
+            'account_uid' => 'uid_' . Str::random(20),
         ]);
-
-        // If registered as teacher with school assignment, associate teacher profile
-        if ($role === 'teacher' && $request->filled('school_id')) {
-            \App\Models\Teacher::create([
-                'user_id' => $user->id,
-                'school_id' => $request->school_id,
-                'subject_specialties' => ['General'],
-            ]);
-        }
 
         $token = $user->createToken('auth-token')->plainTextToken;
 
@@ -150,69 +137,6 @@ class AuthController extends Controller
                 'role' => $user->role,
             ]
         ], 201);
-    }
-
-    /**
-     * Authenticate or register a user using a Firebase ID Token.
-     */
-    public function firebaseLogin(Request $request)
-    {
-        $request->validate([
-            'id_token' => 'required|string',
-            'name' => 'nullable|string',
-            'role' => 'nullable|in:admin,teacher,guardian',
-        ]);
-
-        try {
-            $firebaseProfile = $this->firebaseAuth->verifyIdToken($request->id_token);
-            $phoneNumber = $firebaseProfile['phone_number'];
-            $firebaseUid = $firebaseProfile['firebase_uid'];
-
-            // Find user by phone number
-            $user = User::where('phone_number', $phoneNumber)->first();
-
-            if ($user) {
-                // Update firebase UID if changed or empty
-                if ($user->firebase_uid !== $firebaseUid) {
-                    $user->firebase_uid = $firebaseUid;
-                    $user->save();
-                }
-            } else {
-                // Register new user
-                $name = $request->name ?? $firebaseProfile['name'] ?? 'Guardian of Student';
-                $role = $request->role ?? 'guardian';
-
-                $user = User::create([
-                    'name' => $name,
-                    'phone_number' => $phoneNumber,
-                    'firebase_uid' => $firebaseUid,
-                    'role' => $role,
-                    'email' => null,
-                    'password' => Hash::make(Str::random(16)), // Dummy password
-                ]);
-            }
-
-            // Create Sanctum Token
-            $token = $user->createToken('auth-token')->plainTextToken;
-
-            return response()->json([
-                'status' => 'success',
-                'token' => $token,
-                'user' => [
-                    'id' => $user->id,
-                    'name' => $user->name,
-                    'phone_number' => $user->phone_number,
-                    'role' => $user->role,
-                    'email' => $user->email,
-                ]
-            ]);
-
-        } catch (Exception $e) {
-            return response()->json([
-                'status' => 'error',
-                'message' => $e->getMessage()
-            ], 401);
-        }
     }
 
     /**
@@ -274,14 +198,12 @@ class AuthController extends Controller
                       ->orWhere('name', $identifier)
                       ->orWhereRaw('LOWER(name) = ?', [$lower])
                       ->orWhere('phone_number', $identifier);
-                    if (!str_contains($identifier, '@')) {
-                        $q->orWhere('email', $lower . '@hillside.ac.zw')
-                          ->orWhere('email', $lower . '@chewe.tech')
-                          ->orWhere('email', $lower . '@educonnect.co.zw')
-                          ->orWhere('email', $lower . '@ctpulse.co.zw');
-                    }
                 })->first();
             }
+        }
+
+        if (!$request->user()) {
+            return response()->json(['status' => 'error', 'message' => 'Sign in before changing your password.'], 401);
         }
 
         if (!$user) {
@@ -291,10 +213,7 @@ class AuthController extends Controller
             ], 404);
         }
 
-        $passwordMatches = Hash::check($request->current_password, $user->password)
-            || ($request->current_password === 'chewetech4321#$' && Hash::check('chewetech4321#$', $user->password))
-            || ($request->current_password === 'password123' && Hash::check('password', $user->password))
-            || ($request->current_password === 'password' && Hash::check('password123', $user->password));
+        $passwordMatches = Hash::check($request->current_password, $user->password);
 
         if (!$passwordMatches) {
             return response()->json([
@@ -309,6 +228,130 @@ class AuthController extends Controller
         return response()->json([
             'status' => 'success',
             'message' => 'Password updated successfully! You can now log in with your new password.'
+        ]);
+    }
+
+    /**
+     * Send a password reset or creation link to the user's email.
+     */
+    public function forgotPassword(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|string',
+        ]);
+
+        $identifier = trim($request->input('email'));
+        $user = User::whereRaw('LOWER(email) = ?', [strtolower($identifier)])->first();
+
+        if (!$user || empty($user->email)) {
+            return response()->json(['status' => 'success', 'message' => 'If an account exists for that email address, a password reset link will be sent.']);
+        }
+
+        // Generate token and save to password_reset_tokens
+        $token = Str::random(60);
+        DB::table('password_reset_tokens')->updateOrInsert(
+            ['email' => $user->email],
+            [
+                'token' => Hash::make($token),
+                'created_at' => now(),
+            ]
+        );
+
+        EmailSettingsController::configureMailTransport();
+
+        $portalBaseUrl = SystemSetting::get('portal_access_url', config('app.url', ''));
+        if (!$portalBaseUrl) {
+            return response()->json(['status' => 'error', 'message' => 'Password reset is not configured. Contact your administrator.'], 503);
+        }
+        $resetUrl = rtrim($portalBaseUrl, '/') . '/reset-password?token=' . $token . '&email=' . urlencode($user->email);
+
+        $fromAddress = Config::get('mail.from.address', '');
+        $fromName = Config::get('mail.from.name', 'Edu+Connect Guardianship');
+
+        try {
+            Mail::send('emails.forgot_password', [
+                'name' => $user->name,
+                'email' => $user->email,
+                'resetUrl' => $resetUrl,
+            ], function ($message) use ($user, $fromAddress, $fromName) {
+                $message->to($user->email, $user->name)
+                        ->from($fromAddress, $fromName)
+                        ->subject('Edu+Connect - Reset Your Account Password');
+            });
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Password reset link has been sent to your email.'
+            ]);
+        } catch (\Throwable $e) {
+            Log::error('Forgot password email dispatch failed: ' . $e->getMessage());
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Failed to dispatch email. Please contact administration or verify mail gateway.'
+            ], 500);
+        }
+    }
+
+    /**
+     * Set or reset password using verified token.
+     */
+    public function resetPassword(Request $request)
+    {
+        $request->validate([
+            'token' => 'required|string',
+            'email' => 'required|email',
+            'password' => 'required|string|min:6|confirmed',
+        ]);
+
+        $record = DB::table('password_reset_tokens')
+            ->where('email', $request->email)
+            ->first();
+
+        if (!$record) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Invalid or expired password reset link. Please request a new one.'
+            ], 422);
+        }
+
+        // Verify token against hashed or stored token
+        $tokenValid = Hash::check($request->token, $record->token) || ($request->token === $record->token);
+
+        if (!$tokenValid) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Invalid or expired password reset link. Please request a new one.'
+            ], 422);
+        }
+
+        // Allow up to 48 hours validity
+        if ($record->created_at && Carbon::parse($record->created_at)->addHours(48)->isPast()) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'This password link has expired. Please request a new one.'
+            ], 422);
+        }
+
+        $user = User::where('email', $request->email)->first();
+        if (!$user) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'No user found for this email address.'
+            ], 404);
+        }
+
+        $user->password = Hash::make($request->password);
+        $user->save();
+
+        // Revoke existing sessions after changing credentials.
+        $user->tokens()->delete();
+
+        // Invalidate token after successful reset
+        DB::table('password_reset_tokens')->where('email', $request->email)->delete();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Your password has been successfully set! You can now log in to the mobile application.'
         ]);
     }
 }

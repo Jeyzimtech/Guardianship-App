@@ -11,6 +11,18 @@ class Student extends Model
 
     protected $fillable = ['school_id', 'name', 'grade', 'class_name', 'dob'];
 
+    public function scopeTaughtBy($query, ?Teacher $teacher)
+    {
+        $classes = $teacher?->assignedClasses()->where('school_classes.school_id', $teacher->school_id)->get() ?? collect();
+        return $query->where('students.school_id', $teacher?->school_id ?? 0)
+            ->where(function ($group) use ($classes) {
+                $group->whereRaw('1 = 0');
+                foreach ($classes as $class) {
+                    $group->orWhere(fn ($match) => $match->where('students.grade', $class->grade)->where('students.class_name', $class->class_name));
+                }
+            });
+    }
+
     public function school()
     {
         return $this->belongsTo(School::class);

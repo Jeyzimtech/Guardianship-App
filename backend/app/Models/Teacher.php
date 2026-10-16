@@ -31,4 +31,19 @@ class Teacher extends Model
                     ->withPivot('id', 'subject_name')
                     ->withTimestamps();
     }
+
+    /** Whether the student sits in one of this teacher's assigned classes. */
+    public function teachesStudent(Student $student): bool
+    {
+        return (int) $this->school_id === (int) $student->school_id
+            && $this->assignedClasses()->where('class_name', $student->class_name)->where('grade', $student->grade)->exists();
+    }
+
+    public function teachesSubject(SchoolClass $class, ?string $subject): bool
+    {
+        if (!$subject || (int) $class->school_id !== (int) $this->school_id) return false;
+        return $this->assignedClasses()->where('school_classes.id', $class->id)->get()
+            ->contains(fn ($assigned) => in_array(strtolower(trim($assigned->pivot->subject_name ?? '')), ['', 'general', 'homeroom', 'all subjects'], true)
+                || strcasecmp(trim($assigned->pivot->subject_name ?? ''), trim($subject)) === 0);
+    }
 }

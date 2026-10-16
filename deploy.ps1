@@ -5,10 +5,8 @@ param(
     [string]$Password
 )
 
-if (-not $Password) {
-    $Password = Read-Host -Prompt "Enter root password for 109.199.99.156" -AsSecureString
-    $BSTR = [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($Password)
-    $Password = [System.Runtime.InteropServices.Marshal]::PtrToStringAuto($BSTR)
+if ($Password) {
+    throw "Do not pass the VPS password in a command or script argument. Run .\deploy.ps1 without parameters to enter it securely."
 }
 
-python "$PSScriptRoot\.github\scripts\deploy.py" $Password
+python "$PSScriptRoot\.github\scripts\deploy.py"

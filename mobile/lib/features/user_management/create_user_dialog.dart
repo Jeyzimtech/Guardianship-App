@@ -72,13 +72,11 @@ class _CreateUserDialogState extends State<CreateUserDialog> {
         widget.onUserSaved();
         Navigator.pop(context);
       }
-    } catch (e) {
+    } catch (_) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Saved user (Offline/Demo mode success).')),
+          const SnackBar(content: Text('Could not save user. Check your connection and try again.')),
         );
-        widget.onUserSaved();
-        Navigator.pop(context);
       }
     } finally {
       if (mounted) setState(() => _isSubmitting = false);

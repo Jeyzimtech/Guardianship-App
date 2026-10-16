@@ -80,7 +80,15 @@ class AuthProvider extends ChangeNotifier {
         if (userRole == 'admin' || userRole == 'website_admin') {
           _token = null;
           _user = null;
-          _errorMessage = 'Mobile application access is restricted to Teachers and Parents/Students. Please log in via the Web Admin Portal.';
+          _errorMessage = 'Mobile application access is restricted to Teachers and Parents/Guardians. Please log in via the Web Admin Portal.';
+          _isLoading = false;
+          notifyListeners();
+          return false;
+        }
+        if (!['teacher', 'guardian'].contains(userRole)) {
+          _token = null;
+          _user = null;
+          _errorMessage = 'This account role cannot use the mobile application.';
           _isLoading = false;
           notifyListeners();
           return false;
@@ -256,71 +264,49 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
-  Future<bool> loginWithFirebaseToken(String firebaseIdToken) async {
+  Future<bool> sendForgotPasswordLink(String email) async {
     _isLoading = true;
     _errorMessage = null;
+    notifyListeners();
 
     try {
       final response = await apiClient.dio.post(
-        '/auth/firebase-login',
-        data: {'id_token': firebaseIdToken},
-        options: Options(
-          sendTimeout: const Duration(milliseconds: 1500),
-          receiveTimeout: const Duration(milliseconds: 1500),
-        ),
+        '/auth/forgot-password',
+        data: {
+          'email': email.trim(),
+        },
       );
 
-      if (response.statusCode == 200 && response.data is Map && response.data['status'] == 'success') {
-        final userRole = response.data['user']?['role'];
-        if (userRole == 'admin' || userRole == 'website_admin') {
-          _token = null;
-          _user = null;
-          _errorMessage = 'Mobile application access is restricted to Teachers and Parents/Students only. Please log in via the Web Admin Portal.';
-          _isLoading = false;
-          notifyListeners();
-          return false;
-        }
-
-        _token = response.data['token'];
-        _user = response.data['user'];
-
-        final prefs = await SharedPreferences.getInstance();
-        await prefs.setString('auth_token', _token!);
-        await prefs.setString('user_name', _user!['name'] ?? '');
-        await prefs.setString('user_role', _user!['role'] ?? '');
-        await prefs.setString('user_phone', _user!['phone_number'] ?? '');
-
+      if (response.statusCode == 200 &&
+          response.data is Map &&
+          response.data['status'] == 'success') {
         _isLoading = false;
         notifyListeners();
         return true;
       } else {
-        throw Exception(response.data is Map ? (response.data['message'] ?? 'Authentication failed') : 'Authentication failed');
+        final msg = response.data is Map
+            ? (response.data['message'] ?? 'Failed to send password reset link.')
+            : 'Failed to send password reset link.';
+        _errorMessage = msg.toString();
+        _isLoading = false;
+        notifyListeners();
+        return false;
       }
-    } catch (e) {
-      // Fast fallback: simulate successful login for prototype (Teacher or Guardian)
-      final isTeacherRole = firebaseIdToken.contains('teacher') || firebaseIdToken.contains('+263772222222');
-      final role = isTeacherRole ? 'teacher' : 'guardian';
-      final name = isTeacherRole ? 'Teacher Grace' : 'Guardian John Chewe';
-      final phone = isTeacherRole ? '+263772222222' : '+263773333333';
-
-      _token = 'mock-local-token-123456';
-      _user = {
-        'name': name,
-        'role': role,
-        'phone_number': phone,
-      };
-
-      try {
-        final prefs = await SharedPreferences.getInstance();
-        await prefs.setString('auth_token', _token!);
-        await prefs.setString('user_name', _user!['name'] ?? '');
-        await prefs.setString('user_role', _user!['role'] ?? '');
-        await prefs.setString('user_phone', _user!['phone_number'] ?? '');
-      } catch (_) {}
-
+    } on DioException catch (dioErr) {
+      String msg = 'Failed to send password reset link.';
+      if (dioErr.response?.data is Map &&
+          dioErr.response?.data['message'] != null) {
+        msg = dioErr.response!.data['message'].toString();
+      }
+      _errorMessage = msg;
       _isLoading = false;
       notifyListeners();
-      return true;
+      return false;
+    } catch (e) {
+      _errorMessage = e.toString();
+      _isLoading = false;
+      notifyListeners();
+      return false;
     }
   }
 
@@ -340,7 +326,7 @@ class AuthProvider extends ChangeNotifier {
     } catch (_) {}
 
     // 3. Fire-and-forget server logout in background without blocking the UI
-    if (tokenToRevoke != null && !tokenToRevoke.startsWith('mock-')) {
+    if (tokenToRevoke != null) {
       try {
         apiClient.dio.post(
           '/auth/logout',

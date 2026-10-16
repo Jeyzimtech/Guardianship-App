@@ -9,7 +9,7 @@ class Announcement extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['school_id', 'title', 'content', 'audience_role'];
+    protected $fillable = ['school_id', 'title', 'content', 'audience_role', 'class_name', 'grade', 'author_id'];
 
     public function school()
     {

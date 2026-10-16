@@ -11,7 +11,7 @@ class AssignmentAuthoringTest extends TestCase {
         $school = School::create(['name'=>'Test school', 'type'=>'primary']);
         $class = SchoolClass::create(['school_id'=>$school->id,'grade'=>'4','class_name'=>'Gold']);
         $other = SchoolClass::create(['school_id'=>$school->id,'grade'=>'4','class_name'=>'Blue']);
-        $user = User::create(['name'=>'Teacher','phone_number'=>'12345','role'=>'teacher','firebase_uid'=>'teacher-test']);
+        $user = User::create(['name'=>'Teacher','phone_number'=>'12345','role'=>'teacher','account_uid'=>'teacher-test']);
         $teacher = Teacher::create(['school_id'=>$school->id,'user_id'=>$user->id]);
         $teacher->assignedClasses()->attach($class->id);
         $this->actingAs($user);
@@ -21,14 +21,13 @@ class AssignmentAuthoringTest extends TestCase {
         $payload['school_class_id'] = $other->id;
         $this->postJson('/api/assignments',$payload)->assertForbidden();
         $student = Student::create(['name'=>'Child','school_id'=>$school->id,'grade'=>'4','class_name'=>'Gold']);
-        $result = app(AssignmentController::class)->getStudentAssignments($student->id)->getData(true);
+        $result = $this->getJson("/api/assignments/{$student->id}")->assertOk()->json();
         $this->assertCount(1,$result['data']['all']);
         $student->update(['class_name'=>'Blue']);
-        $result = app(AssignmentController::class)->getStudentAssignments($student->id)->getData(true);
-        $this->assertCount(0,$result['data']['all']);
+        $this->getJson("/api/assignments/{$student->id}")->assertForbidden();
     }
     public function test_parent_cannot_create_assignment(): void {
-        $user = User::create(['name'=>'Parent','phone_number'=>'67890','role'=>'guardian','firebase_uid'=>'parent-test']);
+        $user = User::create(['name'=>'Parent','phone_number'=>'67890','role'=>'guardian','account_uid'=>'parent-test']);
         $this->actingAs($user)->postJson('/api/assignments',['title'=>'Task','due_date'=>'2027-01-01'])->assertForbidden();
     }
 }

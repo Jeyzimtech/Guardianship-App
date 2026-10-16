@@ -31,31 +31,33 @@ class SchoolManagementTest extends TestCase
             'email' => 'admin@hillside.ac.zw',
             'phone_number' => '+263771111111',
             'role' => 'admin',
-            'firebase_uid' => 'uid_admin_123',
+            'school_id' => $this->school->id,
+            'account_uid' => 'uid_admin_123',
         ]);
 
         $this->guardian = User::create([
             'name' => 'Guardian John',
             'phone_number' => '+263773333333',
             'role' => 'guardian',
-            'firebase_uid' => 'uid_guardian_123',
+            'account_uid' => 'uid_guardian_123',
         ]);
     }
 
     /**
      * Test admin can create and list schools.
      */
-    public function test_admin_can_create_and_list_schools()
+    public function test_platform_owner_can_create_and_list_schools()
     {
         $this->actingAs($this->admin);
 
-        $createResponse = $this->postJson('/api/schools', [
+        $this->admin->update(['role' => 'website_admin', 'school_id' => null]);
+        $createResponse = $this->postJson('/api/platform/schools', [
             'name' => 'Hillside High School',
             'type' => 'secondary',
         ]);
 
         $createResponse->assertStatus(201)
-            ->assertJsonPath('school.name', 'Hillside High School');
+            ->assertJsonPath('data.name', 'Hillside High School');
 
         $listResponse = $this->getJson('/api/schools');
         $listResponse->assertStatus(200)
@@ -73,12 +75,14 @@ class SchoolManagementTest extends TestCase
             'name' => 'Term 1 2025',
             'code' => 'AY-2025-T1',
             'is_current' => true,
+            'school_id' => $this->school->id,
         ]);
 
         $ay2Response = $this->postJson('/api/academic-years', [
             'name' => 'Term 1 2026',
             'code' => 'AY-2026-T1',
             'is_current' => true,
+            'school_id' => $this->school->id,
         ]);
 
         $ay2Response->assertStatus(201)
@@ -102,6 +106,7 @@ class SchoolManagementTest extends TestCase
             'name' => 'Term 1 2026',
             'code' => 'AY-2026-T1',
             'is_current' => true,
+            'school_id' => $this->school->id,
         ]);
 
         $response = $this->postJson('/api/school-classes', [

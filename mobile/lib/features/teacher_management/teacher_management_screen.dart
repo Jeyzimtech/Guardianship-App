@@ -16,7 +16,6 @@ class TeacherManagementScreen extends StatefulWidget {
 }
 
 class _TeacherManagementScreenState extends State<TeacherManagementScreen> {
-  bool _demo = false;
   String _filter = 'All';
 
   bool _isLoading = true;
@@ -26,56 +25,6 @@ class _TeacherManagementScreenState extends State<TeacherManagementScreen> {
   List<Map<String, dynamic>> _teachers = [];
   List<Map<String, dynamic>> _schools = [];
   List<Map<String, dynamic>> _classes = [];
-
-  // Mock fallbacks for offline/demo mode
-  final List<Map<String, dynamic>> _mockTeachers = [
-    {
-      'id': 1,
-      'user_id': 2,
-      'school_id': 2,
-      'user': {
-        'name': 'Teacher Grace',
-        'email': 'grace@hillside.ac.zw',
-        'phone_number': '+263772222222',
-      },
-      'school': {'name': 'Hillside Primary School'},
-      'subject_specialties': ['Mathematics', 'English', 'Shona'],
-      'assigned_classes': [
-        {
-          'id': 2,
-          'grade': 'Grade 1',
-          'class_name': 'Green',
-          'pivot': {'subject_name': 'Homeroom'},
-        },
-        {
-          'id': 3,
-          'grade': 'Grade 4',
-          'class_name': 'Gold',
-          'pivot': {'subject_name': 'Mathematics'},
-        },
-      ],
-    },
-    {
-      'id': 2,
-      'user_id': 4,
-      'school_id': 3,
-      'user': {
-        'name': 'Teacher Farai',
-        'email': 'farai@hillside.ac.zw',
-        'phone_number': '+263774444444',
-      },
-      'school': {'name': 'Hillside Secondary School'},
-      'subject_specialties': ['Physics', 'Chemistry', 'Mathematics'],
-      'assigned_classes': [
-        {
-          'id': 4,
-          'grade': 'Form 1',
-          'class_name': 'A',
-          'pivot': {'subject_name': 'Physics'},
-        },
-      ],
-    },
-  ];
 
   @override
   void initState() {
@@ -115,7 +64,6 @@ class _TeacherManagementScreenState extends State<TeacherManagementScreen> {
               cResp.data['classes'] ?? [],
             );
           }
-          _demo = false;
           _isLoading = false;
         });
         return;
@@ -124,16 +72,9 @@ class _TeacherManagementScreenState extends State<TeacherManagementScreen> {
 
     if (mounted) {
       setState(() {
-        _demo = true;
-        _teachers = _mockTeachers;
-        _schools = [
-          {'id': 1, 'name': 'Hillside Primary School'},
-        ];
-        _classes = [
-          {'id': 1, 'grade': 'ECD B', 'class_name': 'Butterflies'},
-          {'id': 2, 'grade': 'Grade 1', 'class_name': 'Green'},
-          {'id': 3, 'grade': 'Grade 4', 'class_name': 'Gold'},
-        ];
+        _teachers = [];
+        _schools = [];
+        _classes = [];
         _isLoading = false;
       });
     }
@@ -188,7 +129,7 @@ class _TeacherManagementScreenState extends State<TeacherManagementScreen> {
 
   bool get _canManage {
     final role = context.read<AuthProvider?>()?.user?['role'];
-    return !_demo && (role == 'admin' || role == 'website_admin');
+    return (role == 'admin' || role == 'website_admin');
   }
 
   void _edit([Map<String, dynamic>? teacher]) => showDialog(
@@ -384,26 +325,6 @@ class _TeacherManagementScreenState extends State<TeacherManagementScreen> {
                   ],
                 ),
               ),
-              if (_demo)
-                Padding(
-                  padding: const EdgeInsets.only(top: 16),
-                  child: PageCard(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const PageBadge('Sample roster'),
-                        const SizedBox(height: 10),
-                        const Text(
-                          'Could not connect. These are example teacher profiles.',
-                        ),
-                        TextButton(
-                          onPressed: _fetchData,
-                          child: const Text('Retry connection'),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
               const SizedBox(height: 24),
               TextField(
                 controller: _searchController,

@@ -9,7 +9,7 @@ class AcademicYear extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'code', 'start_date', 'end_date', 'is_current'];
+    protected $fillable = ['name', 'code', 'start_date', 'end_date', 'is_current', 'school_id'];
 
     protected $casts = [
         'is_current' => 'boolean',
@@ -20,5 +20,10 @@ class AcademicYear extends Model
     public function schoolClasses()
     {
         return $this->hasMany(SchoolClass::class);
+    }
+
+    public function school()
+    {
+        return $this->belongsTo(School::class);
     }
 }

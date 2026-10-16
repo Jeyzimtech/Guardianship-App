@@ -38,21 +38,21 @@ class GuardianshipApiTest extends TestCase
             'name' => 'Guardian John',
             'phone_number' => '+263773333333',
             'role' => 'guardian',
-            'firebase_uid' => 'uid_guardian_123',
+            'account_uid' => 'uid_guardian_123',
         ]);
 
         $this->teacher = User::create([
             'name' => 'Teacher Grace',
             'phone_number' => '+263772222222',
             'role' => 'teacher',
-            'firebase_uid' => 'uid_teacher_123',
+            'account_uid' => 'uid_teacher_123',
         ]);
 
         $this->admin = User::create([
             'name' => 'Admin Tinotenda',
             'phone_number' => '+263771111111',
             'role' => 'admin',
-            'firebase_uid' => 'uid_admin_123',
+            'account_uid' => 'uid_admin_123',
         ]);
 
         Teacher::create([
@@ -74,6 +74,9 @@ class GuardianshipApiTest extends TestCase
             'grade' => 'Grade 4',
             'class_name' => 'Blue',
         ]);
+
+        $class = \App\Models\SchoolClass::create(['school_id' => $this->school->id, 'grade' => 'Grade 1', 'class_name' => 'Green']);
+        $this->teacher->teacherProfile->assignedClasses()->attach($class->id);
 
         // Link guardian to both students
         $this->guardian->students()->attach([$this->student1->id, $this->student2->id]);
@@ -110,39 +113,6 @@ class GuardianshipApiTest extends TestCase
             'fee_gated' => true,
             'uploaded_by' => $this->teacher->id,
         ]);
-    }
-
-    /**
-     * Test Firebase auth login flow.
-     */
-    public function test_firebase_login_creates_token_for_existing_user()
-    {
-        $response = $this->postJson('/api/auth/firebase-login', [
-            'id_token' => 'mock-firebase-token-+263773333333-uid_guardian_123',
-        ]);
-
-        $response->assertStatus(200)
-            ->assertJsonStructure(['status', 'token', 'user'])
-            ->assertJsonPath('user.phone_number', '+263773333333')
-            ->assertJsonPath('user.role', 'guardian');
-    }
-
-    /**
-     * Test Firebase auth login flow registers a new user if not exists.
-     */
-    public function test_firebase_login_registers_new_user()
-    {
-        $response = $this->postJson('/api/auth/firebase-login', [
-            'id_token' => 'mock-firebase-token-+263774444444-uid_new_123',
-            'name' => 'New Parent',
-            'role' => 'guardian',
-        ]);
-
-        $response->assertStatus(200)
-            ->assertJsonPath('user.phone_number', '+263774444444')
-            ->assertJsonPath('user.role', 'guardian');
-
-        $this->assertDatabaseHas('users', ['phone_number' => '+263774444444']);
     }
 
     /**

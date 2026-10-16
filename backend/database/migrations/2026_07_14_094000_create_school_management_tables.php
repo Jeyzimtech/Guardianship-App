@@ -51,7 +51,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('student_id')->constrained('students')->onDelete('cascade');
             $table->date('date');
-            $table->enum('status', ['present', 'absent']);
+            $table->enum('status', ['present', 'absent', 'late']);
             $table->foreignId('marked_by')->constrained('users');
             $table->string('subject_name')->nullable(); // Nullable for Prep/Primary, required for Secondary
             $table->timestamps();

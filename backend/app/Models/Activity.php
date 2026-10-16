@@ -15,6 +15,7 @@ class Activity extends Model
         'description',
         'activity_date',
         'roster',
+        'created_by',
     ];
 
     protected $casts = [

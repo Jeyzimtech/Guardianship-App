@@ -110,7 +110,7 @@ void main() {
     expect(find.text('Your bag is waiting'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
-  testWidgets('Order review fits and records a local order', (tester) async {
+  testWidgets('Order review fits and reloads the saved order', (tester) async {
     await mount(tester, const UniformMarketplaceView(), width: 320, scale: 1.3);
     await tapVisible(tester, find.text('Official Embroidered School Blazer'));
     await tapVisible(tester, find.text('Add to bag'));
@@ -121,7 +121,7 @@ void main() {
     await tapVisible(tester, find.text('Place order'));
     await reveal(tester, find.text('Your orders'));
     expect(
-      find.text('Processing · School Store (Main Campus)'),
+      find.text('Payment pending'),
       findsOneWidget,
     );
     await reveal(tester, find.text('Bag (0)'));

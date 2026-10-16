@@ -1,10 +1,10 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../core/auth_provider.dart';
 import '../../core/app_colors.dart';
 import '../../core/app_icon.dart';
 import '../common/page_components.dart';
-import 'add_roster_student_dialog.dart';
 import '../dashboard/announcements_view.dart';
 
 /// Classroom workspace with roster, attendance, marks and notices.
@@ -29,101 +29,64 @@ class _TeacherDashboardViewState extends State<TeacherDashboardView> {
   final TextEditingController _noticeBodyController = TextEditingController();
 
   // Class Roster State dynamically loaded from backend database
-  List<Map<String, dynamic>> _roster = [
-    {
-      'id': 'STU-001',
-      'roll': '01',
-      'name': 'Alice Chewe',
-      'gender': 'Female',
-      'guardian': 'John Chewe',
-      'guardian_phone': '+263 77 241 8932',
-      'status': 'Present',
-      'merits': 12,
-      'math_mark': 88,
-      'science_mark': 92,
-      'english_mark': 85,
-    },
-    {
-      'id': 'STU-002',
-      'roll': '02',
-      'name': 'Bob Chewe',
-      'gender': 'Male',
-      'guardian': 'John Chewe',
-      'guardian_phone': '+263 77 241 8932',
-      'status': 'Present',
-      'merits': 14,
-      'math_mark': 82,
-      'science_mark': 89,
-      'english_mark': 78,
-    },
-    {
-      'id': 'STU-003',
-      'roll': '03',
-      'name': 'Kudzai Moyo',
-      'gender': 'Male',
-      'guardian': 'Tariro Moyo',
-      'guardian_phone': '+263 71 832 9401',
-      'status': 'Present',
-      'merits': 8,
-      'math_mark': 74,
-      'science_mark': 81,
-      'english_mark': 76,
-    },
-    {
-      'id': 'STU-004',
-      'roll': '04',
-      'name': 'Tafadzwa Ndlovu',
-      'gender': 'Male',
-      'guardian': 'Sipho Ndlovu',
-      'guardian_phone': '+263 78 510 3274',
-      'status': 'Absent',
-      'merits': 5,
-      'math_mark': 68,
-      'science_mark': 70,
-      'english_mark': 65,
-    },
-    {
-      'id': 'STU-005',
-      'roll': '05',
-      'name': 'Tinashe Sibanda',
-      'gender': 'Male',
-      'guardian': 'Grace Sibanda',
-      'guardian_phone': '+263 77 694 1128',
-      'status': 'Present',
-      'merits': 15,
-      'math_mark': 95,
-      'science_mark': 98,
-      'english_mark': 91,
-    },
-    {
-      'id': 'STU-006',
-      'roll': '06',
-      'name': 'Chipo Mutasa',
-      'gender': 'Female',
-      'guardian': 'Blessed Mutasa',
-      'guardian_phone': '+263 77 385 4910',
-      'status': 'Late',
-      'merits': 10,
-      'math_mark': 83,
-      'science_mark': 86,
-      'english_mark': 88,
-    },
-  ];
+  List<Map<String, dynamic>> _roster = [];
+  DateTime _attendanceDate = DateUtils.dateOnly(DateTime.now());
+  bool _isSavingAttendance = false;
   bool _isLoadingRoster = false;
+
+  // Behaviour categories configured by the school admin.
+  List<Map<String, dynamic>> _categories = [];
+
+  // Activity rosters
+  List<Map<String, dynamic>> _activities = [];
+  bool _isLoadingActivities = false;
+
+  // Class chosen for a class notice; null sends to all assigned classes.
+  String? _noticeClass;
 
   @override
   void initState() {
     super.initState();
     _loadTeacherStudents();
+    _loadCategories();
+    _loadActivities();
   }
+
+  Future<void> _loadCategories() async {
+    try {
+      final response = await context.read<AuthProvider>().apiClient.dio.get('/behaviour-categories');
+      final list = (response.data['categories'] as List? ?? []);
+      if (mounted) setState(() => _categories = list.map((e) => Map<String, dynamic>.from(e)).toList());
+    } catch (_) {}
+  }
+
+  Future<void> _loadActivities() async {
+    setState(() => _isLoadingActivities = true);
+    try {
+      final response = await context.read<AuthProvider>().apiClient.dio.get('/activities');
+      final list = (response.data['activities'] as List? ?? []);
+      if (mounted) setState(() => _activities = list.map((e) => Map<String, dynamic>.from(e)).toList());
+    } catch (_) {
+    } finally {
+      if (mounted) setState(() => _isLoadingActivities = false);
+    }
+  }
+
+  List<String> get _classNames => _roster
+      .map((s) => '${s['grade'] ?? ''}|${s['class_name'] ?? ''}')
+      .where((c) => c.isNotEmpty)
+      .toSet()
+      .toList()
+    ..sort();
 
   Future<void> _loadTeacherStudents() async {
     setState(() => _isLoadingRoster = true);
     try {
       final auth = Provider.of<AuthProvider>(context, listen: false);
-      final response = await auth.apiClient.dio.get('/students');
+      final date = '${_attendanceDate.year.toString().padLeft(4, '0')}-${_attendanceDate.month.toString().padLeft(2, '0')}-${_attendanceDate.day.toString().padLeft(2, '0')}';
+      final response = await auth.apiClient.dio.get('/attendance/roster', queryParameters: {'date': date});
       if (response.statusCode == 200 && response.data['status'] == 'success') {
-        final list = (response.data['students'] as List? ?? []);
+        final list = (response.data['roster'] as List? ?? []);
         if (mounted) {
           setState(() {
             _roster = list.asMap().entries.map((entry) {
@@ -133,21 +96,17 @@ class _TeacherDashboardViewState extends State<TeacherDashboardView> {
               final guardianStr = guardians.isNotEmpty
                   ? (guardians[0]['name']?.toString() ?? 'Guardian')
                   : 'Guardian';
-              final guardianPhone = guardians.isNotEmpty
-                  ? (guardians[0]['phone_number']?.toString() ?? '+263 77 000 0000')
-                  : '+263 77 000 0000';
               return {
-                'id': 'STU-${(m['id'] ?? idx + 1).toString().padLeft(3, '0')}',
+                'student_id': m['student_id'],
+              'id': 'STU-${(m['student_id'] ?? idx + 1).toString().padLeft(3, '0')}',
                 'roll': (idx + 1).toString().padLeft(2, '0'),
                 'name': m['name'] ?? '',
-                'gender': 'Student',
+                'class_name': m['class_name'] ?? '',
+                'grade': m['grade'] ?? '',
                 'guardian': guardianStr,
-                'guardian_phone': guardianPhone,
-                'status': 'Present',
-                'merits': 10,
-                'math_mark': 85,
-                'science_mark': 90,
-                'english_mark': 88,
+                'guardians': guardians,
+                'status': (m['status'] ?? 'present').toString().replaceFirstMapped(RegExp(r'^[a-z]'), (match) => match.group(0)!.toUpperCase()),
+                'merits': 0,
               };
             }).toList();
           });
@@ -158,22 +117,6 @@ class _TeacherDashboardViewState extends State<TeacherDashboardView> {
       if (mounted) setState(() => _isLoadingRoster = false);
     }
   }
-
-  // Class Announcements State
-  final List<Map<String, dynamic>> _notices = [
-    {
-      'subject': 'Grade 4 Science Project Submissions',
-      'body':
-          'Please ensure all model solar system projects are brought to school by Friday morning for the term exhibition.',
-      'date': 'Today, 08:30 AM',
-    },
-    {
-      'subject': 'Upcoming Parent-Teacher Consultations',
-      'body':
-          'Term 2 progress review meetings will take place next Wednesday. Time slot reservations are now active on the portal.',
-      'date': 'Yesterday, 02:15 PM',
-    },
-  ];
 
   @override
   void dispose() {
@@ -216,63 +159,270 @@ class _TeacherDashboardViewState extends State<TeacherDashboardView> {
     );
   }
 
-  void _awardMerit(int index) {
-    setState(() {
-      _roster[index]['merits'] = (_roster[index]['merits'] as int) + 1;
-    });
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          'Awarded 1 merit to ${_roster[index]['name']}! Total: ${_roster[index]['merits']}',
-        ),
-        duration: const Duration(seconds: 2),
-        backgroundColor: AppColors.primary,
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
-  }
-
-  Future<void> _openAddStudentDialog() async {
-    final auth = Provider.of<AuthProvider>(context, listen: false);
-    final result = await showDialog<Map<String, dynamic>>(
-      context: context,
-      builder: (context) => const AddRosterStudentDialog(),
-    );
-
-    if (result != null) {
-      try {
-        await auth.apiClient.dio.post('/students', data: {
-          'name': result['name'],
-          'grade': 'Grade 4',
-          'class_name': 'Grade 4 Gold',
-          'guardian_name': result['guardian'],
-          'guardian_phone': result['guardian_phone'],
-        });
-        await _loadTeacherStudents();
-      } catch (e) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Failed to add student: $e'),
-              backgroundColor: AppColors.error,
-            ),
-          );
-        }
-        return;
-      }
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('${result['name']} added to Class Roster!'),
-            backgroundColor: AppColors.success,
-            behavior: SnackBarBehavior.floating,
-          ),
-        );
-      }
+  Future<void> _saveAttendance() async {
+    if (_roster.isEmpty || _isSavingAttendance) return;
+    setState(() => _isSavingAttendance = true);
+    try {
+      final date = '${_attendanceDate.year.toString().padLeft(4, '0')}-${_attendanceDate.month.toString().padLeft(2, '0')}-${_attendanceDate.day.toString().padLeft(2, '0')}';
+      await context.read<AuthProvider>().apiClient.dio.post('/attendance/mark', data: {
+        'date': date,
+        'records': _roster.map((student) => {
+          'student_id': student['student_id'],
+          'status': student['status'].toString().toLowerCase(),
+        }).toList(),
+      });
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Attendance register saved.')));
+    } catch (_) {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Attendance could not be saved. Please try again.')));
+    } finally {
+      if (mounted) setState(() => _isSavingAttendance = false);
     }
   }
 
-  void _publishNotice() {
+  Future<void> _changeAttendanceDate(int offset) async {
+    setState(() => _attendanceDate = DateUtils.dateOnly(_attendanceDate.add(Duration(days: offset))));
+    await _loadTeacherStudents();
+  }
+
+  Future<void> _logBehaviour(int index, String polarity) async {
+    final student = _roster[index];
+    final options = _categories
+        .where((c) => c['polarity'] == polarity)
+        .map((c) => c['name'].toString())
+        .toList();
+    final categoryController = TextEditingController(
+      text: options.isEmpty ? (polarity == 'positive' ? 'Merit' : '') : '',
+    );
+    final noteController = TextEditingController();
+    String? selected = options.isEmpty ? null : options.first;
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => StatefulBuilder(
+        builder: (dialogContext, setDialogState) => AlertDialog(
+          title: Text(polarity == 'positive' ? 'Award merit' : 'Log conduct note'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(student['name'], style: const TextStyle(fontWeight: FontWeight.w600)),
+              const SizedBox(height: 12),
+              if (options.isNotEmpty)
+                DropdownButtonFormField<String>(
+                  initialValue: selected,
+                  decoration: const InputDecoration(labelText: 'Category'),
+                  items: options.map((o) => DropdownMenuItem(value: o, child: Text(o))).toList(),
+                  onChanged: (v) => setDialogState(() => selected = v),
+                )
+              else
+                TextField(
+                  controller: categoryController,
+                  decoration: const InputDecoration(labelText: 'Category'),
+                ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: noteController,
+                minLines: 2,
+                maxLines: 4,
+                decoration: const InputDecoration(labelText: 'Note for parents (optional)'),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(dialogContext, false), child: const Text('Cancel')),
+            FilledButton(onPressed: () => Navigator.pop(dialogContext, true), child: const Text('Save')),
+          ],
+        ),
+      ),
+    );
+    final category = (selected ?? categoryController.text).trim();
+    final note = noteController.text.trim();
+    categoryController.dispose();
+    noteController.dispose();
+    if (confirmed != true || !mounted) return;
+    if (category.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Choose a category.')));
+      return;
+    }
+
+    try {
+      await context.read<AuthProvider>().apiClient.dio.post('/behaviour', data: {
+        'student_id': student['student_id'],
+        'polarity': polarity,
+        'category': category,
+        'note': note.isEmpty ? null : note,
+        'incident_date': DateTime.now().toIso8601String().substring(0, 10),
+      });
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Behaviour saved for ${student['name']}.')));
+    } catch (_) {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Behaviour record could not be saved.')));
+    }
+  }
+
+  Future<void> _createActivity() async {
+    final titleController = TextEditingController();
+    final descriptionController = TextEditingController();
+    DateTime date = DateUtils.dateOnly(DateTime.now());
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => StatefulBuilder(
+        builder: (dialogContext, setDialogState) => AlertDialog(
+          title: const Text('New activity'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(controller: titleController, decoration: const InputDecoration(labelText: 'Title')),
+              const SizedBox(height: 12),
+              TextField(
+                controller: descriptionController,
+                decoration: const InputDecoration(labelText: 'Description (optional)'),
+              ),
+              const SizedBox(height: 12),
+              OutlinedButton.icon(
+                icon: const Icon(Icons.event_outlined),
+                label: Text(_isoDate(date)),
+                onPressed: () async {
+                  final picked = await showDatePicker(
+                    context: dialogContext,
+                    initialDate: date,
+                    firstDate: DateTime(date.year - 1),
+                    lastDate: DateTime(date.year + 1),
+                  );
+                  if (picked != null) setDialogState(() => date = picked);
+                },
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(dialogContext, false), child: const Text('Cancel')),
+            FilledButton(onPressed: () => Navigator.pop(dialogContext, true), child: const Text('Create')),
+          ],
+        ),
+      ),
+    );
+    final title = titleController.text.trim();
+    final description = descriptionController.text.trim();
+    titleController.dispose();
+    descriptionController.dispose();
+    if (confirmed != true || title.isEmpty || !mounted) return;
+
+    try {
+      final response = await context.read<AuthProvider>().apiClient.dio.post('/activities', data: {
+        'title': title,
+        'description': description.isEmpty ? null : description,
+        'activity_date': _isoDate(date),
+      });
+      await _loadActivities();
+      final created = response.data['activity'];
+      if (mounted && created != null) _openActivityRoster(Map<String, dynamic>.from(created));
+    } catch (_) {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Activity could not be created.')));
+    }
+  }
+
+  Future<void> _openActivityRoster(Map<String, dynamic> activity) async {
+    final dio = context.read<AuthProvider>().apiClient.dio;
+    List<Map<String, dynamic>> roster;
+    try {
+      final response = await dio.get('/activities/${activity['id']}/roster');
+      roster = (response.data['roster'] as List? ?? []).map((e) => Map<String, dynamic>.from(e)).toList();
+    } catch (_) {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Roster could not be loaded.')));
+      return;
+    }
+    // Status per learner: null = not on roster.
+    final statuses = {
+      for (final s in roster) s['student_id']: s['status'] ?? (s['on_roster'] == true ? 'present' : null),
+    };
+    final originallyOnRoster = {for (final s in roster) if (s['on_roster'] == true) s['student_id']};
+    if (!mounted) return;
+
+    final save = await showModalBottomSheet<bool>(
+      context: context,
+      isScrollControlled: true,
+      builder: (sheetContext) => StatefulBuilder(
+        builder: (sheetContext, setSheetState) => SafeArea(
+          child: SizedBox(
+            height: MediaQuery.of(sheetContext).size.height * .8,
+            child: Column(
+              children: [
+                ListTile(
+                  title: Text(activity['title']?.toString() ?? 'Activity',
+                      style: const TextStyle(fontWeight: FontWeight.w600)),
+                  subtitle: const Text('Mark who took part'),
+                  trailing: FilledButton(
+                    onPressed: () => Navigator.pop(sheetContext, true),
+                    child: const Text('Save'),
+                  ),
+                ),
+                const Divider(height: 1),
+                Expanded(
+                  child: roster.isEmpty
+                      ? const Center(child: Text('No students in your classes.'))
+                      : ListView(
+                          padding: const EdgeInsets.all(16),
+                          children: [
+                            for (final s in roster)
+                              Padding(
+                                padding: const EdgeInsets.only(bottom: 12),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text('${s['name']} · ${s['class_name'] ?? ''}',
+                                        style: const TextStyle(fontWeight: FontWeight.w600)),
+                                    const SizedBox(height: 6),
+                                    Wrap(
+                                      spacing: 8,
+                                      children: [
+                                        for (final option in const [
+                                          [null, 'Not on roster'],
+                                          ['present', 'Took part'],
+                                          ['late', 'Late'],
+                                          ['absent', 'Absent'],
+                                        ])
+                                          ChoiceChip(
+                                            label: Text(option[1]!),
+                                            selected: statuses[s['student_id']] == option[0],
+                                            showCheckmark: false,
+                                            onSelected: (_) =>
+                                                setSheetState(() => statuses[s['student_id']] = option[0]),
+                                          ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                          ],
+                        ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+    if (save != true || !mounted) return;
+
+    final records = [
+      for (final entry in statuses.entries)
+        if (entry.value != null || originallyOnRoster.contains(entry.key))
+          {'student_id': entry.key, 'status': entry.value},
+    ];
+    if (records.isEmpty) return;
+    try {
+      await dio.post('/activities/${activity['id']}/roster', data: {'records': records});
+      await _loadActivities();
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Activity roster saved.')));
+    } catch (_) {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Activity roster could not be saved.')));
+    }
+  }
+
+  String _isoDate(DateTime d) =>
+      '${d.year.toString().padLeft(4, '0')}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
+
+  Future<void> _publishNotice() async {
     final subject = _noticeSubjectController.text.trim();
     final body = _noticeBodyController.text.trim();
 
@@ -287,344 +437,22 @@ class _TeacherDashboardViewState extends State<TeacherDashboardView> {
       return;
     }
 
-    setState(() {
-      _notices.insert(0, {
-        'subject': subject,
-        'body': body,
-        'date': 'Just now',
+    try {
+      await context.read<AuthProvider>().apiClient.dio.post('/announcements', data: {
+        'title': subject,
+        'content': body,
+        'audience_role': 'guardian',
+        if (_noticeClass != null) 'class_name': _noticeClass!.split('|').last,
+        if (_noticeClass != null) 'grade': _noticeClass!.split('|').first,
       });
-      _noticeSubjectController.clear();
-      _noticeBodyController.clear();
-    });
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Class announcement posted to families!'),
-        backgroundColor: AppColors.primary,
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
-  }
-
-  void _showContactBottomSheet(Map<String, dynamic> student) {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      builder: (ctx) => Container(
-        padding: const EdgeInsets.all(20),
-        decoration: const BoxDecoration(
-          color: AppColors.surface,
-          border: Border(
-            top: BorderSide(color: AppColors.cardBorder, width: 2),
-          ),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Container(
-                  width: 38,
-                  height: 38,
-                  decoration: const BoxDecoration(color: AppColors.softBlue),
-                  alignment: Alignment.center,
-                  child: const Icon(
-                    Icons.contact_phone_outlined,
-                    color: AppColors.primary,
-                    size: 20,
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Contact Guardian of ${student['name']}',
-                        style: const TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.textPrimary,
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        '${student['guardian']} • ${student['guardian_phone']}',
-                        style: const TextStyle(
-                          fontSize: 13,
-                          color: AppColors.textSecondary,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                IconButton(
-                  onPressed: () => Navigator.pop(ctx),
-                  icon: const Icon(Icons.close, size: 20),
-                  color: AppColors.textMuted,
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            const Divider(height: 1, color: AppColors.cardBorder),
-            const SizedBox(height: 16),
-            _buildContactActionTile(
-              icon: Icons.phone_outlined,
-              title: 'Voice Call',
-              subtitle: 'Dial guardian phone directly',
-              onTap: () {
-                Navigator.pop(ctx);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(
-                      'Calling ${student['guardian']} (${student['guardian_phone']})...',
-                    ),
-                    backgroundColor: AppColors.primary,
-                    behavior: SnackBarBehavior.floating,
-                  ),
-                );
-              },
-            ),
-            const SizedBox(height: 8),
-            _buildContactActionTile(
-              icon: Icons.sms_outlined,
-              title: 'Send SMS Alert',
-              subtitle: 'Send direct cellular text alert',
-              onTap: () {
-                Navigator.pop(ctx);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('Opening SMS to ${student['guardian']}...'),
-                    backgroundColor: AppColors.primary,
-                    behavior: SnackBarBehavior.floating,
-                  ),
-                );
-              },
-            ),
-            const SizedBox(height: 8),
-            _buildContactActionTile(
-              icon: Icons.chat_bubble_outline_rounded,
-              title: 'In-App Message',
-              subtitle: 'Start direct thread in Guardianship App',
-              onTap: () {
-                Navigator.pop(ctx);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(
-                      'Opening chat with ${student['guardian']}...',
-                    ),
-                    backgroundColor: AppColors.primary,
-                    behavior: SnackBarBehavior.floating,
-                  ),
-                );
-              },
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildContactActionTile({
-    required IconData icon,
-    required String title,
-    required String subtitle,
-    required VoidCallback onTap,
-  }) {
-    return InkWell(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-        decoration: BoxDecoration(
-          color: AppColors.background,
-          border: Border.all(color: AppColors.cardBorder),
-        ),
-        child: Row(
-          children: [
-            Icon(icon, color: AppColors.primary, size: 20),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: const TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.textPrimary,
-                    ),
-                  ),
-                  Text(
-                    subtitle,
-                    style: const TextStyle(
-                      fontSize: 11,
-                      color: AppColors.textSecondary,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const Icon(
-              Icons.chevron_right,
-              size: 18,
-              color: AppColors.textMuted,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  void _showEditMarksDialog(int index) {
-    final student = _roster[index];
-    final mathController = TextEditingController(
-      text: student['math_mark']?.toString() ?? '75',
-    );
-    final scienceController = TextEditingController(
-      text: student['science_mark']?.toString() ?? '80',
-    );
-    final englishController = TextEditingController(
-      text: student['english_mark']?.toString() ?? '78',
-    );
-    final formKey = GlobalKey<FormState>();
-
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: AppColors.surface,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: Text(
-          'Assessment Marks: ${student['name']}',
-          style: const TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 16,
-            color: AppColors.primaryDark,
-          ),
-        ),
-        content: Form(
-          key: formKey,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextFormField(
-                controller: mathController,
-                keyboardType: TextInputType.number,
-                decoration: _buildInputDecoration(
-                  'Mathematics (%)',
-                  Icons.calculate_outlined,
-                ),
-                validator: (v) {
-                  final val = int.tryParse(v ?? '');
-                  if (val == null || val < 0 || val > 100) {
-                    return 'Enter mark between 0 and 100';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 12),
-              TextFormField(
-                controller: scienceController,
-                keyboardType: TextInputType.number,
-                decoration: _buildInputDecoration(
-                  'Science (%)',
-                  Icons.science_outlined,
-                ),
-                validator: (v) {
-                  final val = int.tryParse(v ?? '');
-                  if (val == null || val < 0 || val > 100) {
-                    return 'Enter mark between 0 and 100';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 12),
-              TextFormField(
-                controller: englishController,
-                keyboardType: TextInputType.number,
-                decoration: _buildInputDecoration(
-                  'English (%)',
-                  Icons.menu_book_outlined,
-                ),
-                validator: (v) {
-                  final val = int.tryParse(v ?? '');
-                  if (val == null || val < 0 || val > 100) {
-                    return 'Enter mark between 0 and 100';
-                  }
-                  return null;
-                },
-              ),
-            ],
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            style: TextButton.styleFrom(
-              foregroundColor: AppColors.textSecondary,
-            ),
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primary,
-              foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
-              ),
-              elevation: 0,
-            ),
-            onPressed: () {
-              if (!formKey.currentState!.validate()) return;
-              setState(() {
-                _roster[index]['math_mark'] = int.parse(
-                  mathController.text.trim(),
-                );
-                _roster[index]['science_mark'] = int.parse(
-                  scienceController.text.trim(),
-                );
-                _roster[index]['english_mark'] = int.parse(
-                  englishController.text.trim(),
-                );
-              });
-              Navigator.pop(ctx);
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('Updated marks for ${student['name']}'),
-                  backgroundColor: AppColors.primary,
-                  behavior: SnackBarBehavior.floating,
-                ),
-              );
-            },
-            child: const Text('Save Marks'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  InputDecoration _buildInputDecoration(String labelText, IconData icon) {
-    return InputDecoration(
-      labelText: labelText,
-      labelStyle: const TextStyle(color: AppColors.textMuted, fontSize: 13),
-      prefixIcon: Icon(icon, color: AppColors.primary, size: 18),
-      filled: true,
-      fillColor: AppColors.background,
-      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: AppColors.cardBorder),
-      ),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: AppColors.cardBorder),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: AppColors.primary, width: 1.5),
-      ),
-    );
+      setState(() {
+        _noticeSubjectController.clear();
+        _noticeBodyController.clear();
+      });
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Notice sent to parents in your class.')));
+    } catch (_) {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Announcement could not be posted.')));
+    }
   }
 
   String _formattedTodayDate() {
@@ -654,14 +482,71 @@ class _TeacherDashboardViewState extends State<TeacherDashboardView> {
     return '${parts[0][0]}${parts[1][0]}'.toUpperCase();
   }
 
+  Future<void> _resendGuardianLink(Map<String, dynamic> guardian) async {
+    try {
+      final response = await context.read<AuthProvider>().apiClient.dio.post('/users/${guardian['id']}/send-link');
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(response.data['message'] ?? 'Invitation sent.')));
+    } catch (_) {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Could not send the invitation. Please contact your school administrator.')));
+    }
+  }
+
+  Future<void> _inviteGuardian(Map<String, dynamic> student) async {
+    final name = TextEditingController();
+    final email = TextEditingController();
+    final phone = TextEditingController();
+    final form = GlobalKey<FormState>();
+    bool sending = false;
+    String? error;
+    await showDialog<void>(context: context, barrierDismissible: false,
+      builder: (dialogContext) => StatefulBuilder(builder: (dialogContext, update) => AlertDialog(
+        title: const Text('Invite guardian'),
+        content: SingleChildScrollView(child: Form(key: form, child: Column(mainAxisSize: MainAxisSize.min, children: [
+          Text('Create a parent or guardian account for ${student['name']}. A password setup link will be sent by email.'),
+          const SizedBox(height: 16),
+          TextFormField(controller: name, decoration: const InputDecoration(labelText: 'Guardian name'), validator: (v) => v == null || v.trim().isEmpty ? 'Enter a name' : null),
+          const SizedBox(height: 12),
+          TextFormField(controller: email, keyboardType: TextInputType.emailAddress, decoration: const InputDecoration(labelText: 'Email address'), validator: (v) => v == null || !RegExp(r'^[^\s@]+@[^\s@]+\.[^\s@]+$').hasMatch(v.trim()) ? 'Enter a valid email' : null),
+          const SizedBox(height: 12),
+          TextFormField(controller: phone, keyboardType: TextInputType.phone, decoration: const InputDecoration(labelText: 'Phone number'), validator: (v) => v == null || v.trim().isEmpty ? 'Enter a phone number' : null),
+          if (error != null) Padding(padding: const EdgeInsets.only(top: 12), child: Text(error!, style: const TextStyle(color: Colors.red))),
+        ]))),
+        actions: [
+          TextButton(onPressed: sending ? null : () => Navigator.pop(dialogContext), child: const Text('Cancel')),
+          FilledButton(onPressed: sending ? null : () async {
+            if (!form.currentState!.validate()) return;
+            update(() { sending = true; error = null; });
+            try {
+              final response = await context.read<AuthProvider>().apiClient.dio.post('/users', data: {
+                'name': name.text.trim(), 'email': email.text.trim(), 'phone_number': phone.text.trim(),
+                'role': 'guardian', 'student_ids': [student['student_id']],
+              });
+              if (!mounted || !dialogContext.mounted) return;
+              Navigator.pop(dialogContext);
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(response.data['message'] ?? 'Guardian account created.')));
+              await _loadTeacherStudents();
+            } catch (exception) {
+              if (!dialogContext.mounted) return;
+              final data = exception is DioException ? exception.response?.data : null;
+              update(() { sending = false; error = data is Map ? data['message']?.toString() ?? 'Could not create this account.' : 'Could not create this account. Please try again.'; });
+            }
+          }, child: Text(sending ? 'Sending?' : 'Send invitation')),
+        ],
+      )),
+    );
+    // Wait for the dialog transition before releasing its field controllers.
+    await Future<void>.delayed(const Duration(milliseconds: 250));
+    name.dispose(); email.dispose(); phone.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     final teacher =
-        context.watch<AuthProvider>().user?['name'] ?? 'Teacher Grace';
+        context.watch<AuthProvider>().user?['name'] ?? 'Teacher';
     final present = _roster.where((s) => s['status'] == 'Present').length;
     final absent = _roster.where((s) => s['status'] == 'Absent').length;
     final late = _roster.where((s) => s['status'] == 'Late').length;
-    const tabs = ['Students', 'Roll call', 'Gradebook', 'Notices'];
+    const tabs = ['Students', 'Roll call', 'Activities', 'Notices'];
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: supportingAppBar(context, 'Classroom'),
@@ -671,7 +556,7 @@ class _TeacherDashboardViewState extends State<TeacherDashboardView> {
           children: [
             PageHeading(
               title: 'Your classroom',
-              subtitle: '${_formattedTodayDate()} · Grade 4 Gold',
+              subtitle: '${_formattedTodayDate()} · Assigned classes',
               symbol: AppSymbol.school,
             ),
             PageCard(
@@ -710,6 +595,13 @@ class _TeacherDashboardViewState extends State<TeacherDashboardView> {
                     ],
                   ),
                   const SizedBox(height: 20),
+                  Row(
+                    children: [
+                      IconButton(onPressed: () => _changeAttendanceDate(-1), icon: const Icon(Icons.chevron_left)),
+                      Expanded(child: Center(child: Text('Attendance · ${_formattedTodayDate()}', style: const TextStyle(fontWeight: FontWeight.w600)))),
+                      IconButton(onPressed: () => _changeAttendanceDate(1), icon: const Icon(Icons.chevron_right)),
+                    ],
+                  ),
                   const Divider(height: 1),
                   const SizedBox(height: 16),
                   Wrap(
@@ -740,7 +632,7 @@ class _TeacherDashboardViewState extends State<TeacherDashboardView> {
             const SizedBox(height: 20),
             if (_activeTabIndex == 0) ..._studentList(),
             if (_activeTabIndex == 1) ..._rollCall(),
-            if (_activeTabIndex == 2) ..._gradebook(),
+            if (_activeTabIndex == 2) ..._activityRosters(),
             if (_activeTabIndex == 3) ..._classNotices(),
           ],
         ),
@@ -784,7 +676,7 @@ class _TeacherDashboardViewState extends State<TeacherDashboardView> {
             ),
             const SizedBox(height: 4),
             Text(
-              '${student['id']} · ${student['gender']}',
+              '${student['id']} · ${student['class_name'] ?? ''}',
               style: const TextStyle(fontSize: 12, color: AppColors.textMuted),
             ),
           ],
@@ -802,11 +694,6 @@ class _TeacherDashboardViewState extends State<TeacherDashboardView> {
         Text(
           '${_filteredRoster.length} students',
           style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
-        ),
-        TextButton.icon(
-          onPressed: _openAddStudentDialog,
-          icon: const Icon(Icons.add, size: 18),
-          label: const Text('Add student'),
         ),
       ],
     ),
@@ -864,7 +751,6 @@ class _TeacherDashboardViewState extends State<TeacherDashboardView> {
                     student['status'],
                     color: _attendanceColor(student['status']),
                   ),
-                  PageBadge('${student['merits']} merits'),
                 ],
               ),
               const SizedBox(height: 16),
@@ -881,14 +767,17 @@ class _TeacherDashboardViewState extends State<TeacherDashboardView> {
                 runSpacing: 8,
                 children: [
                   OutlinedButton(
-                    onPressed: () => _awardMerit(_roster.indexOf(student)),
+                    onPressed: () => _logBehaviour(_roster.indexOf(student), 'positive'),
                     child: const Text('Award merit'),
                   ),
-                  TextButton.icon(
-                    onPressed: () => _showContactBottomSheet(student),
-                    icon: const AppIcon(AppSymbol.message, size: 18),
-                    label: const Text('Contact'),
+                  OutlinedButton(
+                    onPressed: () => _logBehaviour(_roster.indexOf(student), 'negative'),
+                    child: const Text('Conduct note'),
                   ),
+                  OutlinedButton(onPressed: () => _inviteGuardian(student), child: const Text('Invite guardian')),
+                  for (final guardian in (student['guardians'] as List? ?? []))
+                    if (guardian['email'] != null && guardian['email'].toString().isNotEmpty)
+                      TextButton(onPressed: () => _resendGuardianLink(Map<String, dynamic>.from(guardian)), child: Text('Resend link to ${guardian['name']}')),
                 ],
               ),
             ],
@@ -953,78 +842,84 @@ class _TeacherDashboardViewState extends State<TeacherDashboardView> {
           ),
         ),
       ),
-    FilledButton(
-      onPressed: () => ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Attendance saved for this session.')),
-      ),
-      child: const Text('Save register'),
+    FilledButton.icon(
+      onPressed: _isSavingAttendance || _roster.isEmpty ? null : _saveAttendance,
+      icon: _isSavingAttendance ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2)) : const Icon(Icons.save_outlined),
+      label: Text(_isSavingAttendance ? 'Saving…' : 'Save register'),
     ),
   ];
 
-  List<Widget> _gradebook() => [
-    const Text(
-      'Assessment overview',
-      style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+  List<Widget> _activityRosters() => [
+    Wrap(
+      spacing: 12,
+      runSpacing: 8,
+      crossAxisAlignment: WrapCrossAlignment.center,
+      children: [
+        const Text(
+          'Activity rosters',
+          style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+        ),
+        FilledButton.icon(
+          onPressed: _createActivity,
+          icon: const Icon(Icons.add),
+          label: const Text('New activity'),
+        ),
+      ],
     ),
     const SizedBox(height: 6),
     const Text(
-      'Review subject marks and update assessments.',
-      style: TextStyle(color: AppColors.textMuted, height: 1.5),
+      'Record which of your students took part. Parents see this in the app.',
+      style: TextStyle(color: AppColors.textMuted),
     ),
     const SizedBox(height: 16),
-    for (final student in _roster)
-      Padding(
-        padding: const EdgeInsets.only(bottom: 14),
-        child: PageCard(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _studentHeading(student),
-              const SizedBox(height: 20),
-              for (final subject in {
-                'Mathematics': 'math_mark',
-                'Science': 'science_mark',
-                'English': 'english_mark',
-              }.entries)
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 14),
-                  child: Column(
-                    children: [
-                      Row(
-                        children: [
-                          Expanded(child: Text(subject.key)),
-                          Text(
-                            '${student[subject.value]}%',
-                            style: const TextStyle(
-                              fontWeight: FontWeight.w600,
-                              color: AppColors.primary,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 8),
-                      LinearProgressIndicator(
-                        value: ((student[subject.value] as int? ?? 0) / 100)
-                            .clamp(0, 1),
-                        minHeight: 5,
-                        borderRadius: BorderRadius.circular(8),
-                        backgroundColor: AppColors.softBlue,
-                      ),
-                    ],
-                  ),
+    if (_isLoadingActivities)
+      const Padding(
+        padding: EdgeInsets.symmetric(vertical: 32),
+        child: Center(child: CircularProgressIndicator()),
+      )
+    else if (_activities.isEmpty)
+      const PageEmpty(
+        title: 'No activities yet',
+        message: 'Create an activity to start a roster.',
+      )
+    else
+      for (final activity in _activities)
+        Padding(
+          padding: const EdgeInsets.only(bottom: 14),
+          child: PageCard(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  activity['title']?.toString() ?? '',
+                  style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w600),
                 ),
-              Align(
-                alignment: Alignment.centerLeft,
-                child: OutlinedButton(
-                  onPressed: () =>
-                      _showEditMarksDialog(_roster.indexOf(student)),
-                  child: const Text('Edit marks'),
+                const SizedBox(height: 4),
+                Text(
+                  activity['activity_date']?.toString().split('T').first ?? '',
+                  style: const TextStyle(fontSize: 12, color: AppColors.textMuted),
                 ),
-              ),
-            ],
+                const SizedBox(height: 12),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    PageBadge('${activity['roster_count'] ?? 0} on roster'),
+                    PageBadge(
+                      '${activity['participated_count'] ?? 0} took part',
+                      color: const Color(0xFF047857),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                OutlinedButton(
+                  onPressed: () => _openActivityRoster(activity),
+                  child: const Text('Mark roster'),
+                ),
+              ],
+            ),
           ),
         ),
-      ),
   ];
 
   List<Widget> _classNotices() => [
@@ -1047,10 +942,22 @@ class _TeacherDashboardViewState extends State<TeacherDashboardView> {
           ),
           const SizedBox(height: 6),
           const Text(
-            'Keep families informed about class activities.',
+            'Only parents of students in your classes receive class notices.',
             style: TextStyle(color: AppColors.textMuted, height: 1.5),
           ),
           const SizedBox(height: 20),
+          if (_classNames.length > 1) ...[
+            DropdownButtonFormField<String?>(
+              initialValue: _noticeClass,
+              decoration: const InputDecoration(labelText: 'Send to'),
+              items: [
+                const DropdownMenuItem(value: null, child: Text('All my classes')),
+                for (final c in _classNames) DropdownMenuItem(value: c, child: Text(c.replaceAll('|', ' ? '))),
+              ],
+              onChanged: (v) => setState(() => _noticeClass = v),
+            ),
+            const SizedBox(height: 12),
+          ],
           TextField(
             controller: _noticeSubjectController,
             decoration: const InputDecoration(labelText: 'Subject'),
@@ -1073,44 +980,5 @@ class _TeacherDashboardViewState extends State<TeacherDashboardView> {
         ],
       ),
     ),
-    const SizedBox(height: 24),
-    const Text(
-      'Recent notices',
-      style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
-    ),
-    const SizedBox(height: 16),
-    for (final notice in _notices)
-      Padding(
-        padding: const EdgeInsets.only(bottom: 14),
-        child: PageCard(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              PageBadge(notice['date']),
-              const SizedBox(height: 12),
-              Text(
-                notice['subject'],
-                style: const TextStyle(
-                  fontSize: 17,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                notice['body'],
-                style: const TextStyle(
-                  color: AppColors.textSecondary,
-                  height: 1.6,
-                ),
-              ),
-              const SizedBox(height: 8),
-              TextButton(
-                onPressed: () => setState(() => _notices.remove(notice)),
-                child: const Text('Remove notice'),
-              ),
-            ],
-          ),
-        ),
-      ),
   ];
 }

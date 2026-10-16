@@ -19,38 +19,6 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
   String _searchQuery = '';
   final TextEditingController _searchController = TextEditingController();
 
-  // Pre-loaded mock list for offline/demo environment
-  final List<Map<String, dynamic>> _mockUsers = [
-    {
-      'id': 1,
-      'name': 'Admin Tinotenda',
-      'email': 'admin@hillside.ac.zw',
-      'phone_number': '+263771111111',
-      'role': 'admin',
-    },
-    {
-      'id': 2,
-      'name': 'Teacher Grace Mupfumi',
-      'email': 'grace.m@hillside.ac.zw',
-      'phone_number': '+263772222222',
-      'role': 'teacher',
-    },
-    {
-      'id': 3,
-      'name': 'Guardian John Chewe',
-      'email': 'john.chewe@gmail.com',
-      'phone_number': '+263773333333',
-      'role': 'guardian',
-    },
-    {
-      'id': 4,
-      'name': 'Guardian Farai Moyo',
-      'email': 'farai.moyo@gmail.com',
-      'phone_number': '+263774444444',
-      'role': 'guardian',
-    },
-  ];
-
   @override
   void initState() {
     super.initState();
@@ -73,33 +41,20 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
         if (_searchQuery.isNotEmpty) 'search': _searchQuery,
       });
 
-      if (response.statusCode == 200 && response.data['data'] != null) {
+      final rawList = response.data['users'] ?? response.data['data'];
+      if (response.statusCode == 200 && rawList != null) {
         setState(() {
-          _users = List<Map<String, dynamic>>.from(response.data['data']);
+          _users = List<Map<String, dynamic>>.from(rawList);
           _isLoading = false;
         });
         return;
       }
-    } catch (_) {
-      // Fallback to rich offline/demo users
-    }
-
-    // Apply local filter to mock dataset
-    List<Map<String, dynamic>> filtered = List.from(_mockUsers);
-    if (_selectedRoleFilter != 'all') {
-      filtered = filtered.where((u) => u['role'] == _selectedRoleFilter).toList();
-    }
-    if (_searchQuery.isNotEmpty) {
-      final q = _searchQuery.toLowerCase();
-      filtered = filtered.where((u) =>
-        (u['name'] ?? '').toLowerCase().contains(q) ||
-        (u['email'] ?? '').toLowerCase().contains(q) ||
-        (u['phone_number'] ?? '').toLowerCase().contains(q)
-      ).toList();
+    } catch (e) {
+      debugPrint('Users fetch error: $e');
     }
 
     setState(() {
-      _users = filtered;
+      _users = [];
       _isLoading = false;
     });
   }
@@ -138,7 +93,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
       } catch (_) {}
       if (!mounted) return;
       setState(() {
-        _mockUsers.removeWhere((u) => u['id'] == userId);
+        _users.removeWhere((u) => u['id'] == userId);
       });
       _fetchUsers();
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('User deleted.')));

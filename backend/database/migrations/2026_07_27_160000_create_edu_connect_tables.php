@@ -119,7 +119,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('activity_id')->constrained('activities')->onDelete('cascade');
             $table->foreignId('student_id')->constrained('students')->onDelete('cascade');
-            $table->enum('status', ['present', 'absent']);
+            $table->enum('status', ['present', 'absent', 'late']);
             $table->foreignId('marked_by')->constrained('users')->onDelete('cascade');
             $table->timestamps();
         });

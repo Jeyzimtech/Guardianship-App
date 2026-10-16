@@ -3,7 +3,7 @@
 This directory contains the Laravel 11 backend service powering the Edu+Conect Guardianship Platform.
 
 ## Core Features
-- **Sanctum & Firebase Authentication**: Role-based access tokens for Admins, Teachers, and Guardians.
+- **Server-hosted Sanctum Authentication**: Role-based access tokens for Admins, Teachers, and Guardians.
 - **RESTful Endpoints**: Full API surface for school, user, student, and classroom administration.
 - **Fee Gating Enforcement**: Built-in middleware and controller-level fee balance verification.
 - **Blade Web Admin**: Integrated Web Administration console available at `/admin`.

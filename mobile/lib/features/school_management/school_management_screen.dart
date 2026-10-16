@@ -19,69 +19,12 @@ class SchoolManagementScreen extends StatefulWidget {
 class _SchoolManagementScreenState extends State<SchoolManagementScreen> {
   String _tab = 'Campuses';
   String _query = '';
-  bool _demo = false;
   final _search = TextEditingController();
   bool _isLoading = true;
 
   List<Map<String, dynamic>> _schools = [];
   List<Map<String, dynamic>> _academicYears = [];
   List<Map<String, dynamic>> _classes = [];
-
-  // Mock data fallbacks for offline/demo mode
-  final List<Map<String, dynamic>> _mockSchools = [
-    {
-      'id': 1,
-      'name': 'Hillside Primary School',
-      'type': 'primary',
-      'students_count': 0,
-      'teachers_count': 0,
-      'school_classes_count': 3,
-    },
-  ];
-
-  final List<Map<String, dynamic>> _mockAcademicYears = [
-    {
-      'id': 1,
-      'name': 'Term 1 2026',
-      'code': 'AY-2026-T1',
-      'is_current': true,
-      'school_classes_count': 35,
-    },
-    {
-      'id': 2,
-      'name': 'Term 3 2025',
-      'code': 'AY-2025-T3',
-      'is_current': false,
-      'school_classes_count': 35,
-    },
-  ];
-
-  final List<Map<String, dynamic>> _mockClasses = [
-    {
-      'id': 1,
-      'school_id': 1,
-      'grade': 'ECD B',
-      'class_name': 'Butterflies',
-      'capacity': 25,
-      'school': {'name': 'Hillside Preparatory School'},
-    },
-    {
-      'id': 2,
-      'school_id': 2,
-      'grade': 'Grade 1',
-      'class_name': 'Green',
-      'capacity': 30,
-      'school': {'name': 'Hillside Primary School'},
-    },
-    {
-      'id': 3,
-      'school_id': 2,
-      'grade': 'Grade 4',
-      'class_name': 'Gold',
-      'capacity': 35,
-      'school': {'name': 'Hillside Primary School'},
-    },
-  ];
 
   @override
   void initState() {
@@ -121,21 +64,19 @@ class _SchoolManagementScreenState extends State<SchoolManagementScreen> {
               cResp.data['classes'] ?? [],
             );
           }
-          _demo = false;
           _isLoading = false;
         });
         return;
       }
     } catch (_) {
-      // Fallback to offline mock data
+      // Show an empty state when the request fails.
     }
 
     if (mounted) {
       setState(() {
-        _demo = true;
-        _schools = _mockSchools;
-        _academicYears = _mockAcademicYears;
-        _classes = _mockClasses;
+        _schools = [];
+        _academicYears = [];
+        _classes = [];
         _isLoading = false;
       });
     }
@@ -217,7 +158,7 @@ class _SchoolManagementScreenState extends State<SchoolManagementScreen> {
 
   bool get _canManage {
     final role = context.read<AuthProvider?>()?.user?['role'];
-    return !_demo && (role == 'admin' || role == 'website_admin');
+    return (role == 'admin' || role == 'website_admin');
   }
 
   void _edit([Map<String, dynamic>? item]) {
@@ -416,27 +357,6 @@ class _SchoolManagementScreenState extends State<SchoolManagementScreen> {
                   ],
                 ),
               ),
-              if (_demo)
-                Padding(
-                  padding: const EdgeInsets.only(top: 16),
-                  child: PageCard(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const PageBadge('Sample data'),
-                        const SizedBox(height: 10),
-                        const Text(
-                          'Could not connect to your school. These are example records.',
-                          style: TextStyle(height: 1.5),
-                        ),
-                        TextButton(
-                          onPressed: _fetchAllData,
-                          child: const Text('Retry connection'),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
               const SizedBox(height: 24),
               PageFilters(
                 labels: const ['Campuses', 'Terms', 'Classes'],
