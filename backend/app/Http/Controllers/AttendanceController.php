@@ -17,7 +17,7 @@ class AttendanceController extends Controller
         $date = $request->query('date', now()->toDateString());
         $className = $request->query('class_name');
 
-        $query = Student::with('school');
+        $query = Student::with(['school', 'guardians:users.id,users.name,users.email,users.phone_number']);
         if ($request->user()?->role === 'admin' && !$request->user()->school_id) {
             return response()->json(['status' => 'error', 'message' => 'Administrator account has no school assignment.'], 403);
         }
@@ -51,7 +51,7 @@ class AttendanceController extends Controller
 
         $roster = $students->map(function ($s, $idx) use ($existingRecords) {
             $rec = $existingRecords->get($s->id);
-            $guardians = $s->guardians()->get(['users.id', 'users.name', 'users.email', 'users.phone_number']);
+            $guardians = $s->guardians->map(fn ($g) => $g->only(['id', 'name', 'email', 'phone_number']))->values();
             return [
                 'student_id' => $s->id,
                 'roll_no' => 'STU-' . str_pad($s->id, 3, '0', STR_PAD_LEFT),
@@ -59,6 +59,7 @@ class AttendanceController extends Controller
                 'guardians' => $guardians,
                 'grade' => $s->grade,
                 'class_name' => $s->class_name,
+                'grade' => $s->grade,
                 'school_name' => $s->school ? $s->school->name : 'N/A',
                 'status' => $rec ? $rec->status : 'present',
                 'remarks' => $rec && $rec->subject_name ? $rec->subject_name : '',

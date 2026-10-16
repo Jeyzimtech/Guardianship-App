@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:dio/dio.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:provider/provider.dart';
 import '../../core/student_provider.dart';
 import '../../core/app_colors.dart';
@@ -35,28 +37,121 @@ class _UniformMarketplaceViewState extends State<UniformMarketplaceView> {
   }
 
   Future<void> _fetchOrders() async {
-    final studentId = widget.child?['id'] ?? (mounted ? (context.read<StudentProvider>().selectedStudent?['id']) : null);
+    final studentId =
+        widget.child?['id'] ??
+        (mounted
+            ? (context.read<StudentProvider>().selectedStudent?['id'])
+            : null);
     if (studentId == null) return;
     setState(() => _loadingOrders = true);
     try {
-      final response = await context.read<StudentProvider>().apiClient.dio.get('/uniform-orders/$studentId');
-      final values = (response.data['orders'] as List? ?? []).map((order) {
-        final data = Map<String, dynamic>.from(order);
-        return {
-          'order_id': 'ORD-${data['id']}',
-          'date': data['created_at']?.toString().split('T').first ?? '',
-          'items_summary': (data['items'] as List? ?? []).map((line) => '${line['name']} (${line['size']}) ×${line['quantity']}').join(', '),
-          'total_amount': data['total_amount'],
-          'currency': data['currency'],
-          'status': data['payment_status'] == 'pending' ? 'Payment pending' : data['payment_status'],
-          'payment_method': 'Payment is settled with the school.',
-        };
-      }).cast<Map<String, dynamic>>().toList();
+      final response = await context.read<StudentProvider>().apiClient.dio.get(
+        '/uniform-orders/$studentId',
+      );
+      final values = (response.data['orders'] as List? ?? [])
+          .map((order) {
+            final data = Map<String, dynamic>.from(order);
+            return {
+              'id': data['id'],
+              'pending': data['payment_status'] == 'pending',
+              'reference': data['payment_reference'],
+              'order_id': 'ORD-${data['id']}',
+              'date': data['created_at']?.toString().split('T').first ?? '',
+              'items_summary': (data['items'] as List? ?? [])
+                  .map(
+                    (line) =>
+                        '${line['name']} (${line['size']}) ×${line['quantity']}',
+                  )
+                  .join(', '),
+              'total_amount': data['total_amount'],
+              'currency': data['currency'],
+              'status': data['payment_status'] == 'pending'
+                  ? 'Payment pending'
+                  : data['payment_status'] == 'paid' &&
+                        data['latest_payment']?['sandbox'] == true
+                  ? 'Test payment verified'
+                  : data['payment_status'],
+              'payment_method': data['payment_status'] == 'paid'
+                  ? 'Payment verified${data['payment_method'] == 'PesePay' ? ' by PesePay' : ''}.'
+                  : data['payment_reference'] == null
+                  ? 'Complete checkout securely with PesePay.'
+                  : 'Reference: ${data['payment_reference']} · awaiting school verification',
+            };
+          })
+          .cast<Map<String, dynamic>>()
+          .toList();
       if (mounted) setState(() => _ordersHistory = values);
     } catch (_) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Could not load uniform orders.')));
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Could not load uniform orders.')),
+        );
+      }
     } finally {
       if (mounted) setState(() => _loadingOrders = false);
+    }
+  }
+
+  int? _payingOrder;
+  Future<void> _pay(int orderId, {bool checkOnly = false}) async {
+    if (_payingOrder != null) return;
+    setState(() => _payingOrder = orderId);
+    try {
+      final api = context.read<StudentProvider>().apiClient.dio;
+      final response = checkOnly
+          ? await api.get('/uniform-orders/$orderId/payment-status')
+          : await api.post('/uniform-orders/$orderId/checkout');
+      if (!mounted) return;
+      if (checkOnly) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              response.data['payment_status'] == 'paid'
+                  ? 'Payment verified. Your order is paid.'
+                  : 'Payment status: ${response.data['gateway_status'] ?? response.data['payment_status']}',
+            ),
+          ),
+        );
+      } else {
+        if (response.data['sandbox'] == true) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text(
+                'PesePay test checkout. No real money will be collected.',
+              ),
+            ),
+          );
+        }
+        final uri = Uri.tryParse(response.data['redirect_url'] ?? '');
+        if (uri == null ||
+            uri.scheme != 'https' ||
+            !(uri.host == 'pesepay.com' ||
+                uri.host.endsWith('.pesepay.com') ||
+                (response.data['sandbox'] == true &&
+                    uri.host == 'pesepay-payments-sandbox-test.web.app'))) {
+          throw Exception('Invalid payment link.');
+        }
+        if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
+          throw Exception('Could not open PesePay.');
+        }
+      }
+      if (mounted) await _fetchOrders();
+    } catch (e) {
+      if (mounted) {
+        final message = e is DioException && e.response?.data is Map
+            ? e.response!.data['message']?.toString()
+            : null;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              message ??
+                  'Could not open or verify payment. Your order is saved; please try again.',
+            ),
+          ),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _payingOrder = null);
     }
   }
 
@@ -64,11 +159,22 @@ class _UniformMarketplaceViewState extends State<UniformMarketplaceView> {
     setState(() => _loadingCatalog = true);
     try {
       final dio = context.read<StudentProvider>().apiClient.dio;
-      final schoolId = widget.child?['school_id'] ?? (mounted ? (context.read<StudentProvider>().selectedStudent?['school_id']) : null);
-      final res = await dio.get('/uniforms', queryParameters: schoolId == null ? null : {'school_id': schoolId});
-      if (res.statusCode == 200 && res.data != null && res.data['uniforms'] != null) {
+      final schoolId =
+          widget.child?['school_id'] ??
+          (mounted
+              ? (context.read<StudentProvider>().selectedStudent?['school_id'])
+              : null);
+      final res = await dio.get(
+        '/uniforms',
+        queryParameters: schoolId == null ? null : {'school_id': schoolId},
+      );
+      if (res.statusCode == 200 &&
+          res.data != null &&
+          res.data['uniforms'] != null) {
         final list = List<Map<String, dynamic>>.from(
-          (res.data['uniforms'] as List).map((e) => Map<String, dynamic>.from(e)),
+          (res.data['uniforms'] as List).map(
+            (e) => Map<String, dynamic>.from(e),
+          ),
         );
         if (mounted) {
           setState(() {
@@ -172,7 +278,7 @@ class _UniformMarketplaceViewState extends State<UniformMarketplaceView> {
                     strokeWidth: 2,
                     value: progress.expectedTotalBytes != null
                         ? progress.cumulativeBytesLoaded /
-                            progress.expectedTotalBytes!
+                              progress.expectedTotalBytes!
                         : null,
                   ),
                 );
@@ -330,12 +436,8 @@ class _UniformMarketplaceViewState extends State<UniformMarketplaceView> {
 
   void _checkoutOrder() {
     if (_cartItems.isEmpty) return;
-    String collection = 'School Store (Main Campus)';
-    final addressController = TextEditingController();
-    Map<String, dynamic>? deliveryQuote;
-    bool quoting = false;
-    String? quoteError;
-    double? deliveryFeeUsd;
+    bool placing = false;
+    String? orderError;
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -378,134 +480,105 @@ class _UniformMarketplaceViewState extends State<UniformMarketplaceView> {
                   const SizedBox(height: 12),
                   Text(
                     'Items: USD \$${_cartTotalUsd.toStringAsFixed(2)}',
-                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.primary),
-                  ),
-                  if (deliveryFeeUsd != null)
-                    Text('Delivery: USD \$${deliveryFeeUsd!.toStringAsFixed(2)}'),
-                  if (deliveryFeeUsd != null)
-                    Text('Total: USD \$${(_cartTotalUsd + deliveryFeeUsd!).toStringAsFixed(2)}',
-                        style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w700, color: AppColors.primary)),
-                  Text(
-                    'ZiG ${_cartTotalZig.toStringAsFixed(2)}',
-                    style: const TextStyle(color: AppColors.textMuted),
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.primary,
+                    ),
                   ),
                   const SizedBox(height: 24),
-                  const Text('Payment is pending and will be arranged with the school. The app does not charge your account.', style: TextStyle(color: AppColors.textMuted)),
-                  const SizedBox(height: 20),
-                  DropdownButtonFormField<String>(
-                    initialValue: collection,
-                    isExpanded: true,
-                    decoration: const InputDecoration(
-                      labelText: 'Collection point',
-                    ),
-                    items:
-                        [
-                              'School Store (Main Campus)',
-                              'Deliver to address',
-                            ]
-                            .map(
-                              (value) => DropdownMenuItem(
-                                value: value,
-                                child: Text(
-                                  value,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ),
-                            )
-                            .toList(),
-                    onChanged: (value) {
-                      if (value != null) { update(() {
-                        collection = value;
-                        deliveryQuote = null;
-                        deliveryFeeUsd = null;
-                        quoteError = null;
-                      }); }
-                    },
+                  const Text(
+                    'Pay securely on the PesePay payment page. Return to your order and check payment status after checkout.',
+                    style: TextStyle(color: AppColors.textMuted),
                   ),
-                  if (collection == 'Deliver to address') ...[
-                    const SizedBox(height: 16),
-                    TextField(
-                      controller: addressController,
-                      decoration: const InputDecoration(labelText: 'Delivery address', hintText: 'Street, suburb, city'),
-                      textCapitalization: TextCapitalization.words,
-                      minLines: 1,
-                      maxLines: 3,
+                  const SizedBox(height: 20),
+                  const Text(
+                    'Collection: your school. Contact the school for collection details.',
+                  ),
+                  if (orderError != null)
+                    Text(
+                      orderError!,
+                      style: const TextStyle(color: AppColors.error),
                     ),
-                    if (quoteError != null)
-                      Padding(padding: const EdgeInsets.only(top: 8), child: Text(quoteError!, style: const TextStyle(color: Colors.red))),
-                    if (deliveryQuote != null)
-                      Padding(
-                        padding: const EdgeInsets.only(top: 8),
-                        child: Text('Roadrunner quote received${deliveryQuote!['distance'] != null ? ' · ${deliveryQuote!['distance']}' : ''}'),
-                      ),
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: TextButton.icon(
-                        onPressed: quoting ? null : () async {
-                          final address = addressController.text.trim();
-                          if (address.length < 8) {
-                            update(() => quoteError = 'Enter a complete delivery address.');
-                            return;
-                          }
-                          update(() { quoting = true; quoteError = null; deliveryQuote = null; deliveryFeeUsd = null; });
-                          try {
-                            final response = await context.read<StudentProvider>().apiClient.dio.post('/delivery/quote', data: {
-                              'destination_address': address,
-                              'items': _cartItems.map((item) => {
-                                'name': item['name'],
-                                'quantity': item['qty'],
-                              }).toList(),
-                            });
-                            final raw = response.data?['quote'];
-                            if (raw is! Map) throw Exception('Unexpected quote response.');
-                            final quote = Map<String, dynamic>.from(raw);
-                            final amount = _quoteAmount(quote);
-                            if (amount == null) throw Exception('Roadrunner quote did not contain a price.');
-                            update(() { deliveryQuote = quote; deliveryFeeUsd = amount; });
-                          } catch (_) {
-                            update(() => quoteError = 'Could not get a delivery quote. Check the address or try again.');
-                          } finally {
-                            update(() => quoting = false);
-                          }
-                        },
-                        icon: quoting
-                            ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2))
-                            : const Icon(Icons.local_shipping_outlined),
-                        label: Text(quoting ? 'Getting quote…' : 'Get delivery quote'),
-                      ),
-                    ),
-                  ],
                   const SizedBox(height: 24),
                   SizedBox(
                     width: double.infinity,
                     child: FilledButton(
-                      onPressed: collection == 'Deliver to address' ? null : () async {
-                        final studentId = widget.child?['id'] ?? context.read<StudentProvider>().selectedStudent?['id'];
-                        if (studentId == null) {
-                          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Link a child to your account before ordering.')));
-                          return;
-                        }
-                        try {
-                          final response = await context.read<StudentProvider>().apiClient.dio.post('/uniform-orders', data: {
-                            'student_id': studentId,
-                            'currency': 'USD',
-                            'items': _cartItems.map((item) => {
-                              'uniform_id': item['id'],
-                              'size': item['selected_size'],
-                              'quantity': item['qty'],
-                            }).toList(),
-                          });
-                          if (response.data?['status'] != 'success') throw Exception('Order was not accepted.');
-                          if (!mounted || !ctx.mounted) return;
-                          setState(() { _cartItems.clear(); _section = 2; });
-                          Navigator.pop(ctx);
-                          await _fetchOrders();
-                          if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Order request saved. Payment is pending with the school.')));
-                        } catch (error) {
-                          update(() => quoteError = error.toString().replaceFirst('Exception: ', ''));
-                        }
-                      },
-                      child: const Text('Place order'),
+                      onPressed: placing
+                          ? null
+                          : () async {
+                              final studentId =
+                                  widget.child?['id'] ??
+                                  context
+                                      .read<StudentProvider>()
+                                      .selectedStudent?['id'];
+                              if (studentId == null) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text(
+                                      'Link a child to your account before ordering.',
+                                    ),
+                                  ),
+                                );
+                                return;
+                              }
+                              update(() => placing = true);
+                              try {
+                                final response = await context
+                                    .read<StudentProvider>()
+                                    .apiClient
+                                    .dio
+                                    .post(
+                                      '/uniform-orders',
+                                      data: {
+                                        'student_id': studentId,
+                                        'currency': 'USD',
+                                        'items': _cartItems
+                                            .map(
+                                              (item) => {
+                                                'uniform_id': item['id'],
+                                                'size': item['selected_size'],
+                                                'quantity': item['qty'],
+                                              },
+                                            )
+                                            .toList(),
+                                      },
+                                    );
+                                if (response.data?['status'] != 'success') {
+                                  throw Exception('Order was not accepted.');
+                                }
+                                if (!mounted || !ctx.mounted) return;
+                                setState(() {
+                                  _cartItems.clear();
+                                  _section = 2;
+                                });
+                                Navigator.pop(ctx);
+                                await _fetchOrders();
+                                final orderId = response.data['order']?['id'];
+                                if (orderId is int && mounted) {
+                                  await _pay(orderId);
+                                }
+                                if (mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text(
+                                        'Order saved. Complete payment with PesePay.',
+                                      ),
+                                    ),
+                                  );
+                                }
+                              } catch (error) {
+                                if (!ctx.mounted) return;
+                                update(() {
+                                  placing = false;
+                                  orderError = error.toString().replaceFirst(
+                                    'Exception: ',
+                                    '',
+                                  );
+                                });
+                              }
+                            },
+                      child: Text(placing ? 'Saving order...' : 'Place order'),
                     ),
                   ),
                 ],
@@ -515,19 +588,6 @@ class _UniformMarketplaceViewState extends State<UniformMarketplaceView> {
         ),
       ),
     );
-  }
-
-  double? _quoteAmount(Map<String, dynamic> quote) {
-    final candidates = [
-      quote['amount'], quote['total'], quote['price'], quote['fee'], quote['delivery_fee'],
-      if (quote['quote'] is Map) (quote['quote'] as Map)['amount'],
-      if (quote['quote'] is Map) (quote['quote'] as Map)['total'],
-    ];
-    for (final value in candidates) {
-      final parsed = value is num ? value.toDouble() : double.tryParse('$value');
-      if (parsed != null && parsed >= 0) return parsed;
-    }
-    return null;
   }
 
   @override
@@ -652,7 +712,8 @@ class _UniformMarketplaceViewState extends State<UniformMarketplaceView> {
               else if (catalog.isEmpty)
                 const PageEmpty(
                   title: 'No matching items',
-                  message: 'No uniform items found in the school store catalog.',
+                  message:
+                      'No uniform items found in the school store catalog.',
                 ),
               for (final item in catalog)
                 Padding(
@@ -846,9 +907,13 @@ class _UniformMarketplaceViewState extends State<UniformMarketplaceView> {
                 style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600),
               ),
               const SizedBox(height: 16),
-              if (_loadingOrders) const Center(child: CircularProgressIndicator()),
+              if (_loadingOrders)
+                const Center(child: CircularProgressIndicator()),
               if (!_loadingOrders && _ordersHistory.isEmpty)
-                const PageEmpty(title: 'No orders yet', message: 'Orders placed for your child will appear here.'),
+                const PageEmpty(
+                  title: 'No orders yet',
+                  message: 'Orders placed for your child will appear here.',
+                ),
               for (final order in _ordersHistory)
                 Padding(
                   padding: const EdgeInsets.only(bottom: 16),
@@ -895,6 +960,25 @@ class _UniformMarketplaceViewState extends State<UniformMarketplaceView> {
                           order['payment_method'],
                           style: const TextStyle(color: AppColors.textMuted),
                         ),
+                        if (order['pending'] == true)
+                          TextButton(
+                            onPressed: _payingOrder == null
+                                ? () =>
+                                      _pay(order['id'] as int, checkOnly: true)
+                                : null,
+                            child: const Text('Check payment status'),
+                          ),
+                        if (order['pending'] == true)
+                          TextButton(
+                            onPressed: _payingOrder == null
+                                ? () => _pay(order['id'] as int)
+                                : null,
+                            child: Text(
+                              _payingOrder == order['id']
+                                  ? 'Please wait...'
+                                  : 'Pay with PesePay',
+                            ),
+                          ),
                       ],
                     ),
                   ),

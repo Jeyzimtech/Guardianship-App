@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../core/auth_provider.dart';
-import '../../core/student_provider.dart';
 import '../../core/app_colors.dart';
 import '../../core/app_icon.dart';
 import '../parent/uniform_marketplace_view.dart';
+import '../parent/fee_payments_view.dart';
+import '../teacher/teacher_publish_page.dart';
 import '../parent/learning_journal_view.dart';
 import '../parent/behaviour_view.dart';
 import '../parent/assignments_view.dart';
 import '../dashboard/announcements_view.dart';
 import '../dashboard/attendance_view.dart';
-import '../auth/login_screen.dart';
+import '../../core/session.dart';
 
 class AppDrawer extends StatelessWidget {
   final String currentRoute;
@@ -133,6 +134,16 @@ class AppDrawer extends StatelessWidget {
                     if (!isTeacher) ...[
                       _buildDrawerItem(
                         context,
+                        title: 'School fees',
+                        onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const FeePaymentsView(),
+                          ),
+                        ),
+                      ),
+                      _buildDrawerItem(
+                        context,
                         title: 'Uniform Store',
 
                         onTap: () => Navigator.push(
@@ -194,7 +205,18 @@ class AppDrawer extends StatelessWidget {
                         onTap: () => Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (_) => const LearningJournalView(),
+                            builder: (_) => const TeacherPublishPage(),
+                          ),
+                        ),
+                      ),
+                      _buildDrawerItem(
+                        context,
+                        title: 'Upload a report',
+                        onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) =>
+                                const TeacherPublishPage(report: true),
                           ),
                         ),
                       ),
@@ -238,23 +260,7 @@ class AppDrawer extends StatelessWidget {
               builder: (context, auth, _) => SizedBox(
                 width: double.infinity,
                 child: OutlinedButton.icon(
-                  onPressed: () async {
-                    final studentProvider = Provider.of<StudentProvider>(
-                      context,
-                      listen: false,
-                    );
-                    studentProvider.clearData();
-                    await auth.logout();
-                    if (context.mounted) {
-                      Navigator.of(
-                        context,
-                        rootNavigator: true,
-                      ).pushAndRemoveUntil(
-                        MaterialPageRoute(builder: (_) => const LoginScreen()),
-                        (route) => false,
-                      );
-                    }
-                  },
+                  onPressed: () => signOut(context),
                   icon: const Icon(
                     Icons.logout_rounded,
                     color: Colors.red,

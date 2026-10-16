@@ -25,4 +25,9 @@ class UniformOrder extends Model
     {
         return $this->belongsTo(Student::class);
     }
+
+    public function latestPayment()
+    {
+        return $this->hasOne(UniformPayment::class)->latestOfMany();
+    }
 }

@@ -13,6 +13,7 @@ import 'assignments_view.dart';
 import 'sms_alerts_log_view.dart';
 import 'messaging_view.dart';
 import 'uniform_marketplace_view.dart';
+import 'fee_payments_view.dart';
 
 class ParentDashboardView extends StatefulWidget {
   const ParentDashboardView({super.key});
@@ -399,6 +400,11 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
               title: 'SMS history',
               subtitle: 'Review school text messages',
               onTap: () => _open(const SmsAlertsLogView()),
+            ),
+            EditorialLink(
+              title: 'School fees',
+              subtitle: 'View balances and submit payment references',
+              onTap: () => _open(FeePaymentsView(child: child)),
             ),
             EditorialLink(
               title: 'Uniform store',

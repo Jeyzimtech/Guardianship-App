@@ -79,7 +79,8 @@ class WebsiteAdminController extends Controller
                 $guardian = $student->guardians->first();
                 $sub = $student->activeSubscription;
                 $today = now()->toDateString();
-                $subscriptionStatus = $sub?->status ?? 'inactive';
+                // No subscription row means the parent still has access (matches CheckChildSubscription).
+                $subscriptionStatus = $sub?->status ?? 'active';
                 if ($sub && $sub->start_date && $sub->start_date->toDateString() > $today) {
                     $subscriptionStatus = $sub->status === 'inactive' ? 'active' : 'inactive';
                 }

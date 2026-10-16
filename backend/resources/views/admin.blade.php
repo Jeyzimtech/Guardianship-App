@@ -1306,10 +1306,8 @@
 
                     <h3 class="section-title">Subscription Control Engine (Per-Child Access Toggle)</h3>
                     <p style="font-size:12px; color:var(--text-secondary); margin-bottom:12px;">Turning a child's subscription <strong>OFF</strong> suspends the parent's mobile app access for that child. School Admin internal records remain active.</p>
-                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:12px;">
-                        <label for="platformSchoolFilter" style="font-size:13px; font-weight:600;">School view</label>
-                        <select id="platformSchoolFilter" class="form-control" style="max-width:320px;" onchange="renderPlatformDirectoryTable()"><option value="all">All schools</option></select>
-                    </div>
+                    <select id="platformSchoolFilter" style="display:none;" aria-hidden="true"><option value="all">All schools</option></select>
+                    <div id="platformSchoolTabs" role="tablist" aria-label="Schools" style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:12px;"></div>
                     <div class="table-card">
                         <table class="data-table">
                             <thead>
@@ -2645,7 +2643,7 @@
                 ...(fees.data.payments || []).map(p => ({kind:'fee', id:p.id, name:p.fee_account?.student?.name, amount:p.amount, currency:p.currency, method:p.payment_method, reference:p.reference})),
                 ...(uniforms.data.orders || []).map(p => ({kind:'uniform', id:p.id, name:p.student?.name, amount:p.total_amount, currency:p.currency, method:p.payment_method, reference:p.payment_reference}))
             ];
-            section.innerHTML = `<h3 class="section-title" style="margin-top:24px;">Payments awaiting verification</h3><p>Verify each reference against the actual payment received before confirming.</p><div class="table-card"><table class="data-table"><thead><tr><th>Student</th><th>For</th><th>Amount</th><th>Reference</th><th>Action</th></tr></thead><tbody>${rows.length ? rows.map(p => `<tr><td>${escapeTableText(p.name)}</td><td>${p.kind === 'fee' ? 'School fees' : 'Uniform order'}</td><td>${escapeTableText(p.currency)} ${escapeTableText(p.amount)}</td><td>${escapeTableText(p.method)} ? ${escapeTableText(p.reference)}</td><td><button class="btn-sm" onclick="verifySchoolPayment('${p.kind}',${Number(p.id)})">Confirm received payment</button></td></tr>`).join('') : '<tr><td colspan="5">No payment references awaiting verification.</td></tr>'}</tbody></table></div>`;
+            section.innerHTML = `<h3 class="section-title" style="margin-top:24px;">Payments awaiting verification</h3><p>Verify each reference against the actual payment received before confirming.</p><div class="table-card"><table class="data-table"><thead><tr><th>Student</th><th>For</th><th>Amount</th><th>Reference</th><th>Action</th></tr></thead><tbody>${rows.length ? rows.map(p => `<tr><td>${escapeTableText(p.name)}</td><td>${p.kind === 'fee' ? 'School fees' : 'Uniform order'}</td><td>${escapeTableText(p.currency)} ${escapeTableText(p.amount)}</td><td>${escapeTableText(p.method)} / ${escapeTableText(p.reference)}</td><td><button class="btn-sm" onclick="verifySchoolPayment('${p.kind}',${Number(p.id)})">Confirm received payment</button></td></tr>`).join('') : '<tr><td colspan="5">No payment references awaiting verification.</td></tr>'}</tbody></table></div>`;
         }
         async function verifySchoolPayment(kind, id) {
             if (!confirm('Have you verified this reference and amount against funds actually received by the school?')) return;
@@ -2721,17 +2719,20 @@
                 if (schoolsList.length > 0) updateSchool(schoolsList[0].name);
                 const platformSchoolFilter = document.getElementById('platformSchoolFilter');
                 if (platformSchoolFilter) {
+                    const previous = platformSchoolFilter.value || 'all';
                     platformSchoolFilter.innerHTML = '<option value="all">All schools</option>' + schoolsList.map(s => `<option value="${s.id}">${escapeTableText(s.name)}</option>`).join('');
+                    platformSchoolFilter.value = schoolsList.some(s => String(s.id) === previous) ? previous : 'all';
+                    renderPlatformSchoolTabs(platformSchoolFilter.value);
                 }
 
                 const dirBody = document.getElementById('platformDirectoryBody');
                 if (dirBody) {
                     dirBody.innerHTML = schoolsList.map(s => `
                         <tr>
-                            <td><strong>${s.name}</strong></td>
-                            <td><span class="badge" style="background:#DBEAFE; color:#1E40AF;">${(s.type || 'primary').toUpperCase()}</span></td>
-                            <td>${s.primary_admin_name || 'Not assigned'}${s.primary_admin_email ? ` (${s.primary_admin_email})` : ''}</td>
-                            <td><span style="display:inline-block; width:14px; height:14px; background:${s.branding_color || '#3B5998'}; border-radius:50%; vertical-align:middle; margin-right:4px;"></span> ${s.branding_color || '#3B5998'}</td>
+                            <td><strong>${escapeTableText(s.name)}</strong></td>
+                            <td><span class="badge" style="background:#DBEAFE; color:#1E40AF;">${escapeTableText((s.type || 'primary').toUpperCase())}</span></td>
+                            <td>${escapeTableText(s.primary_admin_name || 'Not assigned')}${s.primary_admin_email ? ` (${escapeTableText(s.primary_admin_email)})` : ''}</td>
+                            <td><span style="display:inline-block; width:14px; height:14px; background:${escapeTableText(s.branding_color || '#3B5998')}; border-radius:50%; vertical-align:middle; margin-right:4px;"></span> ${escapeTableText(s.branding_color || '#3B5998')}</td>
                             <td>${Number(s.students_count || 0)} Children</td>
                             <td><button class="btn-sm" onclick="filterPlatformStudents(${s.id})">View Students</button></td>
                         </tr>
@@ -2966,6 +2967,7 @@
             if (actEl) actEl.innerText = activeCount.toString();
             const suspEl = document.getElementById('platformSuspendedSubs');
             if (suspEl) suspEl.innerText = suspendedCount.toString();
+            renderPlatformSchoolTabs(selectedSchoolId);
             if (visibleDirectory.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding: 24px; color: var(--text-secondary);">No enrolled students found for subscription control</td></tr>';
                 return;
@@ -2976,9 +2978,9 @@
 
                 return `
                     <tr>
-                        <td><strong>${d.student_name}</strong></td>
-                        <td>${d.school_name || 'School'} (${d.grade} ${d.class_name || ''})</td>
-                        <td>${d.guardian_name || 'Guardian'} (${d.guardian_phone || 'N/A'})</td>
+                        <td><strong>${escapeTableText(d.student_name)}</strong></td>
+                        <td>${escapeTableText(d.school_name || 'School')} (${escapeTableText(d.grade)} ${escapeTableText(d.class_name || '')})</td>
+                        <td>${escapeTableText(d.guardian_name || 'Guardian')} (${escapeTableText(d.guardian_phone || 'N/A')})</td>
                         <td>
                             <span class="badge" style="background:${isActive ? '#DCFCE7' : '#FEE2E2'}; color:${isActive ? '#15803D' : '#B91C1C'}; font-weight:600;">
                                 ${isActive ? 'ACTIVE' : 'SUSPENDED'}
@@ -2996,11 +2998,23 @@
 
         }
 
-        function filterPlatformStudents(schoolId) {
+        // One tab per onboarded school, plus "All schools".
+        function renderPlatformSchoolTabs(selectedSchoolId) {
+            const tabs = document.getElementById('platformSchoolTabs');
+            if (!tabs) return;
+            const entries = [{ id: 'all', name: 'All schools' }, ...schoolsList.map(s => ({ id: String(s.id), name: s.name }))];
+            tabs.innerHTML = entries.map(entry => {
+                const count = entry.id === 'all' ? directoryList.length : directoryList.filter(d => String(d.school_id) === entry.id).length;
+                const active = String(selectedSchoolId) === entry.id;
+                return `<button type="button" role="tab" aria-selected="${active}" class="btn-sm" onclick="filterPlatformStudents('${entry.id}', false)" style="font-weight:600; ${active ? 'background:var(--primary-blue); color:#fff; border-color:var(--primary-blue);' : ''}">${escapeTableText(entry.name)} (${count})</button>`;
+            }).join('');
+        }
+
+        function filterPlatformStudents(schoolId, scroll = true) {
             const select = document.getElementById('platformSchoolFilter');
             if (select) select.value = String(schoolId);
             renderPlatformDirectoryTable();
-            document.getElementById('subscriptionControlBody')?.closest('.table-card')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            if (scroll) document.getElementById('platformSchoolTabs')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
 
         function openModal(id) {
@@ -3354,9 +3368,7 @@
 
             if (res.ok) {
                 closeModal('onboardSchoolModal');
-                await loadSchools();
-                await loadPlatformDirectory();
-                await loadAdminStats();
+                await Promise.all([loadSchools(), loadPlatformDirectory()]);
                 alert(`School "${name}" onboarded successfully.${res.data.admin_invitation_message ? ` ${res.data.admin_invitation_message}` : ''}`);
             } else {
                 alert(res.data.message || 'Failed to onboard school.');

@@ -140,7 +140,7 @@ class GuardianshipApiTest extends TestCase
         // Legacy outstanding balances do not hide reports.
         $responseList = $this->getJson('/api/reports/' . $this->student1->id);
         $responseList->assertStatus(200)
-            ->assertJsonPath('reports.0.file_path', 'reports/alice.pdf')
+            ->assertJsonPath('reports.0.file_path', fn ($url) => str_contains($url, '/report-files/'))
             ->assertJsonPath('reports.0.is_locked', false);
 
         // The linked guardian can download the report.
@@ -152,7 +152,7 @@ class GuardianshipApiTest extends TestCase
         // 3. Get reports list for Bob (no fees) - verify file path is readable
         $responseListBob = $this->getJson('/api/reports/' . $this->student2->id);
         $responseListBob->assertStatus(200)
-            ->assertJsonPath('reports.0.file_path', 'reports/bob.pdf')
+            ->assertJsonPath('reports.0.file_path', fn ($url) => str_contains($url, '/report-files/'))
             ->assertJsonPath('reports.0.is_locked', false);
 
         // 4. Try to download Bob's report - expect 200 Success

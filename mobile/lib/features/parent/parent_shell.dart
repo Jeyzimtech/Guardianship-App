@@ -21,6 +21,8 @@ class ParentShell extends StatefulWidget {
 
 class _ParentShellState extends State<ParentShell> {
   int _currentIndex = 0;
+  // Tabs are built on first visit so startup only loads the home screen.
+  final Set<int> _visited = {0};
 
   @override
   void initState() {
@@ -41,12 +43,16 @@ class _ParentShellState extends State<ParentShell> {
                 'name': 'No child selected',
               }));
 
+    final builders = <Widget Function()>[
+      () => const ParentDashboardView(),
+      () => const AnnouncementsView(),
+      () => LearningJournalView(child: child),
+      () => const MessagingView(),
+      () => GuardianProfileView(child: child),
+    ];
     final pages = [
-      const ParentDashboardView(),
-      const AnnouncementsView(),
-      LearningJournalView(child: child),
-      const MessagingView(),
-      GuardianProfileView(child: child),
+      for (var i = 0; i < builders.length; i++)
+        _visited.contains(i) ? builders[i]() : const SizedBox.shrink(),
     ];
 
     return Scaffold(
@@ -76,7 +82,10 @@ class _ParentShellState extends State<ParentShell> {
         ),
         child: BottomNavigationBar(
           currentIndex: _currentIndex,
-          onTap: (i) => setState(() => _currentIndex = i),
+          onTap: (i) => setState(() {
+            _currentIndex = i;
+            _visited.add(i);
+          }),
           type: BottomNavigationBarType.fixed,
           backgroundColor: AppColors.surface,
           selectedItemColor: AppColors.primary,

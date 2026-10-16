@@ -46,6 +46,46 @@ def main():
     ssh.connect('109.199.99.156', username='root', password=password, timeout=30, look_for_keys=False, allow_agent=False)
     del password
     print('CONNECTED', flush=True)
+    if '--finish-pesepay' in sys.argv:
+        sftp = ssh.open_sftp()
+        remote_script = '/tmp/guardianship-payment-workers.sh'
+        try:
+            for relative in ['app/Http/Controllers/UniformPaymentController.php', 'app/Services/Pesepay.php', 'routes/console.php']:
+                sftp.put(str(ROOT / 'backend' / relative), REMOTE + '/' + relative + '.deploy-tmp')
+                sftp.posix_rename(REMOTE + '/' + relative + '.deploy-tmp', REMOTE + '/' + relative)
+            sftp.put(str(ROOT / '.github/scripts/install_payment_workers.sh'), remote_script)
+            run(ssh, f'cd {REMOTE} && php artisan route:cache && php artisan uniforms:seed-payment-test 2 && systemctl reload php8.2-fpm && bash {remote_script}')
+        finally:
+            sftp.remove(remote_script)
+            sftp.close()
+            ssh.close()
+        return
+    if '--configure-pesepay' in sys.argv:
+        integration = getpass.getpass('PesePay test integration key: ').strip()
+        encryption = getpass.getpass('PesePay test encryption key: ').strip()
+        if len(encryption) != 32 or not integration:
+            raise ValueError('PesePay requires an integration key and a 32-byte encryption key')
+        sftp = ssh.open_sftp()
+        try:
+            with sftp.open(REMOTE + '/.env', 'r') as source:
+                previous = source.read().decode()
+            # Retain a protected environment backup; credentials never enter source control.
+            with sftp.open(REMOTE + '/.env.before-pesepay', 'w') as backup:
+                backup.write(previous)
+            sftp.chmod(REMOTE + '/.env.before-pesepay', 0o600)
+            values = {'PESEPAY_SANDBOX': 'true', 'PESEPAY_INTEGRATION_KEY': integration, 'PESEPAY_ENCRYPTION_KEY': encryption}
+            lines = [line for line in previous.splitlines() if line.partition('=')[0] not in values and not line.startswith('ROADRUNNER_')]
+            lines += [key + '=' + value for key, value in values.items()]
+            with sftp.open(REMOTE + '/.env.pesepay-tmp', 'w') as target:
+                target.write('\n'.join(lines) + '\n')
+            sftp.chmod(REMOTE + '/.env.pesepay-tmp', 0o640)
+            sftp.chown(REMOTE + '/.env.pesepay-tmp', 0, 33)
+            sftp.posix_rename(REMOTE + '/.env.pesepay-tmp', REMOTE + '/.env')
+        finally:
+            sftp.close()
+            ssh.close()
+        print('PesePay test credentials saved server-side. Cache refresh occurs during deployment.', flush=True)
+        return
     if '--audit-uniform' in sys.argv:
         sftp = ssh.open_sftp()
         try:
@@ -53,6 +93,18 @@ def main():
             sftp.get(REMOTE + '/app/Http/Controllers/UniformController.php', str(target))
             print('Downloaded deployed uniform controller for read-only comparison', flush=True)
         finally:
+            sftp.close()
+            ssh.close()
+        return
+    if '--verify-pesepay' in sys.argv:
+        remote_file = '/tmp/guardianship-pesepay-check.php'
+        sftp = ssh.open_sftp()
+        try:
+            sftp.put(str(ROOT / '.github/scripts/verify_pesepay.php'), remote_file)
+            sftp.chmod(remote_file, 0o600)
+            run(ssh, f'cd {REMOTE} && php {remote_file}')
+        finally:
+            sftp.remove(remote_file)
             sftp.close()
             ssh.close()
         return
@@ -110,6 +162,15 @@ echo json_encode($result, JSON_PRETTY_PRINT);
             if command == 'DEPLOY':
                 import deploy
                 deploy.deploy_connected(ssh)
+            elif command == 'PAYMENT_WORKERS':
+                remote_script = '/tmp/guardianship-payment-workers.sh'
+                sftp = ssh.open_sftp()
+                try:
+                    sftp.put(str(ROOT / '.github/scripts/install_payment_workers.sh'), remote_script)
+                    run(ssh, 'bash ' + remote_script)
+                finally:
+                    sftp.remove(remote_script)
+                    sftp.close()
             elif command.startswith('PHP:'):
                 run(ssh, f'cd {REMOTE} && php', base64.b64decode(command[4:]).decode())
             elif command:

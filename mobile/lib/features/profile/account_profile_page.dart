@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../core/auth_provider.dart';
 import '../../core/student_provider.dart';
+import '../../core/session.dart';
 import '../../core/app_colors.dart';
 import '../../core/app_icon.dart';
 import '../common/page_components.dart';
@@ -107,24 +108,22 @@ class _AccountProfilePageState extends State<AccountProfilePage> {
       ),
     );
     if (confirmed != true || !mounted) return;
-    final auth = context.read<AuthProvider>();
-    final students = context.read<StudentProvider>();
-    if (delete) {
-      final success = await auth.deleteAccount();
-      if (!mounted) return;
-      if (!success) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Could not delete your account. Please try again.'),
-          ),
-        );
-        return;
-      }
-    } else {
-      await auth.logout();
+    if (!delete) {
+      await signOut(context);
+      return;
     }
-    students.clearData();
-    if (mounted) Navigator.of(context).popUntil((route) => route.isFirst);
+    final success = await context.read<AuthProvider>().deleteAccount();
+    if (!mounted) return;
+    if (!success) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Could not delete your account. Please try again.'),
+        ),
+      );
+      return;
+    }
+    context.read<StudentProvider>().clearData();
+    resetToAuthGate(context);
   }
 
   @override

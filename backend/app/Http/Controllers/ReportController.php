@@ -141,7 +141,8 @@ class ReportController extends Controller
         return app(\App\Http\Middleware\CheckChildSubscription::class)->handle($request, function() use($request,$report_id) {
             $report=ReportDocument::findOrFail($report_id);
             // Recheck role/link/subscription when the signed link is opened.
-            $this->downloadReport($request,$report_id);
+            $authorization = $this->downloadReport($request,$report_id);
+            if ($authorization->getStatusCode() !== 200) return $authorization;
             if (str_starts_with($report->file_path,'private:')) {
                 $path=substr($report->file_path,8);
                 abort_unless(str_starts_with($path,'reports/') && !str_contains($path,'..') && Storage::disk('local')->exists($path),404,'Report file unavailable.');
@@ -212,9 +213,6 @@ class ReportController extends Controller
     public function destroy($id)
     {
         $report = ReportDocument::findOrFail($id);
-        if (request()->user()?->role === 'admin' && !Student::whereKey($report->student_id)->where('school_id', request()->user()->school_id)->exists()) {
-            return response()->json(['status' => 'error', 'message' => 'This report is outside your school.'], 403);
-        }
         if (request()->user()?->role === 'admin' && !Student::whereKey($report->student_id)->where('school_id', request()->user()->school_id)->exists()) {
             return response()->json(['status' => 'error', 'message' => 'This report is outside your school.'], 403);
         }

@@ -1,4 +1,5 @@
 <?php
+\Illuminate\Support\Facades\Route::get('/payments/pesepay/return', fn () => response('<!doctype html><html><meta name="viewport" content="width=device-width,initial-scale=1"><title>Uniform payment</title><body style="font:18px system-ui;background:#f7f8fa;padding:32px;max-width:560px;margin:auto"><h1>Return to your uniform order</h1><p>Your checkout has ended. Return to the app and tap Check payment status to see the verified result.</p><p>Closing checkout does not confirm payment.</p></body></html>'));
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;

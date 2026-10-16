@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../core/app_colors.dart';
 import '../../core/app_icon.dart';
 import '../../core/student_provider.dart';
+import '../../core/auth_provider.dart';
+import '../teacher/teacher_publish_page.dart';
 import '../common/page_components.dart';
 
 class LearningJournalView extends StatefulWidget {
@@ -28,13 +31,17 @@ class _LearningJournalViewState extends State<LearningJournalView> {
   Future<void> _fetchEntries() async {
     if (!mounted) return;
     setState(() => _isLoading = true);
-    final studentId = widget.child?['id'] ??
-        context.read<StudentProvider?>()?.selectedStudent?['id'];
+    final studentId = context.read<AuthProvider>().isTeacher
+        ? null
+        : widget.child?['id'] ??
+              context.read<StudentProvider?>()?.selectedStudent?['id'];
     try {
-      final dio = context.read<StudentProvider>().apiClient.dio;
+      final dio = context.read<AuthProvider>().apiClient.dio;
       final endpoint = studentId != null ? '/journal/$studentId' : '/journal';
       final res = await dio.get(endpoint);
-      final rawEntries = studentId != null ? res.data?['data']?['entries'] : res.data?['entries'];
+      final rawEntries = studentId != null
+          ? res.data?['data']?['entries']
+          : res.data?['entries'];
       if (res.statusCode == 200 && rawEntries is List) {
         final list = List<Map<String, dynamic>>.from(
           rawEntries.map((e) {
@@ -91,6 +98,18 @@ class _LearningJournalViewState extends State<LearningJournalView> {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: supportingAppBar(context, 'Learning journal'),
+      floatingActionButton: context.watch<AuthProvider>().isTeacher
+          ? FloatingActionButton.extended(
+              label: const Text('Post an entry'),
+              onPressed: () async {
+                final posted = await Navigator.push<bool>(
+                  context,
+                  MaterialPageRoute(builder: (_) => const TeacherPublishPage()),
+                );
+                if (posted == true && mounted) _fetchEntries();
+              },
+            )
+          : null,
       body: SafeArea(
         child: RefreshIndicator(
           onRefresh: _fetchEntries,
@@ -254,7 +273,32 @@ class _LearningJournalViewState extends State<LearningJournalView> {
             ),
           ),
         ],
-        if (entry['image_url'] != null) ...[
+        if (entry['image_url'] != null &&
+            !['photo', 'drawing'].contains(entry['type']))
+          TextButton(
+            onPressed: () async {
+              final uri = Uri.tryParse(entry['image_url']);
+              if (uri == null || !['https', 'http'].contains(uri.scheme)) {
+                return;
+              }
+              final opened = await launchUrl(
+                uri,
+                mode: LaunchMode.externalApplication,
+              );
+              if (!opened && mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Could not open this media.')),
+                );
+              }
+            },
+            child: Text(
+              entry['type'] == 'link'
+                  ? 'Open learning link'
+                  : 'Open ${entry['type']}',
+            ),
+          ),
+        if (entry['image_url'] != null &&
+            ['photo', 'drawing'].contains(entry['type'])) ...[
           const SizedBox(height: 18),
           ClipRRect(
             borderRadius: BorderRadius.circular(16),

@@ -117,6 +117,7 @@ echo 'Backup saved: {backup}'
     print(f'Upload complete: {count} backend files', flush=True)
     remote(f'''cd {REMOTE_PATH}
 if [ -f app/Services/FirebaseAuthService.php ]; then rm -- app/Services/FirebaseAuthService.php; fi
+if [ -f app/Http/Controllers/RoadrunnerController.php ]; then rm -- app/Http/Controllers/RoadrunnerController.php; fi
 export COMPOSER_ALLOW_SUPERUSER=1
 composer install --no-interaction --prefer-dist --optimize-autoloader --no-dev
 php artisan config:clear

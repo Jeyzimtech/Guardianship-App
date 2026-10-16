@@ -20,12 +20,12 @@ use App\Http\Controllers\StudentController;
 use App\Http\Controllers\TeacherController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\UniformController;
-use App\Http\Controllers\RoadrunnerController;
 use App\Http\Controllers\WebsiteAdminController;
 use App\Http\Middleware\CheckChildSubscription;
 use Illuminate\Support\Facades\Route;
 
 // Public health check endpoint
+Route::post('/payments/pesepay/result', [\App\Http\Controllers\UniformPaymentController::class, 'callback'])->middleware('throttle:120,1');
 Route::get('/health', function () {
     return response()->json([
         'status' => 'ok',
@@ -36,7 +36,6 @@ Route::get('/health', function () {
 
 // Public uniform catalog
 Route::get('/uniforms', [UniformController::class, 'index']);
-Route::post('/delivery/quote', [RoadrunnerController::class, 'quote'])->middleware('throttle:20,1');
 
 // Public auth endpoints
 Route::post('/auth/login', [AuthController::class, 'login']);
@@ -84,6 +83,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/uniform-orders/{id}/verify-payment', [UniformController::class, 'verifyOrderPayment'])->middleware('role:admin');
 
     // Uniform orders are stored and scoped to the selected student.
+    Route::post('/uniform-orders/{id}/checkout', [\App\Http\Controllers\UniformPaymentController::class, 'checkout'])->middleware(['role:guardian,admin','throttle:10,1']);
+    Route::get('/uniform-orders/{id}/payment-status', [\App\Http\Controllers\UniformPaymentController::class, 'status'])->middleware(['role:guardian,admin','throttle:20,1']);
     Route::get('/uniform-orders/{student_id}', [UniformController::class, 'orders'])->middleware('role:guardian,admin');
     Route::post('/uniform-orders', [UniformController::class, 'placeOrder'])->middleware('role:guardian,admin');
 

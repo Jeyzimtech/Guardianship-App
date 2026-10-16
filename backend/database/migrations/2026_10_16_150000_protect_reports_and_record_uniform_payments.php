@@ -12,15 +12,25 @@ return new class extends Migration {
             $t->timestamp('verified_at')->nullable();
         });
         foreach(DB::table('report_documents')->get() as $report) {
+            if (str_starts_with($report->file_path,'private:')) continue;
             $path=parse_url($report->file_path,PHP_URL_PATH);
-            if (!$path || !str_starts_with($path,'/storage/reports/') || str_contains($path,'..')) continue;
+            if (!$path || str_contains($path,'..') || !preg_match('#^(?:/storage/|storage/)?reports/[^/]+$#',$path)) continue;
             $relative='reports/'.basename($path);
-            if (!Storage::disk('public')->exists($relative)) continue;
-            $stream=Storage::disk('public')->readStream($relative);
+            $source = Storage::disk('public')->exists($relative) ? 'public' : null;
+            $oldPath = $relative;
+            if (!$source && Storage::disk('local')->exists('public/'.$relative)) {
+                $source='local'; $oldPath='public/'.$relative;
+            }
+            if (!$source && Storage::disk('local')->exists($relative)) {
+                DB::table('report_documents')->where('id',$report->id)->update(['file_path'=>'private:'.$relative]);
+                continue;
+            }
+            if (!$source) continue;
+            $stream=Storage::disk($source)->readStream($oldPath);
             if (!is_resource($stream) || !Storage::disk('local')->put($relative,$stream)) throw new RuntimeException('Could not protect an existing report.');
             if (is_resource($stream)) fclose($stream);
             DB::table('report_documents')->where('id',$report->id)->update(['file_path'=>'private:'.$relative]);
-            Storage::disk('public')->delete($relative);
+            Storage::disk($source)->delete($oldPath);
         }
     }
     public function down(): void {

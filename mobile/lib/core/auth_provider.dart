@@ -325,14 +325,16 @@ class AuthProvider extends ChangeNotifier {
       await prefs.clear();
     } catch (_) {}
 
-    // 3. Fire-and-forget server logout in background without blocking the UI
+    // 3. Fire-and-forget server logout in background without blocking the UI.
+    // Storage is already cleared, so the token must be attached explicitly.
     if (tokenToRevoke != null) {
       try {
         apiClient.dio.post(
           '/auth/logout',
           options: Options(
-            sendTimeout: const Duration(seconds: 2),
-            receiveTimeout: const Duration(seconds: 2),
+            headers: {'Authorization': 'Bearer $tokenToRevoke'},
+            sendTimeout: const Duration(seconds: 5),
+            receiveTimeout: const Duration(seconds: 5),
           ),
         ).catchError((_) => Response(requestOptions: RequestOptions(path: '')));
       } catch (_) {}

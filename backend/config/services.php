@@ -1,6 +1,11 @@
 <?php
 
 return [
+    'pesepay' => [
+        'integration_key' => env('PESEPAY_INTEGRATION_KEY'),
+        'encryption_key' => env('PESEPAY_ENCRYPTION_KEY'),
+        'sandbox' => env('PESEPAY_SANDBOX', true),
+    ],
 
     /*
     |--------------------------------------------------------------------------
@@ -35,15 +40,6 @@ return [
         ],
     ],
 
-    'roadrunner' => [
-        'base_url' => env('ROADRUNNER_BASE_URL', 'https://api.roadrunnerdeliver.com'),
-        'api_key' => env('ROADRUNNER_API_KEY'),
-        'api_secret' => env('ROADRUNNER_API_SECRET'),
-        'webhook_secret' => env('ROADRUNNER_WEBHOOK_SECRET'),
-        'merchant_public_id' => env('ROADRUNNER_MERCHANT_PUBLIC_ID'),
-        'merchant_slug' => env('ROADRUNNER_MERCHANT_SLUG'),
-        'pickup_address' => env('ROADRUNNER_PICKUP_ADDRESS'),
-        'quote_path' => env('ROADRUNNER_QUOTE_PATH', '/v1/quotes'),
-    ],
+
 
 ];

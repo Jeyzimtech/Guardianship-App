@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import '../../core/auth_provider.dart';
 import '../../core/app_colors.dart';
 import '../../core/app_icon.dart';
-import '../dashboard/dashboard_home.dart';
+import '../../core/session.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -59,10 +59,7 @@ class _LoginScreenState extends State<LoginScreen> {
       });
 
       if (success) {
-        Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
-          MaterialPageRoute(builder: (_) => const DashboardHome()),
-          (route) => false,
-        );
+        resetToAuthGate(context);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(

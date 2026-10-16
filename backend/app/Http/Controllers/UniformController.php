@@ -22,7 +22,7 @@ class UniformController extends Controller
             abort(403, 'This student is outside your account scope.');
         }
 
-        return response()->json(['status' => 'success', 'orders' => $student->uniformOrders()->latest()->get()]);
+        return response()->json(['status' => 'success', 'orders' => $student->uniformOrders()->with('latestPayment')->latest()->get()]);
     }
 
     public function placeOrder(Request $request)
@@ -77,6 +77,7 @@ class UniformController extends Controller
     public function submitPaymentReference(Request $request, int $id)
     {
         $order=UniformOrder::with('student')->findOrFail($id);
+        abort_if(\App\Models\UniformPayment::where('uniform_order_id',$id)->exists(),422,'Use Check payment status for this PesePay order.');
         $actor=$request->user();
         abort_unless($actor->role==='guardian' && $actor->students()->whereKey($order->student_id)->exists(),403);
         $data=$request->validate(['payment_reference'=>'required|string|max:100|unique:uniform_orders,payment_reference,'.$order->id,'payment_method'=>'required|in:EcoCash,OneMoney,Card']);
@@ -98,6 +99,7 @@ class UniformController extends Controller
         $request->validate(['confirmed'=>'required|accepted']);
         $order=DB::transaction(function() use($request,$id) {
             $order=UniformOrder::with('student')->lockForUpdate()->findOrFail($id);
+            abort_if(\App\Models\UniformPayment::where('uniform_order_id',$id)->exists(),422,'PesePay payments must be verified through the payment gateway.');
             abort_unless($request->user()->school_id && (int)$order->student->school_id===(int)$request->user()->school_id,403);
             if($order->payment_status==='paid') return $order;
             abort_unless($order->payment_status==='pending' && $order->payment_reference,422,'A pending order and payment reference are required.');
@@ -212,6 +214,10 @@ class UniformController extends Controller
             'item_code' => 'nullable|string|max:50',
         ]);
 
+        abort_unless($request->user()?->role === 'admin' && $request->user()->school_id, 403);
+        abort_if(isset($validated['school_id']) && (int)$validated['school_id'] !== (int)$request->user()->school_id,403);
+        $validated['school_id'] = $request->user()->school_id;
+
         $imageUrl = $validated['image_url'] ?? null;
 
         if ($request->hasFile('image')) {
@@ -242,9 +248,9 @@ class UniformController extends Controller
         $priceUsd = (float) $validated['price_usd'];
         $priceZig = isset($validated['price_zig']) && $validated['price_zig'] !== '' 
             ? (float) $validated['price_zig'] 
-            : round($priceUsd * 13.5, 2);
+            : 0.0;
 
-        $stock = isset($validated['stock_count']) ? (int) $validated['stock_count'] : 50;
+        $stock = isset($validated['stock_count']) ? (int) $validated['stock_count'] : 0;
 
         $itemCode = $validated['item_code'] ?? null;
         if (!$itemCode) {
@@ -320,7 +326,7 @@ class UniformController extends Controller
         if (isset($validated['price_usd'])) {
             $uniform->price_usd = (float) $validated['price_usd'];
             if (!isset($validated['price_zig']) || $validated['price_zig'] === '') {
-                $uniform->price_zig = round($uniform->price_usd * 13.5, 2);
+                // Keep the school-configured ZiG price when only USD changes.
             }
         }
         if (isset($validated['price_zig']) && $validated['price_zig'] !== '') {
