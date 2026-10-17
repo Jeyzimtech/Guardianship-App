@@ -133,6 +133,10 @@ class UniformController extends Controller
         }
         if (!$schoolId && $user?->role === 'guardian') {
             $schoolId = $user->students()->orderBy('students.id')->value('school_id');
+            // Parents awaiting a child link still see the catalog when the platform runs a single school.
+            if (!$schoolId && \App\Models\School::count() === 1) {
+                $schoolId = \App\Models\School::value('id');
+            }
         }
         if ($schoolId) {
             $query->where(fn ($q) => $q->where('school_id', $schoolId)->orWhereNull('school_id'));

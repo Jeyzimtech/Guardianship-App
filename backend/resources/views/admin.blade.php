@@ -167,6 +167,10 @@
             transition: border 0.2s;
         }
 
+        .auth-form input[type="checkbox"] {
+            width: auto;
+        }
+
         .auth-form input:focus, .auth-form select:focus {
             border-color: var(--primary-blue);
             box-shadow: 0 0 0 3px rgba(59, 89, 152, 0.1);
@@ -447,6 +451,13 @@
             stroke-width: 2;
         }
 
+        .action-btn img {
+            width: 22px;
+            height: 22px;
+            object-fit: contain;
+            filter: brightness(0) invert(1);
+        }
+
         .badge-dot {
             position: absolute;
             top: 4px;
@@ -665,8 +676,15 @@
             border: 1px solid var(--border-color);
             border-radius: 6px;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
-            overflow: hidden;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
             margin-bottom: 24px;
+        }
+
+        /* Keep toolbars and headings in place while a wide table scrolls sideways */
+        .table-card > :not(table) {
+            position: sticky;
+            left: 0;
         }
 
         .table-toolbar {
@@ -933,6 +951,244 @@
             stroke-width: 2;
             flex-shrink: 0;
         }
+
+        /* RESPONSIVE LAYOUT */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(100%, 360px), 1fr));
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+
+        .split-grid {
+            display: grid;
+            grid-template-columns: 1fr 1.5fr;
+            gap: 24px;
+        }
+
+        .split-grid > * {
+            min-width: 0;
+        }
+
+        .menu-toggle {
+            display: none;
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 6px;
+            cursor: pointer;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .menu-toggle svg {
+            width: 22px;
+            height: 22px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2;
+        }
+
+        .sidebar-backdrop {
+            display: none;
+        }
+
+        @media (max-width: 900px) {
+            aside.sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.25s ease;
+                width: min(280px, 85vw);
+                box-shadow: 0 0 24px rgba(0, 0, 0, 0.2);
+            }
+
+            body.nav-open aside.sidebar {
+                transform: translateX(0);
+            }
+
+            body.nav-open {
+                overflow: hidden;
+            }
+
+            .sidebar-backdrop {
+                display: block;
+                position: fixed;
+                inset: 0;
+                background: rgba(0, 0, 0, 0.4);
+                z-index: 95;
+                opacity: 0;
+                pointer-events: none;
+                transition: opacity 0.25s ease;
+            }
+
+            body.nav-open .sidebar-backdrop {
+                opacity: 1;
+                pointer-events: auto;
+            }
+
+            main.main-content {
+                margin-left: 0;
+            }
+
+            header.top-header {
+                justify-content: space-between;
+                padding: 0 16px;
+            }
+
+            .menu-toggle {
+                display: inline-flex;
+            }
+
+            .header-actions {
+                gap: 8px;
+            }
+
+            .content-body {
+                padding: 16px;
+            }
+
+            .split-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .page-header {
+                flex-wrap: wrap;
+                align-items: flex-start;
+                gap: 12px;
+            }
+
+            .page-header > div:last-child:not(:first-child) {
+                flex-wrap: wrap;
+            }
+
+            table.data-table {
+                min-width: 600px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .auth-wrapper {
+                align-items: flex-start;
+                overflow-y: auto;
+                padding: 16px;
+            }
+
+            .auth-card {
+                flex-direction: column-reverse;
+                min-height: 0;
+            }
+
+            .auth-form-side {
+                padding: 24px 20px;
+            }
+
+            .auth-logo-side {
+                padding: 24px 20px;
+            }
+
+            .auth-logo-side > div:first-child {
+                padding: 12px 16px !important;
+                margin-bottom: 12px !important;
+            }
+
+            .auth-logo-side img {
+                height: 64px !important;
+            }
+
+            .auth-logo-side .brand-subtext {
+                margin-bottom: 12px;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr !important;
+                gap: 0 !important;
+            }
+
+            .modal-overlay {
+                padding: 12px;
+                align-items: flex-start;
+            }
+
+            .modal-card {
+                max-height: calc(100vh - 24px);
+                overflow-y: auto;
+            }
+
+            .modal-footer {
+                flex-wrap: wrap;
+            }
+
+            .table-toolbar .filter-group {
+                flex-wrap: wrap;
+                width: 100%;
+            }
+
+            .table-toolbar .filter-group .form-control {
+                flex: 1 1 140px;
+                width: auto !important;
+            }
+
+            .table-toolbar .filter-group label {
+                margin-left: 0 !important;
+            }
+
+            .search-input {
+                width: 100%;
+            }
+
+            .stack-sm {
+                flex-wrap: wrap;
+            }
+
+            #journalFeedContainer .table-card > div:first-child {
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+
+            /* 16px inputs stop iOS Safari from zooming in on focus */
+            .form-control, .search-input, .auth-form input, .auth-form select {
+                font-size: 16px;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .user-info {
+                display: none;
+            }
+
+            .user-profile-pill {
+                padding-left: 8px;
+                gap: 6px;
+            }
+
+            .btn-logout {
+                margin-left: 0;
+            }
+
+            .page-title {
+                font-size: 19px;
+            }
+
+            .kpi-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 10px;
+            }
+
+            .kpi-card {
+                padding: 12px;
+            }
+
+            .kpi-info p.value {
+                font-size: 20px;
+            }
+
+            .kpi-icon {
+                display: none;
+            }
+
+            .cards-grid {
+                grid-template-columns: 1fr;
+            }
+        }
     </style>
 </head>
 <body>
@@ -991,7 +1247,8 @@
     <div class="app-layout" id="dashboardScreen">
 
         <!-- Sidebar Navigation -->
-        <aside class="sidebar">
+        <div class="sidebar-backdrop" onclick="toggleSidebar(false)"></div>
+        <aside class="sidebar" id="sidebarNav">
             <div class="brand-header" style="gap: 12px;">
                 <div style="background: white; border-radius: 6px; padding: 4px; display: flex; align-items: center; justify-content: center; width: 36px; height: 36px;">
                     <img src="/assets/logo.png" alt="Edu+Connect Logo" style="height: 28px; width: 28px; object-fit: contain;">
@@ -1094,6 +1351,9 @@
 
             <!-- Top Header -->
             <header class="top-header">
+                <button class="menu-toggle" type="button" aria-label="Open menu" aria-controls="sidebarNav" aria-expanded="false" onclick="toggleSidebar()">
+                    <svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+                </button>
                 <div class="header-actions">
                     <button class="action-btn" data-roles="admin,teacher" title="View announcements" onclick="switchTab('announcements')">
                         <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
@@ -1169,7 +1429,7 @@
                     </div>
 
                     <h3 class="section-title">School Academic Performance & Engagement Analytics</h3>
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 20px; margin-bottom: 24px;">
+                    <div class="charts-grid">
 
                         <!-- Chart 1: Academic & Enrollment Trends -->
                         <div class="table-card" style="padding: 18px; margin-bottom: 0;">
@@ -1516,7 +1776,7 @@
                         </div>
                     </div>
 
-                    <div style="display: grid; grid-template-columns: 1fr 1.5fr; gap: 24px;">
+                    <div class="split-grid">
                         <!-- Post Authoring Form -->
                         <div class="table-card" style="padding: 20px;">
                             <h4 style="font-size: 15px; font-weight: 700; color: var(--primary-blue); margin-bottom: 14px;">Post Work Sample / Wellbeing Log</h4>
@@ -1624,7 +1884,7 @@
                             <p class="page-subtitle">Create school activities and record which learners took part. Parents see their child's participation.</p>
                         </div>
                     </div>
-                    <div style="display: grid; grid-template-columns: 1fr 1.5fr; gap: 24px;">
+                    <div class="split-grid">
                         <div class="table-card" style="padding: 20px;">
                             <h4 style="font-size: 15px; font-weight: 700; color: var(--primary-blue); margin-bottom: 14px;">New Activity</h4>
                             <form onsubmit="addActivitySubmit(event)">
@@ -1661,7 +1921,7 @@
                             <p class="page-subtitle">Set the merit and conduct categories teachers choose from when logging behaviour.</p>
                         </div>
                     </div>
-                    <div style="display: grid; grid-template-columns: 1fr 1.5fr; gap: 24px;">
+                    <div class="split-grid">
                         <div class="table-card" style="padding: 20px;">
                             <form onsubmit="addBehaviourCategorySubmit(event)">
                                 <div class="form-group"><label>Category Name</label><input type="text" id="behaviourCategoryName" class="form-control" placeholder="e.g. Kindness, Late homework" required></div>
@@ -2031,7 +2291,7 @@
                         <label>Item Name</label>
                         <input type="text" id="uniName" class="form-control" placeholder="e.g. Official Embroidered School Blazer" required>
                     </div>
-                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
+                    <div class="form-row" style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
                         <div class="form-group">
                             <label>Category</label>
                             <select id="uniCategory" class="form-control" required>
@@ -2048,7 +2308,7 @@
                             </select>
                         </div>
                     </div>
-                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
+                    <div class="form-row" style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
                         <div class="form-group">
                             <label>Price in USD ($)</label>
                             <input type="number" step="0.01" id="uniPriceUsd" class="form-control" placeholder="45.00" oninput="autoCalcZig()" required>
@@ -2058,7 +2318,7 @@
                             <input type="number" step="0.01" id="uniPriceZig" class="form-control" placeholder="585.00">
                         </div>
                     </div>
-                    <div style="display:grid; grid-template-columns: 1.5fr 1fr; gap:12px;">
+                    <div class="form-row" style="display:grid; grid-template-columns:1.5fr 1fr; gap:12px;">
                         <div class="form-group">
                             <label>Available Sizes (comma separated)</label>
                             <input type="text" id="uniSizes" class="form-control" placeholder="e.g. Size 28, Size 30, Size 32, Size 34" value="Size 28, Size 30, Size 32, Size 34">
@@ -2100,7 +2360,7 @@
                         <label>Item Name</label>
                         <input type="text" id="editUniName" class="form-control" required>
                     </div>
-                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
+                    <div class="form-row" style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
                         <div class="form-group">
                             <label>Category</label>
                             <select id="editUniCategory" class="form-control" required>
@@ -2115,7 +2375,7 @@
                             <input type="number" id="editUniStock" class="form-control" min="0" required>
                         </div>
                     </div>
-                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
+                    <div class="form-row" style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
                         <div class="form-group">
                             <label>Price in USD ($)</label>
                             <input type="number" step="0.01" id="editUniPriceUsd" class="form-control" oninput="autoCalcEditZig()" required>
@@ -2166,7 +2426,7 @@
                 <!-- Preset Switcher -->
                 <div style="margin-bottom: 20px; background: #F8FAFC; border: 1px solid #E2E8F0; padding: 14px; border-radius: 6px;">
                     <label style="font-weight: 700; font-size: 13px; color: #1E293B; display: block; margin-bottom: 8px;">Select Outbound Delivery Gateway</label>
-                    <div style="display: flex; gap: 8px;">
+                    <div class="stack-sm" style="display: flex; gap: 8px;">
                         <button type="button" id="presetBtnGmail" class="filter-btn active" onclick="applyMailPreset('gmail')" style="flex: 1; padding: 8px 4px; font-weight: 600; text-align: center; font-size: 12px;">
                             Gmail / Google Workspace
                         </button>
@@ -2185,7 +2445,7 @@
                 <form id="mailSettingsForm" onsubmit="saveMailSettingsSubmit(event)">
                     <input type="hidden" id="cfgMailProvider" value="gmail">
 
-                    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 12px;">
+                    <div class="form-row" style="display: grid; grid-template-columns:2fr 1fr; gap: 12px;">
                         <div class="form-group">
                             <label>SMTP Host Server</label>
                             <input type="text" id="cfgMailHost" class="form-control" placeholder="e.g. smtp.gmail.com" value="smtp.gmail.com" required>
@@ -2196,7 +2456,7 @@
                         </div>
                     </div>
 
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                    <div class="form-row" style="display: grid; grid-template-columns:1fr 1fr; gap: 12px;">
                         <div class="form-group">
                             <label>Encryption Protocol</label>
                             <select id="cfgMailEncryption" class="form-control">
@@ -2218,7 +2478,7 @@
                         </div>
                     </div>
 
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                    <div class="form-row" style="display: grid; grid-template-columns:1fr 1fr; gap: 12px;">
                         <div class="form-group">
                             <label>Sender Email (From)</label>
                             <input type="email" id="cfgMailFromAddress" class="form-control" placeholder="you@your-school-domain.org" required>
@@ -2229,7 +2489,7 @@
                         </div>
                     </div>
 
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                    <div class="form-row" style="display: grid; grid-template-columns:1fr 1fr; gap: 12px;">
                         <div class="form-group">
                             <label id="lblMailUsername">SMTP Username / Account</label>
                             <input type="text" id="cfgMailUsername" class="form-control" placeholder="SMTP username or account email">
@@ -2259,7 +2519,7 @@
                     <p style="font-size: 12px; color: #64748b; margin-bottom: 12px;">
                         Send an instant verification email using your current or saved SMTP settings to verify inbox deliverability.
                     </p>
-                    <div style="display: flex; gap: 10px; align-items: center;">
+                    <div class="stack-sm" style="display: flex; gap: 10px; align-items: center;">
                         <input type="email" id="testEmailRecipientInput" class="form-control" placeholder="Recipient email" style="flex: 1;">
                         <button type="button" id="btnSendTestEmail" class="btn-primary" style="background: #0D9488; white-space: nowrap;" onclick="sendTestEmailSubmit()">
                             Send Test Email
@@ -2386,6 +2646,21 @@
             }
         }
 
+        // MOBILE SIDEBAR DRAWER
+        function toggleSidebar(open) {
+            const shouldOpen = typeof open === 'boolean' ? open : !document.body.classList.contains('nav-open');
+            document.body.classList.toggle('nav-open', shouldOpen);
+            document.querySelector('.menu-toggle')?.setAttribute('aria-expanded', String(shouldOpen));
+        }
+
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape') toggleSidebar(false);
+        });
+
+        window.matchMedia('(min-width: 901px)').addEventListener('change', e => {
+            if (e.matches) toggleSidebar(false);
+        });
+
         // TAB NAVIGATION
         function switchTab(tabId) {
             const currentUser = JSON.parse(localStorage.getItem('admin_user') || '{}');
@@ -2405,6 +2680,8 @@
 
             const targetPane = document.getElementById('tab-' + tabId);
             if (targetPane) targetPane.classList.add('active');
+            toggleSidebar(false);
+            window.scrollTo(0, 0);
             const loaders = {
                 schools: () => Promise.all([loadSchools(), loadClasses(), loadAcademicYears()]),
                 announcements: loadAnnouncements,

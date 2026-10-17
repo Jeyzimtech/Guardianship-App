@@ -22,17 +22,7 @@ class PageHeading extends StatelessWidget {
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Container(
-          padding: const EdgeInsets.all(10),
-          decoration: BoxDecoration(
-            color: AppColors.softBlue,
-            borderRadius: BorderRadius.circular(14),
-          ),
-          child: icon == null
-              ? AppIcon(symbol, color: AppColors.primary, size: 24)
-              : Icon(icon, color: AppColors.primary, size: 24),
-        ),
-        const SizedBox(height: 16),
+        // symbol/icon are kept for callers but no longer drawn above headings.
         Text(
           title,
           style: const TextStyle(
