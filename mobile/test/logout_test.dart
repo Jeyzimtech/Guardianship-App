@@ -41,7 +41,7 @@ void main() {
         child: const MaterialApp(home: Scaffold(body: Text('start'))),
       ),
     );
-    expect(await auth.loginWithEmailPassword('parent@example.com', 'secret'), isTrue);
+    expect(await tester.runAsync(() => auth.loginWithEmailPassword('parent@example.com', 'secret')), isTrue);
 
     // A screen pushed deep in the stack, like the profile tab after login.
     final nav = tester.state<NavigatorState>(find.byType(Navigator));

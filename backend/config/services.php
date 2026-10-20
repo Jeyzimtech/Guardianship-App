@@ -1,6 +1,10 @@
 <?php
 
 return [
+    'smspop' => [
+        'token' => env('SMSPOP_API_TOKEN'),
+        'sender_id' => env('SMSPOP_SENDER_ID', 'SMSPoP'),
+    ],
     'pesepay' => [
         'integration_key' => env('PESEPAY_INTEGRATION_KEY'),
         'encryption_key' => env('PESEPAY_ENCRYPTION_KEY'),

@@ -91,52 +91,7 @@ class AuthController extends Controller
      */
     public function register(Request $request)
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users,email',
-            'phone_number' => 'nullable|string|max:50',
-            'password' => 'required|string|min:6',
-            'role' => 'nullable|in:guardian',
-        ]);
-
-        $email = strtolower(trim($request->email));
-        $phoneNumber = $request->phone_number ? trim($request->phone_number) : null;
-
-        if (!$phoneNumber) {
-            $phoneNumber = '+2637' . rand(10000000, 99999999);
-        }
-
-        // Ensure unique phone number
-        if (User::where('phone_number', $phoneNumber)->exists()) {
-            $phoneNumber .= '-' . rand(10, 99);
-        }
-
-        // Public self-registration creates guardian accounts only. Schools invite teachers.
-        $role = 'guardian';
-
-        $user = User::create([
-            'name' => trim($request->name),
-            'email' => $email,
-            'phone_number' => $phoneNumber,
-            'password' => Hash::make($request->password),
-            'role' => $role,
-            'account_uid' => 'uid_' . Str::random(20),
-        ]);
-
-        $token = $user->createToken('auth-token')->plainTextToken;
-
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Account created successfully',
-            'token' => $token,
-            'user' => [
-                'id' => $user->id,
-                'name' => $user->name,
-                'email' => $user->email,
-                'phone_number' => $user->phone_number,
-                'role' => $user->role,
-            ]
-        ], 201);
+        return response()->json(['message' => 'Ask your teacher to add your parent account. School administrators add teachers.'], 403);
     }
 
     /**

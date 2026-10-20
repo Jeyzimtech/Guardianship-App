@@ -37,6 +37,9 @@ Route::get('/health', function () {
 // Public uniform catalog
 Route::get('/uniforms', [UniformController::class, 'index']);
 
+Route::post('/auth/phone/request', [\App\Http\Controllers\PhoneAuthController::class, 'requestCode'])->middleware('throttle:5,1');
+Route::post('/auth/phone/verify', [\App\Http\Controllers\PhoneAuthController::class, 'verify'])->middleware('throttle:15,1');
+
 // Public auth endpoints
 Route::post('/auth/login', [AuthController::class, 'login']);
 Route::post('/auth/register', [AuthController::class, 'register']);
@@ -46,6 +49,9 @@ Route::post('/auth/reset-password', [AuthController::class, 'resetPassword']);
 
 // Authenticated routes
 Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/sos', [\App\Http\Controllers\SosController::class, 'store'])->middleware(['role:teacher', 'throttle:2,1']);
+    Route::get('/sos', [\App\Http\Controllers\SosController::class, 'index'])->middleware('role:guardian');
+    Route::post('/sos/{id}/acknowledge', [\App\Http\Controllers\SosController::class, 'acknowledge'])->middleware('role:guardian');
     // Auth profile & logout
     Route::get('/auth/profile', [AuthController::class, 'profile']);
     Route::post('/auth/logout', [AuthController::class, 'logout']);

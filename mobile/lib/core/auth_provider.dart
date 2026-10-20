@@ -58,6 +58,20 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
+  Future<void> verifyPhoneCode(String challenge, String code) async {
+    final response = await apiClient.dio.post('/auth/phone/verify', data: {
+      'challenge_id': challenge, 'code': code,
+    });
+    _token = response.data['token'];
+    _user = Map<String, dynamic>.from(response.data['user']);
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('auth_token', _token!);
+    for (final entry in {'user_name': 'name', 'user_role': 'role', 'user_phone': 'phone_number', 'user_email': 'email'}.entries) {
+      await prefs.setString(entry.key, _user![entry.value]?.toString() ?? '');
+    }
+    notifyListeners();
+  }
+
   Future<bool> loginWithEmailPassword(String email, String password) async {
     _isLoading = true;
     _errorMessage = null;

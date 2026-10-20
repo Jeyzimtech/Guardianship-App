@@ -34,7 +34,7 @@ class AccountInvitationTest extends TestCase
     {
         [$teacher,,$school,$child] = $this->staff();
         $url = null; $this->expectInvitation($url);
-        $this->actingAs($teacher)->postJson('/api/users', ['name'=>'Parent','email'=>' Parent@Example.com ','phone_number'=>'parent','role'=>'guardian','student_ids'=>[$child->id]])
+        $this->actingAs($teacher)->postJson('/api/users', ['name'=>'Parent','email'=>' Parent@Example.com ','phone_number'=>'0771234567','role'=>'guardian','student_ids'=>[$child->id]])
             ->assertCreated()->assertJsonPath('email_sent', true);
         $parent = User::where('email','parent@example.com')->firstOrFail();
         $this->assertTrue($parent->students()->whereKey($child->id)->exists());
@@ -65,7 +65,7 @@ class AccountInvitationTest extends TestCase
     {
         [$teacher,,$school] = $this->staff();
         $other = Student::create(['school_id'=>$school->id,'name'=>'Other','grade'=>'2','class_name'=>'Blue']);
-        $this->actingAs($teacher)->postJson('/api/users', ['name'=>'Parent','email'=>'other@example.com','phone_number'=>'other','role'=>'guardian','student_ids'=>[$other->id]])->assertForbidden();
+        $this->actingAs($teacher)->postJson('/api/users', ['name'=>'Parent','email'=>'other@example.com','phone_number'=>'0781234567','role'=>'guardian','student_ids'=>[$other->id]])->assertForbidden();
         $this->postJson('/api/users', ['role'=>'teacher'])->assertForbidden();
         $this->assertDatabaseMissing('users',['email'=>'other@example.com']);
     }

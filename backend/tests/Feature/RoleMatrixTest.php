@@ -45,9 +45,11 @@ class RoleMatrixTest extends TestCase {
         $this->putJson("/api/students/{$this->goldChild->id}", ['name' => 'Renamed', 'class_id' => $this->gold->id])->assertForbidden();
     }
 
-    public function test_admin_enrolls_students_and_configures_behaviour_categories(): void {
+    public function test_admin_configures_categories_and_teacher_enrolls_students(): void {
         $this->actingAs($this->admin);
-        $this->postJson('/api/students', ['name' => 'New Child', 'class_id' => $this->gold->id])->assertCreated();
+        $this->postJson('/api/students', ['name' => 'New Child', 'class_id' => $this->gold->id])->assertForbidden();
+        $this->actingAs($this->teacher)->postJson('/api/students', ['name' => 'New Child', 'class_id' => $this->gold->id])->assertCreated();
+        $this->actingAs($this->admin);
         $this->postJson('/api/behaviour-categories', ['name' => 'Kindness', 'polarity' => 'positive'])->assertCreated();
 
         $this->actingAs($this->teacher);

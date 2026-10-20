@@ -57,10 +57,11 @@ class UserController extends Controller
         abort_unless(($actor->role === 'admin' && $request->role === 'teacher')
             || ($actor->role === 'teacher' && $request->role === 'guardian'), 403,
             'School admins invite teachers; teachers invite parents and guardians.');
-        $request->merge(['email' => strtolower(trim((string) $request->email))]);
+        $request->merge(['email' => $request->filled('email') ? strtolower(trim($request->email)) : null]);
+        if ($request->role === 'guardian') $request->merge(['phone_number' => \App\Services\SmsPop::phone((string) $request->phone_number)]);
         $data = $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|email|max:255|unique:users,email',
+            'email' => 'required_if:role,teacher|nullable|email|max:255|unique:users,email',
             'phone_number' => 'required|string|max:50|unique:users,phone_number',
             'role' => 'required|in:teacher,guardian',
             'school_id' => 'nullable|exists:schools,id',
@@ -80,6 +81,9 @@ class UserController extends Controller
                 abort_unless($teacher->teachesStudent($student), 403, 'You may only invite guardians for students in your assigned classes.');
             }
         }
+        if ($data['role'] === 'guardian' && User::whereIn('phone_number', \App\Services\SmsPop::aliases($data['phone_number']))->exists()) {
+            throw \Illuminate\Validation\ValidationException::withMessages(['phone_number' => 'This phone number already has an account.']);
+        }
         $user = \Illuminate\Support\Facades\DB::transaction(function () use ($data, $schoolId) {
             $user = User::create([
                 'name' => trim($data['name']), 'email' => $data['email'],
@@ -95,11 +99,11 @@ class UserController extends Controller
             }
             return $user;
         });
-        $delivery = EmailSettingsController::sendPasswordSetupLink($user);
+        $delivery = $user->email ? EmailSettingsController::sendPasswordSetupLink($user) : ['success' => false];
         return response()->json([
             'status' => 'success',
-            'message' => $delivery['success'] ? 'Account created. A password setup link has been emailed.'
-                : 'Account created, but the setup email could not be sent. Please retry the invitation.',
+            'message' => !$user->email ? 'Parent account created. Sign in with this phone number and an SMS verification code.' : ($delivery['success'] ? 'Account created. A password setup link has been emailed.'
+                : 'Account created, but the setup email could not be sent. Please retry the invitation.'),
             'user' => $user->load(['teacherProfile.school', 'students']),
             'email_sent' => $delivery['success'],
         ], 201);

@@ -68,6 +68,11 @@
             display: none;
         }
 
+        /* Never render the dashboard behind the login screen; zooming out would reveal it */
+        .auth-wrapper:not(.hidden) ~ .app-layout {
+            display: none;
+        }
+
         .auth-card {
             background: white;
             border-radius: 12px;
@@ -1728,7 +1733,7 @@
                         </div>
                         <div style="display: flex; gap: 10px;">
                             <button class="btn-sm" data-roles="admin" style="padding: 8px 12px; font-weight: 600;" onclick="openModal('linkGuardianModal')">Link Guardian</button>
-                            <button class="btn-primary" data-roles="admin,teacher" onclick="openModal('studentModal')">
+                            <button class="btn-primary" data-roles="teacher" onclick="openModal('studentModal')">
                                 <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
                                 Add New Student
                             </button>

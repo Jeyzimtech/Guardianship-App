@@ -67,7 +67,7 @@ class StudentController extends Controller
     public function store(Request $request)
     {
         $user = $request->user();
-        abort_unless(in_array($user->role, ['admin', 'teacher'], true), 403, 'Only school staff can enroll students.');
+        abort_unless(in_array($user->role, ['teacher'], true), 403, 'Teachers enroll students in their assigned classes.');
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',
@@ -75,7 +75,7 @@ class StudentController extends Controller
             'dob' => 'nullable|date',
             'guardian_name' => 'nullable|string|max:255',
             'guardian_phone' => 'required_with:guardian_name|nullable|string|max:50',
-            'guardian_email' => 'required_with:guardian_name|nullable|email|max:255',
+            'guardian_email' => 'nullable|email|max:255',
             'guardian_id' => 'nullable|exists:users,id',
         ]);
 
@@ -90,6 +90,8 @@ class StudentController extends Controller
             abort_unless($class, 403, 'You may only enroll students in your assigned classes.');
         }
 
+        if (!empty($validated['guardian_phone'])) $validated['guardian_phone'] = \App\Services\SmsPop::phone($validated['guardian_phone']);
+
         $guardian = null;
         if (!empty($validated['guardian_id'])) {
             $guardian = \App\Models\User::whereKey($validated['guardian_id'])->where('role', 'guardian')->first();
@@ -98,8 +100,11 @@ class StudentController extends Controller
             $email = !empty($validated['guardian_email']) ? strtolower(trim($validated['guardian_email'])) : null;
             $phone = !empty($validated['guardian_phone']) ? trim($validated['guardian_phone']) : null;
             $guardian = $email ? \App\Models\User::where('email', $email)->first() : null;
-            if (!$guardian && $phone) $guardian = \App\Models\User::where('phone_number', $phone)->first();
-            if ($guardian) abort_unless($guardian->role === 'guardian', 422, 'The matching account is not a guardian.');
+            if (!$guardian && $phone) $guardian = \App\Models\User::whereIn('phone_number', \App\Services\SmsPop::aliases($phone))->first();
+            if ($guardian) {
+                abort_unless($guardian->role === 'guardian', 422, 'The matching account is not a guardian.');
+                abort_unless(\App\Services\SmsPop::phone($guardian->phone_number) === $phone, 422, 'This email belongs to a different phone number. Check the parent details.');
+            }
         }
 
         $student = DB::transaction(function () use ($validated, $class, $guardian, $user) {

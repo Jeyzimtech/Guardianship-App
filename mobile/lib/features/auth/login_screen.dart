@@ -4,6 +4,7 @@ import '../../core/auth_provider.dart';
 import '../../core/app_colors.dart';
 import '../../core/app_icon.dart';
 import '../../core/session.dart';
+import 'phone_login_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -451,6 +452,12 @@ class _LoginScreenState extends State<LoginScreen> {
                     ],
                   ),
                   const SizedBox(height: 24),
+                  OutlinedButton.icon(
+                    onPressed: _isAuthenticating ? null : () => Navigator.push(context, MaterialPageRoute(builder: (_) => const PhoneLoginScreen())),
+                    icon: const Icon(Icons.sms_outlined),
+                    label: const Text('Sign in with SMS code'),
+                  ),
+                  const SizedBox(height: 16),
                   TextField(
                     controller: _emailController,
                     enabled: !_isAuthenticating,
@@ -533,7 +540,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     crossAxisAlignment: WrapCrossAlignment.center,
                     children: [
                       const Text(
-                        'Accounts are managed by school administration. ',
+                        'Teachers add parents. School admins add teachers. ',
                         style: TextStyle(color: AppColors.textMuted, fontSize: 13),
                       ),
                       TextButton(

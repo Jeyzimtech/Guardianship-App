@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'teacher_sos_card.dart';
+import 'enroll_student_page.dart';
 import 'package:provider/provider.dart';
 import '../../core/auth_provider.dart';
 import '../../core/app_colors.dart';
@@ -108,6 +110,9 @@ class _TeacherHomeViewState extends State<TeacherHomeView> {
                 ],
               ),
               const SizedBox(height: 32),
+              const TeacherSosCard(),
+              EditorialLink(title: 'Add student and parent', subtitle: 'Enroll a learner in your assigned class', onTap: () => _open(const EnrollStudentPage())),
+              const SizedBox(height: 16),
               const Text('Teaching essentials', style: Editorial.section),
               const SizedBox(height: 16),
               EditorialLink(

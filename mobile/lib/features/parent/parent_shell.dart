@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'sos_listener.dart';
 import 'package:provider/provider.dart';
 import '../../core/student_provider.dart';
 import '../../core/app_colors.dart';
@@ -72,7 +73,7 @@ class _ParentShellState extends State<ParentShell> {
         ),
         iconTheme: const IconThemeData(color: AppColors.textPrimary),
       ),
-      body: IndexedStack(index: _currentIndex, children: pages),
+      body: SosListener(child: IndexedStack(index: _currentIndex, children: pages)),
       bottomNavigationBar: Container(
         decoration: const BoxDecoration(
           color: AppColors.surface,
