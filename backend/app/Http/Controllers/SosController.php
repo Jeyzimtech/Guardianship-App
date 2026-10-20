@@ -34,7 +34,7 @@ class SosController extends Controller
             $parents = User::whereIn('id', DB::table('sos_recipients')->where('sos_alert_id', $alert->id)->pluck('guardian_id'))->get();
             $phones = []; $unsupported = 0;
             foreach ($parents as $parent) {
-                try { $phones[] = SmsPop::phone($parent->phone_number); }
+                try { $phones[] = SmsPop::phone((string) $parent->phone_number); }
                 catch (\Throwable) { $unsupported++; }
             }
             try {

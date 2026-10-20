@@ -84,7 +84,7 @@ class _EnrollStudentPageState extends State<EnrollStudentPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text(
-            'Student enrolled and parent linked. The parent can now sign in with an SMS code.',
+            'Student enrolled and parent linked. Parents can sign in once an email or phone number is added.',
           ),
         ),
       );
@@ -130,7 +130,7 @@ class _EnrollStudentPageState extends State<EnrollStudentPage> {
                     ),
                     const SizedBox(height: 12),
                     const Text(
-                      'Add a learner to one of your assigned classes. Their parent can verify their phone and sign in by SMS without an email address.',
+                      'Add a learner to one of your assigned classes. Email and phone are optional. Add either contact detail to enable parent sign-in.',
                     ),
                     const SizedBox(height: 24),
                     DropdownButtonFormField<int>(
@@ -181,10 +181,9 @@ class _EnrollStudentPageState extends State<EnrollStudentPage> {
                       enabled: !_saving,
                       keyboardType: TextInputType.phone,
                       decoration: const InputDecoration(
-                        labelText: 'Parent phone number',
+                        labelText: 'Parent phone number (optional)',
                         hintText: '0771234567',
                       ),
-                      validator: _required,
                     ),
                     const SizedBox(height: 16),
                     TextFormField(

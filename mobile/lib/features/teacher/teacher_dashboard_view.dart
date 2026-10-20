@@ -502,13 +502,13 @@ class _TeacherDashboardViewState extends State<TeacherDashboardView> {
       builder: (dialogContext) => StatefulBuilder(builder: (dialogContext, update) => AlertDialog(
         title: const Text('Invite guardian'),
         content: SingleChildScrollView(child: Form(key: form, child: Column(mainAxisSize: MainAxisSize.min, children: [
-          Text('Create a parent or guardian account for ${student['name']}. They can sign in using their phone number and an SMS code. Email is optional.'),
+          Text('Create a parent or guardian account for ${student['name']}. Email and phone are optional. Add either contact detail to enable sign-in.'),
           const SizedBox(height: 16),
           TextFormField(controller: name, decoration: const InputDecoration(labelText: 'Guardian name'), validator: (v) => v == null || v.trim().isEmpty ? 'Enter a name' : null),
           const SizedBox(height: 12),
           TextFormField(controller: email, keyboardType: TextInputType.emailAddress, decoration: const InputDecoration(labelText: 'Email address (optional)'), validator: (v) => v != null && v.trim().isNotEmpty && !RegExp(r'^[^\s@]+@[^\s@]+\.[^\s@]+$').hasMatch(v.trim()) ? 'Enter a valid email' : null),
           const SizedBox(height: 12),
-          TextFormField(controller: phone, keyboardType: TextInputType.phone, decoration: const InputDecoration(labelText: 'Phone number'), validator: (v) => v == null || v.trim().isEmpty ? 'Enter a phone number' : null),
+          TextFormField(controller: phone, keyboardType: TextInputType.phone, decoration: const InputDecoration(labelText: 'Phone number (optional)')),
           if (error != null) Padding(padding: const EdgeInsets.only(top: 12), child: Text(error!, style: const TextStyle(color: Colors.red))),
         ]))),
         actions: [

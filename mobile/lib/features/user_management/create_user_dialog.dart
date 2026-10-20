@@ -138,13 +138,13 @@ class _CreateUserDialogState extends State<CreateUserDialog> {
                   controller: _phoneController,
                   keyboardType: TextInputType.phone,
                   decoration: InputDecoration(
-                    labelText: 'Phone Number',
+                    labelText: _selectedRole == 'guardian' ? 'Phone Number (Optional)' : 'Phone Number',
                     hintText: 'e.g. +263771234567',
                     prefixIcon: const Icon(Icons.phone_outlined, color: darkTeal),
                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                   ),
                   validator: (val) {
-                    if (val == null || val.trim().isEmpty) return 'Phone number is required';
+                    if (val == null || val.trim().isEmpty) return _selectedRole == 'guardian' ? null : 'Phone number is required';
                     if (val.trim().length < 8) return 'Enter a valid phone number (min 8 digits)';
                     return null;
                   },

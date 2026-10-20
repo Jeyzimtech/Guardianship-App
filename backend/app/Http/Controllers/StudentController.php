@@ -74,7 +74,7 @@ class StudentController extends Controller
             'class_id' => 'required|integer|exists:school_classes,id',
             'dob' => 'nullable|date',
             'guardian_name' => 'nullable|string|max:255',
-            'guardian_phone' => 'required_with:guardian_name|nullable|string|max:50',
+            'guardian_phone' => 'nullable|string|max:50',
             'guardian_email' => 'nullable|email|max:255',
             'guardian_id' => 'nullable|exists:users,id',
         ]);
@@ -103,7 +103,7 @@ class StudentController extends Controller
             if (!$guardian && $phone) $guardian = \App\Models\User::whereIn('phone_number', \App\Services\SmsPop::aliases($phone))->first();
             if ($guardian) {
                 abort_unless($guardian->role === 'guardian', 422, 'The matching account is not a guardian.');
-                abort_unless(\App\Services\SmsPop::phone($guardian->phone_number) === $phone, 422, 'This email belongs to a different phone number. Check the parent details.');
+                abort_unless(!$phone || ($guardian->phone_number && \App\Services\SmsPop::phone($guardian->phone_number) === $phone), 422, 'This email belongs to a different phone number. Check the parent details.');
             }
         }
 

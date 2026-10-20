@@ -83,6 +83,23 @@ class SmsAndSosTest extends TestCase
             ->postJson('/api/students', ['name' => 'No', 'class_id' => $class->id])->assertForbidden();
     }
 
+    public function test_parent_contacts_are_independently_optional(): void
+    {
+        [$teacher, $student, $class] = $this->classroom();
+        \Illuminate\Support\Facades\Mail::fake();
+        $this->actingAs($teacher);
+        foreach ([[], ['email' => 'parent@example.com'], ['phone_number' => '0771234567'], ['email' => 'both@example.com', 'phone_number' => '0781234567']] as $contacts) {
+            $response = $this->postJson('/api/users', $contacts + ['name' => 'Parent', 'role' => 'guardian', 'student_ids' => [$student->id]])->assertCreated();
+            $this->assertSame($contacts['email'] ?? null, $response->json('user.email'));
+            if (empty($contacts['phone_number'])) $response->assertJsonPath('user.phone_number', null);
+        }
+        foreach ([[], ['guardian_email' => 'enroll@example.com']] as $contacts) {
+            $this->postJson('/api/students', $contacts + ['name' => 'Child', 'class_id' => $class->id, 'guardian_name' => 'New Parent'])
+                ->assertCreated()->assertJsonPath('student.guardians.0.phone_number', null);
+        }
+        $this->postJson('/api/users', ['name' => 'Invalid', 'role' => 'guardian', 'phone_number' => 'invalid', 'student_ids' => [$student->id]])->assertUnprocessable();
+    }
+
     public function test_sos_is_scoped_deduplicated_and_acknowledged_by_recipient_only(): void
     {
         [$teacher, $student] = $this->classroom();

@@ -58,11 +58,11 @@ class UserController extends Controller
             || ($actor->role === 'teacher' && $request->role === 'guardian'), 403,
             'School admins invite teachers; teachers invite parents and guardians.');
         $request->merge(['email' => $request->filled('email') ? strtolower(trim($request->email)) : null]);
-        if ($request->role === 'guardian') $request->merge(['phone_number' => \App\Services\SmsPop::phone((string) $request->phone_number)]);
+        if ($request->role === 'guardian' && $request->filled('phone_number')) $request->merge(['phone_number' => \App\Services\SmsPop::phone((string) $request->phone_number)]);
         $data = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required_if:role,teacher|nullable|email|max:255|unique:users,email',
-            'phone_number' => 'required|string|max:50|unique:users,phone_number',
+            'phone_number' => 'required_if:role,teacher|nullable|string|max:50|unique:users,phone_number',
             'role' => 'required|in:teacher,guardian',
             'school_id' => 'nullable|exists:schools,id',
             'subject_specialties' => 'nullable|array',
@@ -81,13 +81,13 @@ class UserController extends Controller
                 abort_unless($teacher->teachesStudent($student), 403, 'You may only invite guardians for students in your assigned classes.');
             }
         }
-        if ($data['role'] === 'guardian' && User::whereIn('phone_number', \App\Services\SmsPop::aliases($data['phone_number']))->exists()) {
+        if ($data['role'] === 'guardian' && !empty($data['phone_number']) && User::whereIn('phone_number', \App\Services\SmsPop::aliases($data['phone_number']))->exists()) {
             throw \Illuminate\Validation\ValidationException::withMessages(['phone_number' => 'This phone number already has an account.']);
         }
         $user = \Illuminate\Support\Facades\DB::transaction(function () use ($data, $schoolId) {
             $user = User::create([
                 'name' => trim($data['name']), 'email' => $data['email'],
-                'phone_number' => $data['phone_number'], 'role' => $data['role'],
+                'phone_number' => $data['phone_number'] ?? null, 'role' => $data['role'],
                 'school_id' => $data['role'] === 'teacher' ? $schoolId : null,
                 'account_uid' => (string) Str::uuid(), 'password' => Str::random(64),
             ]);
@@ -102,8 +102,8 @@ class UserController extends Controller
         $delivery = $user->email ? EmailSettingsController::sendPasswordSetupLink($user) : ['success' => false];
         return response()->json([
             'status' => 'success',
-            'message' => !$user->email ? 'Parent account created. Sign in with this phone number and an SMS verification code.' : ($delivery['success'] ? 'Account created. A password setup link has been emailed.'
-                : 'Account created, but the setup email could not be sent. Please retry the invitation.'),
+            'message' => !$user->email && !$user->phone_number ? 'Parent account created. Add an email or phone number before the parent can sign in.' : (!$user->email ? 'Parent account created. Sign in with this phone number and an SMS verification code.' : ($delivery['success'] ? 'Account created. A password setup link has been emailed.'
+                : 'Account created, but the setup email could not be sent. Please retry the invitation.')),
             'user' => $user->load(['teacherProfile.school', 'students']),
             'email_sent' => $delivery['success'],
         ], 201);
@@ -152,7 +152,7 @@ class UserController extends Controller
         $request->validate([
             'name' => 'sometimes|required|string|max:255',
             'email' => 'nullable|email|unique:users,email,' . $id,
-            'phone_number' => 'sometimes|required|string|unique:users,phone_number,' . $id,
+            'phone_number' => ($user->role === 'guardian' ? 'sometimes|nullable|string|unique:users,phone_number,' : 'sometimes|required|string|unique:users,phone_number,') . $id,
             'role' => 'sometimes|required|in:admin,teacher,guardian',
             'password' => 'nullable|string|min:6',
             'school_id' => 'nullable|exists:schools,id',
