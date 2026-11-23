@@ -48,13 +48,17 @@ Route::post('/auth/forgot-password', [AuthController::class, 'forgotPassword']);
 Route::post('/auth/reset-password', [AuthController::class, 'resetPassword']);
 
 // Authenticated routes
-Route::middleware('auth:sanctum')->group(function () {
+Route::middleware(['auth:sanctum', \App\Http\Middleware\GuardianSubscription::class])->group(function () {
+    Route::get('/subscription', fn (\Illuminate\Http\Request $request) => response()->json(\App\Services\GuardianAccess::status($request->user())))->middleware('role:guardian');
     Route::post('/sos', [\App\Http\Controllers\SosController::class, 'store'])->middleware(['role:teacher', 'throttle:2,1']);
     Route::get('/sos', [\App\Http\Controllers\SosController::class, 'index'])->middleware('role:guardian');
+    Route::get('/sos/history', [\App\Http\Controllers\SosController::class, 'history'])->middleware('role:guardian');
     Route::post('/sos/{id}/acknowledge', [\App\Http\Controllers\SosController::class, 'acknowledge'])->middleware('role:guardian');
     // Auth profile & logout
     Route::get('/auth/profile', [AuthController::class, 'profile']);
     Route::post('/auth/logout', [AuthController::class, 'logout']);
+    Route::post('/auth/delete-account', [AuthController::class, 'deleteAccount'])->middleware('throttle:5,1');
+    Route::post('/support/reports', [\App\Http\Controllers\SupportReportController::class, 'store'])->middleware('throttle:5,1');
 
     // Guardian Self-Service Profile (paperless details update)
     Route::get('/guardian/profile', [GuardianProfileController::class, 'getProfile']);
@@ -63,6 +67,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // Website Admin / Platform Owner Console (Restricted to platform owners)
     Route::middleware('role:website_admin')->prefix('platform')->group(function () {
         Route::post('/schools', [WebsiteAdminController::class, 'onboardSchool']);
+        Route::delete('/schools/{id}', [WebsiteAdminController::class, 'destroySchool']);
         Route::get('/directory', [WebsiteAdminController::class, 'listDirectory']);
         Route::post('/subscriptions/toggle', [WebsiteAdminController::class, 'toggleSubscription']);
         Route::get('/subscriptions/history/{student_id}', [WebsiteAdminController::class, 'getSubscriptionHistory']);
@@ -127,6 +132,14 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('/teachers/{id}', [TeacherController::class, 'destroy']);
     });
 
+
+    Route::middleware('role:guardian,teacher')->group(function () {
+        Route::get('/students/{id}/photo-details', [\App\Http\Controllers\StudentPhotoController::class, 'details']);
+        Route::get('/students/{id}/photo', [\App\Http\Controllers\StudentPhotoController::class, 'show']);
+        Route::post('/students/{id}/photo', [\App\Http\Controllers\StudentPhotoController::class, 'store'])->middleware('throttle:10,1');
+        Route::delete('/students/{id}/photo', [\App\Http\Controllers\StudentPhotoController::class, 'destroy']);
+    });
+
     // Students List & Linking
     Route::get('/students', [StudentController::class, 'index'])->middleware('role:guardian,teacher,admin');
     Route::post('/students/request-link', [StudentController::class, 'requestLink'])->middleware('role:guardian');
@@ -137,8 +150,11 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('/students/{id}', [StudentController::class, 'update']);
     });
     Route::post('/students', [StudentController::class, 'store'])->middleware('role:admin,teacher');
+    Route::get('/parents/import/template', [\App\Http\Controllers\ParentImportController::class, 'template'])->middleware('role:teacher');
+    Route::post('/parents/import', [\App\Http\Controllers\ParentImportController::class, 'import'])->middleware(['role:teacher', 'throttle:10,1']);
 
     // Attendance Roster (Teacher & Admin)
+    Route::get('/attendance/export', [AttendanceController::class, 'export'])->middleware('role:admin,teacher');
     Route::get('/attendance/roster', [AttendanceController::class, 'getRoster'])->middleware('role:admin,teacher');
     Route::get('/fees/payments/pending', [FeeController::class, 'pendingPayments'])->middleware('role:admin');
     Route::post('/fees/payments/{id}/verify', [FeeController::class, 'verifyPayment'])->middleware('role:admin');
@@ -189,9 +205,14 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     Route::get('/teacher/assignments', [AssignmentController::class, 'teacherIndex'])->middleware('role:teacher');
+    Route::get('/documents', [\App\Http\Controllers\SchoolDocumentController::class, 'index'])->middleware(['role:admin,teacher,guardian', CheckChildSubscription::class]);
+    Route::post('/documents', [\App\Http\Controllers\SchoolDocumentController::class, 'store'])->middleware('role:admin');
+    Route::get('/documents/{document_id}/download', [\App\Http\Controllers\SchoolDocumentController::class, 'downloadLink'])->middleware(['role:admin,teacher,guardian', CheckChildSubscription::class]);
+    Route::delete('/documents/{document_id}', [\App\Http\Controllers\SchoolDocumentController::class, 'destroy'])->middleware('role:admin');
 
     // Authoring Endpoints (Teachers & Admin)
     Route::post('/attendance/mark', [AttendanceController::class, 'markAttendance'])->middleware('role:admin,teacher');
+    Route::get('/fees/payments/{id}/proof', [FeeController::class, 'proof'])->middleware('role:guardian,admin');
     Route::post('/fees/pay', [FeeController::class, 'processPayment'])->middleware('role:guardian,admin');
     Route::post('/fees/update-balance', [FeeController::class, 'updateBalance'])->middleware('role:admin');
     Route::post('/reports/upload', [ReportController::class, 'uploadReport'])->middleware('role:admin,teacher');
@@ -215,6 +236,26 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/uniforms/{id}', [UniformController::class, 'update'])->middleware('role:admin');
     Route::put('/uniforms/{id}', [UniformController::class, 'update'])->middleware('role:admin');
     Route::delete('/uniforms/{id}', [UniformController::class, 'destroy'])->middleware('role:admin');
+
+    Route::get('/moderation/reports', [\App\Http\Controllers\SupportReportController::class, 'index'])->middleware('role:website_admin');
+    Route::put('/moderation/reports/{id}', [\App\Http\Controllers\SupportReportController::class, 'review'])->middleware('role:website_admin');
+    Route::post('/messages/block/{userId}', [\App\Http\Controllers\MessageController::class, 'block'])->middleware('role:guardian,teacher')->whereNumber('userId');
+    Route::delete('/messages/block/{userId}', [\App\Http\Controllers\MessageController::class, 'block'])->middleware('role:guardian,teacher')->whereNumber('userId');
+
+    // Direct teacher-guardian messages
+    Route::middleware('role:teacher,guardian')->group(function () {
+        Route::delete('/mobile-notifications', [\App\Http\Controllers\MobileNotificationController::class, 'destroy']);
+        Route::get('/mobile-notifications/counts', [\App\Http\Controllers\MobileNotificationController::class, 'counts']);
+        Route::post('/mobile-notifications/read', [\App\Http\Controllers\MobileNotificationController::class, 'read']);
+        Route::post('/mobile-notifications/device', [\App\Http\Controllers\MobileNotificationController::class, 'register']);
+        Route::delete('/mobile-notifications/device', [\App\Http\Controllers\MobileNotificationController::class, 'unregister']);
+    });
+    Route::middleware('role:teacher,guardian')->group(function () {
+        Route::delete('/messages/with/{userId}', [\App\Http\Controllers\MessageController::class, 'destroy'])->whereNumber('userId');
+        Route::get('/messages/contacts', [\App\Http\Controllers\MessageController::class, 'contacts']);
+        Route::get('/messages/with/{userId}', [\App\Http\Controllers\MessageController::class, 'thread'])->whereNumber('userId');
+        Route::post('/messages', [\App\Http\Controllers\MessageController::class, 'store'])->middleware('throttle:30,1');
+    });
 
     // Announcements
     Route::get('/announcements', [AnnouncementController::class, 'index'])->middleware('role:guardian,admin,teacher');

@@ -53,6 +53,38 @@ class AccountInvitationTest extends TestCase
             ->assertCreated()->assertJsonPath('email_sent',true)->assertJsonPath('user.teacher_profile.school_id',$school->id);
     }
 
+    public function test_new_teacher_and_class_assignment_are_created_together(): void
+    {
+        [,$admin,$school] = $this->staff();
+        $class = SchoolClass::where('school_id', $school->id)->firstOrFail();
+        $url = null; $this->expectInvitation($url);
+        $response = $this->actingAs($admin)->postJson('/api/users', ['name'=>'Class Teacher','email'=>'class@example.com','phone_number'=>'class-teacher','role'=>'teacher','class_id'=>$class->id])->assertCreated();
+        $teacher = User::findOrFail($response->json('user.id'))->teacherProfile;
+        $this->assertTrue($teacher->assignedClasses()->whereKey($class->id)->exists());
+        $this->assertSame('Homeroom', $teacher->assignedClasses()->first()->pivot->subject_name);
+    }
+
+    public function test_teacher_cannot_be_created_with_another_schools_class(): void
+    {
+        [,$admin] = $this->staff();
+        $school = School::create(['name'=>'Other School','type'=>'primary']);
+        $class = SchoolClass::create(['school_id'=>$school->id,'grade'=>'2','class_name'=>'Red']);
+        $this->actingAs($admin)->postJson('/api/users', ['name'=>'Wrong School','email'=>'wrongclass@example.com','phone_number'=>'wrong-class','role'=>'teacher','class_id'=>$class->id])->assertUnprocessable();
+        $this->assertDatabaseMissing('users', ['email'=>'wrongclass@example.com']);
+    }
+
+    public function test_existing_teacher_can_receive_an_additional_class(): void
+    {
+        [$teacher,$admin,$school] = $this->staff();
+        $first = $teacher->teacherProfile->assignedClasses()->first();
+        $second = SchoolClass::create(['school_id'=>$school->id,'grade'=>'2','class_name'=>'Red']);
+        $this->actingAs($admin)->putJson('/api/teachers/'.$teacher->teacherProfile->id, ['class_assignments'=>[
+            ['school_class_id'=>$first->id,'subject_name'=>'Homeroom'],
+            ['school_class_id'=>$second->id,'subject_name'=>'Homeroom'],
+        ]])->assertOk();
+        $this->assertSame(2, $teacher->teacherProfile->assignedClasses()->count());
+    }
+
     public function test_teacher_profile_creation_sends_exactly_one_invitation(): void
     {
         [,$admin,$school] = $this->staff();

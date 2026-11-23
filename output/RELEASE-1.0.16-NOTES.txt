@@ -1,0 +1,5 @@
+<en-US>
+Removed medical and wellbeing tracking features.
+Updated privacy information and data handling.
+Retained content reporting, message blocking and account deletion controls.
+</en-US>

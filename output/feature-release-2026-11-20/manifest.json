@@ -1,0 +1,26 @@
+{
+  "date": "2026-11-20",
+  "files": {
+    "app/Services/GuardianAccess.php": "165cf92289facceb839d87574ef5973fb3b7be5d89bfa29761f61b1e93328d94",
+    "app/Http/Middleware/GuardianSubscription.php": "a86f5936e993d65d1ea722dab21a1468ec296fe3e890d09ae004f3e2bc31483d",
+    "app/Http/Middleware/CheckChildSubscription.php": "84fc8c22578a7e4d05561b4874067e32f63edd2b9370611784921aa017572934",
+    "app/Http/Controllers/WebsiteAdminController.php": "abb5751b276bd9b33f651575d699136b76fec53a36e37d4c09407b6a067dea88",
+    "app/Services/SchoolRemoval.php": "192190d5189a53ed5d826569a4a96eeb337d9d1e26baabb99384a96d44f718dd",
+    "app/Jobs/PurgeSchoolFiles.php": "c055eb1f4632dee293049ba9d4a6d0ab963abe79c06f3dd7d2b8da08e248ce46",
+    "app/Http/Controllers/UserController.php": "4452bdae52dd6ae5ec5c785b169ee1e753bc5a5e9458cbc780c6495bf16d59c2",
+    "app/Http/Controllers/JournalController.php": "c79b3bb058ff622ff1b89bd7b322053a41794a3d63a7fb17d353399d138574c8",
+    "app/Http/Controllers/MessageController.php": "8aaf47e00990865d53a7f5bb9fb654ce8e5a7b58afe0a607b3d9daa8bcd98535",
+    "app/Services/MessageRetention.php": "45c8d753bc8d8b6e454dc038f0d122dfa63c7d491d1a56a57b0f681daac9954c",
+    "app/Services/MobileUpdates.php": "cf3638fc5308ea3b261ba494900d1953ab3e34fdf14adabb6607fc1cfec6e6b6",
+    "app/Http/Controllers/AnnouncementController.php": "9a3c57c98d32aee6b33f5f8a02a73fca4c2c2cb525b8d0198be1277ed4b9b676",
+    "app/Http/Controllers/FeeController.php": "eedeff4b34fbdfe1dbb23a28ca8014dae6e3a4d3b7be3319e1300d4dd337db1a",
+    "app/Models/FeeTransaction.php": "19b2cea3f1641fb29bffb91713138a00c1b0ef8589c64adde96588dfe1643b82",
+    "app/Http/Controllers/DashboardController.php": "7567d7608b565d52c58ff653125273cb522bba9206464459bf68498d2b8ae0d4",
+    "resources/views/admin.blade.php": "85869586dedef5d7ae88602b369ec9231330553559c77b669dc7c5d978fb3e34",
+    "routes/api.php": "b74c4c7a9b057ee773655afcb2a95c87b01bf699459bf3c3ef5b923b6fecbec6",
+    "routes/console.php": "a4f7f936a7a52fba3e4bec8e8bed851a7f1275dc1af77441104c08082e893f58",
+    "database/migrations/2026_11_20_000001_add_payment_proof_and_retention_index.php": "d3ed79fb77c72e63478a8bc0b79e1cb4d8119b79e98beb6974fdcce783032634"
+  },
+  "server_rename": false,
+  "migration": "2026_11_20_000001_add_payment_proof_and_retention_index.php"
+}

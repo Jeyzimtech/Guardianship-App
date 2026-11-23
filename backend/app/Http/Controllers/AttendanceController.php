@@ -8,6 +8,26 @@ use Illuminate\Http\Request;
 
 class AttendanceController extends Controller
 {
+    public function export(Request $request)
+    {
+        $request->validate(['date' => 'required|date_format:Y-m-d']);
+        $response = $this->getRoster($request);
+        if ($response->getStatusCode() !== 200) return $response;
+        $data = $response->getData(true);
+        $rows = collect($data['roster'])->where('marked', true);
+        abort_if($rows->isEmpty(), 422, 'No saved register exists for this date.');
+        return response()->streamDownload(function () use ($rows, $data) {
+            $file = fopen('php://output', 'w');
+            fwrite($file, "\xEF\xBB\xBF");
+            fputcsv($file, ['Date', 'Student ID', 'Name', 'Grade', 'Class', 'Status', 'Remarks']);
+            foreach ($rows as $row) {
+                $values = [$data['date'], $row['roll_no'], $row['name'], $row['grade'], $row['class_name'], $row['status'], $row['remarks']];
+                fputcsv($file, array_map(fn ($v) => preg_match('/^[\s]*[=+@-]/u', (string) $v) ? "'".$v : $v, $values));
+            }
+            fclose($file);
+        }, 'attendance-'.$data['date'].'.csv', ['Content-Type' => 'text/csv; charset=UTF-8', 'Cache-Control' => 'private, no-store']);
+    }
+
     /**
      * Get attendance roster for a given date and class.
      * Admin and Teachers can retrieve roster to mark daily attendance.
@@ -49,11 +69,15 @@ class AttendanceController extends Controller
             ->get()
             ->keyBy('student_id');
 
-        $roster = $students->map(function ($s, $idx) use ($existingRecords) {
+        $merits = \App\Models\BehaviourIncident::whereIn('student_id', $studentIds)->where('polarity', 'positive')
+            ->selectRaw('student_id, count(*) as total')->groupBy('student_id')->pluck('total', 'student_id');
+
+        $roster = $students->map(function ($s, $idx) use ($existingRecords, $merits) {
             $rec = $existingRecords->get($s->id);
             $guardians = $s->guardians->map(fn ($g) => $g->only(['id', 'name', 'email', 'phone_number']))->values();
             return [
                 'student_id' => $s->id,
+                'photo_url' => $s->photo_url,
                 'roll_no' => 'STU-' . str_pad($s->id, 3, '0', STR_PAD_LEFT),
                 'name' => $s->name,
                 'guardians' => $guardians,
@@ -62,6 +86,8 @@ class AttendanceController extends Controller
                 'grade' => $s->grade,
                 'school_name' => $s->school ? $s->school->name : 'N/A',
                 'status' => $rec ? $rec->status : 'present',
+                'marked' => (bool) $rec,
+                'merits' => (int) ($merits[$s->id] ?? 0),
                 'remarks' => $rec && $rec->subject_name ? $rec->subject_name : '',
             ];
         });

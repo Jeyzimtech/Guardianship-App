@@ -11,11 +11,11 @@ use Illuminate\Support\Str;
 class JournalController extends Controller
 {
     /**
-     * Admin feed: Get all learning journal entries & Preparatory daily wellbeing logs.
+     * Admin feed: Get all learning journal entries.
      */
     public function index(Request $request)
     {
-        $query = JournalEntry::with(['student.school', 'author:id,name,role']);
+        $query = JournalEntry::where('type', '!=', 'wellbeing')->with(['student.school', 'author:id,name,role']);
 
         if ($request->filled('student_id')) {
             $query->where('student_id', $request->student_id);
@@ -53,7 +53,6 @@ class JournalController extends Controller
                 'type' => $entry->type,
                 'caption' => $entry->caption,
                 'media_url' => $mediaUrl,
-                'wellbeing_data' => $entry->wellbeing_data,
                 'author_name' => $entry->author ? $entry->author->name : 'School staff',
                 'created_at' => $entry->created_at->diffForHumans(),
                 'created_at_date' => $entry->created_at->format('d M Y, h:i A'),
@@ -68,7 +67,7 @@ class JournalController extends Controller
     }
 
     /**
-     * Get learning journal entries & Preparatory daily wellbeing logs for single student.
+     * Get learning journal entries for single student.
      */
     public function getEntries(Request $request, $student_id)
     {
@@ -81,6 +80,7 @@ class JournalController extends Controller
             return response()->json(['status' => 'error', 'message' => 'You may only view students in your assigned classes.'], 403);
         }
         $entries = JournalEntry::where('student_id', $student_id)
+            ->where('type', '!=', 'wellbeing')
             ->with('author:id,name,role')
             ->orderBy('created_at', 'desc')
             ->get();
@@ -100,21 +100,17 @@ class JournalController extends Controller
     }
 
     /**
-     * Post a new multimedia work sample or Preparatory daily log.
+     * Post a new multimedia work sample.
      */
     public function storeEntry(Request $request)
     {
         $validated = $request->validate([
             'student_id' => 'required|exists:students,id',
-            'type' => 'required|in:photo,video,drawing,voice,text,link,wellbeing',
+            'type' => 'required|in:photo,video,voice,text,link',
             'caption' => 'nullable|string',
             'media_url' => 'nullable|url:https',
             'subject_name' => 'nullable|string',
-            'wellbeing_data' => 'nullable|array',
-            'wellbeing_data.meals' => 'nullable|string',
-            'wellbeing_data.nap' => 'nullable|string',
-            'wellbeing_data.hygiene' => 'nullable|string',
-            'wellbeing_data.mood' => 'nullable|string',
+            'wellbeing_data' => 'prohibited',
             'image' => 'nullable|file|image|max:8192',
             'file' => 'nullable|file|mimes:jpg,jpeg,png,gif,mp4,webm,mp3,wav,m4a,ogg|max:10240',
         ]);
@@ -152,9 +148,10 @@ class JournalController extends Controller
             'caption' => $validated['caption'] ?? null,
             'media_url' => $mediaUrl,
             'subject_name' => $validated['subject_name'] ?? null,
-            'wellbeing_data' => $validated['wellbeing_data'] ?? null,
             'fee_gated' => false,
         ]);
+
+        \App\Jobs\SendMobilePush::dispatch('journal', $entry->id)->afterCommit();
 
         return response()->json([
             'status' => 'success',

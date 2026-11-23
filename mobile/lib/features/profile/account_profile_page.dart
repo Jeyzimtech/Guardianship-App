@@ -6,8 +6,13 @@ import '../../core/session.dart';
 import '../../core/app_colors.dart';
 import '../../core/app_icon.dart';
 import '../common/page_components.dart';
-import '../school_management/school_management_screen.dart';
-import '../teacher_management/teacher_management_screen.dart';
+import '../common/student_avatar.dart';
+import '../common/student_photo_page.dart';
+import '../../core/legal.dart';
+import '../legal/legal_document_page.dart';
+import '../support/app_info_page.dart';
+import '../support/help_center_page.dart';
+import '../support/report_issue_page.dart';
 
 class AccountProfilePage extends StatefulWidget {
   final Map<String, dynamic>? child;
@@ -24,7 +29,54 @@ class AccountProfilePage extends StatefulWidget {
 }
 
 class _AccountProfilePageState extends State<AccountProfilePage> {
-  bool _notificationsEnabled = true;
+  final Map<int, String?> _photoOverrides = {};
+  // A teacher's assigned classes, loaded from the server.
+  List<Map<String, dynamic>>? _classes;
+  bool _classesFailed = false;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _loadClasses());
+  }
+
+  Future<void> _loadClasses() async {
+    final auth = context.read<AuthProvider>();
+    if (!auth.isTeacher || widget.parent) return;
+    try {
+      final response = await auth.apiClient.dio.get('/school-classes');
+      if (!mounted) return;
+      setState(() => _classes = [
+        for (final c in response.data['school_classes'] as List? ?? []) Map<String, dynamic>.from(c),
+      ]);
+    } catch (_) {
+      if (mounted) setState(() => _classesFailed = true);
+    }
+  }
+
+  Widget _schoolRow(String title, String subtitle) => _detail(subtitle, title);
+
+  @override
+  void didUpdateWidget(covariant AccountProfilePage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.child?['id'] != widget.child?['id'] ||
+        oldWidget.child?['photo_url'] != widget.child?['photo_url']) {
+      _photoOverrides.clear();
+    }
+  }
+
+  Future<void> _editStudentPhoto(Map<String, dynamic> child) async {
+    final id = child['id'];
+    if (id is! int) return;
+    final result = await Navigator.push<Map<String, dynamic>>(context, MaterialPageRoute(builder: (_) => StudentPhotoPage(
+      studentId: id, studentName: child['name']?.toString() ?? 'Your child',
+      photoUrl: _photoOverrides.containsKey(id) ? _photoOverrides[id] : child['photo_url'] as String?)));
+    if (!mounted || result == null) return;
+    final url = result['photo_url'] as String?;
+    setState(() => _photoOverrides[id] = url);
+    context.read<StudentProvider>().updateStudentPhoto(id, url);
+  }
+
 
   String _value(Map<String, dynamic>? user, String key) {
     final value = user?[key]?.toString().trim() ?? '';
@@ -82,14 +134,30 @@ class _AccountProfilePageState extends State<AccountProfilePage> {
         ),
       );
 
+  // Material keeps the ripple visible above the card's background.
+  Widget _link(IconData icon, String title, Widget page, {String? subtitle}) => Material(
+    type: MaterialType.transparency,
+    child: ListTile(
+      contentPadding: EdgeInsets.zero,
+      leading: Icon(icon, color: AppColors.primary),
+      title: Text(title, style: const TextStyle(fontWeight: FontWeight.w500)),
+      subtitle: subtitle == null ? null : Text(subtitle),
+      trailing: const Icon(Icons.chevron_right, color: AppColors.textMuted),
+      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => page)),
+    ),
+  );
+
   Future<void> _confirmExit({bool delete = false}) async {
+    final teacher = context.read<AuthProvider>().isTeacher;
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
         title: Text(delete ? 'Delete account?' : 'Log out?'),
         content: Text(
           delete
-              ? 'This permanently deletes your account and cannot be undone.'
+              ? teacher
+                  ? 'This permanently deletes your account and personal details and cannot be undone. Attendance, reports and journal posts you created stay with the school as "Former teacher".'
+                  : 'This permanently deletes your account, contact details and messages and cannot be undone. Your child\'s school records stay with the school.'
               : 'You can sign back in whenever you need to.',
         ),
         actions: [
@@ -139,6 +207,8 @@ class _AccountProfilePageState extends State<AccountProfilePage> {
         .join()
         .toUpperCase();
     final parent = widget.parent || !auth.isTeacher;
+    final selectedChild = widget.child ?? context.watch<StudentProvider>().selectedStudent;
+    final selectedChildId = selectedChild?['id'];
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: widget.showAppBar
@@ -160,7 +230,7 @@ class _AccountProfilePageState extends State<AccountProfilePage> {
                 borderRadius: BorderRadius.circular(24),
               ),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   CircleAvatar(
                     radius: 30,
@@ -177,6 +247,7 @@ class _AccountProfilePageState extends State<AccountProfilePage> {
                   const SizedBox(height: 18),
                   Text(
                     displayName,
+                    textAlign: TextAlign.center,
                     style: const TextStyle(
                       fontSize: 25,
                       height: 1.25,
@@ -213,24 +284,22 @@ class _AccountProfilePageState extends State<AccountProfilePage> {
             const SizedBox(height: 24),
             if (widget.child != null)
               _section('Linked student', AppSymbol.student, [
+                SizedBox(width: double.infinity, child: Column(children: [
+                StudentAvatar(name: widget.child!['name']?.toString() ?? 'Student',
+                  photoUrl: _photoOverrides.containsKey(widget.child!['id']) ? _photoOverrides[widget.child!['id']] : widget.child!['photo_url'] as String?, size: 76),
+                const SizedBox(height: 14),
                 Text(
                   widget.child!['name']?.toString() ?? 'Student',
+                  textAlign: TextAlign.center,
                   style: const TextStyle(
                     fontWeight: FontWeight.w600,
                     fontSize: 16,
                   ),
                 ),
-                const SizedBox(height: 6),
-                Text(
-                  [widget.child!['class'], widget.child!['school']]
-                      .where((v) => v != null && v.toString().isNotEmpty)
-                      .join(' · '),
-                  style: const TextStyle(
-                    color: AppColors.textMuted,
-                    height: 1.5,
-                  ),
-                ),
+                ])),
               ]),
+            if (parent && selectedChildId is int)
+              Padding(padding: const EdgeInsets.only(bottom: 16), child: OutlinedButton(onPressed: () => _editStudentPhoto(selectedChild!), child: const Text('Add / change student photo'))),
             _section('Contact details', AppSymbol.profile, [
               _detail('Phone number', _value(user, 'phone_number')),
               const Divider(height: 1),
@@ -248,68 +317,56 @@ class _AccountProfilePageState extends State<AccountProfilePage> {
                 'Preferred language',
                 user?['preferred_language']?.toString() ?? 'English',
               ),
-              if (parent) ...[
-                const Divider(height: 1),
-                Material(
-                  color: Colors.transparent,
-                  child: SwitchListTile(
-                    contentPadding: EdgeInsets.zero,
-                    title: const Text(
-                      'Notifications',
-                      style: TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    subtitle: const Text(
-                      'Attendance and school announcements',
-                      style: TextStyle(fontSize: 13, height: 1.5),
-                    ),
-                    value: _notificationsEnabled,
-                    onChanged: (value) =>
-                        setState(() => _notificationsEnabled = value),
-                  ),
-                ),
-              ],
             ]),
             _section('Your school', AppSymbol.school, [
-              if (!parent)
-                TextButton(
-                  onPressed: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const TeacherManagementScreen(),
-                    ),
-                  ),
-                  child: const Text('Class & teacher roster'),
-                ),
-              TextButton(
-                onPressed: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => const SchoolManagementScreen(),
-                  ),
-                ),
-                child: const Text('School & class information'),
-              ),
+              if (parent)
+                ...(() {
+                  final children = context.watch<StudentProvider>().students;
+                  return children.isEmpty
+                      ? [const Text('No children are linked to your account yet.', style: TextStyle(color: AppColors.textMuted))]
+                      : [
+                          for (final c in children)
+                            _schoolRow(
+                              c['name']?.toString() ?? 'Student',
+                              [c['school']?['name'], '${c['grade'] ?? ''} ${c['class_name'] ?? ''}'.trim()]
+                                  .where((v) => v != null && v.toString().isNotEmpty)
+                                  .join(' · '),
+                            ),
+                        ];
+                })()
+              else if (_classesFailed)
+                const Text('Could not load your classes. Pull down on Home to retry.', style: TextStyle(color: AppColors.textMuted))
+              else if (_classes == null)
+                const Center(child: CircularProgressIndicator())
+              else if (_classes!.isEmpty)
+                const Text('Your school administrator has not assigned you a class yet.', style: TextStyle(color: AppColors.textMuted))
+              else
+                for (final c in _classes!)
+                  _schoolRow('${c['grade'] ?? ''} · ${c['class_name'] ?? ''}', c['school']?['name']?.toString() ?? 'Assigned class'),
+            ]),
+            _section('Help & legal', AppSymbol.report, [
+              _link(Icons.privacy_tip_outlined, 'Privacy policy', const LegalDocumentPage()),
+              _link(Icons.description_outlined, 'Terms of use', const LegalDocumentPage(terms: true)),
+              _link(Icons.help_outline, 'Help center', const HelpCenterPage(), subtitle: Legal.supportEmail),
+              _link(Icons.bug_report_outlined, 'Report a technical issue', const ReportIssuePage()),
+              _link(Icons.rate_review_outlined, 'Send feedback', const ReportIssuePage(category: 'feedback')),
+              _link(Icons.info_outline, 'App info', const AppInfoPage()),
             ]),
             OutlinedButton.icon(
               onPressed: auth.isLoading ? null : () => _confirmExit(),
               icon: const Icon(Icons.logout, size: 18),
               label: const Text('Log out'),
             ),
-            if (widget.parent) ...[
-              const SizedBox(height: 8),
-              TextButton(
-                onPressed: auth.isLoading
-                    ? null
-                    : () => _confirmExit(delete: true),
-                style: TextButton.styleFrom(
-                  foregroundColor: const Color(0xFFB91C1C),
-                ),
-                child: const Text('Delete account'),
+            const SizedBox(height: 8),
+            TextButton(
+              onPressed: auth.isLoading
+                  ? null
+                  : () => _confirmExit(delete: true),
+              style: TextButton.styleFrom(
+                foregroundColor: const Color(0xFFB91C1C),
               ),
-            ],
+              child: const Text('Delete account'),
+            ),
           ],
         ),
       ),

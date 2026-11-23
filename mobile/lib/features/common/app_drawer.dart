@@ -1,17 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../core/auth_provider.dart';
+import '../../core/notification_provider.dart';
 import '../../core/app_colors.dart';
 import '../../core/app_icon.dart';
-import '../parent/uniform_marketplace_view.dart';
-import '../parent/fee_payments_view.dart';
 import '../teacher/teacher_publish_page.dart';
-import '../parent/learning_journal_view.dart';
-import '../parent/behaviour_view.dart';
 import '../parent/assignments_view.dart';
-import '../dashboard/announcements_view.dart';
 import '../dashboard/attendance_view.dart';
 import '../../core/session.dart';
+import 'documents_view.dart';
 
 class AppDrawer extends StatelessWidget {
   final String currentRoute;
@@ -28,6 +25,15 @@ class AppDrawer extends StatelessWidget {
     required VoidCallback onTap,
   }) {
     final isSelected = currentRoute == title;
+    final updates = context.watch<NotificationProvider?>();
+    final category = title == 'Learning Journal'
+        ? 'journal'
+        : title == 'Notifications' || title == 'Announcements'
+        ? 'notices'
+        : title == 'Messages'
+        ? 'messages'
+        : '';
+    final unread = updates?.count(category) ?? 0;
 
     return Container(
       decoration: BoxDecoration(
@@ -47,6 +53,12 @@ class AppDrawer extends StatelessWidget {
           color: isSelected ? primaryBlue : AppColors.textMuted,
           size: 20,
         ),
+        trailing: unread > 0
+            ? Badge(
+                label: Text(unread > 99 ? '99+' : '$unread'),
+                backgroundColor: const Color(0xFFEF1524),
+              )
+            : null,
         title: Text(
           title,
           style: TextStyle(
@@ -104,10 +116,6 @@ class AppDrawer extends StatelessWidget {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      Text(
-                        'Guardianship Portal',
-                        style: TextStyle(color: Colors.white70, fontSize: 12),
-                      ),
                     ],
                   ),
                 ),
@@ -132,49 +140,6 @@ class AppDrawer extends StatelessWidget {
                           Navigator.popUntil(context, (r) => r.isFirst),
                     ),
                     if (!isTeacher) ...[
-                      _buildDrawerItem(
-                        context,
-                        title: 'School fees',
-                        onTap: () => Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => const FeePaymentsView(),
-                          ),
-                        ),
-                      ),
-                      _buildDrawerItem(
-                        context,
-                        title: 'Uniform Store',
-
-                        onTap: () => Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => const UniformMarketplaceView(),
-                          ),
-                        ),
-                      ),
-                      _buildDrawerItem(
-                        context,
-                        title: 'Learning Journal',
-
-                        onTap: () => Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => const LearningJournalView(),
-                          ),
-                        ),
-                      ),
-                      _buildDrawerItem(
-                        context,
-                        title: 'Behaviour & Merits',
-
-                        onTap: () => Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => const BehaviourView(),
-                          ),
-                        ),
-                      ),
                       _buildDrawerItem(
                         context,
                         title: 'Homework Tasks',
@@ -234,13 +199,11 @@ class AppDrawer extends StatelessWidget {
                     ],
                     _buildDrawerItem(
                       context,
-                      title: 'Notifications',
-
+                      title: 'School documents',
                       onTap: () => Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (_) =>
-                              const AnnouncementsView(notifications: true),
+                          builder: (_) => const DocumentsView(),
                         ),
                       ),
                     ),

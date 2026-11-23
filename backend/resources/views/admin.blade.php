@@ -806,10 +806,10 @@
             text-transform: capitalize;
         }
 
-        .role-badge.admin { background: #E0E7FF; color: #3730A3; }
-        .role-badge.teacher { background: #ECFDF5; color: #065F46; }
-        .role-badge.guardian { background: #FEF3C7; color: #92400E; }
-        .role-badge.student { background: #E0F2FE; color: #075985; }
+        .role-badge.admin { color: #3730A3; }
+        .role-badge.teacher { color: #065F46; }
+        .role-badge.guardian { color: #92400E; }
+        .role-badge.student { color: #075985; }
 
         .btn-sm {
             padding: 4px 8px;
@@ -1276,12 +1276,6 @@
                 </li>
                 <li class="nav-section" data-roles="admin">SCHOOL ADMIN</li>
                 <li class="nav-item" data-roles="admin">
-                    <a class="nav-link" onclick="switchTab('users')">
-                        <img src="/assets/icons8-user.svg" alt="User Management">
-                        <span>User Management</span>
-                    </a>
-                </li>
-                <li class="nav-item" data-roles="admin">
                     <a class="nav-link" onclick="switchTab('schools')">
                         <img src="/assets/icons8-school-management.svg" alt="School Management">
                         <span>School Management</span>
@@ -1293,25 +1287,19 @@
                         <span>Teachers</span>
                     </a>
                 </li>
-                <li class="nav-item" data-roles="admin,teacher">
+                <li class="nav-item" data-roles="teacher">
                     <a class="nav-link" onclick="switchTab('students')">
                         <img src="/assets/icons8-education.svg" alt="Students">
                         <span>Students</span>
                     </a>
                 </li>
-                <li class="nav-item" data-roles="admin">
-                    <a class="nav-link" onclick="switchTab('fees')">
-                        <img src="/assets/icons8-wallet.svg" alt="Fee Accounts">
-                        <span>Fee Accounts</span>
-                    </a>
-                </li>
-                <li class="nav-item" data-roles="teacher,admin">
+                <li class="nav-item" data-roles="teacher">
                     <a class="nav-link" onclick="switchTab('journal')">
                         <img src="/assets/icons8-reports.svg" alt="Learning Journal">
                         <span>Learning Journal & Logs</span>
                     </a>
                 </li>
-                <li class="nav-item" data-roles="teacher,admin">
+                <li class="nav-item" data-roles="teacher">
                     <a class="nav-link" onclick="switchTab('attendance')">
                         <img src="/assets/icons8-attendance.svg" alt="Attendance">
                         <span>Attendance</span>
@@ -1340,6 +1328,12 @@
                     <a class="nav-link" onclick="switchTab('reports')">
                         <img src="/assets/icons8-reports.svg" alt="Reports & Circulars">
                         <span>Reports & Circulars</span>
+                    </a>
+                </li>
+                <li class="nav-item" data-roles="admin">
+                    <a class="nav-link" onclick="switchTab('documents')">
+                        <img src="/assets/icons8-reports.svg" alt="Documents">
+                        <span>Documents</span>
                     </a>
                 </li>
                 <li class="nav-item" data-roles="admin">
@@ -1386,24 +1380,15 @@
                     <div class="page-header">
                         <div>
                             <h2 class="page-title" id="displaySchoolName">School Admin Workspace</h2>
-                            <p class="page-subtitle">School records, classes, staff, fees, uniform shop, and communications</p>
+                            <p class="page-subtitle">School records, classes, staff, uniform shop, and communications</p>
                         </div>
-                        <button class="btn-primary" data-roles="admin" onclick="openModal('userModal')">
+                        <button class="btn-primary" data-roles="admin" onclick="openModal('teacherAccountModal')">
                             <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                            Quick Add User
+                            Add Teacher
                         </button>
                     </div>
 
                     <div class="kpi-grid">
-                        <div class="kpi-card">
-                            <div class="kpi-info">
-                                <p class="title">Total Students</p>
-                                <p class="value" id="kpiStudents">--</p>
-                            </div>
-                            <div class="kpi-icon">
-                                <img src="/assets/icons8-education.svg" alt="Students">
-                            </div>
-                        </div>
                         <div class="kpi-card">
                             <div class="kpi-info">
                                 <p class="title">Attendance Rate</p>
@@ -1439,8 +1424,8 @@
                         <!-- Chart 1: Academic & Enrollment Trends -->
                         <div class="table-card" style="padding: 18px; margin-bottom: 0;">
                             <div style="margin-bottom: 12px;">
-                                <h4 style="font-size: 14px; font-weight: 700; color: var(--primary-blue); margin: 0;">Academic Pass Rate Trends</h4>
-                                <p style="font-size: 11px; color: var(--text-secondary); margin: 2px 0 0 0;">Term-over-term verified academic pass rates</p>
+                                <h4 style="font-size: 14px; font-weight: 700; color: var(--primary-blue); margin: 0;">Weekly Attendance Rate</h4>
+                                <p style="font-size: 11px; color: var(--text-secondary); margin: 2px 0 0 0;">Present or late, from saved registers over the last six weeks</p>
                             </div>
                             <div style="height: 220px; position: relative;">
                                 <canvas id="revenueChart"></canvas>
@@ -1450,8 +1435,8 @@
                         <!-- Chart 2: Attendance by Stream -->
                         <div class="table-card" style="padding: 18px; margin-bottom: 0;">
                             <div style="margin-bottom: 12px;">
-                                <h4 style="font-size: 14px; font-weight: 700; color: var(--primary-blue); margin: 0;">Weekly Attendance Rate by Stream</h4>
-                                <p style="font-size: 11px; color: var(--text-secondary); margin: 2px 0 0 0;">Comparison across Preparatory, Primary & Secondary</p>
+                                <h4 style="font-size: 14px; font-weight: 700; color: var(--primary-blue); margin: 0;">Attendance Rate by Class</h4>
+                                <p style="font-size: 11px; color: var(--text-secondary); margin: 2px 0 0 0;">Last 30 days of saved registers</p>
                             </div>
                             <div style="height: 220px; position: relative;">
                                 <canvas id="attendanceChart"></canvas>
@@ -1461,8 +1446,8 @@
                         <!-- Chart 3: App Activity & Engagement -->
                         <div class="table-card" style="padding: 18px; margin-bottom: 0;">
                             <div style="margin-bottom: 12px;">
-                                <h4 style="font-size: 14px; font-weight: 700; color: var(--primary-blue); margin: 0;">Parent & Teacher App Interactions</h4>
-                                <p style="font-size: 11px; color: var(--text-secondary); margin: 2px 0 0 0;">Daily logins, report card views & notifications</p>
+                                <h4 style="font-size: 14px; font-weight: 700; color: var(--primary-blue); margin: 0;">Teacher Activity</h4>
+                                <p style="font-size: 11px; color: var(--text-secondary); margin: 2px 0 0 0;">Journal posts, homework, behaviour records and attendance marks per week</p>
                             </div>
                             <div style="height: 220px; position: relative;">
                                 <canvas id="activityChart"></canvas>
@@ -1473,20 +1458,6 @@
 
                     <h3 class="section-title">Quick Management Modules</h3>
                     <div class="cards-grid">
-                        <div class="module-card" onclick="switchTab('students')">
-                            <div class="module-icon"><img src="/assets/icons8-education.svg" alt="Student Management"></div>
-                            <div class="module-text">
-                                <h4>Student Management</h4>
-                                <p>Enrolment, profiles & class allocations</p>
-                            </div>
-                        </div>
-                        <div class="module-card" onclick="switchTab('users')">
-                            <div class="module-icon"><img src="/assets/icons8-user.svg" alt="User Control"></div>
-                            <div class="module-text">
-                                <h4>User & Access Control</h4>
-                                <p>Manage Admin, Teacher & Guardian accounts</p>
-                            </div>
-                        </div>
                         <div class="module-card" onclick="switchTab('schools')">
                             <div class="module-icon"><img src="/assets/icons8-school-management.svg" alt="School Setup"></div>
                             <div class="module-text">
@@ -1594,53 +1565,6 @@
                     </div>
                 </div>
 
-                <!-- TAB 2: USER MANAGEMENT -->
-                <div id="tab-users" class="tab-pane" data-roles="admin">
-                    <div class="page-header">
-                        <div>
-                            <h2 class="page-title">User Management</h2>
-                            <p class="page-subtitle">Manage system users, security credentials, and access roles</p>
-                        </div>
-                        <div style="display:flex; gap:10px;">
-                            <button class="btn-sm" data-roles="admin" style="background:#FFFFFF; border:1px solid #CBD5E1; color:#475569; display:inline-flex; align-items:center; gap:6px; font-weight:600; padding:6px 12px;" onclick="openMailSettingsModal()" title="Configure Outbound Email / SES Gateway">
-                                <svg viewBox="0 0 24 24" style="width:14px; height:14px; stroke:currentColor; fill:none; stroke-width:2;"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-                                SMTP Gateway
-                            </button>
-                            <button class="btn-primary" data-roles="admin" onclick="openModal('userModal')">
-                                <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                                Add New User
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="table-card">
-                        <div class="table-toolbar">
-                            <div class="filter-group">
-                                <button class="filter-btn active" onclick="filterUserRole('all', this)">All Users</button>
-                                <button class="filter-btn" onclick="filterUserRole('admin', this)">Admins</button>
-                                <button class="filter-btn" onclick="filterUserRole('teacher', this)">Teachers</button>
-                                <button class="filter-btn" onclick="filterUserRole('guardian', this)">Guardians</button>
-                            </div>
-                            <input type="text" id="userSearchInput" class="search-input" placeholder="Search by name, email or phone..." onkeyup="renderUsersTable()">
-                        </div>
-                        <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Name</th>
-                                    <th>Email</th>
-                                    <th>Phone Number</th>
-                                    <th>Role</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="usersTableBody">
-                                <!-- Populated dynamically via JS -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
                 <!-- TAB 3: SCHOOL MANAGEMENT -->
                 <div id="tab-schools" class="tab-pane" data-roles="admin">
                     <div class="page-header">
@@ -1678,7 +1602,7 @@
                                 <tr>
                                     <th>Class Name</th>
                                     <th>Grade Level</th>
-                                    <th>Form Teacher</th>
+                                    <th>Teachers</th>
                                     <th>Enrolled Students</th>
                                     <th>Actions</th>
                                 </tr>
@@ -1690,6 +1614,16 @@
                             </tbody>
                         </table>
                     </div>
+                    <div class="table-card" id="classRosterCard" style="margin-top: 24px; display: none;">
+                        <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px;">
+                            <strong id="classRosterTitle">Class roster</strong>
+                            <button class="btn-sm" onclick="document.getElementById('classRosterCard').style.display='none'">Close</button>
+                        </div>
+                        <table class="data-table">
+                            <thead><tr><th>Student</th><th>Linked parents</th></tr></thead>
+                            <tbody id="classRosterBody"></tbody>
+                        </table>
+                    </div>
                 </div>
 
                 <!-- TAB 4: TEACHER MANAGEMENT -->
@@ -1699,7 +1633,8 @@
                             <h2 class="page-title">Teacher Directory</h2>
                             <p class="page-subtitle">Manage school faculty, assigned subjects, and contact records</p>
                         </div>
-                        <button class="btn-primary" data-roles="admin" onclick="openModal('teacherModal')">
+                        <button class="btn-sm" data-roles="admin" onclick="openMailSettingsModal()">SMTP Gateway</button>
+                        <button class="btn-primary" data-roles="admin" onclick="openModal('teacherAccountModal')">
                             <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
                             Add New Teacher
                         </button>
@@ -1725,7 +1660,7 @@
                 </div>
 
                 <!-- TAB 5: STUDENT MANAGEMENT -->
-                <div id="tab-students" class="tab-pane" data-roles="admin,teacher">
+                <div id="tab-students" class="tab-pane" data-roles="teacher">
                     <div class="page-header">
                         <div>
                             <h2 class="page-title">Student Directory</h2>
@@ -1767,24 +1702,19 @@
                     </div>
                 </div>
 
-                <div id="tab-fees" class="tab-pane" data-roles="admin">
-                    <div class="page-header"><div><h2 class="page-title">Fee Accounts</h2><p class="page-subtitle">View and update fee balances for students at your school.</p></div></div>
-                    <div class="table-card"><table class="data-table"><thead><tr><th>Student</th><th>Class</th><th>USD Balance</th><th>ZiG Balance</th><th>Action</th></tr></thead><tbody id="feeAccountsBody"><tr><td colspan="5" style="text-align:center;padding:20px;">Loading fee accounts…</td></tr></tbody></table></div>
-                </div>
-
-                <!-- TAB: LEARNING JOURNAL & PREPARATORY WELLBEING LOGS -->
-                <div id="tab-journal" class="tab-pane" data-roles="teacher,admin">
+                <!-- TAB: LEARNING JOURNAL -->
+                <div id="tab-journal" class="tab-pane" data-roles="teacher">
                     <div class="page-header">
                         <div>
-                            <h2 class="page-title">Learning Journal & Daily Wellbeing Feed</h2>
-                            <p class="page-subtitle">Post work samples, drawings, audio/video notes, and Preparatory daily logs (always accessible to parents regardless of fee status)</p>
+                            <h2 class="page-title">Learning Journal Feed</h2>
+                            <p class="page-subtitle">Share classroom photos, notes, and videos with families</p>
                         </div>
                     </div>
 
                     <div class="split-grid">
                         <!-- Post Authoring Form -->
                         <div class="table-card" style="padding: 20px;">
-                            <h4 style="font-size: 15px; font-weight: 700; color: var(--primary-blue); margin-bottom: 14px;">Post Work Sample / Wellbeing Log</h4>
+                            <h4 style="font-size: 15px; font-weight: 700; color: var(--primary-blue); margin-bottom: 14px;">Post Work Sample</h4>
                             <form onsubmit="handleJournalPostSubmit(event)">
                                 <div class="form-group">
                                     <label>Select Student</label>
@@ -1796,8 +1726,6 @@
                                     <label>Entry Type</label>
                                     <select class="form-control" id="journalType" onchange="toggleJournalTypeFields()">
                                         <option value="photo">Photo Work Sample</option>
-                                        <option value="wellbeing">Preparatory Daily Wellbeing Log</option>
-                                        <option value="drawing">Drawing / Annotation</option>
                                         <option value="voice">Voice Note</option>
                                         <option value="text">Text Note</option>
                                     </select>
@@ -1810,21 +1738,6 @@
                                     <label>Work Sample Image (Upload or URL)</label>
                                     <input type="file" id="journalImageFile" class="form-control" accept="image/*" style="margin-bottom:8px;">
                                     <input type="url" class="form-control" id="journalMediaUrl" placeholder="Or paste sample image URL (optional)">
-                                </div>
-                                <div id="journalWellbeingGroup" style="display:none; background:#F8FAFC; padding:12px; border:1px solid #E2E8F0; border-radius:4px; margin-bottom:14px;">
-                                    <h5 style="font-size:12px; text-transform:uppercase; color:var(--text-secondary); margin-bottom:8px;">Preparatory Wellbeing Details</h5>
-                                    <div class="form-group">
-                                        <label>Meals Eaten</label>
-                                        <input type="text" class="form-control" id="wellbeingMeals" placeholder="e.g. Ate all of lunch & snacks">
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Nap / Rest Duration</label>
-                                        <input type="text" class="form-control" id="wellbeingNap" placeholder="e.g. Rested 45 mins quietly">
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Hygiene & Toileting</label>
-                                        <input type="text" class="form-control" id="wellbeingHygiene" placeholder="e.g. Hands washed, good routine">
-                                    </div>
                                 </div>
                                 <button type="submit" class="btn-primary" style="width: 100%; justify-content: center;">Post to Learning Journal</button>
                             </form>
@@ -1841,7 +1754,7 @@
                 </div>
 
                 <!-- TAB 6: ATTENDANCE -->
-                <div id="tab-attendance" class="tab-pane" data-roles="teacher,admin">
+                <div id="tab-attendance" class="tab-pane" data-roles="teacher">
                     <div class="page-header">
                         <div>
                             <h2 class="page-title">Daily Attendance Register</h2>
@@ -2013,6 +1926,25 @@
                     </div>
                 </div>
 
+                <div id="tab-documents" class="tab-pane" data-roles="admin">
+                    <div class="page-header"><div>
+                        <h2 class="page-title">School Documents</h2>
+                        <p class="page-subtitle">Share downloadable files with your school or a selected class.</p>
+                    </div></div>
+                    <form id="schoolDocumentForm" class="table-card" style="padding:24px;margin-bottom:24px;" onsubmit="uploadSchoolDocument(event)">
+                        <div class="form-group"><label for="documentTitle">Title</label><input id="documentTitle" name="title" class="form-control" required maxlength="255"></div>
+                        <div class="form-group"><label for="documentDescription">Description (optional)</label><textarea id="documentDescription" name="description" class="form-control" rows="3" maxlength="5000"></textarea></div>
+                        <div class="form-group"><label for="documentClass">Share with</label><select id="documentClass" name="school_class_id" class="form-control"><option value="">Whole school</option></select></div>
+                        <div class="form-group"><label for="schoolDocumentFile">Document (up to 10 MB)</label><input id="schoolDocumentFile" name="file" type="file" class="form-control" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt" required><small>PDF, Word, Excel, PowerPoint or text files.</small></div>
+                        <p id="documentUploadStatus" role="status" aria-live="polite"></p>
+                        <button id="documentUploadButton" class="btn-primary" type="submit">Upload document</button>
+                    </form>
+                    <div class="table-card"><table class="data-table">
+                        <thead><tr><th>Document</th><th>Audience</th><th>File</th><th>Actions</th></tr></thead>
+                        <tbody id="schoolDocumentsBody"><tr><td colspan="4">Open Documents to load shared files.</td></tr></tbody>
+                    </table></div>
+                </div>
+
                 <!-- TAB 10: UNIFORM SHOP & ACCOUNTS -->
                 <div id="tab-uniforms" class="tab-pane" data-roles="admin">
                     <div class="page-header">
@@ -2054,13 +1986,13 @@
     </div>
 
     <!-- Modal Dialogs -->
-    <div class="modal-overlay" id="userModal">
+    <div class="modal-overlay" id="teacherAccountModal">
         <div class="modal-card">
             <div class="modal-header">
-                <h3>Add New User</h3>
-                <button class="modal-close" onclick="closeModal('userModal')">&times;</button>
+                <h3>Add New Teacher</h3>
+                <button class="modal-close" onclick="closeModal('teacherAccountModal')">&times;</button>
             </div>
-            <form onsubmit="addUserSubmit(event)">
+            <form onsubmit="createTeacherAccount(event)">
                 <div class="modal-body">
                     <div class="form-group">
                         <label>Full Name</label>
@@ -2080,11 +2012,16 @@
                             <option value="teacher">Teacher (Mobile App Access)</option>
                         </select>
                     </div>
+                    <div class="form-group">
+                        <label for="newUserClass">Assigned Class</label>
+                        <select id="newUserClass" class="form-control" required><option value="">Select a class</option></select>
+                        <p style="margin-top:6px;color:var(--text-secondary);font-size:12px;">Create classes in School Management first. More classes can be assigned from Teachers.</p>
+                    </div>
                     <p style="margin:12px 0;color:var(--text-secondary);font-size:13px;line-height:1.5;">A password setup link will be emailed to this teacher. They will choose their own password.</p>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn-sm" onclick="closeModal('userModal')">Cancel</button>
-                    <button type="submit" class="btn-primary">Create User</button>
+                    <button type="button" class="btn-sm" onclick="closeModal('teacherAccountModal')">Cancel</button>
+                    <button type="submit" class="btn-primary">Create Teacher</button>
                 </div>
             </form>
         </div>
@@ -2669,7 +2606,9 @@
         // TAB NAVIGATION
         function switchTab(tabId) {
             const currentUser = JSON.parse(localStorage.getItem('admin_user') || '{}');
-            const allowedRoles = document.getElementById('tab-' + tabId)?.dataset.roles;
+            const requestedPane = document.getElementById('tab-' + tabId);
+            if (!requestedPane) return;
+            const allowedRoles = requestedPane.dataset.roles;
             if (allowedRoles && !allowedRoles.split(',').includes(currentUser.role)) {
                 alert('This section is not available for your account role.');
                 return;
@@ -2691,6 +2630,7 @@
                 schools: () => Promise.all([loadSchools(), loadClasses(), loadAcademicYears()]),
                 announcements: loadAnnouncements,
                 activities: loadActivities,
+                documents: loadSchoolDocuments,
                 behaviour: loadBehaviourCategories
             };
             if (loaders[tabId]) loaders[tabId]();
@@ -2722,13 +2662,12 @@
             if (currentUser.role === 'website_admin') {
                 loaders = [loadSchools(), loadPlatformDirectory()];
             } else if (currentUser.role === 'admin') {
-                loaders = [loadAdminStats(), loadUsers(), loadTeachers(), loadStudents(), loadSchools(), loadClasses(), loadAcademicYears(), loadAnnouncements(), loadAttendanceRoster(), loadJournalFeed(), loadReports(), loadUniforms(), loadFeeAccounts(), loadStudentLinkRequests()];
+                loaders = [loadAdminStats(), loadTeachers(), loadStudents(), loadSchools(), loadClasses(), loadAcademicYears(), loadAnnouncements(), loadReports(), loadUniforms()];
             } else if (currentUser.role === 'teacher') {
                 loaders = [loadStudents(), loadClasses(), loadAnnouncements(), loadAttendanceRoster(), loadJournalFeed(), loadReports()];
             }
             await Promise.all(loaders);
             if (currentUser.role === 'admin') recalculateStatistics();
-            if (currentUser.role === 'admin') initDashboardCharts();
         }
 
         // ACTIVITY ROSTERS
@@ -2845,6 +2784,7 @@
                 if (actSub) actSub.innerText = s.active_subscriptions.toLocaleString();
                 const suspSub = document.getElementById('platformSuspendedSubs');
                 if (suspSub) suspSub.innerText = s.suspended_subscriptions.toLocaleString();
+                if (s.charts) initDashboardCharts(s.charts);
             }
         }
 
@@ -2922,10 +2862,20 @@
             const [fees, uniforms] = await Promise.all([apiFetch('/api/fees/payments/pending'), apiFetch('/api/uniform-payments/pending')]);
             if (!fees.ok || !uniforms.ok) { section.textContent = 'Could not load payments awaiting verification.'; return; }
             const rows = [
-                ...(fees.data.payments || []).map(p => ({kind:'fee', id:p.id, name:p.fee_account?.student?.name, amount:p.amount, currency:p.currency, method:p.payment_method, reference:p.reference})),
+                ...(fees.data.payments || []).map(p => ({kind:'fee', id:p.id, name:p.fee_account?.student?.name, amount:p.amount, currency:p.currency, method:p.payment_method, reference:p.reference, has_proof:p.has_proof})),
                 ...(uniforms.data.orders || []).map(p => ({kind:'uniform', id:p.id, name:p.student?.name, amount:p.total_amount, currency:p.currency, method:p.payment_method, reference:p.payment_reference}))
             ];
-            section.innerHTML = `<h3 class="section-title" style="margin-top:24px;">Payments awaiting verification</h3><p>Verify each reference against the actual payment received before confirming.</p><div class="table-card"><table class="data-table"><thead><tr><th>Student</th><th>For</th><th>Amount</th><th>Reference</th><th>Action</th></tr></thead><tbody>${rows.length ? rows.map(p => `<tr><td>${escapeTableText(p.name)}</td><td>${p.kind === 'fee' ? 'School fees' : 'Uniform order'}</td><td>${escapeTableText(p.currency)} ${escapeTableText(p.amount)}</td><td>${escapeTableText(p.method)} / ${escapeTableText(p.reference)}</td><td><button class="btn-sm" onclick="verifySchoolPayment('${p.kind}',${Number(p.id)})">Confirm received payment</button></td></tr>`).join('') : '<tr><td colspan="5">No payment references awaiting verification.</td></tr>'}</tbody></table></div>`;
+            section.innerHTML = `<h3 class="section-title" style="margin-top:24px;">Payments awaiting verification</h3><p>Verify each reference against the actual payment received before confirming.</p><div class="table-card"><table class="data-table"><thead><tr><th>Student</th><th>For</th><th>Amount</th><th>Reference</th><th>Action</th></tr></thead><tbody>${rows.length ? rows.map(p => `<tr><td>${escapeTableText(p.name)}</td><td>${p.kind === 'fee' ? 'School fees' : 'Uniform order'}</td><td>${escapeTableText(p.currency)} ${escapeTableText(p.amount)}</td><td>${escapeTableText(p.method)} / ${escapeTableText(p.reference)}</td><td>${p.kind === 'fee' && p.has_proof ? `<button class="btn-sm" onclick="downloadPaymentProof(${Number(p.id)})">View proof</button> ` : ''}<button class="btn-sm" onclick="verifySchoolPayment('${p.kind}',${Number(p.id)})">Confirm received payment</button></td></tr>`).join('') : '<tr><td colspan="5">No payment references awaiting verification.</td></tr>'}</tbody></table></div>`;
+        }
+        async function downloadPaymentProof(id) {
+            try {
+                const response = await fetch(`/api/fees/payments/${id}/proof`, {headers:{Authorization:`Bearer ${localStorage.getItem('admin_token') || ''}`}});
+                if (!response.ok) throw new Error('Could not load payment proof.');
+                const blob = await response.blob();
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a'); link.href = url; link.download = 'payment-proof-' + id;
+                document.body.appendChild(link); link.click(); link.remove(); setTimeout(() => URL.revokeObjectURL(url), 60000);
+            } catch (error) { alert(error.message); }
         }
         async function verifySchoolPayment(kind, id) {
             if (!confirm('Have you verified this reference and amount against funds actually received by the school?')) return;
@@ -3012,21 +2962,39 @@
                     dirBody.innerHTML = schoolsList.map(s => `
                         <tr>
                             <td><strong>${escapeTableText(s.name)}</strong></td>
-                            <td><span class="badge" style="background:#DBEAFE; color:#1E40AF;">${escapeTableText((s.type || 'primary').toUpperCase())}</span></td>
+                            <td><span class="badge" style="color:#1E40AF;">${escapeTableText((s.type || 'primary').toUpperCase())}</span></td>
                             <td>${escapeTableText(s.primary_admin_name || 'Not assigned')}${s.primary_admin_email ? ` (${escapeTableText(s.primary_admin_email)})` : ''}</td>
                             <td><span style="display:inline-block; width:14px; height:14px; background:${escapeTableText(s.branding_color || '#3B5998')}; border-radius:50%; vertical-align:middle; margin-right:4px;"></span> ${escapeTableText(s.branding_color || '#3B5998')}</td>
                             <td>${Number(s.students_count || 0)} Children</td>
-                            <td><button class="btn-sm" onclick="filterPlatformStudents(${s.id})">View Students</button></td>
+                            <td><button class="btn-sm" onclick="filterPlatformStudents(${s.id})">View Students</button> <button class="btn-sm" style="color:var(--danger-red);" onclick="removePlatformSchool(${s.id})">Remove school</button></td>
                         </tr>
                     `).join('');
                 }
             }
         }
 
+        async function removePlatformSchool(id) {
+            const school = schoolsList.find(s => s.id === id);
+            if (!school || currentUser.role !== 'website_admin') return;
+            const typed = prompt(`Permanently remove ${school.name}? This wipes children, registers, documents, payments and school staff accounts. Parents linked to other schools keep those accounts. Type the school name to continue.`);
+            if (typed === null) return;
+            if (typed !== school.name) { alert('School name does not match.'); return; }
+            const res = await apiFetch(`/api/platform/schools/${id}`, {method:'DELETE', body:JSON.stringify({confirm_name:typed})});
+            alert(res.data?.message || (res.ok ? 'School removed.' : 'Could not remove school.'));
+            if (res.ok) { await loadSchools(); await loadPlatformDirectory(); }
+        }
+
         async function loadClasses() {
             const res = await apiFetch('/api/school-classes');
             if (res.ok && res.data.school_classes) {
                 classesList = res.data.school_classes;
+                const newUserClass = document.getElementById('newUserClass');
+                if (newUserClass) {
+                    const selected = newUserClass.value;
+                    newUserClass.innerHTML = '<option value="">Select a class</option>' + classesList.map(c => `<option value="${c.id}">${escapeTableText(c.grade)} - ${escapeTableText(c.class_name)}</option>`).join('');
+                    newUserClass.value = selected;
+                }
+                renderTeachersTable();
                 const classSelect = document.getElementById('sClass');
                 if (classSelect) {
                     classSelect.innerHTML = '<option value="">Select assigned class</option>' + classesList.map(c => `<option value="${c.id}">${c.class_name} (${c.grade})</option>`).join('');
@@ -3038,20 +3006,55 @@
 
                 const classesTbody = document.getElementById('classesTableBody');
                 if (classesTbody) {
-                    classesTbody.innerHTML = classesList.length ? classesList.map(c => `
+                    classesTbody.innerHTML = classesList.length ? classesList.map(c => {
+                        const teachers = (c.teacher_list || []).map(t => `${escapeTableText(t.name || 'Teacher')} <small>(${escapeTableText(t.subject || 'Homeroom')})</small>`).join('<br>');
+                        return `
                         <tr>
-                            <td><strong>${c.class_name}</strong></td>
-                            <td>${c.grade || 'Primary'}</td>
-                            <td>Unassigned</td>
-                            <td>${studentsList ? studentsList.filter(s => s.class_name === c.class_name).length : 0} Students</td>
-                            <td><button class="btn-sm" onclick="filterAttendanceClass('${String(c.class_name).replace(/'/g, "\\'")}')">View Register</button></td>
-                        </tr>
-                    `).join('') : '<tr><td colspan="5" style="text-align:center;padding:20px;">No classes configured</td></tr>';
+                            <td><strong>${escapeTableText(c.class_name)}</strong></td>
+                            <td>${escapeTableText(c.grade || 'Primary')}</td>
+                            <td>${teachers || '<span style="color:var(--text-secondary);">No teacher assigned</span>'}</td>
+                            <td>${c.student_count ?? 0}${c.capacity ? ` / ${c.capacity}` : ''} Students</td>
+                            <td><button class="btn-sm" onclick="openClassRoster(${c.id})">Roster</button> <button class="btn-sm" onclick="editClass(${c.id})">Edit</button> <button class="btn-sm" onclick="deleteClass(${c.id})">Delete</button></td>
+                        </tr>`;
+                    }).join('') : '<tr><td colspan="5" style="text-align:center;padding:20px;">No classes configured</td></tr>';
                 }
             }
         }
 
+        function openClassRoster(id) {
+            const c = classesList.find(x => x.id === id);
+            if (!c) return;
+            document.getElementById('classRosterTitle').innerText = `Roster · ${c.grade} - ${c.class_name} (${c.student_count ?? 0} students)`;
+            document.getElementById('classRosterBody').innerHTML = (c.roster || []).length
+                ? c.roster.map(s => `<tr><td>${escapeTableText(s.name)}</td><td>${s.guardians_count || 0}</td></tr>`).join('')
+                : '<tr><td colspan="2" style="text-align:center;padding:20px;">No students enrolled in this class yet.</td></tr>';
+            document.getElementById('classRosterCard').style.display = '';
+        }
+
+        async function editClass(id) {
+            const c = classesList.find(x => x.id === id);
+            if (!c) return;
+            const grade = prompt('Grade level', c.grade || '');
+            if (grade === null) return;
+            const className = prompt('Class name', c.class_name || '');
+            if (className === null) return;
+            const capacity = prompt('Capacity', c.capacity || 30);
+            if (capacity === null) return;
+            const res = await apiFetch(`/api/school-classes/${id}`, { method: 'PUT', body: JSON.stringify({ grade: grade.trim(), class_name: className.trim(), capacity: Number(capacity) || null }) });
+            if (!res.ok) { alert(res.data.message || 'Could not update class.'); return; }
+            await loadClasses(); await loadStudents();
+        }
+
+        async function deleteClass(id) {
+            if (!confirm('Delete this class? Teacher assignments for it are removed.')) return;
+            const res = await apiFetch(`/api/school-classes/${id}`, { method: 'DELETE' });
+            if (!res.ok) { alert(res.data.message || 'Could not delete class.'); return; }
+            document.getElementById('classRosterCard').style.display = 'none';
+            await loadClasses();
+        }
+
         function filterAttendanceClass(className) {
+            if (JSON.parse(localStorage.getItem('admin_user') || '{}').role !== 'teacher') return;
             switchTab('attendance');
             const select = document.getElementById('attClassSelect');
             if (select) {
@@ -3179,7 +3182,7 @@
                 const email = t.user ? t.user.email : (t.email || 'N/A');
                 const phone = t.user ? t.user.phone_number : (t.phone || 'N/A');
                 const subjects = Array.isArray(t.subject_specialties) ? t.subject_specialties.join(', ') : (t.subject || 'General');
-                const assignedClasses = Array.isArray(t.assigned_classes) ? t.assigned_classes.map(c => c.class_name).join(', ') : (t.assignedClasses || []).map(c => c.class_name).join(', ');
+                const assignedClasses = Array.isArray(t.assigned_classes) ? t.assigned_classes.map(c => `${c.grade} - ${c.class_name}`).join(', ') : (t.assignedClasses || []).map(c => c.class_name).join(', ');
                 return `
                     <tr>
                         <td><strong>${name}</strong></td>
@@ -3188,11 +3191,30 @@
                         <td>${email}</td>
                         <td>${phone}</td>
                         <td>
-                            <button class="btn-sm" onclick="switchTab('users')">Manage Account</button>
+                            <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+                                <select id="assignTeacherClass${t.id}" class="form-control" aria-label="Assign teacher class" style="max-width:220px;">
+                                    <option value="">Select a class</option>
+                                    ${classesList.filter(c => Number(c.school_id) === Number(t.school_id) && !(t.assigned_classes || []).some(a => a.id === c.id)).map(c => `<option value="${c.id}">${escapeTableText(c.grade)} - ${escapeTableText(c.class_name)}</option>`).join('')}
+                                </select>
+                                <button class="btn-sm" onclick="assignTeacherClass(${t.id})">Assign Class</button>
+                                <button class="btn-sm" onclick="sendTeacherSetupLink(${t.id})">Send Setup Link</button>
+                            </div>
                         </td>
                     </tr>
                 `;
             }).join('');
+        }
+
+        async function assignTeacherClass(teacherId) {
+            const teacher = teachersList.find(t => t.id === teacherId);
+            const classId = Number(document.getElementById(`assignTeacherClass${teacherId}`)?.value);
+            if (!teacher || !classId) { alert('Select a class to assign.'); return; }
+            const assignments = (teacher.assigned_classes || []).map(c => ({school_class_id: c.id, subject_name: c.pivot?.subject_name || 'Homeroom'}));
+            if (!assignments.some(a => a.school_class_id === classId)) assignments.push({school_class_id: classId, subject_name: 'Homeroom'});
+            const res = await apiFetch(`/api/teachers/${teacherId}`, {method: 'PUT', body: JSON.stringify({class_assignments: assignments})});
+            if (!res.ok) { alert(res.data.message || 'Could not assign this class.'); return; }
+            await loadTeachers();
+            alert('Class assigned successfully.');
         }
 
         function renderStudentsTable() {
@@ -3264,7 +3286,7 @@
                         <td>${escapeTableText(d.school_name || 'School')} (${escapeTableText(d.grade)} ${escapeTableText(d.class_name || '')})</td>
                         <td>${escapeTableText(d.guardian_name || 'Guardian')} (${escapeTableText(d.guardian_phone || 'N/A')})</td>
                         <td>
-                            <span class="badge" style="background:${isActive ? '#DCFCE7' : '#FEE2E2'}; color:${isActive ? '#15803D' : '#B91C1C'}; font-weight:600;">
+                            <span class="badge" style="color:${isActive ? '#15803D' : '#B91C1C'}; font-weight:600;">
                                 ${isActive ? 'ACTIVE' : 'SUSPENDED'}
                             </span>
                         </td>
@@ -3302,6 +3324,7 @@
         function openModal(id) {
             const el = document.getElementById(id);
             if (el) el.classList.add('open');
+            if (id === 'teacherAccountModal') loadClasses();
         }
 
         function closeModal(id) {
@@ -3309,8 +3332,11 @@
             if (el) el.classList.remove('open');
         }
 
-        async function addUserSubmit(e) {
+        async function createTeacherAccount(e) {
             e.preventDefault();
+            const currentUser = JSON.parse(localStorage.getItem('admin_user') || '{}');
+            const classId = document.getElementById('newUserClass').value;
+            if (!classId) { alert('Select a class for this teacher.'); return; }
             const name = document.getElementById('newUserName').value.trim();
             const email = document.getElementById('newUserEmail').value.trim();
             const phone = document.getElementById('newUserPhone').value.trim();
@@ -3322,6 +3348,7 @@
                 name,
                 email,
                 phone_number: phone,
+                class_id: Number(classId),
                 role,
                 send_invite: sendInvite
             };
@@ -3336,12 +3363,13 @@
             });
 
             if (res.ok) {
-                closeModal('userModal');
+                closeModal('teacherAccountModal');
                 document.getElementById('newUserName').value = '';
                 document.getElementById('newUserEmail').value = '';
                 document.getElementById('newUserPhone').value = '';
+                document.getElementById('newUserClass').value = '';
                 if (document.getElementById('newUserPassword')) document.getElementById('newUserPassword').value = '';
-                await loadUsers();
+                await loadTeachers();
 
                 let successMsg = `New ${role.toUpperCase()} "${name}" successfully created!`;
                 if (res.data.email_sent) {
@@ -3504,6 +3532,12 @@
                 resultBox.style.border = '1px solid #FCA5A5';
                 resultBox.innerHTML = `<strong>Delivery Failed:</strong> ${res.data.message || 'Failed to dispatch email.'}`;
             }
+        }
+
+        async function sendTeacherSetupLink(teacherId) {
+            const teacher = teachersList.find(t => t.id === teacherId);
+            if (!teacher?.user?.email) { alert('This teacher has no email address.'); return; }
+            await sendUserPasswordLink(teacher.user.id, teacher.user.email);
         }
 
         async function sendUserPasswordLink(userId, userEmail) {
@@ -3713,7 +3747,7 @@
                         <td><code>${r.reg || ('STU-00' + r.student_id)}</code></td>
                         <td>
                             <strong>${r.name}</strong>
-                            <span class="badge" style="background:#F1F5F9; color:#475569; margin-left:6px; font-size:11px;">${r.class_name || r.grade}</span>
+                            <span class="badge" style="color:#475569; margin-left:6px; font-size:11px;">${r.class_name || r.grade}</span>
                         </td>
                         <td>
                             <div style="display:flex; gap:16px; align-items:center;">
@@ -3771,18 +3805,11 @@
             }
         }
 
-        // ================= LEARNING JOURNAL & WELLBEING =================
+        // ================= LEARNING JOURNAL =================
         function toggleJournalTypeFields() {
             const type = document.getElementById('journalType').value;
-            const wellbeingGrp = document.getElementById('journalWellbeingGroup');
             const mediaGrp = document.getElementById('journalMediaGroup');
-            if (type === 'wellbeing') {
-                if (wellbeingGrp) wellbeingGrp.style.display = 'block';
-                if (mediaGrp) mediaGrp.style.display = 'none';
-            } else {
-                if (wellbeingGrp) wellbeingGrp.style.display = 'none';
-                if (mediaGrp) mediaGrp.style.display = 'block';
-            }
+            if (mediaGrp) mediaGrp.style.display = 'block';
         }
 
         async function loadJournalFeed() {
@@ -3793,13 +3820,12 @@
             if (res.ok && res.data.entries) {
                 journalFeedList = res.data.entries;
                 if (journalFeedList.length === 0) {
-                    container.innerHTML = '<p style="color:var(--text-secondary); text-align:center; padding:24px;">No learning journal entries posted yet. Use the form on the left to post work samples or wellbeing updates.</p>';
+                    container.innerHTML = '<p style="color:var(--text-secondary); text-align:center; padding:24px;">No learning journal entries posted yet. Use the form on the left to post work samples.</p>';
                     return;
                 }
 
                 const badgeColors = {
                     photo: { bg: '#DBEAFE', color: '#1E40AF' },
-                    wellbeing: { bg: '#DCFCE7', color: '#15803D' },
                     drawing: { bg: '#FEF3C7', color: '#B45309' },
                     voice: { bg: '#F3E8FF', color: '#7E22CE' },
                     text: { bg: '#F1F5F9', color: '#334155' }
@@ -3815,18 +3841,6 @@
                             </div>
                         `;
                     }
-                    let wellbeingHtml = '';
-                    if (item.wellbeing_data) {
-                        const wb = item.wellbeing_data;
-                        wellbeingHtml = `
-                            <div style="background:#F8FAFC; border:1px solid #E2E8F0; border-radius:6px; padding:10px; margin-top:8px; font-size:12px;">
-                                ${wb.meals ? `<div><strong>Meals:</strong> ${wb.meals}</div>` : ''}
-                                ${wb.nap ? `<div><strong>Rest/Nap:</strong> ${wb.nap}</div>` : ''}
-                                ${wb.hygiene ? `<div><strong>Hygiene:</strong> ${wb.hygiene}</div>` : ''}
-                            </div>
-                        `;
-                    }
-
                     return `
                         <div class="table-card" style="padding:16px; margin-bottom:14px;">
                             <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px;">
@@ -3836,12 +3850,11 @@
                                     <div style="font-size:11px; color:var(--text-secondary); margin-top:2px;">By ${item.author_name} &bull; ${item.created_at}</div>
                                 </div>
                                 <div style="display:flex; align-items:center; gap:8px;">
-                                    <span class="badge" style="background:${badge.bg}; color:${badge.color}; font-size:11px; text-transform:uppercase;">${item.type}</span>
+                                    <span class="badge" style="color:${badge.color}; font-size:11px; text-transform:uppercase;">${item.type}</span>
                                     <button class="btn-sm btn-danger" style="padding:2px 8px; font-size:11px;" onclick="deleteJournalEntry(${item.id})">Delete</button>
                                 </div>
                             </div>
                             ${item.caption ? `<p style="font-size:13px; color:var(--text-primary); margin:6px 0; line-height:1.4;">${item.caption}</p>` : ''}
-                            ${wellbeingHtml}
                             ${mediaHtml}
                         </div>
                     `;
@@ -3866,19 +3879,10 @@
             formData.append('type', type);
             formData.append('caption', caption);
 
-            if (type === 'wellbeing') {
-                const meals = document.getElementById('wellbeingMeals') ? document.getElementById('wellbeingMeals').value : '';
-                const nap = document.getElementById('wellbeingNap') ? document.getElementById('wellbeingNap').value : '';
-                const hygiene = document.getElementById('wellbeingHygiene') ? document.getElementById('wellbeingHygiene').value : '';
-                formData.append('wellbeing_data[meals]', meals);
-                formData.append('wellbeing_data[nap]', nap);
-                formData.append('wellbeing_data[hygiene]', hygiene);
-            } else {
-                if (fileInput && fileInput.files[0]) {
-                    formData.append('image', fileInput.files[0]);
-                } else if (mediaUrlInput && mediaUrlInput.value.trim()) {
-                    formData.append('media_url', mediaUrlInput.value.trim());
-                }
+            if (fileInput && fileInput.files[0]) {
+                formData.append('image', fileInput.files[0]);
+            } else if (mediaUrlInput && mediaUrlInput.value.trim()) {
+                formData.append('media_url', mediaUrlInput.value.trim());
             }
 
             const res = await apiFetch('/api/journal', {
@@ -3908,6 +3912,67 @@
             }
         }
 
+        // ================= SHARED SCHOOL DOCUMENTS =================
+        async function loadSchoolDocuments() {
+            const body = document.getElementById('schoolDocumentsBody');
+            body.innerHTML = '<tr><td colspan="4">Loading documents…</td></tr>';
+            const res = await apiFetch('/api/documents');
+            if (!res.ok) {
+                body.innerHTML = '<tr><td colspan="4">Could not load documents. Reopen this section to retry.</td></tr>';
+                return;
+            }
+            const select = document.getElementById('documentClass');
+            const previous = select.value;
+            select.innerHTML = '<option value="">Whole school</option>' + classesList.map(c => `<option value="${Number(c.id)}">${escapeTableText(c.grade)} - ${escapeTableText(c.class_name)}</option>`).join('');
+            select.value = previous;
+            body.innerHTML = (res.data.documents || []).map(d => `<tr>
+                <td><strong>${escapeTableText(d.title)}</strong><br>${escapeTableText(d.description)}</td>
+                <td>${escapeTableText(d.audience)}</td>
+                <td>${escapeTableText(d.file_name)}<br><small>${Math.ceil(d.file_size / 1024)} KB</small></td>
+                <td><button class="btn-sm" onclick="downloadSchoolDocument(${Number(d.id)})">Download</button>
+                <button class="btn-sm btn-danger" onclick="deleteSchoolDocument(${Number(d.id)})">Delete</button></td>
+            </tr>`).join('') || '<tr><td colspan="4">No school documents uploaded yet.</td></tr>';
+        }
+
+        async function uploadSchoolDocument(event) {
+            event.preventDefault();
+            const form = event.currentTarget;
+            const button = document.getElementById('documentUploadButton');
+            const status = document.getElementById('documentUploadStatus');
+            const file = document.getElementById('schoolDocumentFile').files[0];
+            if (!file || file.size > 10 * 1024 * 1024) {
+                status.textContent = 'Choose a document no larger than 10 MB.';
+                return;
+            }
+            button.disabled = true;
+            status.textContent = 'Uploading document…';
+            const res = await apiFetch('/api/documents', {method: 'POST', body: new FormData(form)});
+            button.disabled = false;
+            if (!res.ok) {
+                status.textContent = Object.values(res.data.errors || {}).flat().join(' ') || res.data.message || 'Upload failed. Please try again.';
+                return;
+            }
+            form.reset();
+            status.textContent = 'Document uploaded successfully.';
+            await loadSchoolDocuments();
+        }
+
+        async function downloadSchoolDocument(id) {
+            const res = await apiFetch(`/api/documents/${id}/download`);
+            if (!res.ok) { alert(res.data.message || 'Document could not be downloaded.'); return; }
+            const link = document.createElement('a');
+            link.href = res.data.download_url;
+            link.rel = 'noopener';
+            link.click();
+        }
+
+        async function deleteSchoolDocument(id) {
+            if (!confirm('Delete this shared document? It will no longer be available to download.')) return;
+            const res = await apiFetch(`/api/documents/${id}`, {method: 'DELETE'});
+            if (res.ok) await loadSchoolDocuments();
+            else alert(res.data.message || 'Document could not be deleted.');
+        }
+
         // ================= REPORTS & CIRCULARS =================
         async function loadReports() {
             const tbody = document.getElementById('reportsTableBody');
@@ -3931,7 +3996,7 @@
                     <tr>
                         <td><strong>${r.student_name}</strong><br><small style="color:var(--text-secondary);">${r.class_name || r.grade}</small></td>
                         <td><strong>${r.title}</strong></td>
-                        <td><span class="badge" style="background:#EFF6FF; color:#1D4ED8;">${typeLabels[r.type] || r.type}</span></td>
+                        <td><span class="badge" style="color:#1D4ED8;">${typeLabels[r.type] || r.type}</span></td>
                         <td>${r.created_at}</td>
                         <td style="white-space:nowrap;">
                             <a href="${r.file_url}" target="_blank" class="btn-sm" style="text-decoration:none; display:inline-block; margin-right:6px;">Download</a>
@@ -4024,13 +4089,13 @@
                                 <strong>${u.name}</strong><br>
                                 <small style="color:var(--text-secondary);">Code: ${u.item_code} | Sizes: ${sizesStr}</small>
                             </td>
-                            <td><span class="badge" style="background:#EEF2FF; color:#4338CA;">${u.category}</span></td>
+                            <td><span class="badge" style="color:#4338CA;">${u.category}</span></td>
                             <td>
                                 <strong style="color:var(--primary-blue);">$${Number(u.price_usd).toFixed(2)} USD</strong><br>
                                 <small style="color:var(--text-secondary);">${Number(u.price_zig).toFixed(2)} ZiG</small>
                             </td>
                             <td>
-                                <span class="badge" style="background:${u.stock_count > 0 ? '#DCFCE7' : '#FEE2E2'}; color:${u.stock_count > 0 ? '#15803D' : '#B91C1C'}; font-weight:600;">
+                                <span class="badge" style="color:${u.stock_count > 0 ? '#15803D' : '#B91C1C'}; font-weight:600;">
                                     ${u.stock_count > 0 ? (u.stock_count + ' in stock') : 'Out of stock'}
                                 </span>
                             </td>
@@ -4223,107 +4288,55 @@
             const kpiEl = document.getElementById('kpiStudents');
             if (kpiEl) kpiEl.innerText = totalStudents.toLocaleString();
 
-            const zAttEl = document.getElementById('dynZAtt');
-            if (zAttEl) {
-                zAttEl.innerText = 'Z = +0.8 (Optimal Attendance)';
-            }
-
-            const aiAlertEl = document.getElementById('dynAiAlerts');
-            if (aiAlertEl) {
-                aiAlertEl.innerHTML = `
-                    • <strong>Academic Attendance:</strong> Verified roll call across ${totalStudents} active learners.<br>
-                    • <strong>Institutional Engagement:</strong> High teacher participation with daily updates.<br>
-                    • <strong>Uniform Shop:</strong> Roster and inventory synchronized with real database records.
-                `;
-            }
         }
 
-        function initDashboardCharts() {
-            if (typeof Chart === 'undefined') return;
-
-            // Chart 1: Academic Pass Rate / Enrollment Trends
-            const ctxRev = document.getElementById('revenueChart');
-            if (ctxRev && !ctxRev._chartInstance) {
-                ctxRev._chartInstance = new Chart(ctxRev, {
-                    type: 'line',
-                    data: {
-                        labels: ['Term 1 2025', 'Term 2 2025', 'Term 3 2025', 'Term 1 2026'],
-                        datasets: [
-                            {
-                                label: 'Pass Rate (%)',
-                                data: [88, 91, 93, 96],
-                                borderColor: '#3B5998',
-                                backgroundColor: 'rgba(59, 89, 152, 0.12)',
-                                fill: true,
-                                tension: 0.4,
-                                borderWidth: 2.5
-                            }
-                        ]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: { legend: { position: 'top', labels: { font: { family: 'Cabin' } } } },
-                        scales: { y: { min: 70, max: 100, grid: { color: '#F1F5F9' } }, x: { grid: { display: false } } }
+        // Draws the dashboard charts from /api/admin/dashboard-stats; nothing here is sample data.
+        function initDashboardCharts(charts) {
+            if (typeof Chart === 'undefined' || !charts) return;
+            const font = { legend: { position: 'top', labels: { font: { family: 'Cabin' } } } };
+            const draw = (id, config, hasData, emptyText) => {
+                const canvas = document.getElementById(id);
+                if (!canvas) return;
+                if (canvas._chartInstance) canvas._chartInstance.destroy();
+                canvas._chartInstance = null;
+                let note = canvas.parentElement.querySelector('.chart-empty');
+                if (!hasData) {
+                    canvas.style.display = 'none';
+                    if (!note) {
+                        note = document.createElement('p');
+                        note.className = 'chart-empty';
+                        note.style.cssText = 'color:var(--text-secondary);font-size:13px;text-align:center;padding-top:80px;margin:0;';
+                        canvas.parentElement.appendChild(note);
                     }
-                });
-            }
+                    note.textContent = emptyText;
+                    return;
+                }
+                if (note) note.remove();
+                canvas.style.display = '';
+                canvas._chartInstance = new Chart(canvas, config);
+            };
 
-            // Chart 2: Attendance Rate by Stream
-            const ctxAtt = document.getElementById('attendanceChart');
-            if (ctxAtt && !ctxAtt._chartInstance) {
-                ctxAtt._chartInstance = new Chart(ctxAtt, {
-                    type: 'bar',
-                    data: {
-                        labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'],
-                        datasets: [
-                            { label: 'Preparatory (ECD)', data: [98, 97, 96, 95, 96], backgroundColor: '#5B7BD5' },
-                            { label: 'Primary', data: [96, 95, 97, 96, 94], backgroundColor: '#3B5998' },
-                            { label: 'Secondary', data: [94, 93, 95, 92, 91], backgroundColor: '#1E3A8A' }
-                        ]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: { legend: { position: 'top', labels: { font: { family: 'Cabin' } } } },
-                        scales: { y: { min: 80, max: 100, grid: { color: '#F1F5F9' } }, x: { grid: { display: false } } }
-                    }
-                });
-            }
+            const weekly = charts.attendance_weekly || [];
+            draw('revenueChart', {
+                type: 'line',
+                data: { labels: charts.weeks, datasets: [{ label: 'Attendance (%)', data: weekly, borderColor: '#3B5998', backgroundColor: 'rgba(59, 89, 152, 0.12)', fill: true, tension: 0.3, borderWidth: 2.5, spanGaps: true }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: font, scales: { y: { min: 0, max: 100, grid: { color: '#F1F5F9' } }, x: { grid: { display: false } } } }
+            }, weekly.some(v => v !== null), 'No attendance registers saved in the last six weeks.');
 
-            // Chart 3: App Activity & Engagement
-            const ctxAct = document.getElementById('activityChart');
-            if (ctxAct && !ctxAct._chartInstance) {
-                ctxAct._chartInstance = new Chart(ctxAct, {
-                    type: 'line',
-                    data: {
-                        labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5', 'Week 6'],
-                        datasets: [
-                            {
-                                label: 'Parent Portal Logins',
-                                data: [320, 450, 580, 720, 890, 1100],
-                                borderColor: '#0EA5E9',
-                                backgroundColor: 'rgba(14, 165, 233, 0.1)',
-                                fill: true,
-                                tension: 0.3
-                            },
-                            {
-                                label: 'Teacher Submissions',
-                                data: [140, 180, 210, 250, 290, 340],
-                                borderColor: '#22C55E',
-                                fill: false,
-                                tension: 0.3
-                            }
-                        ]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: { legend: { position: 'top', labels: { font: { family: 'Cabin' } } } },
-                        scales: { y: { beginAtZero: true, grid: { color: '#F1F5F9' } }, x: { grid: { display: false } } }
-                    }
-                });
-            }
+            const byClass = charts.attendance_by_class || { labels: [], rates: [] };
+            draw('attendanceChart', {
+                type: 'bar',
+                data: { labels: byClass.labels, datasets: [{ label: 'Attendance (%)', data: byClass.rates, backgroundColor: '#3B5998' }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: font, scales: { y: { min: 0, max: 100, grid: { color: '#F1F5F9' } }, x: { grid: { display: false } } } }
+            }, byClass.labels.length > 0, 'No attendance registers saved in the last 30 days.');
+
+            const a = charts.activity_weekly || {};
+            const series = [['Journal posts', a.journal, '#0EA5E9'], ['Homework', a.homework, '#22C55E'], ['Behaviour records', a.behaviour, '#F59E0B'], ['Attendance marks', a.attendance_marks, '#1E3A8A']];
+            draw('activityChart', {
+                type: 'line',
+                data: { labels: charts.weeks, datasets: series.map(([label, data, color]) => ({ label, data: data || [], borderColor: color, backgroundColor: color, fill: false, tension: 0.3 })) },
+                options: { responsive: true, maintainAspectRatio: false, plugins: font, scales: { y: { beginAtZero: true, ticks: { precision: 0 }, grid: { color: '#F1F5F9' } }, x: { grid: { display: false } } } }
+            }, series.some(([, data]) => (data || []).some(v => v > 0)), 'No teacher activity recorded in the last six weeks.');
         }
 
         window.addEventListener('DOMContentLoaded', async () => {
@@ -4362,5 +4375,6 @@
             });
         });
     </script>
+<a href="/moderation" style="position:fixed;bottom:10px;right:14px;z-index:100;font:13px system-ui;background:white;padding:8px 12px;border:1px solid #dce2ed;border-radius:6px;color:#213e92">Safety reports</a>
 </body>
 </html>

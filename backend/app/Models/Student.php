@@ -11,6 +11,15 @@ class Student extends Model
 
     protected $fillable = ['school_id', 'name', 'grade', 'class_name', 'dob'];
 
+    protected $hidden = ['photo_path'];
+    protected $appends = ['photo_url'];
+
+    public function getPhotoUrlAttribute(): ?string
+    {
+        return $this->photo_path ? url('/api/students/'.$this->id.'/photo').'?v='.sha1($this->photo_path) : null;
+    }
+
+
     public function scopeTaughtBy($query, ?Teacher $teacher)
     {
         $classes = $teacher?->assignedClasses()->where('school_classes.school_id', $teacher->school_id)->get() ?? collect();

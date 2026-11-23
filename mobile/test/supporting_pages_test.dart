@@ -27,7 +27,9 @@ ApiClient fixtureApi() {
   bool ordered = false;
   api.dio.interceptors.add(InterceptorsWrapper(onRequest: (o, h) {
     if (o.path == '/uniform-orders' && o.method == 'POST') ordered = true;
-    final data = <String, dynamic>{'status': 'success', 'categories': [], 'activities': [], 'announcements': [], 'reports': [], 'entries': [], 'orders': ordered ? [{'id': 1, 'created_at': '2026-10-16', 'items': [], 'total_amount': 45, 'currency': 'USD', 'payment_status': 'pending'}] : [],
+    final data = <String, dynamic>{'status': 'success', 'categories': [], 'activities': [],
+      'contacts': [{'id': 7, 'name': 'Mrs Teacher', 'role': 'teacher', 'students': ['Alice Chewe'], 'unread': 1, 'last_message': {'body': 'Alice read well today.', 'created_at': '2026-10-20 08:00:00', 'from_me': false}}],
+      'messages': [{'id': 1, 'body': 'Alice read well today.', 'created_at': '2026-10-20 08:00:00', 'from_me': false}], 'announcements': [], 'reports': [], 'entries': [], 'orders': ordered ? [{'id': 1, 'created_at': '2026-10-16', 'items': [], 'total_amount': 45, 'currency': 'USD', 'payment_status': 'pending'}] : [],
       'roster': [
         {'student_id': 1, 'name': 'Alice Chewe', 'class_name': 'Gold', 'status': 'present'},
         {'student_id': 2, 'name': 'Bob Chewe', 'class_name': 'Gold', 'status': 'absent'},
@@ -88,7 +90,7 @@ Future<void> reveal(WidgetTester tester, Finder finder) async {
     await tester.pumpAndSettle();
     if (finder.evaluate().isEmpty) {
       await tester.scrollUntilVisible(
-        finder.first,
+        finder,
         250,
         scrollable: find.byType(Scrollable).first,
       );
@@ -164,12 +166,14 @@ void main() {
     expect(find.text('Bob Chewe'), findsNothing);
     await tapVisible(tester, find.text('Award merit'));
     await tapVisible(tester, find.text('Save'));
-    expect(find.text('Behaviour saved for Alice Chewe.'), findsOneWidget);
+    expect(find.text('Merit awarded to Alice Chewe. Their parent sees it under Behaviour & merits.'), findsOneWidget);
+    expect(find.text('1 merits'), findsOneWidget);
     await tester.pump(const Duration(seconds: 5));
     await tapVisible(tester, find.text('Roll call'));
     await tapVisible(tester, find.widgetWithText(ChoiceChip, 'Absent'));
-    await reveal(tester, find.text('2 absent'));
-    expect(find.text('2 absent'), findsOneWidget);
+    expect(find.text('You have unsaved changes. Save the register so parents can see it.'), findsOneWidget);
+    await tapVisible(tester, find.text('Save register'));
+    expect(find.text('Attendance register saved. Parents can now see it.'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
   testWidgets('Teacher guardian invitation validates details and submits the selected child', (tester) async {
@@ -226,11 +230,18 @@ void main() {
     expect(find.text('Photosynthesis Observation Journal'), findsOneWidget);
     expect(find.text('Fractions & Decimals Exercise Set 3'), findsNothing);
   });
-  testWidgets('Messages show persisted school notices and an empty search state', (tester) async {
+  testWidgets('Messages list conversations, open a thread and search', (tester) async {
     await mount(tester, const MessagingView());
+    expect(find.text('Mrs Teacher'), findsOneWidget);
+    expect(find.text('1 new'), findsOneWidget);
+    await tapVisible(tester, find.text('Mrs Teacher'));
+    expect(find.text('Alice read well today.'), findsOneWidget);
+    expect(find.text('Send'), findsOneWidget);
+    await tester.pageBack();
+    await tester.pumpAndSettle();
     await tester.enterText(find.byType(TextField).first, 'no match');
     await tester.pumpAndSettle();
-    expect(find.text('No updates match this view. Try another filter or pull down to refresh.'), findsOneWidget);
+    expect(find.text('No matches'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 }

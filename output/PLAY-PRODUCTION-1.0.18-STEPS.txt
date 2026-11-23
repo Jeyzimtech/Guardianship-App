@@ -1,0 +1,69 @@
+﻿EDU CONNECT - GOOGLE PLAY PRODUCTION STEPS
+Version 1.0.18 (version code 19) - 20 November 2026
+Package: educonnect.com
+API: https://admin.chewetechnologies.co.zw/api
+
+THE TWO SEPARATE GOOGLE PLAY APPROVALS
+The active Apply for production button lets you request production access. It does not publish the app and does not mean a production release has already been approved. Use the existing Edu Connect app in Play Console; do not create another app or change the package/signing key.
+
+1. APPLY FOR PRODUCTION ACCESS
+Open Play Console, select Edu Connect, then Dashboard > Apply for production.
+Complete About your closed test, About your app/game, and About your production readiness. Keep the existing closed test active while Google reviews the request.
+Use your real tester recruitment method, engagement, feedback channel and tester feedback. Automated test counts and a CSV of email addresses do not prove human tester participation. Do not claim that testers used every feature unless they actually did.
+Click Apply to submit. Google's access-review guidance says usually seven days or less, sometimes longer; watch the Console and account-owner email for the result.
+
+Evidence you can use when describing app changes, where it matches the feedback you actually received:
+- Removed unwanted dashboard/sidebar items and drawing options.
+- Fixed dashboard/detail attendance calculations to count late arrivals consistently.
+- Restricted suspended parent access while allowing teachers to continue working.
+- Supported one parent login across multiple schools with school-scoped records.
+- Added seven-day direct-message expiry and school-managed activity registers.
+- Tested small-screen layouts, account access, authoring and permissions.
+
+A factual description of the app:
+Edu Connect is a school-to-home communication app for adult parents/guardians and teachers. Schools provision accounts and link parents to their children. Parents view school records and updates; teachers share classroom information with assigned families. Learners do not sign in themselves.
+
+2. TEST THE NEW BUNDLE THROUGH GOOGLE PLAY
+Upload EduConnect-1.0.18-19-production.aab to an internal testing release (or your existing closed track). Enter the release notes from RELEASE-1.0.18-NOTES.txt. Review the Play-generated device compatibility, app-bundle checks, and pre-launch report. Test the Play-installed version on a real device using an existing active parent account and an assigned teacher account.
+Check login/logout, restricted/active parent access, child selection, attendance, journal/homework/documents, teacher messaging/authoring, notifications, blocking/reporting, password reset and account deletion.
+The uniform store is hidden for this release because the gateway is still sandboxed. Existing subscribers sign in; this release does not offer an in-app digital subscription purchase or an external activation/purchase button.
+
+3. COMPLETE APP CONTENT AND STORE LISTING
+In Play Console, use Policy and programs > App content (or the App content task linked from Dashboard). Complete every required item shown by your Console.
+- App access: functionality requires login. Supply a working parent email/password with an active linked learner, plus a teacher email/password assigned to a class. Use review/demo accounts, not server/admin credentials or real private school data. Include English instructions, sample records and access to all reviewable functions. No OTP, subscription purchase, activation call or staff approval should be required for these accounts.
+- Privacy policy: https://admin.chewetechnologies.co.zw/privacy-policy
+- Account deletion website: https://admin.chewetechnologies.co.zw/account-deletion
+- Data safety: complete from the actual app and SDK behavior. Current relevant data includes account/contact information and user IDs; school/learner records; optional learner photos; teacher-uploaded photos/video/voice/files; parent-teacher messages and other school content; support reports; and Firebase notification/installation identifiers. Assess each field's collection, sharing, purpose, and optionality. No location/contacts/SMS-reading permission or advertising ID is requested. Do not copy the old checklist's medical-data collection entry: medical/wellbeing features were retired. Consider any retained historical data separately when answering operator questions.
+- Ads: no third-party advertising is implemented.
+- Target audience: adult parents/guardians and teachers. Reflect that actual audience; learner records are not the same as child user accounts. Review the target-audience form before selecting the adult age group.
+- Content rating: disclose messaging/user interaction accurately; complete the questionnaire from actual content and functionality.
+- Health declaration, if shown: the current app has no medical or structured wellbeing feature. Answer the current form accordingly.
+- Pricing: the Play download is separate from any externally managed existing school/app membership. There is no Google Play Billing purchase in this build.
+- Store listing: verify app name, descriptions, support contact, icon, feature graphic and current screenshots. Do not advertise the hidden uniform checkout or retired medical/drawing features.
+- Clear outstanding policy-status, account-verification and Console setup tasks.
+
+4. AFTER PRODUCTION ACCESS IS APPROVED
+Open Test and release > Production > Countries/regions and select the countries you actually support.
+Open Production > Create new release.
+If build 19 was already uploaded to a testing track, choose Add from library/select that build or use the Console's promote-release flow. Do not upload a second copy of the same version code. If it was never uploaded, upload the supplied AAB.
+Keep the existing Play App Signing configuration and upload certificate.
+Use release name 1.0.18 (19), add the release notes, then Save/Next and inspect the review summary. Resolve all errors and assess warnings. Confirm package educonnect.com, version code 19, version name 1.0.18, and target SDK 36.
+
+5. SEND FOR REVIEW AND PUBLISH
+Use Publishing overview to send the prepared changes for review, following the buttons shown by your Console. Check Managed publishing so you understand whether approval publishes automatically or waits for your Publish changes action. For a first production release, rollout-percentage choices are not available; selected countries determine availability.
+Production-access approval and app-release review are separate. The supplied AAB and technical checks do not guarantee Google's approval.
+
+RELEASE NOTES
+Copy the complete language-tagged text in RELEASE-1.0.18-NOTES.txt into the release-notes field. Do not paste these instructions there.
+
+PAYMENT AND SUPPORT STATUS
+Parents pay separately for digital app access. This build is prepared as a consumption-only client: existing members sign in, with no in-app digital purchase or external activation CTA. Any future in-app subscription sales need a fresh Google Play Billing/policy assessment. The sandbox uniform checkout is not exposed in this build.
+Saved SMTP settings authenticated successfully without sending an email. HTTPS policy and deletion pages are available. Production debug is off; push credentials, queue processing and hourly message cleanup are configured and active.
+
+OFFICIAL REFERENCES
+Production access: https://support.google.com/googleplay/android-developer/answer/14151465?hl=en
+Release preparation: https://support.google.com/googleplay/android-developer/answer/9859348
+Reviewer sign-in: https://support.google.com/googleplay/android-developer/answer/15748846?hl=en
+Payments: https://support.google.com/googleplay/android-developer/answer/10281818?hl=en
+Target API: https://support.google.com/googleplay/android-developer/answer/11926878?hl=en
+16 KB compatibility: https://developer.android.com/guide/practices/page-sizes

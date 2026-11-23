@@ -130,6 +130,46 @@ class AuthController extends Controller
     }
 
     /**
+     * Permanently delete the signed-in teacher or guardian account (Google Play account deletion requirement).
+     */
+    public function deleteAccount(Request $request)
+    {
+        $user = $request->user();
+        if (!in_array($user->role, ['teacher', 'guardian'], true)) {
+            return response()->json(['status' => 'error', 'message' => 'Administrator accounts are removed from the web portal.'], 403);
+        }
+
+        DB::transaction(function () use ($user) {
+            $user->tokens()->delete();
+            DB::table('direct_messages')->where('sender_id', $user->id)->orWhere('recipient_id', $user->id)->delete();
+            DB::table('support_reports')->where('user_id', $user->id)->delete();
+            DB::table('message_blocks')->where('user_id', $user->id)->orWhere('blocked_user_id', $user->id)->delete();
+            if ($user->role === 'guardian') {
+                $user->delete();
+                return;
+            }
+            // Attendance, journal, behaviour and SOS records belong to the school, so a
+            // teacher's identity is erased and the records stay attributed to "Former teacher".
+            DB::table('mobile_devices')->where('user_id', $user->id)->delete();
+            $user->teacherProfile()->delete();
+            $user->forceFill([
+                'name' => 'Former teacher',
+                'email' => null,
+                'phone_number' => null,
+                'address' => null,
+                'emergency_contact_name' => null,
+                'emergency_contact_phone' => null,
+                'account_uid' => 'deleted_' . Str::uuid(),
+                'role' => 'deleted',
+                'password' => Str::random(64),
+                'remember_token' => null,
+            ])->save();
+        });
+
+        return response()->json(['status' => 'success', 'message' => 'Your account has been deleted.']);
+    }
+
+    /**
      * Change password for users (Teachers, Students/Guardians, Admins).
      */
     public function changePassword(Request $request)

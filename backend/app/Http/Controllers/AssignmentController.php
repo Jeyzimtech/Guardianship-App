@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Assignment;
 use App\Models\Student;
 use App\Models\SchoolClass;
+use App\Models\SchoolDocument;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class AssignmentController extends Controller
 {
@@ -16,7 +18,7 @@ class AssignmentController extends Controller
         return response()->json([
             'status' => 'success',
             'classes' => $teacher->assignedClasses()->where('school_classes.school_id',$teacher->school_id)->get(),
-            'data' => Assignment::where('created_by', $request->user()->id)->orderByDesc('id')->get(),
+            'data' => Assignment::with('document.schoolClass')->where('created_by', $request->user()->id)->orderByDesc('id')->get()->map(fn ($a) => $this->present($a, $request)),
         ]);
     }
 
@@ -40,7 +42,7 @@ class AssignmentController extends Controller
             $assignedIds = collect();
         }
 
-        $assignments = Assignment::where(function ($query) use ($student, $user, $assignedIds) {
+        $assignments = Assignment::with('document.schoolClass')->where(function ($query) use ($student, $user, $assignedIds) {
             $query->whereHas('schoolClass', function ($q) use ($student) {
                 $q->where('school_id', $student->school_id)
                   ->where('grade', $student->grade)
@@ -54,11 +56,11 @@ class AssignmentController extends Controller
             });
         })
         ->orderBy('due_date', 'asc')
-        ->get();
+        ->get()->map(fn ($a) => $this->present($a, $request, (int) $student_id));
 
         $today = now()->toDateString();
-        $upcoming = $assignments->filter(fn($a) => $a->due_date >= $today)->values();
-        $overdue = $assignments->filter(fn($a) => $a->due_date < $today)->values();
+        $upcoming = $assignments->filter(fn($a) => $a['due_date'] >= $today)->values();
+        $overdue = $assignments->filter(fn($a) => $a['due_date'] < $today)->values();
 
         return response()->json([
             'status' => 'success',
@@ -82,6 +84,7 @@ class AssignmentController extends Controller
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
             'due_date' => 'required|date',
+            'file' => array_merge(['nullable'], SchoolDocument::fileRules()),
         ]);
 
         if ($request->user()->role === 'teacher') {
@@ -104,6 +107,7 @@ class AssignmentController extends Controller
         if ($request->user()->role === 'admin') {
             abort_unless(!empty($validated['school_class_id']), 422, 'Choose a class at your school.');
         }
+        $assignment = DB::transaction(function () use ($request, $validated) {
         $assignment = Assignment::create([
             'grade_name' => $validated['grade_name'] ?? null,
             'school_class_id' => $validated['school_class_id'] ?? null,
@@ -113,11 +117,28 @@ class AssignmentController extends Controller
             'due_date' => $validated['due_date'],
             'created_by' => $request->user()->id,
         ]);
+        if ($request->hasFile('file')) {
+            $class = SchoolClass::findOrFail($assignment->school_class_id);
+            SchoolDocument::upload($request->file('file'), [
+                'school_id' => $class->school_id, 'school_class_id' => $class->id,
+                'assignment_id' => $assignment->id, 'title' => $assignment->title,
+                'uploaded_by' => $request->user()->id,
+            ]);
+        }
+        return $assignment;
+        });
 
         return response()->json([
             'status' => 'success',
             'message' => 'Assignment created successfully.',
-            'data' => $assignment
+            'data' => $this->present($assignment->load('document.schoolClass'), $request)
         ], 201);
+    }
+
+    private function present(Assignment $assignment, Request $request, ?int $studentId = null): array
+    {
+        $data = $assignment->attributesToArray();
+        $data['attachment'] = $assignment->document?->forViewer($request->user(), $studentId);
+        return $data;
     }
 }

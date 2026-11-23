@@ -1,0 +1,91 @@
+{
+  "package": "educonnect.com",
+  "version": "1.0.18",
+  "version_code": 19,
+  "target_sdk": 36,
+  "min_sdk": 24,
+  "debuggable": false,
+  "cleartext_allowed": false,
+  "signed": true,
+  "upload_certificate_sha256": "73:22:E7:81:3B:16:5E:6F:5E:3A:81:41:5D:F3:D5:54:5F:7D:8F:7B:66:E8:9A:B2:1A:A1:5F:2F:DB:33:B8:AE",
+  "matches_previous_upload_certificate": true,
+  "bundletool_validation": "passed",
+  "zip_page_alignment": "16 KB",
+  "native_64_bit_libraries": [
+    {
+      "path": "base/lib/arm64-v8a/libapp.so",
+      "load_alignments": [
+        65536,
+        65536,
+        65536
+      ]
+    },
+    {
+      "path": "base/lib/arm64-v8a/libdartjni.so",
+      "load_alignments": [
+        16384,
+        16384,
+        16384
+      ]
+    },
+    {
+      "path": "base/lib/arm64-v8a/libdatastore_shared_counter.so",
+      "load_alignments": [
+        16384,
+        16384,
+        16384
+      ]
+    },
+    {
+      "path": "base/lib/arm64-v8a/libflutter.so",
+      "load_alignments": [
+        65536,
+        65536,
+        65536
+      ]
+    },
+    {
+      "path": "base/lib/x86_64/libapp.so",
+      "load_alignments": [
+        65536,
+        65536,
+        65536
+      ]
+    },
+    {
+      "path": "base/lib/x86_64/libdartjni.so",
+      "load_alignments": [
+        16384,
+        16384,
+        16384
+      ]
+    },
+    {
+      "path": "base/lib/x86_64/libdatastore_shared_counter.so",
+      "load_alignments": [
+        16384,
+        16384
+      ]
+    },
+    {
+      "path": "base/lib/x86_64/libflutter.so",
+      "load_alignments": [
+        65536,
+        65536,
+        65536
+      ]
+    }
+  ],
+  "production_api_compiled": true,
+  "permissions": [
+    "android.permission.INTERNET",
+    "android.permission.POST_NOTIFICATIONS",
+    "android.permission.WAKE_LOCK",
+    "android.permission.ACCESS_NETWORK_STATE",
+    "android.permission.VIBRATE",
+    "com.google.android.c2dm.permission.RECEIVE",
+    "educonnect.com.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+  ],
+  "sha256": "9d0444bb581dc2cee38e7de2b7953e8ef9192b1a583a8227f2f283915884bd29",
+  "size_bytes": 64113213
+}

@@ -37,6 +37,18 @@ class SchoolClassController extends Controller
         }
 
         $classes = $query->orderBy('grade', 'asc')->orderBy('class_name', 'asc')->get();
+        if ($request->user()?->role === 'admin') {
+            // Class information for the admin portal: teachers and the enrolled roster.
+            $classes->load('teachers.user:id,name');
+            $students = \App\Models\Student::where('school_id', $request->user()->school_id ?? 0)->withCount('guardians')->orderBy('name')->get();
+            $classes->each(function ($class) use ($students) {
+                $roster = $students->where('grade', $class->grade)->where('class_name', $class->class_name)->values();
+                $class->setAttribute('student_count', $roster->count());
+                $class->setAttribute('roster', $roster->map(fn ($s) => ['id' => $s->id, 'name' => $s->name, 'guardians_count' => $s->guardians_count])->values());
+                $class->setAttribute('teacher_list', $class->teachers->map(fn ($t) => ['name' => $t->user?->name, 'subject' => $t->pivot->subject_name])->values());
+                $class->unsetRelation('teachers');
+            });
+        }
 
         return response()->json([
             'status' => 'success',
@@ -119,7 +131,15 @@ class SchoolClassController extends Controller
             && !\App\Models\AcademicYear::whereKey($request->academic_year_id)->where('school_id', $class->school_id)->exists()) {
             return response()->json(['status' => 'error', 'message' => 'Select an academic year at the class school.'], 422);
         }
-        $class->update($request->only(['academic_year_id', 'grade', 'class_name', 'capacity']));
+        // Students store their class by grade and name, so a rename moves them with it.
+        $old = $class->only(['grade', 'class_name']);
+        \Illuminate\Support\Facades\DB::transaction(function () use ($class, $request, $old) {
+            $class->update($request->only(['academic_year_id', 'grade', 'class_name', 'capacity']));
+            if ($class->wasChanged(['grade', 'class_name'])) {
+                \App\Models\Student::where('school_id', $class->school_id)->where('grade', $old['grade'])->where('class_name', $old['class_name'])
+                    ->update(['grade' => $class->grade, 'class_name' => $class->class_name]);
+            }
+        });
         $class->load(['school', 'academicYear']);
 
         return response()->json([
@@ -140,6 +160,9 @@ class SchoolClassController extends Controller
         $class = SchoolClass::findOrFail($id);
         if (request()->user()?->role === 'admin' && (!$class->school_id || (int) $class->school_id !== (int) request()->user()->school_id)) {
             return response()->json(['status' => 'error', 'message' => 'You may only manage classes at your school.'], 403);
+        }
+        if (\App\Models\Student::where('school_id', $class->school_id)->where('grade', $class->grade)->where('class_name', $class->class_name)->exists()) {
+            return response()->json(['status' => 'error', 'message' => 'Move or remove the students in this class before deleting it.'], 422);
         }
         $class->delete();
 

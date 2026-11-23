@@ -1,0 +1,14 @@
+{
+  "status": "complete",
+  "backend_tests": 137,
+  "mobile_tests": 106,
+  "device_ui_checks": 10,
+  "live_checks": 23,
+  "server_name_changed": false,
+  "apk": "EduConnect-features-2026-11-20.apk",
+  "sha256": "20c185ea6fa38f7a2001e87b1fc2a909d46b88f8caf960d53d21699b553a413e",
+  "queue": "active",
+  "message_retention_timer": "active",
+  "phone": "Pixel 7 Pro",
+  "live_test_data": "rolled back"
+}

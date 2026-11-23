@@ -1,3 +1,4 @@
+import '../common/report_content_button.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../core/auth_provider.dart';
@@ -6,6 +7,7 @@ import '../teacher/create_assignment_page.dart';
 import '../../core/app_colors.dart';
 import '../../core/app_icon.dart';
 import '../common/page_components.dart';
+import '../common/document_download_button.dart';
 
 class AssignmentsView extends StatefulWidget {
   final Map<String, dynamic>? child;
@@ -54,9 +56,12 @@ class _AssignmentsViewState extends State<AssignmentsView> {
         _assignments.addAll(
           items.map(
             (a) => <String, dynamic>{
+              'id': a['id'],
               'title': a['title'],
               'subject': a['subject_name'] ?? 'Assignment',
               'description': a['description'] ?? '',
+              'attachment': a['attachment'],
+              'student_id': auth.isTeacher ? null : student,
               'due_date': 'Due ${a['due_date']}',
               'status': auth.isTeacher
                   ? 'PUBLISHED'
@@ -243,6 +248,18 @@ class _AssignmentsViewState extends State<AssignmentsView> {
                         ),
                       ),
                       const SizedBox(height: 20),
+                      ReportContentButton(
+                        details: 'Assignment ${item['id']}: ${item['title']}',
+                      ),
+                      if (item['attachment'] != null) ...[
+                        DocumentDownloadButton(
+                          document: Map<String, dynamic>.from(
+                            item['attachment'],
+                          ),
+                          studentId: item['student_id'] as int?,
+                        ),
+                        const SizedBox(height: 16),
+                      ],
                       const Divider(height: 1),
                       const SizedBox(height: 16),
                       Wrap(

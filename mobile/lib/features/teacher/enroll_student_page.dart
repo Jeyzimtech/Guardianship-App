@@ -181,8 +181,9 @@ class _EnrollStudentPageState extends State<EnrollStudentPage> {
                       enabled: !_saving,
                       keyboardType: TextInputType.phone,
                       decoration: const InputDecoration(
-                        labelText: 'Parent phone number (optional)',
+                        labelText: 'Parent phone number',
                         hintText: '0771234567',
+                        helperText: 'Parents can sign in with just this number. Email is optional.',
                       ),
                     ),
                     const SizedBox(height: 16),

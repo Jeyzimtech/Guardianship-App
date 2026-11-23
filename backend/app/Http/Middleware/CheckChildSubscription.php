@@ -50,13 +50,7 @@ class CheckChildSubscription
         if ($studentId) {
             $student = Student::with('activeSubscription')->find($studentId);
             if ($student && $student->activeSubscription) {
-                $sub = $student->activeSubscription;
-                $subscriptionEnded = $sub->status === 'active' && $sub->end_date && $sub->end_date->lt(now()->startOfDay());
-                $subscriptionNotStarted = $sub->status === 'active' && $sub->start_date && $sub->start_date->gt(now()->endOfDay());
-                $suspensionInEffect = $sub->status === 'inactive'
-                    && (!$sub->start_date || $sub->start_date->lte(now()->startOfDay()))
-                    && (!$sub->end_date || $sub->end_date->gte(now()->startOfDay()));
-                if ($suspensionInEffect || $subscriptionEnded || $subscriptionNotStarted) {
+                if (!\App\Services\GuardianAccess::active($student)) {
                     return response()->json([
                         'status' => 'error',
                         'code' => 'subscription_suspended',
@@ -64,8 +58,8 @@ class CheckChildSubscription
                         'data' => [
                             'student_id' => $student->id,
                             'student_name' => $student->name,
-                            'start_date' => $sub->start_date,
-                            'end_date' => $sub->end_date,
+                            'start_date' => $student->activeSubscription->start_date,
+                            'end_date' => $student->activeSubscription->end_date,
                         ]
                     ], 403);
                 }

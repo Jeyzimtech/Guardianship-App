@@ -1,0 +1,19 @@
+{
+  "configuration": {
+    "environment": "production",
+    "debug": false,
+    "pesepay_sandbox": true,
+    "pesepay_configured": true,
+    "firebase_credentials_readable": true,
+    "mail_transport": "log",
+    "proof_column": true
+  },
+  "services": [
+    "active",
+    "active",
+    "active",
+    "active"
+  ],
+  "http": "/api/health 200\n/privacy-policy 200\n/terms 200\n/account-deletion 200\n/api/subscription 302",
+  "disk": "/dev/sda1        96G   13G   84G  14% /"
+}

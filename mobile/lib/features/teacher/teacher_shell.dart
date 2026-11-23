@@ -3,6 +3,7 @@ import '../../core/app_colors.dart';
 import '../../core/app_icon.dart';
 import '../common/editorial_widgets.dart';
 import '../common/app_drawer.dart';
+import '../common/unread_icon.dart';
 import '../teacher/teacher_dashboard_view.dart';
 import '../teacher/teacher_home_view.dart';
 import '../parent/messaging_view.dart';
@@ -21,6 +22,7 @@ class _TeacherShellState extends State<TeacherShell> {
   int _currentIndex = 0;
   // Tabs are built on first visit so startup only loads the home screen.
   final Set<int> _visited = {0};
+  final Map<int, int> _visits = {};
 
   static const List<Widget> _allPages = [
     TeacherHomeView(),
@@ -32,7 +34,9 @@ class _TeacherShellState extends State<TeacherShell> {
 
   List<Widget> get _pages => [
     for (var i = 0; i < _allPages.length; i++)
-      _visited.contains(i) ? _allPages[i] : const SizedBox.shrink(),
+      _visited.contains(i)
+          ? KeyedSubtree(key: ValueKey('$i-${_visits[i]}'), child: _allPages[i])
+          : const SizedBox.shrink(),
   ];
 
   @override
@@ -65,6 +69,7 @@ class _TeacherShellState extends State<TeacherShell> {
         child: BottomNavigationBar(
           currentIndex: _currentIndex,
           onTap: (i) => setState(() {
+            if (_currentIndex != i) _visits[i] = (_visits[i] ?? 0) + 1;
             _currentIndex = i;
             _visited.add(i);
           }),
@@ -90,13 +95,13 @@ class _TeacherShellState extends State<TeacherShell> {
               label: 'Classroom',
             ),
             BottomNavigationBarItem(
-              icon: AppIcon(AppSymbol.report),
-              activeIcon: AppIcon(AppSymbol.report),
+              icon: UnreadIcon(AppSymbol.report, 'journal'),
+              activeIcon: UnreadIcon(AppSymbol.report, 'journal'),
               label: 'Journal',
             ),
             BottomNavigationBarItem(
-              icon: AppIcon(AppSymbol.message),
-              activeIcon: AppIcon(AppSymbol.message),
+              icon: UnreadIcon(AppSymbol.message, 'messages'),
+              activeIcon: UnreadIcon(AppSymbol.message, 'messages'),
               label: 'Messages',
             ),
             BottomNavigationBarItem(

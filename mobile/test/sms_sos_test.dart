@@ -37,11 +37,13 @@ void main() {
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
-    await tester.pumpWidget(const MaterialApp(home: Scaffold(body: SingleChildScrollView(child: TeacherSosCard()))));
-    await tester.tap(find.text('Send SOS to parents'));
+    final api=ApiClient();
+    api.dio.interceptors.add(InterceptorsWrapper(onRequest:(o,h)=>h.resolve(Response(requestOptions:o,statusCode:200,data:{'contacts':[{'id':1,'name':'Parent','students':['Learner']}]}))));
+    await tester.pumpWidget(ChangeNotifierProvider(create:(_)=>AuthProvider(api),child:const MaterialApp(home: Scaffold(body: SingleChildScrollView(child: TeacherSosCard())))));
+    await tester.tap(find.text('Choose SOS recipients'));
     await tester.pumpAndSettle();
     expect(find.text('Send emergency SOS?'), findsOneWidget);
-    expect(find.textContaining('assigned classes'), findsOneWidget);
+    expect(tester.widget<FilledButton>(find.widgetWithText(FilledButton, 'Send SOS')).onPressed, isNull);
     expect(tester.takeException(), isNull);
     await tester.tap(find.text('Cancel'));
     await tester.pumpAndSettle();

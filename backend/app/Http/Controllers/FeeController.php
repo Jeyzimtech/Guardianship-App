@@ -75,6 +75,7 @@ class FeeController extends Controller
         abort_unless(($actor->role==='guardian' && $actor->students()->whereKey($student->id)->exists())
             || ($actor->role==='admin' && $actor->school_id && (int)$actor->school_id===(int)$student->school_id),403);
         $data=$request->validate([
+            'proof'=>'nullable|file|mimes:jpg,jpeg,png,pdf|max:5120',
             'amount'=>'required|numeric|min:1','currency'=>'required|in:USD,ZiG',
             'payment_method'=>'required|in:EcoCash,OneMoney,Card',
             'reference'=>['required','string','max:100',\Illuminate\Validation\Rule::unique('fee_transactions')->where('payment_method',$request->payment_method)],
@@ -82,8 +83,28 @@ class FeeController extends Controller
         $account=FeeAccount::firstOrCreate(['student_id'=>$student->id],['balance_usd'=>0,'balance_zig'=>0]);
         $column=$data['currency']==='USD'?'balance_usd':'balance_zig';
         abort_if((float)$data['amount']>(float)$account->$column,422,'The amount exceeds the outstanding balance.');
-        $payment=FeeTransaction::create($data+['fee_account_id'=>$account->id,'status'=>'pending']);
+        unset($data['proof']);
+        $path = $request->hasFile('proof') ? $request->file('proof')->store('payment-proofs', 'local') : null;
+        try {
+            $payment=FeeTransaction::create($data+['fee_account_id'=>$account->id,'status'=>'pending','proof_path'=>$path]);
+        } catch (\Throwable $e) {
+            if ($path) \Illuminate\Support\Facades\Storage::disk('local')->delete($path);
+            throw $e;
+        }
         return response()->json(['status'=>'success','message'=>'Payment reference submitted for school verification. Your balance changes only after verification.','transaction'=>$payment,'fee_account'=>$account],202);
+    }
+
+    public function proof(Request $request, int $id)
+    {
+        $payment = FeeTransaction::findOrFail($id);
+        $student = $payment->feeAccount->student;
+        $actor = $request->user();
+        abort_unless(($actor->role === 'admin' && (int) $actor->school_id === (int) $student->school_id)
+            || ($actor->role === 'guardian' && $actor->students()->where('students.id', $student->id)->exists()), 403);
+        if ($actor->role === 'guardian') abort_unless(\App\Services\GuardianAccess::active($student), 403);
+        abort_unless($payment->proof_path && \Illuminate\Support\Facades\Storage::disk('local')->exists($payment->proof_path), 404);
+        return \Illuminate\Support\Facades\Storage::disk('local')->download($payment->proof_path, 'payment-proof.'.pathinfo($payment->proof_path, PATHINFO_EXTENSION),
+            ['Cache-Control' => 'private, no-store', 'X-Content-Type-Options' => 'nosniff']);
     }
 
     public function pendingPayments(Request $request)

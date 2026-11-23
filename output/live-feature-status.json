@@ -1,0 +1,7 @@
+{
+  "status": "verified",
+  "checksums": 19,
+  "worker": "active",
+  "retention_timer": "active",
+  "backup": "/var/backups/guardianship/20261120T080048Z-requested-features"
+}

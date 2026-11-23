@@ -34,7 +34,7 @@ class DashboardController extends Controller
         // Attendance rate calculation
         $attendanceQuery = AttendanceRecord::when($schoolId, fn ($q) => $q->whereHas('student', fn ($s) => $s->where('school_id', $schoolId)));
         $totalAttendance = (clone $attendanceQuery)->count();
-        $presentAttendance = (clone $attendanceQuery)->where('status', 'present')->count();
+        $presentAttendance = (clone $attendanceQuery)->whereIn('status', ['present', 'late'])->count();
         $attendanceRate = $totalAttendance > 0 ? round(($presentAttendance / $totalAttendance) * 100) : 0;
 
         // Stream distribution based on actual students
@@ -74,8 +74,52 @@ class DashboardController extends Controller
                     'primary' => $primaryCount,
                     'secondary' => $secondaryCount,
                 ],
+                'charts' => $this->adminCharts($schoolId),
             ],
         ]);
+    }
+
+    /** Dashboard chart series computed from recorded school activity. */
+    private function adminCharts(?int $schoolId): array
+    {
+        $studentIds = Student::when($schoolId, fn ($q) => $q->where('school_id', $schoolId))->pluck('id');
+        $weeks = collect(range(5, 0))->map(fn ($ago) => now()->startOfWeek()->subWeeks($ago));
+        $since = $weeks->first()->copy();
+        $weekOf = fn ($date) => \Carbon\Carbon::parse($date)->startOfWeek()->toDateString();
+        $labels = $weeks->map(fn ($w) => $w->format('j M'))->all();
+
+        $attendance = AttendanceRecord::whereIn('student_id', $studentIds)->where('date', '>=', $since->toDateString())->get(['student_id', 'date', 'status']);
+        $byWeek = $attendance->groupBy(fn ($r) => $weekOf($r->date));
+        $weeklyRate = $weeks->map(function ($w) use ($byWeek) {
+            $rows = $byWeek->get($w->toDateString());
+            return $rows ? round($rows->where('status', '!=', 'absent')->count() / $rows->count() * 100) : null;
+        })->all();
+
+        $recent = $attendance->where('date', '>=', now()->subDays(30)->toDateString());
+        $classOf = Student::whereIn('id', $studentIds)->get(['id', 'grade', 'class_name'])->mapWithKeys(fn ($s) => [$s->id => str_contains((string) $s->class_name, (string) $s->grade) ? $s->class_name : trim("$s->grade $s->class_name")]);
+        $byClass = $recent->groupBy(fn ($r) => $classOf[$r->student_id] ?? 'Unassigned')
+            ->map(fn ($rows) => round($rows->where('status', '!=', 'absent')->count() / $rows->count() * 100))->sortKeys();
+
+        $count = fn ($query, string $column) => $query->where($column, '>=', $since)->pluck($column)
+            ->countBy(fn ($date) => $weekOf($date));
+        $series = fn ($counts) => $weeks->map(fn ($w) => $counts->get($w->toDateString(), 0))->all();
+        $journal = $count(\App\Models\JournalEntry::whereIn('student_id', $studentIds), 'created_at');
+        $behaviour = $count(\App\Models\BehaviourIncident::whereIn('student_id', $studentIds), 'created_at');
+        $classIds = SchoolClass::when($schoolId, fn ($q) => $q->where('school_id', $schoolId))->pluck('id');
+        $homework = $count(\App\Models\Assignment::whereIn('school_class_id', $classIds), 'created_at');
+        $registers = $attendance->unique(fn ($r) => $r->student_id.'|'.$r->date)->pluck('date')->countBy(fn ($date) => $weekOf($date));
+
+        return [
+            'weeks' => $labels,
+            'attendance_weekly' => $weeklyRate,
+            'attendance_by_class' => ['labels' => $byClass->keys()->all(), 'rates' => $byClass->values()->all()],
+            'activity_weekly' => [
+                'journal' => $series($journal),
+                'homework' => $series($homework),
+                'behaviour' => $series($behaviour),
+                'attendance_marks' => $series($registers),
+            ],
+        ];
     }
 
     /**
@@ -102,7 +146,7 @@ class DashboardController extends Controller
         // 1. Attendance Snapshot
         $attendanceRecords = AttendanceRecord::where('student_id', $studentId);
         $totalDays = (clone $attendanceRecords)->count();
-        $presentDays = (clone $attendanceRecords)->where('status', 'present')->count();
+        $presentDays = (clone $attendanceRecords)->whereIn('status', ['present', 'late'])->count();
         $attendancePercentage = $totalDays > 0 ? round(($presentDays / $totalDays) * 100) : 0;
         $behaviourCounts = \App\Models\BehaviourIncident::where('student_id', $studentId)
             ->selectRaw("SUM(CASE WHEN polarity = 'positive' THEN 1 ELSE 0 END) as positive_count, SUM(CASE WHEN polarity = 'negative' THEN 1 ELSE 0 END) as negative_count")

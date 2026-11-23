@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'api_client.dart';
+import 'legal.dart';
+import 'push_notifications.dart';
 
 class AuthProvider extends ChangeNotifier {
   final ApiClient apiClient;
@@ -55,7 +57,30 @@ class AuthProvider extends ChangeNotifier {
         'preferred_language': lang ?? 'English',
       };
       notifyListeners();
+      await _refreshProfile();
     }
+  }
+
+  /// The cached profile only covers start-up; the server copy is authoritative.
+  Future<void> _refreshProfile() async {
+    try {
+      final response = await apiClient.dio.get('/auth/profile');
+      final fresh = response.data is Map ? response.data['user'] : null;
+      if (fresh is! Map || _token == null) return;
+      _user = Map<String, dynamic>.from(fresh);
+      final prefs = await SharedPreferences.getInstance();
+      for (final entry in {
+        'user_name': 'name', 'user_phone': 'phone_number', 'user_email': 'email',
+        'user_address': 'address', 'user_language': 'preferred_language',
+      }.entries) {
+        final value = _user![entry.value];
+        value == null ? await prefs.remove(entry.key) : await prefs.setString(entry.key, value.toString());
+      }
+      notifyListeners();
+    } on DioException catch (e) {
+      // A revoked or expired session signs out; offline keeps the cached profile.
+      if (e.response?.statusCode == 401) await logout();
+    } catch (_) {}
   }
 
   Future<void> verifyPhoneCode(String challenge, String code) async {
@@ -325,6 +350,7 @@ class AuthProvider extends ChangeNotifier {
   }
 
   Future<void> logout() async {
+    await PushNotifications.detach(this);
     final tokenToRevoke = _token;
 
     // 1. Immediately reset memory state and notify listeners
@@ -333,10 +359,12 @@ class AuthProvider extends ChangeNotifier {
     _errorMessage = null;
     notifyListeners();
 
-    // 2. Clear storage asynchronously
+    // 2. Clear storage asynchronously, keeping the device's policy acceptance
     try {
       final prefs = await SharedPreferences.getInstance();
+      final accepted = prefs.getString(Legal.acceptedKey);
       await prefs.clear();
+      if (accepted != null) await prefs.setString(Legal.acceptedKey, accepted);
     } catch (_) {}
 
     // 3. Fire-and-forget server logout in background without blocking the UI.
@@ -417,6 +445,7 @@ class AuthProvider extends ChangeNotifier {
     return true;
   }
 
+  /// Deletes the account on the server; the session is only cleared once the server confirms.
   Future<bool> deleteAccount() async {
     _isLoading = true;
     notifyListeners();
@@ -424,17 +453,14 @@ class AuthProvider extends ChangeNotifier {
     try {
       await apiClient.dio.post('/auth/delete-account');
     } catch (_) {
-      // Offline fallback
+      _isLoading = false;
+      notifyListeners();
+      return false;
     }
 
+    // The server already revoked the token, so only local state is cleared.
     _token = null;
-    _user = null;
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.remove('auth_token');
-    await prefs.remove('user_name');
-    await prefs.remove('user_role');
-    await prefs.remove('user_phone');
-
+    await logout();
     _isLoading = false;
     notifyListeners();
     return true;

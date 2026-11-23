@@ -1,3 +1,4 @@
+import '../common/report_content_button.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -5,6 +6,7 @@ import '../../core/app_colors.dart';
 import '../../core/app_icon.dart';
 import '../../core/student_provider.dart';
 import '../../core/auth_provider.dart';
+import '../../core/notification_provider.dart';
 import '../teacher/teacher_publish_page.dart';
 import '../common/page_components.dart';
 
@@ -55,7 +57,6 @@ class _LearningJournalViewState extends State<LearningJournalView> {
               'caption': map['caption'] ?? '',
               'image_url': map['media_url'],
               'feedback': map['feedback'] ?? '',
-              'wellbeing': map['wellbeing_data'],
             };
           }),
         );
@@ -64,6 +65,10 @@ class _LearningJournalViewState extends State<LearningJournalView> {
             _entries = list;
             _isLoading = false;
           });
+          await context.read<NotificationProvider?>()?.markRead(
+            'journal',
+            list.map((entry) => (entry['id'] as num).toInt()),
+          );
           return;
         }
       }
@@ -80,10 +85,7 @@ class _LearningJournalViewState extends State<LearningJournalView> {
 
   static const _filters = {
     'All entries': 'all',
-    'Wellbeing': 'wellbeing',
     'Photos': 'photo',
-    'Drawings': 'drawing',
-    'Voice notes': 'voice',
     'Notes': 'text',
   };
 
@@ -119,7 +121,7 @@ class _LearningJournalViewState extends State<LearningJournalView> {
               PageHeading(
                 title: 'Little moments.\nMeaningful progress.',
                 subtitle: widget.child == null
-                    ? 'Learning, wellbeing and classroom stories.'
+                    ? 'Learning and classroom stories.'
                     : '${widget.child!['name']} · Learning journal',
                 symbol: AppSymbol.report,
               ),
@@ -141,7 +143,7 @@ class _LearningJournalViewState extends State<LearningJournalView> {
                 const PageEmpty(
                   title: 'No journal entries yet',
                   message:
-                      'Classroom moments and wellbeing logs posted by teachers and administrators will appear here.',
+                      'Classroom moments posted by teachers and administrators will appear here.',
                 )
               else
                 for (final entry in entries)
@@ -200,11 +202,18 @@ class _LearningJournalViewState extends State<LearningJournalView> {
             ),
           ],
         ),
+        ReportContentButton(
+          details:
+              'Learning journal entry ${entry['id']}, author: ${entry['author']}',
+        ),
         const SizedBox(height: 18),
         PageBadge(
           entry['subject'] ??
               _filters.entries
-                  .firstWhere((filter) => filter.value == entry['type'])
+                  .firstWhere(
+                    (filter) => filter.value == entry['type'],
+                    orElse: () => const MapEntry('Learning entry', 'all'),
+                  )
                   .key,
         ),
         const SizedBox(height: 14),
@@ -217,62 +226,6 @@ class _LearningJournalViewState extends State<LearningJournalView> {
               color: AppColors.textPrimary,
             ),
           ),
-        if (entry['wellbeing'] != null) ...[
-          const SizedBox(height: 20),
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: AppColors.softBlue,
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'TODAY’S WELLBEING',
-                  style: TextStyle(
-                    fontSize: 11,
-                    letterSpacing: 1.1,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.primary,
-                  ),
-                ),
-                const SizedBox(height: 16),
-                for (final item in {
-                  'Meals': 'meals',
-                  'Rest': 'nap',
-                  'Hygiene': 'hygiene',
-                  'Mood': 'mood',
-                }.entries)
-                  if (entry['wellbeing'][item.value] != null)
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 12),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            item.key,
-                            style: const TextStyle(
-                              fontWeight: FontWeight.w600,
-                              color: AppColors.primaryDark,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            entry['wellbeing'][item.value],
-                            style: const TextStyle(
-                              color: AppColors.textSecondary,
-                              height: 1.5,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-              ],
-            ),
-          ),
-        ],
         if (entry['image_url'] != null &&
             !['photo', 'drawing'].contains(entry['type']))
           TextButton(

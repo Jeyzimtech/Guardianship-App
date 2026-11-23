@@ -58,3 +58,8 @@ Artisan::command('payments:reconcile-uniforms', function () {
 })->purpose('Reconcile uniform payments if a PesePay callback was missed');
 
 // Production runs reconciliation through the dedicated systemd payment timer.
+
+Artisan::command('messages:prune', function () {
+    $this->info(\App\Services\MessageRetention::purge().' expired messages deleted.');
+})->purpose('Permanently remove messages seven days after sending');
+\Illuminate\Support\Facades\Schedule::command('messages:prune')->hourly()->withoutOverlapping();

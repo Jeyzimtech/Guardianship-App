@@ -15,7 +15,7 @@ class UserController extends Controller
      */
     public function index(Request $request)
     {
-        $query = User::with(['teacherProfile.school', 'students']);
+        $query = User::with(['teacherProfile.school', 'students' => fn ($q) => $q->when($request->user()?->role === 'admin', fn ($q) => $q->where('students.school_id', $request->user()->school_id))]);
         $currentUser = $request->user();
         if ($currentUser?->role === 'admin') {
             $schoolId = $currentUser->school_id ?? 0;
@@ -61,11 +61,12 @@ class UserController extends Controller
         if ($request->role === 'guardian' && $request->filled('phone_number')) $request->merge(['phone_number' => \App\Services\SmsPop::phone((string) $request->phone_number)]);
         $data = $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required_if:role,teacher|nullable|email|max:255|unique:users,email',
-            'phone_number' => 'required_if:role,teacher|nullable|string|max:50|unique:users,phone_number',
+            'email' => 'required_if:role,teacher|nullable|email|max:255'.($request->role === 'teacher' ? '|unique:users,email' : ''),
+            'phone_number' => 'required_if:role,teacher|nullable|string|max:50'.($request->role === 'teacher' ? '|unique:users,phone_number' : ''),
             'role' => 'required|in:teacher,guardian',
             'school_id' => 'nullable|exists:schools,id',
             'subject_specialties' => 'nullable|array',
+            'class_id' => 'nullable|integer|exists:school_classes,id',
             'student_ids' => 'required_if:role,guardian|array|min:1',
             'student_ids.*' => 'required|integer|distinct|exists:students,id',
         ]);
@@ -73,6 +74,9 @@ class UserController extends Controller
             abort_unless($actor->school_id, 403, 'Your account has no school assignment.');
             abort_if($request->filled('school_id') && (int) $request->school_id !== (int) $actor->school_id, 403, 'Select your own school.');
             $schoolId = $actor->school_id;
+            if (!empty($data['class_id'])) {
+                abort_unless(\App\Models\SchoolClass::where('school_id', $schoolId)->whereKey($data['class_id'])->exists(), 422, 'Select a class at your school.');
+            }
         } else {
             $teacher = $actor->teacherProfile;
             abort_unless($teacher, 403, 'Your teacher profile has no school assignment.');
@@ -81,8 +85,18 @@ class UserController extends Controller
                 abort_unless($teacher->teachesStudent($student), 403, 'You may only invite guardians for students in your assigned classes.');
             }
         }
-        if ($data['role'] === 'guardian' && !empty($data['phone_number']) && User::whereIn('phone_number', \App\Services\SmsPop::aliases($data['phone_number']))->exists()) {
-            throw \Illuminate\Validation\ValidationException::withMessages(['phone_number' => 'This phone number already has an account.']);
+        if ($data['role'] === 'guardian') {
+            $emailUser = !empty($data['email']) ? User::where('email', $data['email'])->first() : null;
+            $phoneUser = !empty($data['phone_number']) ? User::whereIn('phone_number', \App\Services\SmsPop::aliases($data['phone_number']))->first() : null;
+            abort_if($emailUser && $phoneUser && $emailUser->id !== $phoneUser->id, 422, 'Email and phone belong to different accounts.');
+            $existing = $emailUser ?? $phoneUser;
+            if ($existing) {
+                abort_unless($existing->role === 'guardian', 422, 'This contact belongs to a staff account.');
+                $existing->students()->syncWithoutDetaching($data['student_ids']);
+                return response()->json(['status' => 'success',
+                    'message' => 'Parent linked. They can use their existing sign-in at both schools.',
+                    'user' => $existing->only(['id', 'name', 'role']), 'email_sent' => false], 200);
+            }
         }
         $user = \Illuminate\Support\Facades\DB::transaction(function () use ($data, $schoolId) {
             $user = User::create([
@@ -92,8 +106,9 @@ class UserController extends Controller
                 'account_uid' => (string) Str::uuid(), 'password' => Str::random(64),
             ]);
             if ($data['role'] === 'teacher') {
-                Teacher::create(['user_id' => $user->id, 'school_id' => $schoolId,
+                $teacher = Teacher::create(['user_id' => $user->id, 'school_id' => $schoolId,
                     'subject_specialties' => $data['subject_specialties'] ?? []]);
+                if (!empty($data['class_id'])) $teacher->assignedClasses()->attach($data['class_id'], ['subject_name' => 'Homeroom']);
             } else {
                 $user->students()->attach($data['student_ids']);
             }
@@ -104,7 +119,7 @@ class UserController extends Controller
             'status' => 'success',
             'message' => !$user->email && !$user->phone_number ? 'Parent account created. Add an email or phone number before the parent can sign in.' : (!$user->email ? 'Parent account created. Sign in with this phone number and an SMS verification code.' : ($delivery['success'] ? 'Account created. A password setup link has been emailed.'
                 : 'Account created, but the setup email could not be sent. Please retry the invitation.')),
-            'user' => $user->load(['teacherProfile.school', 'students']),
+            'user' => $user->load(['teacherProfile.school', 'teacherProfile.assignedClasses', 'students']),
             'email_sent' => $delivery['success'],
         ], 201);
     }
@@ -124,7 +139,7 @@ class UserController extends Controller
             ], 403);
         }
 
-        $user = User::with(['teacherProfile.school', 'students'])->findOrFail($id);
+        $user = User::with(['teacherProfile.school', 'students' => fn ($q) => $q->when($request->user()?->role === 'admin', fn ($q) => $q->where('students.school_id', $request->user()->school_id))])->findOrFail($id);
         if ($currentUser->role === 'admin' && $user->school_id !== $currentUser->school_id && $user->teacherProfile?->school_id !== $currentUser->school_id) {
             if (!$user->students()->where('students.school_id', $currentUser->school_id)->exists()) {
                 return response()->json(['status' => 'error', 'message' => 'You may only view accounts in your school.'], 403);
@@ -149,6 +164,10 @@ class UserController extends Controller
             }
         }
 
+        if ($user->role === 'guardian' && $user->students()->where('students.school_id', '!=', $request->user()->school_id)->exists()) {
+            abort_if(($request->has('email') && $request->email !== $user->email) || ($request->has('phone_number') && $request->phone_number !== $user->phone_number) || $request->filled('password'), 422, 'This parent uses one account across schools. Contact details and passwords are managed by the parent.');
+        }
+
         $request->validate([
             'name' => 'sometimes|required|string|max:255',
             'email' => 'nullable|email|unique:users,email,' . $id,
@@ -163,9 +182,6 @@ class UserController extends Controller
 
         if ($request->user()?->role === 'admin' && $request->has('role') && $request->role !== $user->role) {
             return response()->json(['status' => 'error', 'message' => 'School administrators cannot change account roles.'], 403);
-        }
-        if ($request->has('student_ids') && \App\Models\Student::whereIn('id', $request->student_ids)->pluck('school_id')->unique()->count() > 1) {
-            return response()->json(['status' => 'error', 'message' => 'Select guardian students at one school.'], 422);
         }
         if ($request->user()?->role === 'admin' && $request->has('student_ids') && \App\Models\Student::whereIn('id', $request->student_ids)->where('school_id', '!=', $request->user()->school_id)->exists()) {
             return response()->json(['status' => 'error', 'message' => 'Selected students must belong to your school.'], 403);
@@ -194,10 +210,11 @@ class UserController extends Controller
         }
 
         if ($user->role === 'guardian' && $request->has('student_ids')) {
-            $user->students()->sync($request->student_ids);
+            $otherSchoolIds = $user->students()->where('students.school_id', '!=', $request->user()->school_id)->pluck('students.id')->all();
+            $user->students()->sync(array_unique([...$otherSchoolIds, ...$request->student_ids]));
         }
 
-        $user->load(['teacherProfile.school', 'students']);
+        $user->load(['teacherProfile.school', 'teacherProfile.assignedClasses', 'students' => fn ($q) => $q->when($request->user()?->role === 'admin', fn ($q) => $q->where('students.school_id', $request->user()->school_id))]);
 
         $invitation = null;
         if ($user->role === 'teacher' && $user->email && $request->input('send_invite', true)) {
@@ -224,6 +241,12 @@ class UserController extends Controller
         }
         if ($request->user()?->role === 'admin' && $user->role === 'admin') {
             return response()->json(['status' => 'error', 'message' => 'School administrators cannot delete administrator accounts.'], 403);
+        }
+        if ($user->role === 'guardian' && $request->user()?->role === 'admin'
+            && $user->students()->where('students.school_id', '!=', $request->user()->school_id)->exists()) {
+            $ids = $user->students()->where('students.school_id', $request->user()->school_id)->pluck('students.id');
+            $user->students()->detach($ids);
+            return response()->json(['status' => 'success', 'message' => 'Parent removed from this school. Their other school links remain active.']);
         }
         $user->delete();
 

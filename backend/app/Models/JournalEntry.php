@@ -16,9 +16,10 @@ class JournalEntry extends Model
         'media_url',
         'caption',
         'subject_name',
-        'wellbeing_data',
         'fee_gated',
     ];
+
+    protected $hidden = ['wellbeing_data'];
 
     protected $casts = [
         'wellbeing_data' => 'array',

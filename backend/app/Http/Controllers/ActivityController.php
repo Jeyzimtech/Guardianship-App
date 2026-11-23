@@ -80,7 +80,7 @@ class ActivityController extends Controller
         $candidates = Student::where('school_id', $schoolId)
             ->when($allowedIds !== null, fn ($q) => $q->whereIn('id', $allowedIds))
             ->orderBy('class_name')->orderBy('name')
-            ->get(['id', 'name', 'class_name', 'grade']);
+            ->get(['id', 'name', 'class_name', 'grade', 'photo_path']);
         $rosterIds = collect($activity->roster ?? [])->map(fn ($v) => (int) $v);
         $statuses = ActivityAttendance::where('activity_id', $activity->id)->pluck('status', 'student_id');
 
@@ -89,6 +89,7 @@ class ActivityController extends Controller
             'activity' => $activity->only(['id', 'title', 'description', 'activity_date']),
             'roster' => $candidates->map(fn ($student) => [
                 'student_id' => $student->id,
+                'photo_url' => $student->photo_url,
                 'name' => $student->name,
                 'class_name' => $student->class_name,
                 'grade' => $student->grade,

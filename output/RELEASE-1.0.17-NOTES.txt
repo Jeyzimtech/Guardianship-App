@@ -1,0 +1,5 @@
+<en-US>
+Updated release connected to the production school server.
+Removed medical and wellbeing tracking.
+Includes content reporting, message blocking and account deletion.
+</en-US>

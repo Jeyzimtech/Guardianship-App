@@ -1,0 +1,37 @@
+REQUESTED FEATURES - 20 NOVEMBER 2026
+
+STATUS: Deployed and verified. Matching APK installed and launched on the connected Pixel 7 Pro. Server name unchanged.
+
+VALIDATION: 137 backend tests, 106 mobile tests, 10 physical-device UI tests, 23 live transactional checks. Source checksums verified; queue and hourly retention timer active. All live synthetic data rolled back.
+BACKUP: /var/backups/guardianship/20261120T080048Z-requested-features
+
+SCOPE
+- Suspended parents authenticate but cannot bypass the subscription screen or API restrictions.
+- Subscription benefits, account-first activation popup, contact 079 054 3013.
+- Teachers and school admins retain school access without subscription UI.
+- Parent identity can be linked at multiple schools; credentials and other-school links are preserved.
+- Owner-only school removal requires exact school-name confirmation; DB cascades are transactional and private/public assets are queued for cleanup. This deployment does not invoke school removal.
+- Direct messages expire at seven days; message bodies and notification references are physically removed.
+- Drawings cannot be newly published. Existing historical entries are retained.
+- Parent dashboard links to child information, proof of payment, documents, profile and activity participation. Existing school activity authoring/registers are reused.
+- Receipt uploads are private and require school verification. Fee payments do not activate app subscriptions.
+- Server name and API domain remain unchanged.
+
+BACKEND DEPLOYMENT
+1. Back up the live source files in manifest.json and take a consistent database backup. Preserve existing environment, storage, server identity and credentials.
+2. Compare each bundled file with live source before replacement to avoid overwriting newer server-only changes.
+3. Copy the listed source files. Run PHP syntax checks first.
+4. Run only: php artisan migrate --path=database/migrations/2026_11_20_000001_add_payment_proof_and_retention_index.php --force
+5. Refresh application route/view caches and restart the queue worker so file cleanup and push jobs use the new code. Verify that queue processing is running.
+6. Install the bundled hourly message-retention systemd timer/service if Laravel scheduling is not already running. If an existing scheduler is active, the hourly route/console.php entry is sufficient; do not install a duplicate timer.
+7. Verify /api/health, parent login, /api/subscription, suspended parent 403 responses, staff publishing, multi-school links and private proof access with test accounts. Do not delete a real school as a smoke test.
+8. Install the new release APK on the connected device and verify live activation/restriction behavior.
+
+ROLLBACK
+Restore the backed-up source and application caches, then restart workers. Leave the additive nullable proof_path column and message index in place during source rollback so receipt references are preserved. Expired messages and a deliberately removed school cannot be restored without the database/storage backups.
+
+COMPATIBILITY
+Existing children with no subscription row retain their legacy access. Existing suspension dates keep their established behavior. New app access checks require /api/subscription; failed checks display a retry screen rather than expose records.
+
+DEVICE TESTS
+The device test runner uses fixtures to exercise the UI on the connected Pixel. Flutter removes that runner after tests; the normal pre-release app is restored afterward. Backend behavior is verified with the Laravel test database. Production end-to-end verification requires deployment approval.

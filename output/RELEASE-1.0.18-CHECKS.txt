@@ -1,0 +1,39 @@
+Edu Connect 1.0.18 (19) - checked 20 November 2026
+
+FINAL FILE: EduConnect-1.0.18-19-production.aab
+Package: educonnect.com
+Build: 19, newer than the confirmed Play Console build 18.
+Production API explicitly compiled: https://admin.chewetechnologies.co.zw/api
+Signing: release certificate verified; matches the previous signed app and local store bundle.
+Google bundletool validation: PASS.
+Android target: API 36. Minimum: API 24 (Android 7).
+64-bit native ELF alignment and bundle configuration: 16 KB compatible alignment verified.
+Debugging disabled; cleartext networking disabled.
+Requested permissions: internet, notifications and Firebase/background delivery support. No location, contacts, SMS reading, broad photo-library access or advertising-ID permission.
+
+TESTS
+Full mobile suite: 106 passed.
+Final account-access/dashboard/privacy targeted rerun: 18 passed.
+Backend suite: 137 passed.
+Analyzer: No issues found.
+The previous core feature release also passed real-device UI tests and transactional live API checks. This build's final Play-generated APKs/pre-launch report should still be checked through an internal or closed track before production rollout.
+
+PRODUCTION CHANGES
+- Hidden uniform-store entry points because PesePay remains sandboxed on the server. No gateway mode or payment credentials were changed.
+- Removed in-app subscription purchase/activation prompts and call-to-activate action. Existing subscribers sign in; account support is informational.
+- Retained restricted-account gating and all earlier requested dashboard cleanup.
+- Updated mobile/public privacy information for seven-day direct-message expiry; new consent version is 2026-11-20-r18.
+
+LIVE SERVICES
+App environment production; debug off. HTTPS API and public privacy/terms/account-deletion pages available. Anonymous JSON subscription requests correctly return 401.
+Push credentials readable, notification queue active, message-retention timer active.
+Saved SMTP configuration authenticated successfully. No test email was sent.
+Public privacy/controller update backed up at /var/backups/guardianship/20261120T082435Z-release19-policy.
+
+HANDOFF
+Read PLAY-PRODUCTION-1.0.18-STEPS.txt and use RELEASE-1.0.18-NOTES.txt.
+Keep the same Play Console app and signing key.
+If uploading this build first to testing, select build 19 from the library when creating production; do not upload duplicate version code 19.
+The operator must complete and verify Play Console declarations, provide active review accounts and describe real closed-test participation. No Play Console submission or publication has been performed here; Google decides approval.
+
+SHA256: 9d0444bb581dc2cee38e7de2b7953e8ef9192b1a583a8227f2f283915884bd29

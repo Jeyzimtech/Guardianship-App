@@ -6,6 +6,7 @@ import '../../core/app_colors.dart';
 import '../../core/app_icon.dart';
 import '../common/editorial_widgets.dart';
 import '../common/app_drawer.dart';
+import '../common/unread_icon.dart';
 import '../parent/parent_dashboard_view.dart';
 import '../parent/learning_journal_view.dart';
 import '../parent/messaging_view.dart';
@@ -24,6 +25,7 @@ class _ParentShellState extends State<ParentShell> {
   int _currentIndex = 0;
   // Tabs are built on first visit so startup only loads the home screen.
   final Set<int> _visited = {0};
+  final Map<int, int> _visits = {};
 
   @override
   void initState() {
@@ -39,10 +41,8 @@ class _ParentShellState extends State<ParentShell> {
     final child = (studentProvider.selectedStudent != null
         ? studentProvider.selectedStudent!
         : (studentProvider.students.isNotEmpty
-            ? studentProvider.students[0] as Map<String, dynamic>
-            : <String, dynamic>{
-                'name': 'No child selected',
-              }));
+              ? studentProvider.students[0] as Map<String, dynamic>
+              : <String, dynamic>{'name': 'No child selected'}));
 
     final builders = <Widget Function()>[
       () => const ParentDashboardView(),
@@ -53,7 +53,12 @@ class _ParentShellState extends State<ParentShell> {
     ];
     final pages = [
       for (var i = 0; i < builders.length; i++)
-        _visited.contains(i) ? builders[i]() : const SizedBox.shrink(),
+        _visited.contains(i)
+            ? KeyedSubtree(
+                key: ValueKey('$i-${_visits[i]}'),
+                child: builders[i](),
+              )
+            : const SizedBox.shrink(),
     ];
 
     return Scaffold(
@@ -73,7 +78,9 @@ class _ParentShellState extends State<ParentShell> {
         ),
         iconTheme: const IconThemeData(color: AppColors.textPrimary),
       ),
-      body: SosListener(child: IndexedStack(index: _currentIndex, children: pages)),
+      body: SosListener(
+        child: IndexedStack(index: _currentIndex, children: pages),
+      ),
       bottomNavigationBar: Container(
         decoration: const BoxDecoration(
           color: AppColors.surface,
@@ -84,6 +91,7 @@ class _ParentShellState extends State<ParentShell> {
         child: BottomNavigationBar(
           currentIndex: _currentIndex,
           onTap: (i) => setState(() {
+            if (_currentIndex != i) _visits[i] = (_visits[i] ?? 0) + 1;
             _currentIndex = i;
             _visited.add(i);
           }),
@@ -104,18 +112,18 @@ class _ParentShellState extends State<ParentShell> {
               label: 'Home',
             ),
             BottomNavigationBarItem(
-              icon: AppIcon(AppSymbol.message),
-              activeIcon: AppIcon(AppSymbol.message),
+              icon: UnreadIcon(AppSymbol.message, 'notices'),
+              activeIcon: UnreadIcon(AppSymbol.message, 'notices'),
               label: 'Notices',
             ),
             BottomNavigationBarItem(
-              icon: AppIcon(AppSymbol.report),
-              activeIcon: AppIcon(AppSymbol.report),
+              icon: UnreadIcon(AppSymbol.report, 'journal'),
+              activeIcon: UnreadIcon(AppSymbol.report, 'journal'),
               label: 'Journal',
             ),
             BottomNavigationBarItem(
-              icon: AppIcon(AppSymbol.message),
-              activeIcon: AppIcon(AppSymbol.message),
+              icon: UnreadIcon(AppSymbol.message, 'messages'),
+              activeIcon: UnreadIcon(AppSymbol.message, 'messages'),
               label: 'Messages',
             ),
             BottomNavigationBarItem(

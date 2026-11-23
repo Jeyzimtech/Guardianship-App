@@ -1,0 +1,9 @@
+{
+  "configured_transport": "smtp",
+  "smtp_connection_authenticated": true,
+  "smtp_host_configured": true,
+  "sender_configured": true,
+  "policy_backup": "/var/backups/guardianship/20261120T082435Z-release19-policy",
+  "api_subscription_status": "401",
+  "privacy_updated": true
+}

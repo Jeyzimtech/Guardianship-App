@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'teacher_sos_card.dart';
 import 'enroll_student_page.dart';
+import 'import_parents_page.dart';
 import 'package:provider/provider.dart';
 import '../../core/auth_provider.dart';
 import '../../core/app_colors.dart';
@@ -88,7 +89,7 @@ class _TeacherHomeViewState extends State<TeacherHomeView> {
                 eyebrow: 'YOUR CLASSROOM',
                 title: 'Start with attendance',
                 subtitle: 'A thoughtful start to your school day.',
-                onTap: () => _open(const TeacherDashboardView()),
+                onTap: () => _open(const TeacherDashboardView(initialTab: 1)),
               ),
               const SizedBox(height: 16),
               Row(
@@ -112,6 +113,7 @@ class _TeacherHomeViewState extends State<TeacherHomeView> {
               const SizedBox(height: 32),
               const TeacherSosCard(),
               EditorialLink(title: 'Add student and parent', subtitle: 'Enroll a learner in your assigned class', onTap: () => _open(const EnrollStudentPage())),
+              EditorialLink(title: 'Import parents from CSV', subtitle: 'Add many parents at once from a spreadsheet', onTap: () => _open(const ImportParentsPage())),
               const SizedBox(height: 16),
               const Text('Teaching essentials', style: Editorial.section),
               const SizedBox(height: 16),

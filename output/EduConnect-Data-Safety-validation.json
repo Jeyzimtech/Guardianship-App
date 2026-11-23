@@ -1,0 +1,26 @@
+{
+  "rows": 782,
+  "columns": 5,
+  "schema": "User supplied current Play Console example",
+  "csv_round_trip": "passed",
+  "play_console_import": "not yet tested",
+  "selected_data_types": [
+    "PSL_NAME",
+    "PSL_EMAIL",
+    "PSL_USER_ACCOUNT",
+    "PSL_PHONE",
+    "PSL_ADDRESS",
+    "PSL_OTHER_PERSONAL",
+    "PSL_PURCHASE_HISTORY",
+    "PSL_OTHER_MESSAGES",
+    "PSL_PHOTOS",
+    "PSL_VIDEOS",
+    "PSL_AUDIO",
+    "PSL_HEALTH",
+    "PSL_FILES_AND_DOCS",
+    "PSL_USER_INTERACTION",
+    "PSL_USER_GENERATED_CONTENT",
+    "PSL_PERFORMANCE_DIAGNOSTICS",
+    "PSL_DEVICE_ID"
+  ]
+}

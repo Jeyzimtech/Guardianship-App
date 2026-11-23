@@ -12,6 +12,8 @@ Route::get('/admin', function () {
     return view('admin');
 });
 
+Route::get('/moderation', fn () => view('moderation'));
+
 Route::get('/login', function () {
     return redirect('/');
 })->name('login');
@@ -33,4 +35,10 @@ Route::get('/reset-password', function (Request $request) {
     ]);
 });
 
+// Public pages linked from the Google Play listing and the app.
+Route::get('/privacy-policy', [\App\Http\Controllers\LegalPageController::class, 'show'])->defaults('page', 'privacy');
+Route::get('/terms', [\App\Http\Controllers\LegalPageController::class, 'show'])->defaults('page', 'terms');
+Route::get('/account-deletion', [\App\Http\Controllers\LegalPageController::class, 'show'])->defaults('page', 'deletion');
+
 Route::get('/report-files/{report_id}', [\App\Http\Controllers\ReportController::class, 'downloadFile'])->middleware('signed')->name('reports.file');
+Route::get('/document-files/{document_id}', [\App\Http\Controllers\SchoolDocumentController::class, 'signedDownload'])->middleware('signed')->name('documents.file');

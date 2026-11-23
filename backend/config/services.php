@@ -1,9 +1,10 @@
 <?php
 
 return [
+    'firebase' => ['credentials' => env('FIREBASE_CREDENTIALS')],
     'smspop' => [
         'token' => env('SMSPOP_API_TOKEN'),
-        'sender_id' => env('SMSPOP_SENDER_ID', 'SMSPoP'),
+        'sender_id' => env('SMSPOP_SENDER_ID', 'CheweTech'),
     ],
     'pesepay' => [
         'integration_key' => env('PESEPAY_INTEGRATION_KEY'),
@@ -35,6 +36,10 @@ return [
         'key' => env('AWS_ACCESS_KEY_ID'),
         'secret' => env('AWS_SECRET_ACCESS_KEY'),
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
+    ],
+
+    'support' => [
+        'email' => env('SUPPORT_EMAIL', 'admin@teramark.co.zw'),
     ],
 
     'slack' => [

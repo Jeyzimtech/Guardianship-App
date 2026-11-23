@@ -11,6 +11,16 @@ use Illuminate\Http\Request;
 
 class WebsiteAdminController extends Controller
 {
+    public function destroySchool(Request $request, int $id)
+    {
+        abort_unless($request->user()?->role === 'website_admin', 403);
+        $school = School::findOrFail($id);
+        $data = $request->validate(['confirm_name' => 'required|string']);
+        abort_unless(hash_equals($school->name, $data['confirm_name']), 422, 'Type the exact school name to confirm permanent deletion.');
+        \App\Services\SchoolRemoval::remove($school);
+        return response()->json(['status' => 'success', 'message' => 'School and school records removed. Stored files are queued for permanent cleanup.']);
+    }
+
     /**
      * Onboard new school on platform (Website Admin only)
      */

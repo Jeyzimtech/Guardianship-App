@@ -18,9 +18,6 @@ class _TeacherPublishPageState extends State<TeacherPublishPage> {
   final _title = TextEditingController();
   final _note = TextEditingController();
   final _link = TextEditingController();
-  final _meals = TextEditingController();
-  final _nap = TextEditingController();
-  final _hygiene = TextEditingController();
   List<Map<String, dynamic>> _students = [], _classes = [];
   int? _student;
   String? _subject;
@@ -138,13 +135,7 @@ class _TeacherPublishPageState extends State<TeacherPublishPage> {
         data['caption'] = _note.text.trim();
         if (_subject != null) data['subject_name'] = _subject;
         if (_type == 'link') data['media_url'] = _link.text.trim();
-        if (_type == 'wellbeing') {
-          data['wellbeing_data'] = {
-            'meals': _meals.text.trim(),
-            'nap': _nap.text.trim(),
-            'hygiene': _hygiene.text.trim(),
-          };
-        }
+
       }
       if (_file != null) {
         data['file'] = MultipartFile.fromBytes(
@@ -174,7 +165,7 @@ class _TeacherPublishPageState extends State<TeacherPublishPage> {
 
   @override
   void dispose() {
-    for (final controller in [_title, _note, _link, _meals, _nap, _hygiene]) {
+    for (final controller in [_title, _note, _link]) {
       controller.dispose();
     }
     super.dispose();
@@ -262,11 +253,9 @@ class _TeacherPublishPageState extends State<TeacherPublishPage> {
                                     : {
                                         'text': 'Note',
                                         'photo': 'Photo',
-                                        'drawing': 'Drawing',
                                         'voice': 'Voice note',
                                         'video': 'Video',
                                         'link': 'Learning link',
-                                        'wellbeing': 'Wellbeing log',
                                       })
                                 .entries
                                 .map(
@@ -338,27 +327,6 @@ class _TeacherPublishPageState extends State<TeacherPublishPage> {
                               Uri.tryParse(v ?? '')?.scheme == 'https'
                               ? null
                               : 'Enter a valid HTTPS link',
-                        ),
-                      ],
-                      if (_type == 'wellbeing') ...[
-                        const SizedBox(height: 16),
-                        TextFormField(
-                          controller: _meals,
-                          decoration: const InputDecoration(labelText: 'Meals'),
-                        ),
-                        const SizedBox(height: 12),
-                        TextFormField(
-                          controller: _nap,
-                          decoration: const InputDecoration(
-                            labelText: 'Rest / nap',
-                          ),
-                        ),
-                        const SizedBox(height: 12),
-                        TextFormField(
-                          controller: _hygiene,
-                          decoration: const InputDecoration(
-                            labelText: 'Hygiene',
-                          ),
                         ),
                       ],
                       if (widget.report ||

@@ -7,10 +7,14 @@ class AnnouncementController extends Controller
 {
     public function index(Request $request)
     {
-        $user=$request->user();
+        return response()->json(['status'=>'success','announcements'=>$this->visibleTo($request->user())->when(in_array($request->user()->role, ['teacher', 'guardian']), fn ($q) => $q->whereNotIn('id', \App\Services\MobileUpdates::dismissedIds($request->user(), 'notices')))->latest()->get()]);
+    }
+
+    public static function visibleTo($user)
+    {
         $query=Announcement::query();
         if ($user->role === 'guardian') {
-            $children=$user->students()->get();
+            $children=$user->students()->with('activeSubscription')->get()->filter(fn ($s) => \App\Services\GuardianAccess::active($s));
             $query->whereIn('school_id',$children->pluck('school_id'))->whereIn('audience_role',['guardian','all'])
                 ->where(function($scope) use($children) {
                     $scope->whereNull('class_name');
@@ -28,7 +32,7 @@ class AnnouncementController extends Controller
         } elseif($user->role === 'admin') {
             $query->where('school_id',$user->school_id ?? 0);
         } else abort(403);
-        return response()->json(['status'=>'success','announcements'=>$query->latest()->get()]);
+        return $query;
     }
 
     public function store(Request $request)
@@ -62,6 +66,7 @@ class AnnouncementController extends Controller
         } else $notices=collect([Announcement::create([
             'school_id'=>$schoolId,'title'=>$data['title'],'content'=>$data['content'],'audience_role'=>$data['audience_role'],'author_id'=>$user->id,
         ])]);
+        foreach ($notices as $notice) \App\Jobs\SendMobilePush::dispatch('notices', $notice->id)->afterCommit();
         return response()->json(['status'=>'success','announcement'=>$notices->first(),'announcements'=>$notices],201);
     }
 }

@@ -1,0 +1,25 @@
+﻿Signer #1:
+
+Certificate #1:
+Owner: CN=Edu Connect, C=ZW
+Issuer: CN=Edu Connect, C=ZW
+Serial number: b6e5f1e506bcc8ca
+Valid from: Mon Oct 26 16:36:30 WAT 2026 until: Fri Mar 13 16:36:30 WAT 2054
+Certificate fingerprints:
+	 SHA1: 55:91:49:12:A9:AD:4F:16:76:DB:89:D2:B9:46:A1:1F:12:EC:D9:98
+	 SHA256: 73:22:E7:81:3B:16:5E:6F:5E:3A:81:41:5D:F3:D5:54:5F:7D:8F:7B:66:E8:9A:B2:1A:A1:5F:2F:DB:33:B8:AE
+Signature algorithm name: SHA384withRSA
+Subject Public Key Algorithm: 2048-bit RSA key
+Version: 3
+
+Extensions: 
+
+#1: ObjectId: 2.5.29.14 Criticality=false
+SubjectKeyIdentifier [
+KeyIdentifier [
+0000: 9D 3B 98 88 52 AB 58 F8   14 91 E0 76 46 AE E4 11  .;..R.X....vF...
+0010: 7E 3F C8 58                                        .?.X
+]
+]
+
+

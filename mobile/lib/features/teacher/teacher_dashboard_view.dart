@@ -1,5 +1,9 @@
+import 'dart:typed_data';
+import 'package:file_picker/file_picker.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import '../common/student_avatar.dart';
+import '../common/student_photo_page.dart';
 import 'package:provider/provider.dart';
 import '../../core/auth_provider.dart';
 import '../../core/app_colors.dart';
@@ -9,7 +13,9 @@ import '../dashboard/announcements_view.dart';
 
 /// Classroom workspace with roster, attendance, marks and notices.
 class TeacherDashboardView extends StatefulWidget {
-  const TeacherDashboardView({super.key});
+  /// 0: Students, 1: Roll call, 2: Activities, 3: Notices.
+  final int initialTab;
+  const TeacherDashboardView({super.key, this.initialTab = 0});
 
   @override
   State<TeacherDashboardView> createState() => _TeacherDashboardViewState();
@@ -17,7 +23,7 @@ class TeacherDashboardView extends StatefulWidget {
 
 class _TeacherDashboardViewState extends State<TeacherDashboardView> {
   // Active Tab Index: 0: Roster, 1: Roll Call, 2: Gradebook, 3: Notices
-  int _activeTabIndex = 0;
+  late int _activeTabIndex = widget.initialTab;
 
   // Roster Filters & Search
   String _rosterSearchQuery = '';
@@ -32,6 +38,8 @@ class _TeacherDashboardViewState extends State<TeacherDashboardView> {
   List<Map<String, dynamic>> _roster = [];
   DateTime _attendanceDate = DateUtils.dateOnly(DateTime.now());
   bool _isSavingAttendance = false;
+  // Statuses changed since the register was last loaded or saved.
+  bool _attendanceDirty = false;
   bool _isLoadingRoster = false;
 
   // Behaviour categories configured by the school admin.
@@ -52,39 +60,98 @@ class _TeacherDashboardViewState extends State<TeacherDashboardView> {
     _loadActivities();
   }
 
+  bool _exporting = false;
+
+  Future<void> _exportRegister() async {
+    final date = _attendanceDate.toIso8601String().split('T').first;
+    setState(() => _exporting = true);
+    try {
+      final response = await context
+          .read<AuthProvider>()
+          .apiClient
+          .dio
+          .get<List<int>>(
+            '/attendance/export',
+            queryParameters: {'date': date},
+            options: Options(responseType: ResponseType.bytes),
+          );
+      await FilePicker.saveFile(
+        dialogTitle: 'Save attendance register',
+        mimeType: 'text/csv',
+        fileName: 'attendance-$date.csv',
+        type: FileType.custom,
+        allowedExtensions: ['csv'],
+        bytes: Uint8List.fromList(response.data!),
+      );
+    } catch (_) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'Could not download. Make sure this date has a saved register and try again.',
+            ),
+          ),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _exporting = false);
+    }
+  }
+
   Future<void> _loadCategories() async {
     try {
-      final response = await context.read<AuthProvider>().apiClient.dio.get('/behaviour-categories');
+      final response = await context.read<AuthProvider>().apiClient.dio.get(
+        '/behaviour-categories',
+      );
       final list = (response.data['categories'] as List? ?? []);
-      if (mounted) setState(() => _categories = list.map((e) => Map<String, dynamic>.from(e)).toList());
+      if (mounted) {
+        setState(
+          () => _categories = list
+              .map((e) => Map<String, dynamic>.from(e))
+              .toList(),
+        );
+      }
     } catch (_) {}
   }
 
   Future<void> _loadActivities() async {
     setState(() => _isLoadingActivities = true);
     try {
-      final response = await context.read<AuthProvider>().apiClient.dio.get('/activities');
+      final response = await context.read<AuthProvider>().apiClient.dio.get(
+        '/activities',
+      );
       final list = (response.data['activities'] as List? ?? []);
-      if (mounted) setState(() => _activities = list.map((e) => Map<String, dynamic>.from(e)).toList());
+      if (mounted) {
+        setState(
+          () => _activities = list
+              .map((e) => Map<String, dynamic>.from(e))
+              .toList(),
+        );
+      }
     } catch (_) {
     } finally {
       if (mounted) setState(() => _isLoadingActivities = false);
     }
   }
 
-  List<String> get _classNames => _roster
-      .map((s) => '${s['grade'] ?? ''}|${s['class_name'] ?? ''}')
-      .where((c) => c.isNotEmpty)
-      .toSet()
-      .toList()
-    ..sort();
+  List<String> get _classNames =>
+      _roster
+          .map((s) => '${s['grade'] ?? ''}|${s['class_name'] ?? ''}')
+          .where((c) => c.isNotEmpty)
+          .toSet()
+          .toList()
+        ..sort();
 
   Future<void> _loadTeacherStudents() async {
     setState(() => _isLoadingRoster = true);
     try {
       final auth = Provider.of<AuthProvider>(context, listen: false);
-      final date = '${_attendanceDate.year.toString().padLeft(4, '0')}-${_attendanceDate.month.toString().padLeft(2, '0')}-${_attendanceDate.day.toString().padLeft(2, '0')}';
-      final response = await auth.apiClient.dio.get('/attendance/roster', queryParameters: {'date': date});
+      final date =
+          '${_attendanceDate.year.toString().padLeft(4, '0')}-${_attendanceDate.month.toString().padLeft(2, '0')}-${_attendanceDate.day.toString().padLeft(2, '0')}';
+      final response = await auth.apiClient.dio.get(
+        '/attendance/roster',
+        queryParameters: {'date': date},
+      );
       if (response.statusCode == 200 && response.data['status'] == 'success') {
         final list = (response.data['roster'] as List? ?? []);
         if (mounted) {
@@ -98,17 +165,26 @@ class _TeacherDashboardViewState extends State<TeacherDashboardView> {
                   : 'Guardian';
               return {
                 'student_id': m['student_id'],
-              'id': 'STU-${(m['student_id'] ?? idx + 1).toString().padLeft(3, '0')}',
+                'photo_url': m['photo_url'],
+                'id':
+                    'STU-${(m['student_id'] ?? idx + 1).toString().padLeft(3, '0')}',
                 'roll': (idx + 1).toString().padLeft(2, '0'),
                 'name': m['name'] ?? '',
                 'class_name': m['class_name'] ?? '',
                 'grade': m['grade'] ?? '',
                 'guardian': guardianStr,
                 'guardians': guardians,
-                'status': (m['status'] ?? 'present').toString().replaceFirstMapped(RegExp(r'^[a-z]'), (match) => match.group(0)!.toUpperCase()),
-                'merits': 0,
+                'status': (m['status'] ?? 'present')
+                    .toString()
+                    .replaceFirstMapped(
+                      RegExp(r'^[a-z]'),
+                      (match) => match.group(0)!.toUpperCase(),
+                    ),
+                'marked': m['marked'] == true,
+                'merits': (m['merits'] as num?)?.toInt() ?? 0,
               };
             }).toList();
+            _attendanceDirty = false;
           });
         }
       }
@@ -148,40 +224,72 @@ class _TeacherDashboardViewState extends State<TeacherDashboardView> {
   void _toggleAttendance(int index, String status) {
     setState(() {
       _roster[index]['status'] = status;
+      _attendanceDirty = true;
     });
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('${_roster[index]['name']} marked $status'),
-        duration: const Duration(seconds: 1),
-        backgroundColor: AppColors.primary,
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
   }
+
+  bool get _registerSaved =>
+      _roster.isNotEmpty &&
+      !_attendanceDirty &&
+      _roster.every((s) => s['marked'] == true);
 
   Future<void> _saveAttendance() async {
     if (_roster.isEmpty || _isSavingAttendance) return;
     setState(() => _isSavingAttendance = true);
     try {
-      final date = '${_attendanceDate.year.toString().padLeft(4, '0')}-${_attendanceDate.month.toString().padLeft(2, '0')}-${_attendanceDate.day.toString().padLeft(2, '0')}';
-      await context.read<AuthProvider>().apiClient.dio.post('/attendance/mark', data: {
-        'date': date,
-        'records': _roster.map((student) => {
-          'student_id': student['student_id'],
-          'status': student['status'].toString().toLowerCase(),
-        }).toList(),
-      });
+      final date =
+          '${_attendanceDate.year.toString().padLeft(4, '0')}-${_attendanceDate.month.toString().padLeft(2, '0')}-${_attendanceDate.day.toString().padLeft(2, '0')}';
+      await context.read<AuthProvider>().apiClient.dio.post(
+        '/attendance/mark',
+        data: {
+          'date': date,
+          'records': _roster
+              .map(
+                (student) => {
+                  'student_id': student['student_id'],
+                  'status': student['status'].toString().toLowerCase(),
+                },
+              )
+              .toList(),
+        },
+      );
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Attendance register saved.')));
-    } catch (_) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Attendance could not be saved. Please try again.')));
+      setState(() {
+        for (final student in _roster) {
+          student['marked'] = true;
+        }
+        _attendanceDirty = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Attendance register saved. Parents can now see it.'),
+        ),
+      );
+    } catch (e) {
+      final data = e is DioException ? e.response?.data : null;
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              data is Map
+                  ? data['message']?.toString() ??
+                        'Attendance could not be saved.'
+                  : 'Attendance could not be saved. Check your connection and try again.',
+            ),
+          ),
+        );
+      }
     } finally {
       if (mounted) setState(() => _isSavingAttendance = false);
     }
   }
 
   Future<void> _changeAttendanceDate(int offset) async {
-    setState(() => _attendanceDate = DateUtils.dateOnly(_attendanceDate.add(Duration(days: offset))));
+    setState(
+      () => _attendanceDate = DateUtils.dateOnly(
+        _attendanceDate.add(Duration(days: offset)),
+      ),
+    );
     await _loadTeacherStudents();
   }
 
@@ -201,17 +309,24 @@ class _TeacherDashboardViewState extends State<TeacherDashboardView> {
       context: context,
       builder: (dialogContext) => StatefulBuilder(
         builder: (dialogContext, setDialogState) => AlertDialog(
-          title: Text(polarity == 'positive' ? 'Award merit' : 'Log conduct note'),
+          title: Text(
+            polarity == 'positive' ? 'Award merit' : 'Log conduct note',
+          ),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(student['name'], style: const TextStyle(fontWeight: FontWeight.w600)),
+              Text(
+                student['name'],
+                style: const TextStyle(fontWeight: FontWeight.w600),
+              ),
               const SizedBox(height: 12),
               if (options.isNotEmpty)
                 DropdownButtonFormField<String>(
                   initialValue: selected,
                   decoration: const InputDecoration(labelText: 'Category'),
-                  items: options.map((o) => DropdownMenuItem(value: o, child: Text(o))).toList(),
+                  items: options
+                      .map((o) => DropdownMenuItem(value: o, child: Text(o)))
+                      .toList(),
                   onChanged: (v) => setDialogState(() => selected = v),
                 )
               else
@@ -224,13 +339,21 @@ class _TeacherDashboardViewState extends State<TeacherDashboardView> {
                 controller: noteController,
                 minLines: 2,
                 maxLines: 4,
-                decoration: const InputDecoration(labelText: 'Note for parents (optional)'),
+                decoration: const InputDecoration(
+                  labelText: 'Note for parents (optional)',
+                ),
               ),
             ],
           ),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(dialogContext, false), child: const Text('Cancel')),
-            FilledButton(onPressed: () => Navigator.pop(dialogContext, true), child: const Text('Save')),
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext, false),
+              child: const Text('Cancel'),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.pop(dialogContext, true),
+              child: const Text('Save'),
+            ),
           ],
         ),
       ),
@@ -241,21 +364,52 @@ class _TeacherDashboardViewState extends State<TeacherDashboardView> {
     noteController.dispose();
     if (confirmed != true || !mounted) return;
     if (category.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Choose a category.')));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Choose a category.')));
       return;
     }
 
     try {
-      await context.read<AuthProvider>().apiClient.dio.post('/behaviour', data: {
-        'student_id': student['student_id'],
-        'polarity': polarity,
-        'category': category,
-        'note': note.isEmpty ? null : note,
-        'incident_date': DateTime.now().toIso8601String().substring(0, 10),
-      });
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Behaviour saved for ${student['name']}.')));
-    } catch (_) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Behaviour record could not be saved.')));
+      await context.read<AuthProvider>().apiClient.dio.post(
+        '/behaviour',
+        data: {
+          'student_id': student['student_id'],
+          'polarity': polarity,
+          'category': category,
+          'note': note.isEmpty ? null : note,
+          'incident_date': DateTime.now().toIso8601String().substring(0, 10),
+        },
+      );
+      if (!mounted) return;
+      if (polarity == 'positive') {
+        setState(
+          () => student['merits'] = (student['merits'] as int? ?? 0) + 1,
+        );
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            polarity == 'positive'
+                ? 'Merit awarded to ${student['name']}. Their parent sees it under Behaviour & merits.'
+                : 'Conduct note saved for ${student['name']}.',
+          ),
+        ),
+      );
+    } catch (e) {
+      final data = e is DioException ? e.response?.data : null;
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              data is Map
+                  ? data['message']?.toString() ??
+                        'Behaviour record could not be saved.'
+                  : 'Behaviour record could not be saved. Check your connection and try again.',
+            ),
+          ),
+        );
+      }
     }
   }
 
@@ -272,11 +426,16 @@ class _TeacherDashboardViewState extends State<TeacherDashboardView> {
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              TextField(controller: titleController, decoration: const InputDecoration(labelText: 'Title')),
+              TextField(
+                controller: titleController,
+                decoration: const InputDecoration(labelText: 'Title'),
+              ),
               const SizedBox(height: 12),
               TextField(
                 controller: descriptionController,
-                decoration: const InputDecoration(labelText: 'Description (optional)'),
+                decoration: const InputDecoration(
+                  labelText: 'Description (optional)',
+                ),
               ),
               const SizedBox(height: 12),
               OutlinedButton.icon(
@@ -295,8 +454,14 @@ class _TeacherDashboardViewState extends State<TeacherDashboardView> {
             ],
           ),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(dialogContext, false), child: const Text('Cancel')),
-            FilledButton(onPressed: () => Navigator.pop(dialogContext, true), child: const Text('Create')),
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext, false),
+              child: const Text('Cancel'),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.pop(dialogContext, true),
+              child: const Text('Create'),
+            ),
           ],
         ),
       ),
@@ -308,16 +473,25 @@ class _TeacherDashboardViewState extends State<TeacherDashboardView> {
     if (confirmed != true || title.isEmpty || !mounted) return;
 
     try {
-      final response = await context.read<AuthProvider>().apiClient.dio.post('/activities', data: {
-        'title': title,
-        'description': description.isEmpty ? null : description,
-        'activity_date': _isoDate(date),
-      });
+      final response = await context.read<AuthProvider>().apiClient.dio.post(
+        '/activities',
+        data: {
+          'title': title,
+          'description': description.isEmpty ? null : description,
+          'activity_date': _isoDate(date),
+        },
+      );
       await _loadActivities();
       final created = response.data['activity'];
-      if (mounted && created != null) _openActivityRoster(Map<String, dynamic>.from(created));
+      if (mounted && created != null) {
+        _openActivityRoster(Map<String, dynamic>.from(created));
+      }
     } catch (_) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Activity could not be created.')));
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Activity could not be created.')),
+        );
+      }
     }
   }
 
@@ -326,16 +500,27 @@ class _TeacherDashboardViewState extends State<TeacherDashboardView> {
     List<Map<String, dynamic>> roster;
     try {
       final response = await dio.get('/activities/${activity['id']}/roster');
-      roster = (response.data['roster'] as List? ?? []).map((e) => Map<String, dynamic>.from(e)).toList();
+      roster = (response.data['roster'] as List? ?? [])
+          .map((e) => Map<String, dynamic>.from(e))
+          .toList();
     } catch (_) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Roster could not be loaded.')));
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Roster could not be loaded.')),
+        );
+      }
       return;
     }
     // Status per learner: null = not on roster.
     final statuses = {
-      for (final s in roster) s['student_id']: s['status'] ?? (s['on_roster'] == true ? 'present' : null),
+      for (final s in roster)
+        s['student_id']:
+            s['status'] ?? (s['on_roster'] == true ? 'present' : null),
     };
-    final originallyOnRoster = {for (final s in roster) if (s['on_roster'] == true) s['student_id']};
+    final originallyOnRoster = {
+      for (final s in roster)
+        if (s['on_roster'] == true) s['student_id'],
+    };
     if (!mounted) return;
 
     final save = await showModalBottomSheet<bool>(
@@ -348,8 +533,10 @@ class _TeacherDashboardViewState extends State<TeacherDashboardView> {
             child: Column(
               children: [
                 ListTile(
-                  title: Text(activity['title']?.toString() ?? 'Activity',
-                      style: const TextStyle(fontWeight: FontWeight.w600)),
+                  title: Text(
+                    activity['title']?.toString() ?? 'Activity',
+                    style: const TextStyle(fontWeight: FontWeight.w600),
+                  ),
                   subtitle: const Text('Mark who took part'),
                   trailing: FilledButton(
                     onPressed: () => Navigator.pop(sheetContext, true),
@@ -359,7 +546,9 @@ class _TeacherDashboardViewState extends State<TeacherDashboardView> {
                 const Divider(height: 1),
                 Expanded(
                   child: roster.isEmpty
-                      ? const Center(child: Text('No students in your classes.'))
+                      ? const Center(
+                          child: Text('No students in your classes.'),
+                        )
                       : ListView(
                           padding: const EdgeInsets.all(16),
                           children: [
@@ -369,8 +558,26 @@ class _TeacherDashboardViewState extends State<TeacherDashboardView> {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text('${s['name']} · ${s['class_name'] ?? ''}',
-                                        style: const TextStyle(fontWeight: FontWeight.w600)),
+                                    Row(
+                                      children: [
+                                        StudentAvatar(
+                                          name:
+                                              s['name']?.toString() ??
+                                              'Student',
+                                          photoUrl: s['photo_url'] as String?,
+                                          size: 40,
+                                        ),
+                                        const SizedBox(width: 10),
+                                        Expanded(
+                                          child: Text(
+                                            '${s['name']} · ${s['class_name'] ?? ''}',
+                                            style: const TextStyle(
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                     const SizedBox(height: 6),
                                     Wrap(
                                       spacing: 8,
@@ -383,10 +590,14 @@ class _TeacherDashboardViewState extends State<TeacherDashboardView> {
                                         ])
                                           ChoiceChip(
                                             label: Text(option[1]!),
-                                            selected: statuses[s['student_id']] == option[0],
+                                            selected:
+                                                statuses[s['student_id']] ==
+                                                option[0],
                                             showCheckmark: false,
-                                            onSelected: (_) =>
-                                                setSheetState(() => statuses[s['student_id']] = option[0]),
+                                            onSelected: (_) => setSheetState(
+                                              () => statuses[s['student_id']] =
+                                                  option[0],
+                                            ),
                                           ),
                                       ],
                                     ),
@@ -411,11 +622,22 @@ class _TeacherDashboardViewState extends State<TeacherDashboardView> {
     ];
     if (records.isEmpty) return;
     try {
-      await dio.post('/activities/${activity['id']}/roster', data: {'records': records});
+      await dio.post(
+        '/activities/${activity['id']}/roster',
+        data: {'records': records},
+      );
       await _loadActivities();
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Activity roster saved.')));
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Activity roster saved.')));
+      }
     } catch (_) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Activity roster could not be saved.')));
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Activity roster could not be saved.')),
+        );
+      }
     }
   }
 
@@ -438,25 +660,38 @@ class _TeacherDashboardViewState extends State<TeacherDashboardView> {
     }
 
     try {
-      await context.read<AuthProvider>().apiClient.dio.post('/announcements', data: {
-        'title': subject,
-        'content': body,
-        'audience_role': 'guardian',
-        if (_noticeClass != null) 'class_name': _noticeClass!.split('|').last,
-        if (_noticeClass != null) 'grade': _noticeClass!.split('|').first,
-      });
+      await context.read<AuthProvider>().apiClient.dio.post(
+        '/announcements',
+        data: {
+          'title': subject,
+          'content': body,
+          'audience_role': 'guardian',
+          if (_noticeClass != null) 'class_name': _noticeClass!.split('|').last,
+          if (_noticeClass != null) 'grade': _noticeClass!.split('|').first,
+        },
+      );
       setState(() {
         _noticeSubjectController.clear();
         _noticeBodyController.clear();
       });
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Notice sent to parents in your class.')));
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Notice sent to parents in your class.'),
+          ),
+        );
+      }
     } catch (_) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Announcement could not be posted.')));
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Announcement could not be posted.')),
+        );
+      }
     }
   }
 
   String _formattedTodayDate() {
-    final now = DateTime.now();
+    final now = _attendanceDate;
     final months = [
       'Jan',
       'Feb',
@@ -482,12 +717,49 @@ class _TeacherDashboardViewState extends State<TeacherDashboardView> {
     return '${parts[0][0]}${parts[1][0]}'.toUpperCase();
   }
 
+  Future<void> _studentPhoto(Map<String, dynamic> student) async {
+    final result = await Navigator.push<Map<String, dynamic>>(
+      context,
+      MaterialPageRoute(
+        builder: (_) => StudentPhotoPage(
+          studentId: student['student_id'] as int,
+          studentName: student['name']?.toString() ?? 'Student',
+          photoUrl: student['photo_url'] as String?,
+        ),
+      ),
+    );
+    if (result != null && mounted) {
+      await _loadTeacherStudents();
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Student photo updated.')));
+      }
+    }
+  }
+
   Future<void> _resendGuardianLink(Map<String, dynamic> guardian) async {
     try {
-      final response = await context.read<AuthProvider>().apiClient.dio.post('/users/${guardian['id']}/send-link');
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(response.data['message'] ?? 'Invitation sent.')));
+      final response = await context.read<AuthProvider>().apiClient.dio.post(
+        '/users/${guardian['id']}/send-link',
+      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(response.data['message'] ?? 'Invitation sent.'),
+          ),
+        );
+      }
     } catch (_) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Could not send the invitation. Please contact your school administrator.')));
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'Could not send the invitation. Please contact your school administrator.',
+            ),
+          ),
+        );
+      }
     }
   }
 
@@ -498,51 +770,138 @@ class _TeacherDashboardViewState extends State<TeacherDashboardView> {
     final form = GlobalKey<FormState>();
     bool sending = false;
     String? error;
-    await showDialog<void>(context: context, barrierDismissible: false,
-      builder: (dialogContext) => StatefulBuilder(builder: (dialogContext, update) => AlertDialog(
-        title: const Text('Invite guardian'),
-        content: SingleChildScrollView(child: Form(key: form, child: Column(mainAxisSize: MainAxisSize.min, children: [
-          Text('Create a parent or guardian account for ${student['name']}. Email and phone are optional. Add either contact detail to enable sign-in.'),
-          const SizedBox(height: 16),
-          TextFormField(controller: name, decoration: const InputDecoration(labelText: 'Guardian name'), validator: (v) => v == null || v.trim().isEmpty ? 'Enter a name' : null),
-          const SizedBox(height: 12),
-          TextFormField(controller: email, keyboardType: TextInputType.emailAddress, decoration: const InputDecoration(labelText: 'Email address (optional)'), validator: (v) => v != null && v.trim().isNotEmpty && !RegExp(r'^[^\s@]+@[^\s@]+\.[^\s@]+$').hasMatch(v.trim()) ? 'Enter a valid email' : null),
-          const SizedBox(height: 12),
-          TextFormField(controller: phone, keyboardType: TextInputType.phone, decoration: const InputDecoration(labelText: 'Phone number (optional)')),
-          if (error != null) Padding(padding: const EdgeInsets.only(top: 12), child: Text(error!, style: const TextStyle(color: Colors.red))),
-        ]))),
-        actions: [
-          TextButton(onPressed: sending ? null : () => Navigator.pop(dialogContext), child: const Text('Cancel')),
-          FilledButton(onPressed: sending ? null : () async {
-            if (!form.currentState!.validate()) return;
-            update(() { sending = true; error = null; });
-            try {
-              final response = await context.read<AuthProvider>().apiClient.dio.post('/users', data: {
-                'name': name.text.trim(), 'email': email.text.trim(), 'phone_number': phone.text.trim(),
-                'role': 'guardian', 'student_ids': [student['student_id']],
-              });
-              if (!mounted || !dialogContext.mounted) return;
-              Navigator.pop(dialogContext);
-              ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(response.data['message'] ?? 'Guardian account created.')));
-              await _loadTeacherStudents();
-            } catch (exception) {
-              if (!dialogContext.mounted) return;
-              final data = exception is DioException ? exception.response?.data : null;
-              update(() { sending = false; error = data is Map ? data['message']?.toString() ?? 'Could not create this account.' : 'Could not create this account. Please try again.'; });
-            }
-          }, child: Text(sending ? 'Sending?' : 'Send invitation')),
-        ],
-      )),
+    await showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (dialogContext) => StatefulBuilder(
+        builder: (dialogContext, update) => AlertDialog(
+          title: const Text('Invite guardian'),
+          content: SingleChildScrollView(
+            child: Form(
+              key: form,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'Create a parent or guardian account for ${student['name']}. Email and phone are optional. Add either contact detail to enable sign-in.',
+                  ),
+                  const SizedBox(height: 16),
+                  TextFormField(
+                    controller: name,
+                    decoration: const InputDecoration(
+                      labelText: 'Guardian name',
+                    ),
+                    validator: (v) =>
+                        v == null || v.trim().isEmpty ? 'Enter a name' : null,
+                  ),
+                  const SizedBox(height: 12),
+                  TextFormField(
+                    controller: email,
+                    keyboardType: TextInputType.emailAddress,
+                    decoration: const InputDecoration(
+                      labelText: 'Email address (optional)',
+                    ),
+                    validator: (v) =>
+                        v != null &&
+                            v.trim().isNotEmpty &&
+                            !RegExp(
+                              r'^[^\s@]+@[^\s@]+\.[^\s@]+$',
+                            ).hasMatch(v.trim())
+                        ? 'Enter a valid email'
+                        : null,
+                  ),
+                  const SizedBox(height: 12),
+                  TextFormField(
+                    controller: phone,
+                    keyboardType: TextInputType.phone,
+                    decoration: const InputDecoration(
+                      labelText: 'Phone number',
+                      helperText:
+                          'Parents can sign in with just this number. Email is optional.',
+                    ),
+                  ),
+                  if (error != null)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 12),
+                      child: Text(
+                        error!,
+                        style: const TextStyle(color: Colors.red),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: sending ? null : () => Navigator.pop(dialogContext),
+              child: const Text('Cancel'),
+            ),
+            FilledButton(
+              onPressed: sending
+                  ? null
+                  : () async {
+                      if (!form.currentState!.validate()) return;
+                      update(() {
+                        sending = true;
+                        error = null;
+                      });
+                      try {
+                        final response = await context
+                            .read<AuthProvider>()
+                            .apiClient
+                            .dio
+                            .post(
+                              '/users',
+                              data: {
+                                'name': name.text.trim(),
+                                'email': email.text.trim(),
+                                'phone_number': phone.text.trim(),
+                                'role': 'guardian',
+                                'student_ids': [student['student_id']],
+                              },
+                            );
+                        if (!mounted || !dialogContext.mounted) return;
+                        Navigator.pop(dialogContext);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              response.data['message'] ??
+                                  'Guardian account created.',
+                            ),
+                          ),
+                        );
+                        await _loadTeacherStudents();
+                      } catch (exception) {
+                        if (!dialogContext.mounted) return;
+                        final data = exception is DioException
+                            ? exception.response?.data
+                            : null;
+                        update(() {
+                          sending = false;
+                          error = data is Map
+                              ? data['message']?.toString() ??
+                                    'Could not create this account.'
+                              : 'Could not create this account. Please try again.';
+                        });
+                      }
+                    },
+              child: Text(sending ? 'Sending?' : 'Send invitation'),
+            ),
+          ],
+        ),
+      ),
     );
     // Wait for the dialog transition before releasing its field controllers.
     await Future<void>.delayed(const Duration(milliseconds: 250));
-    name.dispose(); email.dispose(); phone.dispose();
+    name.dispose();
+    email.dispose();
+    phone.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final teacher =
-        context.watch<AuthProvider>().user?['name'] ?? 'Teacher';
+    final teacher = context.watch<AuthProvider>().user?['name'] ?? 'Teacher';
     final present = _roster.where((s) => s['status'] == 'Present').length;
     final absent = _roster.where((s) => s['status'] == 'Absent').length;
     final late = _roster.where((s) => s['status'] == 'Late').length;
@@ -597,9 +956,22 @@ class _TeacherDashboardViewState extends State<TeacherDashboardView> {
                   const SizedBox(height: 20),
                   Row(
                     children: [
-                      IconButton(onPressed: () => _changeAttendanceDate(-1), icon: const Icon(Icons.chevron_left)),
-                      Expanded(child: Center(child: Text('Attendance · ${_formattedTodayDate()}', style: const TextStyle(fontWeight: FontWeight.w600)))),
-                      IconButton(onPressed: () => _changeAttendanceDate(1), icon: const Icon(Icons.chevron_right)),
+                      IconButton(
+                        onPressed: () => _changeAttendanceDate(-1),
+                        icon: const Icon(Icons.chevron_left),
+                      ),
+                      Expanded(
+                        child: Center(
+                          child: Text(
+                            'Attendance · ${_formattedTodayDate()}',
+                            style: const TextStyle(fontWeight: FontWeight.w600),
+                          ),
+                        ),
+                      ),
+                      IconButton(
+                        onPressed: () => _changeAttendanceDate(1),
+                        icon: const Icon(Icons.chevron_right),
+                      ),
                     ],
                   ),
                   const Divider(height: 1),
@@ -649,21 +1021,10 @@ class _TeacherDashboardViewState extends State<TeacherDashboardView> {
   Widget _studentHeading(Map<String, dynamic> student) => Row(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      Container(
-        width: 42,
-        height: 42,
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-          color: AppColors.softBlue,
-          borderRadius: BorderRadius.circular(14),
-        ),
-        child: Text(
-          student['roll'],
-          style: const TextStyle(
-            color: AppColors.primary,
-            fontWeight: FontWeight.w700,
-          ),
-        ),
+      StudentAvatar(
+        name: student['name']?.toString() ?? 'Student',
+        photoUrl: student['photo_url'] as String?,
+        size: 48,
       ),
       const SizedBox(width: 12),
       Expanded(
@@ -735,55 +1096,81 @@ class _TeacherDashboardViewState extends State<TeacherDashboardView> {
       )
     else
       for (final student in _filteredRoster)
-      Padding(
-        padding: const EdgeInsets.only(bottom: 14),
-        child: PageCard(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _studentHeading(student),
-              const SizedBox(height: 16),
-              Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                children: [
-                  PageBadge(
-                    student['status'],
-                    color: _attendanceColor(student['status']),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              Text(
-                'Guardian · ${student['guardian']}',
-                style: const TextStyle(
-                  color: AppColors.textSecondary,
-                  height: 1.5,
+        Padding(
+          padding: const EdgeInsets.only(bottom: 14),
+          child: PageCard(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _studentHeading(student),
+                const SizedBox(height: 16),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    if (student['marked'] == true)
+                      PageBadge(
+                        student['status'],
+                        color: _attendanceColor(student['status']),
+                      )
+                    else
+                      const PageBadge(
+                        'Attendance not taken',
+                        color: AppColors.textMuted,
+                      ),
+                    PageBadge(
+                      '${student['merits'] ?? 0} merits',
+                      color: const Color(0xFF047857),
+                    ),
+                  ],
                 ),
-              ),
-              const SizedBox(height: 14),
-              Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                children: [
-                  OutlinedButton(
-                    onPressed: () => _logBehaviour(_roster.indexOf(student), 'positive'),
-                    child: const Text('Award merit'),
+                const SizedBox(height: 16),
+                Text(
+                  'Guardian · ${student['guardian']}',
+                  style: const TextStyle(
+                    color: AppColors.textSecondary,
+                    height: 1.5,
                   ),
-                  OutlinedButton(
-                    onPressed: () => _logBehaviour(_roster.indexOf(student), 'negative'),
-                    child: const Text('Conduct note'),
-                  ),
-                  OutlinedButton(onPressed: () => _inviteGuardian(student), child: const Text('Invite guardian')),
-                  for (final guardian in (student['guardians'] as List? ?? []))
-                    if (guardian['email'] != null && guardian['email'].toString().isNotEmpty)
-                      TextButton(onPressed: () => _resendGuardianLink(Map<String, dynamic>.from(guardian)), child: Text('Resend link to ${guardian['name']}')),
-                ],
-              ),
-            ],
+                ),
+                const SizedBox(height: 14),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    OutlinedButton(
+                      onPressed: () =>
+                          _logBehaviour(_roster.indexOf(student), 'positive'),
+                      child: const Text('Award merit'),
+                    ),
+                    OutlinedButton(
+                      onPressed: () =>
+                          _logBehaviour(_roster.indexOf(student), 'negative'),
+                      child: const Text('Conduct note'),
+                    ),
+                    OutlinedButton(
+                      onPressed: () => _studentPhoto(student),
+                      child: const Text('Student photo'),
+                    ),
+                    OutlinedButton(
+                      onPressed: () => _inviteGuardian(student),
+                      child: const Text('Invite guardian'),
+                    ),
+                    for (final guardian
+                        in (student['guardians'] as List? ?? []))
+                      if (guardian['email'] != null &&
+                          guardian['email'].toString().isNotEmpty)
+                        TextButton(
+                          onPressed: () => _resendGuardianLink(
+                            Map<String, dynamic>.from(guardian),
+                          ),
+                          child: Text('Resend link to ${guardian['name']}'),
+                        ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
-      ),
   ];
 
   List<Widget> _rollCall() => [
@@ -793,20 +1180,55 @@ class _TeacherDashboardViewState extends State<TeacherDashboardView> {
     ),
     const SizedBox(height: 6),
     const Text(
-      'Select a status for each student.',
+      'Select a status for each student, then save the register.',
       style: TextStyle(color: AppColors.textMuted),
     ),
-    Align(
-      alignment: Alignment.centerLeft,
-      child: TextButton(
-        onPressed: () => setState(() {
-          for (final student in _roster) {
-            student['status'] = 'Present';
-          }
-        }),
-        child: const Text('Mark all present'),
+    const SizedBox(height: 14),
+    PageCard(
+      color: _registerSaved ? AppColors.successLight : AppColors.warningLight,
+      padding: const EdgeInsets.all(16),
+      child: Text(
+        _roster.isEmpty
+            ? 'No students in your assigned classes yet.'
+            : _registerSaved
+            ? 'Register saved for ${_formattedTodayDate()}.'
+            : _attendanceDirty
+            ? 'You have unsaved changes. Save the register so parents can see it.'
+            : 'Attendance has not been saved for ${_formattedTodayDate()} yet.',
+        style: TextStyle(
+          fontWeight: FontWeight.w600,
+          color: _registerSaved
+              ? const Color(0xFF047857)
+              : const Color(0xFF92400E),
+        ),
       ),
     ),
+    const SizedBox(height: 8),
+    Wrap(
+      spacing: 8,
+      runSpacing: 4,
+      crossAxisAlignment: WrapCrossAlignment.center,
+      children: [
+        TextButton(
+          onPressed: _roster.isEmpty
+              ? null
+              : () => setState(() {
+                  for (final student in _roster) {
+                    student['status'] = 'Present';
+                  }
+                  _attendanceDirty = true;
+                }),
+          child: const Text('Mark all present'),
+        ),
+        _saveRegisterButton(),
+        OutlinedButton.icon(
+          onPressed: _exporting || _isLoadingRoster ? null : _exportRegister,
+          icon: const Icon(Icons.download_outlined),
+          label: Text(_exporting ? 'Downloading...' : 'Download saved CSV'),
+        ),
+      ],
+    ),
+    const SizedBox(height: 12),
     for (final student in _roster)
       Padding(
         padding: const EdgeInsets.only(bottom: 14),
@@ -842,12 +1264,20 @@ class _TeacherDashboardViewState extends State<TeacherDashboardView> {
           ),
         ),
       ),
-    FilledButton.icon(
-      onPressed: _isSavingAttendance || _roster.isEmpty ? null : _saveAttendance,
-      icon: _isSavingAttendance ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2)) : const Icon(Icons.save_outlined),
-      label: Text(_isSavingAttendance ? 'Saving…' : 'Save register'),
-    ),
+    if (_roster.isNotEmpty) _saveRegisterButton(),
   ];
+
+  Widget _saveRegisterButton() => FilledButton.icon(
+    onPressed: _isSavingAttendance || _roster.isEmpty ? null : _saveAttendance,
+    icon: _isSavingAttendance
+        ? const SizedBox(
+            width: 18,
+            height: 18,
+            child: CircularProgressIndicator(strokeWidth: 2),
+          )
+        : const Icon(Icons.save_outlined),
+    label: Text(_isSavingAttendance ? 'Saving…' : 'Save register'),
+  );
 
   List<Widget> _activityRosters() => [
     Wrap(
@@ -892,12 +1322,18 @@ class _TeacherDashboardViewState extends State<TeacherDashboardView> {
               children: [
                 Text(
                   activity['title']?.toString() ?? '',
-                  style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w600),
+                  style: const TextStyle(
+                    fontSize: 17,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   activity['activity_date']?.toString().split('T').first ?? '',
-                  style: const TextStyle(fontSize: 12, color: AppColors.textMuted),
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: AppColors.textMuted,
+                  ),
                 ),
                 const SizedBox(height: 12),
                 Wrap(
@@ -951,8 +1387,15 @@ class _TeacherDashboardViewState extends State<TeacherDashboardView> {
               initialValue: _noticeClass,
               decoration: const InputDecoration(labelText: 'Send to'),
               items: [
-                const DropdownMenuItem(value: null, child: Text('All my classes')),
-                for (final c in _classNames) DropdownMenuItem(value: c, child: Text(c.replaceAll('|', ' ? '))),
+                const DropdownMenuItem(
+                  value: null,
+                  child: Text('All my classes'),
+                ),
+                for (final c in _classNames)
+                  DropdownMenuItem(
+                    value: c,
+                    child: Text(c.replaceAll('|', ' ? ')),
+                  ),
               ],
               onChanged: (v) => setState(() => _noticeClass = v),
             ),

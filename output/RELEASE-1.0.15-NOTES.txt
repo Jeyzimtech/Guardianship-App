@@ -1,0 +1,8 @@
+Release name: 1.0.15 (16) - Closed Testing
+
+<en-US>
+• Added controls to report content and users.
+• Added blocking and unblocking for direct messages.
+• Improved account deletion and support reporting.
+• Updated privacy and terms information.
+</en-US>

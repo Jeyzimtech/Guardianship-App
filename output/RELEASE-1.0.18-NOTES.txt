@@ -1,0 +1,7 @@
+﻿<en-US>
+Improved school communication and account access.
+Fixed attendance totals and support for parents at multiple schools.
+Updated activity registers and seven-day message expiry.
+Simplified the dashboard and removed retired options.
+Existing subscribers can sign in; account support and privacy information have been updated.
+</en-US>

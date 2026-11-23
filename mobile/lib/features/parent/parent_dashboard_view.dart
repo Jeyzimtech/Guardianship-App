@@ -4,6 +4,8 @@ import '../../core/auth_provider.dart';
 import '../../core/app_colors.dart';
 import '../../core/student_provider.dart';
 import '../common/editorial_widgets.dart';
+import '../common/student_avatar.dart';
+import '../common/student_photo_page.dart';
 import '../dashboard/attendance_view.dart';
 import '../dashboard/reports_view.dart';
 import '../dashboard/announcements_view.dart';
@@ -12,8 +14,8 @@ import 'behaviour_view.dart';
 import 'assignments_view.dart';
 import 'sms_alerts_log_view.dart';
 import 'messaging_view.dart';
-import 'uniform_marketplace_view.dart';
-import 'fee_payments_view.dart';
+import 'activity_participation_page.dart';
+import 'subscription_page.dart';
 
 class ParentDashboardView extends StatefulWidget {
   const ParentDashboardView({super.key});
@@ -23,12 +25,20 @@ class ParentDashboardView extends StatefulWidget {
 }
 
 class _ParentDashboardViewState extends State<ParentDashboardView> {
-  int _selectedChildIndex = 0;
-
+  // The provider's selection drives every parent page, so the home view follows it.
   void selectChild(int index) {
-    setState(() {
-      _selectedChildIndex = index;
-    });
+    final provider = context.read<StudentProvider>();
+    if (index < provider.students.length) {
+      provider.selectStudent(
+        Map<String, dynamic>.from(provider.students[index]),
+      );
+    }
+  }
+
+  Future<void> _refresh() async {
+    final provider = context.read<StudentProvider>();
+    final id = provider.selectedStudent?['id'];
+    if (id is int) await provider.fetchDashboard(id);
   }
 
   void _showRequestAddStudentDialog(BuildContext context) {
@@ -168,17 +178,35 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
                   }
                   try {
                     final auth = context.read<AuthProvider>();
-                    await auth.apiClient.dio.post('/students/request-link', data: {
-                      'student_name': name,
-                      'school_name': schoolController.text.trim(),
-                      'relationship': 'Parent/Guardian',
-                      'notes': notesController.text.trim(),
-                    });
+                    await auth.apiClient.dio.post(
+                      '/students/request-link',
+                      data: {
+                        'student_name': name,
+                        'school_name': schoolController.text.trim(),
+                        'relationship': 'Parent/Guardian',
+                        'notes': notesController.text.trim(),
+                      },
+                    );
                     if (!ctx.mounted) return;
                     Navigator.pop(ctx);
-                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Link request submitted for school verification.'), backgroundColor: AppColors.primary));
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text(
+                          'Link request submitted for school verification.',
+                        ),
+                        backgroundColor: AppColors.primary,
+                      ),
+                    );
                   } catch (_) {
-                    if (ctx.mounted) ScaffoldMessenger.of(ctx).showSnackBar(const SnackBar(content: Text('Link request could not be submitted. Please try again.')));
+                    if (ctx.mounted) {
+                      ScaffoldMessenger.of(ctx).showSnackBar(
+                        const SnackBar(
+                          content: Text(
+                            'Link request could not be submitted. Please try again.',
+                          ),
+                        ),
+                      );
+                    }
                   }
                 },
                 icon: const Icon(Icons.send_rounded, size: 18),
@@ -212,22 +240,32 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
 
     final rawStudents = studentProvider?.students ?? [];
     final hasStudents = rawStudents.isNotEmpty;
-    final safeIndex = (hasStudents && _selectedChildIndex < rawStudents.length)
-        ? _selectedChildIndex
-        : 0;
+    final selectedId = studentProvider?.selectedStudent?['id'];
+    final selectedIndex = rawStudents.indexWhere((s) => s['id'] == selectedId);
+    final safeIndex = selectedIndex < 0 ? 0 : selectedIndex;
 
     final dashboard = studentProvider?.dashboardData;
-    final rawChild = hasStudents ? Map<String, dynamic>.from(rawStudents[safeIndex]) : <String, dynamic>{};
+    final rawChild = hasStudents
+        ? Map<String, dynamic>.from(rawStudents[safeIndex])
+        : <String, dynamic>{};
     final child = hasStudents
         ? {
             'id': rawStudents[safeIndex]['id'],
             'name': rawStudents[safeIndex]['name'] ?? 'Enrolled Learner',
-            'class': '${rawStudents[safeIndex]['grade'] ?? ''} ${rawStudents[safeIndex]['class_name'] ?? ''}'.trim(),
+            'class':
+                '${rawStudents[safeIndex]['grade'] ?? ''} ${rawStudents[safeIndex]['class_name'] ?? ''}'
+                    .trim(),
             'school_id': rawChild['school_id'],
+            'photo_url': rawChild['photo_url'],
             'school': rawChild['school']?['name'] ?? 'School',
-            'attendance_rate': '${dashboard?['attendance_snapshot']?['percentage'] ?? 0}%',
-            'merits_pos': dashboard?['behaviour_snapshot']?['positive_count'] ?? 0,
-            'merits_neg': dashboard?['behaviour_snapshot']?['negative_count'] ?? 0,
+            'attendance_rate':
+                dashboard?['attendance_snapshot']?['percentage'] == null
+                ? '—'
+                : '${dashboard!['attendance_snapshot']['percentage']}%',
+            'merits_pos':
+                dashboard?['behaviour_snapshot']?['positive_count'] ?? '—',
+            'merits_neg':
+                dashboard?['behaviour_snapshot']?['negative_count'] ?? 0,
           }
         : {
             'name': 'Enrolled Learner',
@@ -241,182 +279,252 @@ class _ParentDashboardViewState extends State<ParentDashboardView> {
     return ColoredBox(
       color: Editorial.canvas,
       child: SafeArea(
-        child: ListView(
-          padding: const EdgeInsets.fromLTRB(24, 12, 24, 32),
-          children: [
-            const Text('A good day\nto learn.', style: Editorial.headline),
-            if (!hasStudents) ...[
-              const SizedBox(height: 20),
-              Container(
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: AppColors.cardBorder),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+        child: RefreshIndicator(
+          onRefresh: _refresh,
+          child: ListView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            padding: const EdgeInsets.fromLTRB(24, 12, 24, 32),
+            children: [
+              const Text('A good day\nto learn.', style: Editorial.headline),
+              if (hasStudents) ...[
+                const SizedBox(height: 20),
+                Row(
                   children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                      decoration: BoxDecoration(
-                        color: AppColors.softBlue,
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                      child: const Text(
-                        'LEARNER ROSTER',
-                        style: TextStyle(
-                          color: AppColors.primary,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 10,
-                          letterSpacing: 0.5,
-                        ),
+                    StudentAvatar(
+                      name: child['name']?.toString() ?? 'Your child',
+                      photoUrl: child['photo_url'] as String?,
+                      size: 62,
+                    ),
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            child['name']?.toString() ?? 'Your child',
+                            style: const TextStyle(
+                              fontSize: 17,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          const SizedBox(height: 5),
+                          Text(
+                            child['class']?.toString() ?? '',
+                            style: const TextStyle(
+                              color: AppColors.textSecondary,
+                              fontSize: 13,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                    const SizedBox(height: 10),
-                    const Text(
-                      'No enrolled learners linked yet',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.textPrimary,
-                      ),
-                    ),
-                    const SizedBox(height: 6),
-                    const Text(
-                      'Student accounts and enrollments are provisioned by your school administrator. Once your school links your child, their records will display here.',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: AppColors.textMuted,
-                        height: 1.4,
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    FilledButton.icon(
-                      onPressed: () => _showRequestAddStudentDialog(context),
-                      icon: const Icon(Icons.link_rounded, size: 16),
-                      label: const Text('Request Child Link', style: TextStyle(fontSize: 13)),
+                    TextButton(
+                      onPressed: () async {
+                        final id = child['id'];
+                        if (id is! int) return;
+                        final result =
+                            await Navigator.push<Map<String, dynamic>>(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => StudentPhotoPage(
+                                  studentId: id,
+                                  studentName: child['name'].toString(),
+                                  photoUrl: child['photo_url'] as String?,
+                                ),
+                              ),
+                            );
+                        if (result != null && context.mounted) {
+                          context.read<StudentProvider>().updateStudentPhoto(
+                            id,
+                            result['photo_url'] as String?,
+                          );
+                        }
+                      },
+                      child: const Text('Photo'),
                     ),
                   ],
                 ),
-              ),
-            ],
-            if (rawStudents.length > 1) ...[
-              const SizedBox(height: 16),
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  children: List.generate(rawStudents.length, (idx) {
-                    final isSel = idx == safeIndex;
-                    final studentName = rawStudents[idx]['name'] ?? 'Learner ${idx + 1}';
-                    return Padding(
-                      padding: const EdgeInsets.only(right: 8),
-                      child: ChoiceChip(
-                        label: Text(studentName),
-                        selected: isSel,
-                        onSelected: (_) => selectChild(idx),
-                        selectedColor: AppColors.primary,
-                        labelStyle: TextStyle(
-                          color: isSel ? Colors.white : AppColors.textPrimary,
-                          fontWeight: FontWeight.bold,
+              ],
+              if (!hasStudents) ...[
+                const SizedBox(height: 20),
+                Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: AppColors.cardBorder),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 3,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppColors.softBlue,
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: const Text(
+                          'LEARNER ROSTER',
+                          style: TextStyle(
+                            color: AppColors.primary,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 10,
+                            letterSpacing: 0.5,
+                          ),
                         ),
                       ),
-                    );
-                  }),
-                ),
-              ),
-            ],
-            const SizedBox(height: 28),
-            EditorialFeature(
-              eyebrow: 'TODAY AT SCHOOL',
-              title: 'Learning in focus',
-              subtitle: 'Your child’s day, at a glance.',
-              onTap: () => _open(LearningJournalView(child: child)),
-            ),
-            const SizedBox(height: 16),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(
-                  child: EditorialMetric(
-                    value: child['attendance_rate'],
-                    label: 'Attendance',
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: EditorialMetric(
-                    value: '${child['merits_pos']}',
-                    label: 'Positive merits',
+                      const SizedBox(height: 10),
+                      const Text(
+                        'No enrolled learners linked yet',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.textPrimary,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      const Text(
+                        'Student accounts and enrollments are provisioned by your school administrator. Once your school links your child, their records will display here.',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: AppColors.textMuted,
+                          height: 1.4,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      FilledButton.icon(
+                        onPressed: () => _showRequestAddStudentDialog(context),
+                        icon: const Icon(Icons.link_rounded, size: 16),
+                        label: const Text(
+                          'Request Child Link',
+                          style: TextStyle(fontSize: 13),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],
-            ),
-            const SizedBox(height: 32),
-            const Text('Latest from school', style: Editorial.section),
-            const SizedBox(height: 16),
-            EditorialLink(
-              title: 'School notices',
-              subtitle: 'News, events and updates from your school',
-              onTap: () => _open(const AnnouncementsView()),
-            ),
-            EditorialLink(
-              title: 'Teacher conversations',
-              subtitle: 'Keep in touch about your child’s progress',
-              onTap: () => _open(const MessagingView()),
-            ),
-            const SizedBox(height: 20),
-            const Text('Learning & progress', style: Editorial.section),
-            const SizedBox(height: 16),
-            EditorialLink(
-              title: 'Learning journal',
-              subtitle: 'Classroom moments and teacher feedback',
-              onTap: () => _open(LearningJournalView(child: child)),
-            ),
-            EditorialLink(
-              title: 'Homework',
-              subtitle: 'Assignments and upcoming due dates',
-              onTap: () => _open(AssignmentsView(child: child)),
-            ),
-            EditorialLink(
-              title: 'Attendance',
-              subtitle: 'Review your child’s attendance record',
-              onTap: () => _open(const AttendanceView()),
-            ),
-            EditorialLink(
-              title: 'Behaviour & merits',
-              subtitle: 'Achievements and wellbeing',
-              onTap: () => _open(BehaviourView(child: child)),
-            ),
-            EditorialLink(
-              title: 'Academic reports',
-              subtitle: 'Review term reports and progress',
-              onTap: () => _open(const ReportsView()),
-            ),
-            const SizedBox(height: 20),
-            const Text('School essentials', style: Editorial.section),
-            const SizedBox(height: 16),
-            EditorialLink(
-              title: 'SMS history',
-              subtitle: 'Review school text messages',
-              onTap: () => _open(const SmsAlertsLogView()),
-            ),
-            EditorialLink(
-              title: 'School fees',
-              subtitle: 'View balances and submit payment references',
-              onTap: () => _open(FeePaymentsView(child: child)),
-            ),
-            EditorialLink(
-              title: 'Uniform store',
-              subtitle: 'Browse school essentials',
-              onTap: () => _open(UniformMarketplaceView(child: child)),
-            ),
-            const SizedBox(height: 8),
-            OutlinedButton(
-              onPressed: () => _showRequestAddStudentDialog(context),
-              child: const Text('Link another child'),
-            ),
-          ],
+              if (rawStudents.length > 1) ...[
+                const SizedBox(height: 16),
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: List.generate(rawStudents.length, (idx) {
+                      final isSel = idx == safeIndex;
+                      final studentName =
+                          rawStudents[idx]['name'] ?? 'Learner ${idx + 1}';
+                      return Padding(
+                        padding: const EdgeInsets.only(right: 8),
+                        child: ChoiceChip(
+                          label: Text(studentName),
+                          selected: isSel,
+                          onSelected: (_) => selectChild(idx),
+                          selectedColor: AppColors.primary,
+                          labelStyle: TextStyle(
+                            color: isSel ? Colors.white : AppColors.textPrimary,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      );
+                    }),
+                  ),
+                ),
+              ],
+              const SizedBox(height: 28),
+              EditorialFeature(
+                eyebrow: 'TODAY AT SCHOOL',
+                title: 'Learning in focus',
+                subtitle: 'Your child’s day, at a glance.',
+                onTap: () => _open(LearningJournalView(child: child)),
+              ),
+              const SizedBox(height: 16),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: EditorialMetric(
+                      value: child['attendance_rate'],
+                      label: 'Attendance',
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: EditorialMetric(
+                      value: '${child['merits_pos']}',
+                      label: 'Positive merits',
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 32),
+              const Text('Latest from school', style: Editorial.section),
+              const SizedBox(height: 16),
+              EditorialLink(
+                title: 'School notices',
+                subtitle: 'News, events and updates from your school',
+                onTap: () => _open(const AnnouncementsView()),
+              ),
+              EditorialLink(
+                title: 'Teacher conversations',
+                subtitle: 'Keep in touch about your child’s progress',
+                onTap: () => _open(const MessagingView()),
+              ),
+              const SizedBox(height: 20),
+              const Text('Learning & progress', style: Editorial.section),
+              const SizedBox(height: 16),
+              EditorialLink(
+                title: 'Learning journal',
+                subtitle: 'Classroom moments and teacher feedback',
+                onTap: () => _open(LearningJournalView(child: child)),
+              ),
+              EditorialLink(
+                title: 'Tasks & activities',
+                subtitle: 'Sports, extra lessons and participation',
+                onTap: () => _open(const ActivityParticipationPage()),
+              ),
+              EditorialLink(
+                title: 'Homework',
+                subtitle: 'Assignments and upcoming due dates',
+                onTap: () => _open(AssignmentsView(child: child)),
+              ),
+              EditorialLink(
+                title: 'Attendance',
+                subtitle: 'Review your child’s attendance record',
+                onTap: () => _open(const AttendanceView()),
+              ),
+              EditorialLink(
+                title: 'Behaviour & merits',
+                subtitle: 'Learning and achievements',
+                onTap: () => _open(BehaviourView(child: child)),
+              ),
+              EditorialLink(
+                title: 'Academic reports',
+                subtitle: 'Review term reports and progress',
+                onTap: () => _open(const ReportsView()),
+              ),
+              const SizedBox(height: 20),
+              const Text('School essentials', style: Editorial.section),
+              EditorialLink(
+                title: 'Subscription',
+                subtitle: 'Account access and support',
+                onTap: () => _open(const SubscriptionPage()),
+              ),
+              const SizedBox(height: 16),
+              EditorialLink(
+                title: 'SMS history',
+                subtitle: 'Review school text messages',
+                onTap: () => _open(const SmsAlertsLogView()),
+              ),
+              const SizedBox(height: 8),
+              OutlinedButton(
+                onPressed: () => _showRequestAddStudentDialog(context),
+                child: const Text('Link another child'),
+              ),
+            ],
+          ),
         ),
       ),
     );

@@ -1,0 +1,9 @@
+{
+  "status": "deployed",
+  "backup": "/var/backups/guardianship/20261120T080048Z-requested-features",
+  "health": {
+    "status": "ok",
+    "message": "Guardianship API is running",
+    "timestamp": "2026-11-20T07:02:13+00:00"
+  }
+}

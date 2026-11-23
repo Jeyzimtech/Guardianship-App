@@ -28,6 +28,27 @@ class RoleBoundaryRegressionTest extends TestCase
         [,,,,,,$t]=$this->fixture();
         $this->actingAs($t)->getJson('/api/attendance/roster')->assertOk()->assertJsonCount(1,'roster');
     }
+    public function test_teacher_marks_attendance_and_roster_reports_saved_state_and_merits(): void {
+        [,,,$a,,,$t]=$this->fixture();
+        $this->actingAs($t)->getJson('/api/attendance/roster?date=2026-10-16')->assertJsonPath('roster.0.marked',false)->assertJsonPath('roster.0.merits',0);
+        $this->postJson('/api/attendance/mark',['date'=>'2026-10-16','records'=>[['student_id'=>$a->id,'status'=>'absent']]])->assertOk();
+        $this->postJson('/api/behaviour',['student_id'=>$a->id,'polarity'=>'positive','category'=>'Merit','incident_date'=>'2026-10-16'])->assertCreated();
+        $this->getJson('/api/attendance/roster?date=2026-10-16')->assertJsonPath('roster.0.marked',true)->assertJsonPath('roster.0.status','absent')->assertJsonPath('roster.0.merits',1);
+    }
+    public function test_admin_dashboard_charts_come_from_recorded_activity(): void {
+        [,,,$a,,,$t,$admin]=$this->fixture();
+        $empty=$this->actingAs($admin)->getJson('/api/admin/dashboard-stats')->assertOk()->json('stats.charts');
+        $this->assertSame([null,null,null,null,null,null],$empty['attendance_weekly']);
+        $this->assertSame([],$empty['attendance_by_class']['labels']);
+        $today=now()->toDateString();
+        $this->actingAs($t)->postJson('/api/attendance/mark',['date'=>$today,'records'=>[['student_id'=>$a->id,'status'=>'present']]])->assertOk();
+        $this->postJson('/api/behaviour',['student_id'=>$a->id,'polarity'=>'positive','category'=>'Merit','incident_date'=>$today])->assertCreated();
+        $charts=$this->actingAs($admin)->getJson('/api/admin/dashboard-stats')->json('stats.charts');
+        $this->assertSame(100,$charts['attendance_weekly'][5]);
+        $this->assertSame(['1 Blue'],$charts['attendance_by_class']['labels']);
+        $this->assertSame(1,$charts['activity_weekly']['behaviour'][5]);
+        $this->assertSame(1,$charts['activity_weekly']['attendance_marks'][5]);
+    }
     public function test_teacher_cannot_mark_other_grade_with_same_class_name(): void {
         [,,,,$b,,$t]=$this->fixture();
         $this->actingAs($t)->postJson('/api/attendance/mark',['date'=>'2026-10-16','records'=>[['student_id'=>$b->id,'status'=>'present']]])->assertForbidden();

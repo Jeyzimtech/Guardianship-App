@@ -77,7 +77,6 @@ class PageBadge extends StatelessWidget {
   Widget build(BuildContext context) => Container(
     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
     decoration: BoxDecoration(
-      color: color.withValues(alpha: .08),
       borderRadius: BorderRadius.circular(8),
     ),
     child: Text(

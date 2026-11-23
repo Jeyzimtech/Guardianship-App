@@ -1,28 +1,44 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'core/api_client.dart';
+import 'core/notification_provider.dart';
+import 'core/push_notifications.dart';
 import 'core/auth_provider.dart';
 import 'core/role_guard.dart';
 import 'core/student_provider.dart';
+import 'core/subscription_provider.dart';
+import 'features/parent/subscription_boundary.dart';
 import 'core/app_colors.dart';
 import 'features/common/editorial_widgets.dart';
 import 'features/auth/login_screen.dart';
 import 'features/dashboard/dashboard_home.dart';
+import 'features/legal/consent_screen.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
-void main() {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  await PushNotifications.initialize();
   final apiClient = ApiClient();
 
+  final subscription = SubscriptionProvider();
+  apiClient.dio.interceptors.add(subscription.interceptor);
   runApp(
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => AuthProvider(apiClient)),
         ChangeNotifierProvider(create: (_) => StudentProvider(apiClient)),
+        ChangeNotifierProxyProvider<AuthProvider, SubscriptionProvider>(
+          create: (_) => subscription,
+          update: (_, auth, access) => access!..bind(auth),
+        ),
+        ChangeNotifierProxyProvider<AuthProvider, NotificationProvider>(
+          create: (_) => NotificationProvider(),
+          update: (_, auth, updates) => updates!..bind(auth),
+        ),
       ],
-      child: const EduConectApp(),
+      child: const PushNotificationListener(child: EduConectApp()),
     ),
   );
 }
@@ -34,6 +50,7 @@ class EduConectApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       navigatorKey: navigatorKey,
+      builder: (context, child) => SubscriptionBoundary(child: child!),
       title: 'Edu Connect',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
@@ -133,7 +150,7 @@ class EduConectApp extends StatelessWidget {
           ),
         ),
       ),
-      home: const AuthGate(),
+      home: const ConsentGate(child: AuthGate()),
     );
   }
 }

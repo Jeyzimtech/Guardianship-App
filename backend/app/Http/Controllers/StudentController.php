@@ -133,7 +133,7 @@ class StudentController extends Controller
                     'phone_number' => $guardianPhone,
                     'role' => 'guardian',
                     'password' => \Illuminate\Support\Facades\Hash::make(\Illuminate\Support\Str::random(64)),
-                    'account_uid' => 'uid_guardian_' . time() . '_' . rand(10, 99),
+                    'account_uid' => (string) \Illuminate\Support\Str::uuid(),
                 ]);
                 if ($guardianEmail) EmailSettingsController::sendPasswordSetupLink($guardian);
             }

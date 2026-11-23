@@ -1,0 +1,24 @@
+PASS POST /auth/login status 200
+PASS GET /subscription status 200
+PASS Subscription contact and suspended state
+PASS GET /announcements status 403
+PASS GET /messages/contacts status 403
+PASS GET /dashboard/22 status 200
+PASS POST /journal status 201
+PASS POST /journal status 422
+PASS GET /admin/dashboard-stats status 200
+PASS POST /users status 200
+PASS Parent is linked at both schools
+PASS POST /platform/subscriptions/toggle status 200
+PASS POST /activities status 201
+PASS POST /activities/4/roster status 200
+PASS GET /activities/student/22 status 200
+PASS Parent reads activity participation
+PASS POST /fees/pay status 202
+PASS Payment still requires school verification
+PASS DELETE /platform/schools/15 status 403
+PASS DELETE /platform/schools/15 status 422
+PASS DELETE /platform/schools/15 status 200
+PASS Removing synthetic school preserves shared parent
+PASS All synthetic changes rolled back
+{"status":"passed","checks":23}

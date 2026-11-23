@@ -1,0 +1,18 @@
+PASS Production configuration
+PASS Database integrity
+PASS Scoped guardian contacts
+PASS Direct message creation
+PASS Message delivery and visibility
+PASS Block contact
+PASS Blocked sender cannot bypass block
+PASS Unblock contact
+PASS Safety report persistence
+PASS Reports restricted from ordinary users
+PASS Moderator review
+PASS Guardian account deletion
+PASS Guardian identity deleted
+PASS Associated messages deleted
+PASS School learner records preserved
+PASS All temporary verification records rolled back
+No real messages, email or SMS sent.
+

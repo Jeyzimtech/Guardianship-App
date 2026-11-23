@@ -15,7 +15,7 @@ class SmsAndSosTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        config(['services.smspop.token' => 'test-token', 'services.smspop.sender_id' => 'SMSPoP']);
+        config(['services.smspop.token' => 'test-token', 'services.smspop.sender_id' => 'CheweTech']);
         Http::preventStrayRequests();
     }
 
@@ -36,7 +36,7 @@ class SmsAndSosTest extends TestCase
         $code = null;
         Http::assertSent(function ($request) use (&$code) {
             preg_match('/code: (\d{6})/', $request['message'], $matches); $code = $matches[1];
-            return $request['manual_contacts'] === '263771234567' && $request->hasHeader('Authorization', 'Bearer test-token');
+            return $request['sender_id'] === 'CheweTech' && $request['manual_contacts'] === '263771234567' && $request->hasHeader('Authorization', 'Bearer test-token');
         });
         $this->assertNotSame($code, DB::table('phone_otps')->value('code_hash'));
         $this->postJson('/api/auth/phone/verify', ['challenge_id' => $id, 'code' => $code])->assertOk()->assertJsonPath('user.id', $parent->id)->assertJsonStructure(['token']);
@@ -106,7 +106,7 @@ class SmsAndSosTest extends TestCase
         $parent = $this->parentAccount(); $parent->students()->attach($student->id);
         $outsider = User::create(['name' => 'Other', 'role' => 'guardian', 'phone_number' => '0781234567', 'account_uid' => 'other']);
         $this->gateway();
-        $payload = ['request_id' => (string) Str::uuid(), 'message' => 'Contact the school.'];
+        $payload = ['request_id' => (string) Str::uuid(), 'message' => 'Contact the school.', 'student_ids' => [$student->id]];
         $id = $this->actingAs($teacher)->postJson('/api/sos', $payload)->assertCreated()->assertJsonPath('recipients', 1)->assertJsonPath('alert.sms_status', 'accepted')->json('alert.id');
         $this->postJson('/api/sos', $payload)->assertCreated()->assertJsonPath('alert.id', $id);
         Http::assertSentCount(1);
@@ -115,6 +115,10 @@ class SmsAndSosTest extends TestCase
         $this->actingAs($parent)->getJson('/api/sos')->assertJsonCount(1, 'alerts');
         $this->postJson('/api/sos/'.$id.'/acknowledge')->assertOk();
         $this->getJson('/api/sos')->assertJsonCount(0, 'alerts');
+        // Acknowledged alerts stay in the parent's notifications.
+        $this->getJson('/api/sos/history')->assertJsonCount(1, 'alerts')->assertJsonPath('alerts.0.id', $id)->assertJsonPath('alerts.0.teacher_name', 'Teacher');
+        $this->actingAs($outsider)->getJson('/api/sos/history')->assertJsonCount(0, 'alerts');
+        $this->actingAs($parent);
         $this->postJson('/api/sos', $payload)->assertForbidden();
     }
 
@@ -123,8 +127,58 @@ class SmsAndSosTest extends TestCase
         [$teacher, $student] = $this->classroom();
         $parent = $this->parentAccount(); $parent->students()->attach($student->id);
         Http::fake(['*' => Http::response([], 402)]);
-        $this->actingAs($teacher)->postJson('/api/sos', ['request_id' => (string) Str::uuid(), 'message' => 'Emergency'])
+        $this->actingAs($teacher)->postJson('/api/sos', ['request_id' => (string) Str::uuid(), 'message' => 'Emergency', 'student_ids' => [$student->id]])
             ->assertCreated()->assertJsonPath('alert.sms_status', 'unconfirmed');
         $this->actingAs($parent)->getJson('/api/sos')->assertJsonCount(1, 'alerts');
+    }
+
+    public function test_sos_only_reaches_guardians_of_selected_learners(): void
+    {
+        [$teacher, $student] = $this->classroom();
+        $sibling = Student::create(['name' => 'Classmate', 'school_id' => $student->school_id, 'grade' => '1', 'class_name' => 'Blue']);
+        $parent = $this->parentAccount(); $parent->students()->attach($student->id);
+        $other = User::create(['name' => 'Other', 'role' => 'guardian', 'phone_number' => '0781234567', 'account_uid' => 'other']);
+        $other->students()->attach($sibling->id);
+        $elsewhere = Student::create(['name' => 'Elsewhere', 'school_id' => $student->school_id, 'grade' => '2', 'class_name' => 'Red']);
+        $this->gateway();
+        $this->actingAs($teacher)->postJson('/api/sos', ['request_id' => (string) Str::uuid(), 'message' => 'Emergency', 'student_ids' => [$elsewhere->id]])->assertForbidden();
+        $this->postJson('/api/sos', ['request_id' => (string) Str::uuid(), 'message' => 'Emergency', 'student_ids' => [$student->id]])
+            ->assertCreated()->assertJsonPath('recipients', 1);
+        Http::assertSent(fn ($request) => $request['manual_contacts'] === '263771234567');
+        $this->actingAs($other)->getJson('/api/sos')->assertJsonCount(0, 'alerts');
+        $this->actingAs($parent)->getJson('/api/sos')->assertJsonCount(1, 'alerts');
+    }
+
+    public function test_sos_requires_selection_or_explicit_all_parents(): void
+    {
+        [$teacher, $student] = $this->classroom();
+        $sibling = Student::create(['name' => 'Classmate', 'school_id' => $student->school_id, 'grade' => '1', 'class_name' => 'Blue']);
+        $this->parentAccount()->students()->attach($student->id);
+        User::create(['name' => 'Other', 'role' => 'guardian', 'phone_number' => '0781234567', 'account_uid' => 'other'])->students()->attach($sibling->id);
+        $this->gateway();
+        $this->withoutMiddleware(\Illuminate\Routing\Middleware\ThrottleRequests::class);
+        $this->actingAs($teacher)->postJson('/api/sos', ['request_id' => (string) Str::uuid(), 'message' => 'Emergency'])->assertUnprocessable();
+        $this->postJson('/api/sos', ['request_id' => (string) Str::uuid(), 'message' => 'Emergency', 'student_ids' => [$student->id, $sibling->id]])->assertUnprocessable();
+        Http::assertNothingSent();
+        $this->postJson('/api/sos', ['request_id' => (string) Str::uuid(), 'message' => 'Emergency', 'audience' => 'all'])
+            ->assertCreated()->assertJsonPath('recipients', 2);
+    }
+
+    public function test_sos_can_target_one_named_parent_even_when_a_child_has_two_guardians(): void
+    {
+        [$teacher, $student] = $this->classroom();
+        $one = $this->parentAccount(); $one->students()->attach($student->id);
+        $two = User::create(['name' => 'Other guardian', 'role' => 'guardian', 'phone_number' => '0781234567', 'account_uid' => 'two']);
+        $two->students()->attach($student->id);
+        $outsider = User::create(['name' => 'Outside', 'role' => 'guardian', 'phone_number' => '0789999999', 'account_uid' => 'outside']);
+        $this->gateway();
+        $this->actingAs($teacher)->postJson('/api/sos', ['request_id' => (string) Str::uuid(), 'message' => 'Please contact school.', 'guardian_ids' => [$outsider->id]])->assertForbidden();
+        $this->postJson('/api/sos', ['request_id' => (string) Str::uuid(), 'message' => 'Please contact school.', 'guardian_ids' => [$one->id]])
+            ->assertCreated()->assertJsonPath('recipients', 1);
+        Http::assertSentCount(1);
+        Http::assertSent(fn ($request) => $request['manual_contacts'] === '263771234567');
+        $this->actingAs($two)->getJson('/api/sos')->assertJsonCount(0, 'alerts');
+        $this->actingAs($outsider)->getJson('/api/sos')->assertJsonCount(0, 'alerts');
+        $this->actingAs($one)->getJson('/api/sos')->assertJsonCount(1, 'alerts');
     }
 }

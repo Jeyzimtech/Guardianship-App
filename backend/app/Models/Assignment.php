@@ -24,6 +24,11 @@ class Assignment extends Model
         return $this->belongsTo(SchoolClass::class);
     }
 
+    public function document()
+    {
+        return $this->hasOne(SchoolDocument::class);
+    }
+
     public function createdBy()
     {
         return $this->belongsTo(User::class, 'created_by');

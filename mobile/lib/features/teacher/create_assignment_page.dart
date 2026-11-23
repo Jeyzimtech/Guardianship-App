@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:dio/dio.dart';
+import 'package:file_picker/file_picker.dart';
 import '../../core/api_client.dart';
 import '../../core/app_colors.dart';
 
@@ -23,6 +25,45 @@ class _CreateAssignmentPageState extends State<CreateAssignmentPage> {
   DateTime? _due;
   bool _saving = false;
   String? _error;
+  PlatformFile? _file;
+
+  Future<void> _chooseFile() async {
+    try {
+      final file = await FilePicker.pickFile(
+        type: FileType.custom,
+        allowedExtensions: [
+          'pdf',
+          'doc',
+          'docx',
+          'xls',
+          'xlsx',
+          'ppt',
+          'pptx',
+          'txt',
+        ],
+      );
+      if (file == null || !mounted) return;
+      final length = await file.length();
+      if (!mounted) return;
+      if (length == null || length > 10 * 1024 * 1024) {
+        setState(
+          () => _error = 'Choose a readable document no larger than 10 MB.',
+        );
+        return;
+      }
+      setState(() {
+        _file = file;
+        _error = null;
+      });
+    } catch (_) {
+      if (mounted) {
+        setState(
+          () => _error = 'Could not open this file. Please choose it again.',
+        );
+      }
+    }
+  }
+
   @override
   void dispose() {
     _title.dispose();
@@ -42,15 +83,22 @@ class _CreateAssignmentPageState extends State<CreateAssignmentPage> {
       _error = null;
     });
     try {
+      final data = <String, dynamic>{
+        'school_class_id': _classId,
+        'title': _title.text.trim(),
+        'subject_name': _subject.text.trim(),
+        'description': _description.text.trim(),
+        'due_date': _due!.toIso8601String().split('T').first,
+      };
+      if (_file != null) {
+        data['file'] = MultipartFile.fromBytes(
+          await _file!.readAsBytes(),
+          filename: _file!.name,
+        );
+      }
       final response = await widget.api.dio.post(
         '/assignments',
-        data: {
-          'school_class_id': _classId,
-          'title': _title.text.trim(),
-          'subject_name': _subject.text.trim(),
-          'description': _description.text.trim(),
-          'due_date': _due!.toIso8601String().split('T').first,
-        },
+        data: _file == null ? data : FormData.fromMap(data),
       );
       if (response.data['status'] != 'success') throw StateError('Save failed');
       if (mounted) Navigator.pop(context, true);
@@ -122,7 +170,8 @@ class _CreateAssignmentPageState extends State<CreateAssignmentPage> {
                   labelText: field.$2,
                   alignLabelWithHint: true,
                 ),
-                validator: (v) => v == null || v.trim().isEmpty
+                validator: (v) =>
+                    field.$1 != _description && (v == null || v.trim().isEmpty)
                     ? '${field.$2} is required'
                     : null,
               ),
@@ -149,6 +198,21 @@ class _CreateAssignmentPageState extends State<CreateAssignmentPage> {
                     },
             ),
             const SizedBox(height: 24),
+            const Text(
+              'Optional attachment: PDF, Word, Excel, PowerPoint or text (up to 10 MB).',
+            ),
+            const SizedBox(height: 8),
+            OutlinedButton.icon(
+              onPressed: _saving ? null : _chooseFile,
+              icon: const Icon(Icons.attach_file),
+              label: Text(_file?.name ?? 'Attach homework document'),
+            ),
+            if (_file != null)
+              TextButton(
+                onPressed: _saving ? null : () => setState(() => _file = null),
+                child: const Text('Remove attachment'),
+              ),
+            const SizedBox(height: 16),
             if (_error != null)
               Padding(
                 padding: const EdgeInsets.only(bottom: 16),

@@ -4,7 +4,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:guardianship/core/api_client.dart';
 import 'package:guardianship/core/auth_provider.dart';
 import 'package:guardianship/core/student_provider.dart';
-import 'package:guardianship/features/parent/fee_payments_view.dart';
 import 'package:guardianship/features/teacher/teacher_publish_page.dart';
 import 'package:guardianship/features/parent/uniform_marketplace_view.dart';
 import 'package:provider/provider.dart';
@@ -193,56 +192,4 @@ void main() {
     expect(find.byType(FilledButton), findsNothing);
     expect(tester.takeException(), isNull);
   });
-
-  testWidgets(
-    'Fee references remain pending and do not lower the displayed balance',
-    (tester) async {
-      final api = ApiClient();
-      Map<String, dynamic>? posted;
-      api.dio.interceptors.add(
-        InterceptorsWrapper(
-          onRequest: (o, h) {
-            if (o.method == 'POST') posted = Map<String, dynamic>.from(o.data);
-            h.resolve(
-              Response(
-                requestOptions: o,
-                statusCode: o.method == 'POST' ? 202 : 200,
-                data: {
-                  'fee_account': {
-                    'balance_usd': '100.00',
-                    'balance_zig': '0.00',
-                  },
-                  'transactions': posted == null
-                      ? []
-                      : [
-                          {
-                            'amount': 10,
-                            'currency': 'USD',
-                            'status': 'pending',
-                            'reference': 'receipt-123',
-                          },
-                        ],
-                },
-              ),
-            );
-          },
-        ),
-      );
-      await mount(tester, const FeePaymentsView(child: {'id': 1}), api);
-      if (const bool.fromEnvironment('CAPTURE_PREVIEW')) {
-        await preview(tester, 'parent-fees');
-      }
-      await tester.enterText(find.byType(TextFormField).first, '10');
-      await tester.enterText(find.byType(TextFormField).last, 'receipt-123');
-      await tester.ensureVisible(find.text('Submit reference'));
-      await tester.tap(find.text('Submit reference'));
-      await tester.pumpAndSettle();
-      expect(posted?['student_id'], 1);
-      expect(posted?['reference'], 'receipt-123');
-      expect(find.textContaining('100.00'), findsOneWidget);
-      await tester.ensureVisible(find.textContaining('10 · pending'));
-      expect(find.textContaining('10 · pending'), findsOneWidget);
-      expect(tester.takeException(), isNull);
-    },
-  );
 }

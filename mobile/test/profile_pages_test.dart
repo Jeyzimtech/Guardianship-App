@@ -64,7 +64,8 @@ void main() {
           scale: 1.3,
         );
         expect(find.text('Grace Moyo'), findsOneWidget);
-        for (var i = 0; i < 6; i++) {
+        // Scroll to the bottom, past the Help & legal section, to the log out button.
+        for (var i = 0; i < 10; i++) {
           await tester.drag(find.byType(ListView).first, const Offset(0, -400));
           await tester.pumpAndSettle();
           expect(tester.takeException(), isNull);

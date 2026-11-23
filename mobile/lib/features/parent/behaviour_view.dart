@@ -20,6 +20,8 @@ class _BehaviourViewState extends State<BehaviourView> {
   List<Map<String, dynamic>> _activities = [];
   bool _loading = true;
   String? _error;
+  // Chosen child when the parent switches here; starts from the page argument.
+  Map<String, dynamic>? _child;
 
   @override
   void initState() {
@@ -29,7 +31,8 @@ class _BehaviourViewState extends State<BehaviourView> {
 
   Future<void> _load() async {
     final provider = context.read<StudentProvider>();
-    final studentId = widget.child?['id'] ?? provider.selectedStudent?['id'];
+    _child ??= widget.child ?? provider.selectedStudent;
+    final studentId = _child?['id'];
     if (studentId == null) { if (mounted) setState(() => _loading = false); return; }
     setState(() { _loading = true; _error = null; });
     try {
@@ -43,6 +46,16 @@ class _BehaviourViewState extends State<BehaviourView> {
     } catch (_) { if (mounted) setState(() => _error = 'Could not load behaviour records.'); }
     finally { if (mounted) setState(() => _loading = false); }
   }
+  Future<void> _switchChild(Map<String, dynamic> child) async {
+    setState(() {
+      _child = child;
+      _incidents = [];
+      _activities = [];
+    });
+    context.read<StudentProvider>().selectStudent(child);
+    await _load();
+  }
+
   @override
   void dispose() {
     _search.dispose();
@@ -51,6 +64,9 @@ class _BehaviourViewState extends State<BehaviourView> {
 
   @override
   Widget build(BuildContext context) {
+    final children = [
+      for (final c in context.watch<StudentProvider>().students) Map<String, dynamic>.from(c),
+    ];
     final merits = _incidents.where((i) => i['polarity'] == 'positive').length;
     final notes = _incidents.length - merits;
     final points = merits;
@@ -76,9 +92,17 @@ class _BehaviourViewState extends State<BehaviourView> {
             PageHeading(
               title: 'Behaviour & merits',
               subtitle:
-                  '${widget.child?['name'] ?? 'Your child'} · Celebrating growth, every day.',
+                  '${_child?['name'] ?? widget.child?['name'] ?? 'Your child'} · Celebrating growth, every day.',
               symbol: AppSymbol.student,
             ),
+            if (children.length > 1) ...[
+              PageFilters(
+                labels: [for (final c in children) c['name'].toString()],
+                selected: _child?['name']?.toString() ?? '',
+                onSelected: (name) => _switchChild(children.firstWhere((c) => c['name'].toString() == name)),
+              ),
+              const SizedBox(height: 20),
+            ],
             PageCard(
               color: AppColors.primaryDark,
               child: Column(

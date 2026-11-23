@@ -30,17 +30,32 @@ class _AttendanceViewState extends State<AttendanceView> {
     final provider = context.read<StudentProvider>();
     final studentId = provider.selectedStudent?['id'];
     if (studentId == null) {
-      if (mounted) setState(() { _loading = false; _attendanceRecords = []; });
+      if (mounted) {
+        setState(() {
+          _loading = false;
+          _attendanceRecords = [];
+        });
+      }
       return;
     }
-    setState(() { _loading = true; _loadError = null; });
+    setState(() {
+      _loading = true;
+      _loadError = null;
+    });
     try {
-      final response = await provider.apiClient.dio.get('/attendance/$studentId');
-      final rows = (response.data['attendance'] as List? ?? []).map((row) {
+      final records = await provider.fetchAttendance(studentId);
+      records.sort(
+        (a, b) => (b['date']?.toString() ?? '').compareTo(
+          a['date']?.toString() ?? '',
+        ),
+      );
+      final rows = records.map((row) {
         final record = Map<String, dynamic>.from(row);
         final date = DateTime.tryParse(record['date']?.toString() ?? '');
         return <String, dynamic>{
-          'date': date == null ? '' : '${date.day} ${_month(date.month)} ${date.year}',
+          'date': date == null
+              ? ''
+              : '${date.day} ${_month(date.month)} ${date.year}',
           'status': record['status'].toString().toUpperCase(),
           'remarks': record['subject_name'] ?? '',
         };
@@ -53,7 +68,20 @@ class _AttendanceViewState extends State<AttendanceView> {
     }
   }
 
-  String _month(int month) => const ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][month - 1];
+  String _month(int month) => const [
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'May',
+    'Jun',
+    'Jul',
+    'Aug',
+    'Sep',
+    'Oct',
+    'Nov',
+    'Dec',
+  ][month - 1];
   @override
   void dispose() {
     _searchController.dispose();
@@ -110,7 +138,9 @@ class _AttendanceViewState extends State<AttendanceView> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    _attendanceRecords.isEmpty ? 'ATTENDANCE SUMMARY' : 'LATEST ATTENDANCE',
+                    _attendanceRecords.isEmpty
+                        ? 'ATTENDANCE SUMMARY'
+                        : 'LATEST ATTENDANCE',
                     style: TextStyle(
                       color: Colors.white70,
                       fontSize: 12,
@@ -119,7 +149,7 @@ class _AttendanceViewState extends State<AttendanceView> {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    '${(rate * 100).toStringAsFixed(1)}%',
+                    '${(rate * 100).round()}%',
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 44,
@@ -148,7 +178,8 @@ class _AttendanceViewState extends State<AttendanceView> {
                 ],
               ),
             ),
-            if (_loadError != null) Text(_loadError!, style: const TextStyle(color: AppColors.error)),
+            if (_loadError != null)
+              Text(_loadError!, style: const TextStyle(color: AppColors.error)),
             if (_loading) const Center(child: CircularProgressIndicator()),
             const SizedBox(height: 16),
             PageCard(
@@ -184,7 +215,8 @@ class _AttendanceViewState extends State<AttendanceView> {
                 ],
               ),
             ),
-            if (_loadError != null) Text(_loadError!, style: const TextStyle(color: AppColors.error)),
+            if (_loadError != null)
+              Text(_loadError!, style: const TextStyle(color: AppColors.error)),
             if (_loading) const Center(child: CircularProgressIndicator()),
             const SizedBox(height: 28),
             const Text(

@@ -1,0 +1,113 @@
+{
+  "cases": 200,
+  "processes": 23,
+  "totalRow": 28,
+  "summary": [
+    [
+      "TOTAL",
+      200,
+      0,
+      0,
+      0,
+      200,
+      0,
+      0,
+      0,
+      0
+    ]
+  ],
+  "modules": [
+    [
+      "Installation & environment",
+      6
+    ],
+    [
+      "Authentication & sessions",
+      14
+    ],
+    [
+      "Platform & school setup",
+      9
+    ],
+    [
+      "Staff & subject assignment",
+      6
+    ],
+    [
+      "Student enrolment & links",
+      12
+    ],
+    [
+      "Parent profile & child selection",
+      6
+    ],
+    [
+      "Student photographs",
+      7
+    ],
+    [
+      "Medical information",
+      5
+    ],
+    [
+      "Teacher attendance register",
+      11
+    ],
+    [
+      "Merits & demerits",
+      5
+    ],
+    [
+      "Activities & participation",
+      7
+    ],
+    [
+      "Homework & assignments",
+      7
+    ],
+    [
+      "Journals & wellbeing",
+      12
+    ],
+    [
+      "Student reports & files",
+      8
+    ],
+    [
+      "Notices & announcements",
+      8
+    ],
+    [
+      "Messaging & delivery receipts",
+      16
+    ],
+    [
+      "Phone notifications & badges",
+      14
+    ],
+    [
+      "SMS alerts & emergency SOS",
+      6
+    ],
+    [
+      "Fees & payment verification",
+      7
+    ],
+    [
+      "Uniform catalogue & orders",
+      10
+    ],
+    [
+      "PesePay checkout & callbacks",
+      8
+    ],
+    [
+      "Subscriptions & access control",
+      8
+    ],
+    [
+      "Performance, resilience & usability",
+      8
+    ]
+  ]
+}

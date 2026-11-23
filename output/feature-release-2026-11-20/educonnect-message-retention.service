@@ -1,0 +1,8 @@
+[Unit]
+Description=Remove EduConnect messages older than seven days
+
+[Service]
+Type=oneshot
+User=www-data
+WorkingDirectory=/var/www/guardianship/backend
+ExecStart=/usr/bin/php artisan messages:prune

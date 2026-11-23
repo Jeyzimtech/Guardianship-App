@@ -4,8 +4,8 @@ Deploy directly through SSH/SFTP using the existing `deploy.ps1` script, after
 confirming server access. This does not require GitHub Actions.
 
 Production `.env` must contain `SMSPOP_API_TOKEN` and `SMSPOP_SENDER_ID`. Keep the
-token exclusively on the server. The default shared sender is `SMSPoP`; confirm
-that the account can use it or configure an approved sender before live testing.
+token exclusively on the server. The configured sender is `CheweTech`
+(`SMSPOP_SENDER_ID=CheweTech`), matching the sender selected in the provider account.
 The account needs sufficient SMS credits. Do not put the token in Flutter builds.
 
 Run `php artisan migrate --force` and rebuild the Laravel configuration cache.

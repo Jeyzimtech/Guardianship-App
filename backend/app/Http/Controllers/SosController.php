@@ -13,15 +13,32 @@ class SosController extends Controller
     public function store(Request $request, SmsPop $sms)
     {
         abort_unless($request->user()->role === 'teacher', 403);
-        $data = $request->validate(['message' => 'required|string|max:500', 'request_id' => 'required|uuid']);
+        $data = $request->validate([
+            'message' => 'required|string|max:500', 'request_id' => 'required|uuid',
+            'audience' => 'sometimes|in:selected,all',
+            'student_ids' => 'nullable|array|size:1', 'student_ids.*' => 'integer|distinct',
+            'guardian_ids' => 'nullable|array|size:1', 'guardian_ids.*' => 'integer|distinct',
+        ]);
+        $everyone = ($data['audience'] ?? 'selected') === 'all';
+        abort_if(!$everyone && empty($data['guardian_ids']) && empty($data['student_ids']), 422, 'Select a parent before sending SOS.');
         $teacher = $request->user()->teacherProfile;
         abort_unless($teacher, 403);
-        $alert = DB::transaction(function () use ($request, $teacher, $data) {
+        $alert = DB::transaction(function () use ($request, $teacher, $data, $everyone) {
             $existing = DB::table('sos_alerts')->where('teacher_id', $request->user()->id)->where('request_id', $data['request_id'])->first();
             if ($existing) return $existing;
-            $studentIds = Student::taughtBy($teacher)->pluck('id');
-            $parents = User::where('role', 'guardian')->whereHas('students', fn ($q) => $q->whereIn('students.id', $studentIds))->pluck('id');
-            abort_if($parents->isEmpty(), 422, 'No parents are linked to your assigned classes. Add guardians before sending SOS.');
+            $students = Student::taughtBy($teacher);
+            if (!$everyone && empty($data['guardian_ids'])) {
+                $students->whereIn('id', $data['student_ids']);
+                abort_unless((clone $students)->count() === 1, 403, 'You can only send SOS for a learner in your assigned classes.');
+            }
+            $studentIds = $students->pluck('id');
+            $parents = User::where('role', 'guardian')->whereHas('students', fn ($q) => $q->whereIn('students.id', $studentIds));
+            if (!$everyone && !empty($data['guardian_ids'])) {
+                $parents->whereIn('id', $data['guardian_ids']);
+                abort_unless((clone $parents)->count() === 1, 403, 'Select a parent linked to your assigned classes.');
+            }
+            $parents = $parents->pluck('id');
+            abort_if($parents->isEmpty(), 422, 'No guardians are linked to this selection. Add guardians before sending SOS.');
             $id = DB::table('sos_alerts')->insertGetId([
                 'teacher_id' => $request->user()->id, 'request_id' => $data['request_id'],
                 'message' => trim($data['message']), 'created_at' => now(), 'updated_at' => now(),
@@ -59,9 +76,21 @@ class SosController extends Controller
         abort_unless($request->user()->role === 'guardian', 403);
         $alerts = DB::table('sos_recipients')->join('sos_alerts', 'sos_alerts.id', '=', 'sos_recipients.sos_alert_id')
             ->join('users', 'users.id', '=', 'sos_alerts.teacher_id')
-            ->where('guardian_id', $request->user()->id)->whereNull('acknowledged_at')
+            ->where('guardian_id', $request->user()->id)->whereNotIn('sos_alerts.id', \App\Services\MobileUpdates::dismissedIds($request->user(), 'sos'))->whereNull('acknowledged_at')
             ->select('sos_alerts.id', 'sos_alerts.message', 'sos_alerts.created_at', 'users.name as teacher_name')
             ->orderBy('sos_alerts.id')->limit(50)->get();
+        return response()->json(['alerts' => $alerts]);
+    }
+
+    /** Every alert this guardian received, kept for the notifications list after acknowledgement. */
+    public function history(Request $request)
+    {
+        abort_unless($request->user()->role === 'guardian', 403);
+        $alerts = DB::table('sos_recipients')->join('sos_alerts', 'sos_alerts.id', '=', 'sos_recipients.sos_alert_id')
+            ->join('users', 'users.id', '=', 'sos_alerts.teacher_id')
+            ->where('guardian_id', $request->user()->id)->whereNotIn('sos_alerts.id', \App\Services\MobileUpdates::dismissedIds($request->user(), 'sos'))
+            ->select('sos_alerts.id', 'sos_alerts.message', 'sos_alerts.created_at', 'users.name as teacher_name', 'sos_recipients.acknowledged_at', 'sos_alerts.sms_status')
+            ->orderByDesc('sos_alerts.id')->limit(50)->get();
         return response()->json(['alerts' => $alerts]);
     }
 
